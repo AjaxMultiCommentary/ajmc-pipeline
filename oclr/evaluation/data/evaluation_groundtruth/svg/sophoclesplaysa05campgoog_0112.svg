@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" id="svg" width="500" height="829.042904290429045408">
+                                            <image xmlns:xlink="http://www.w3.org/1999/xlink" id="page_image" x="0" y="0" width="500" height="829.042904290429045408" data-scale="0.165016501650165017" xlink:href="/exist/rest/db/apps/sophoclesplaysa05campgoog/sophoclesplaysa05campgoog_0112.png"/>
+                                            <rect id="svg_focus_rect" x="111.05610561056106" y="271.78217821782175" height="17.821782178217823" width="27.06270627062706" fill-opacity="0.4" style="fill: #aaffff; stroke: #aaffff; stroke-width: 1; stroke-opacity: 0.5" visibility="hidden" data-original-title="" title=""/>
+                                        
+                                            
+                                            
+                                            <rect x="59.24092409240924" y="336.13861386138615" id="app_crit_1612388500465_rectangle" class="app_crit_rectangle rectangle" data-rectangle-type="app_crit" data-rectangle-line-mode="false" fill-opacity="0.0" width="397.6897689768977" height="85.8085808580858" data-rectangle-ordinal="1" title="app_crit Zone 1" data-original-title="app_crit zone 1"/>
+                                            <circle cx="59.24092409240924" cy="336.13861386138615" r="3" id="app_crit_1612388500465_start_circle" class="app_crit_circle"/>
+                                            <circle cx="456.9306930693069" cy="421.94719471947195" r="3" id="app_crit_1612388500465_finish_circle" class="app_crit_circle"/>
+                                            <rect x="212.04620462046205" y="62.37623762376238" id="title_1612388505513_rectangle" class="title_rectangle rectangle" data-rectangle-type="title" data-rectangle-line-mode="false" fill-opacity="0.0" width="93.23432343234323" height="11.221122112211221" data-rectangle-ordinal="2" title="title Zone 2" data-original-title="title zone 2"/>
+                                            <circle cx="212.04620462046205" cy="62.37623762376238" r="3" id="title_1612388505513_start_circle" class="title_circle"/>
+                                            <circle cx="305.28052805280527" cy="73.5973597359736" r="3" id="title_1612388505513_finish_circle" class="title_circle"/>
+                                            <rect x="63.53135313531353" y="63.2013201320132" id="page_number_1612388509095_rectangle" class="page_number_rectangle rectangle" data-rectangle-type="page_number" data-rectangle-line-mode="false" fill-opacity="0.0" width="7.590759075907591" height="10.396039603960396" data-rectangle-ordinal="3" title="page_number Zone 3" data-original-title="page_number zone 3"/>
+                                            <circle cx="63.53135313531353" cy="63.2013201320132" r="3" id="page_number_1612388509095_start_circle" class="page_number_circle"/>
+                                            <circle cx="71.12211221122112" cy="73.5973597359736" r="3" id="page_number_1612388509095_finish_circle" class="page_number_circle"/>
+                                            <rect x="59.73597359735974" y="454.62046204620464" id="commentary_1612388513983_rectangle" class="commentary_rectangle rectangle" data-rectangle-type="commentary" data-rectangle-line-mode="false" fill-opacity="0.0" width="190.92409240924093" height="290.42904290429044" data-rectangle-ordinal="4" title="commentary Zone 4" data-original-title="commentary zone 4"/>
+                                            <circle cx="59.73597359735974" cy="454.62046204620464" r="3" id="commentary_1612388513983_start_circle" class="commentary_circle"/>
+                                            <circle cx="250.66006600660066" cy="745.049504950495" r="3" id="commentary_1612388513983_finish_circle" class="commentary_circle"/>
+                                            <rect x="266.5016501650165" y="455.44554455445547" id="commentary_1612388518429_rectangle" class="commentary_rectangle rectangle" data-rectangle-type="commentary" data-rectangle-line-mode="false" fill-opacity="0.0" width="191.0891089108911" height="289.4389438943894" data-rectangle-ordinal="5" title="commentary Zone 5" data-original-title="commentary zone 5"/>
+                                            <circle cx="266.5016501650165" cy="455.44554455445547" r="3" id="commentary_1612388518429_start_circle" class="commentary_circle"/>
+                                            <circle cx="457.5907590759076" cy="744.8844884488449" r="3" id="commentary_1612388518429_finish_circle" class="commentary_circle"/>
+                                        <rect x="62.54125412541254" y="88.77887788778878" id="primary_text_1615802560920_rectangle" class="primary_text_rectangle rectangle" data-rectangle-type="primary_text" data-rectangle-line-mode="true" fill-opacity="0.0" width="393.7293729372937" height="238.77887788778878" data-rectangle-ordinal="6" title="" data-original-title="primary_text Zone 6"/>
+    <circle cx="62.54125412541254" cy="88.77887788778878" r="3" id="primary_text_1615802560920_start_circle" class="primary_text_circle"/>
+    <circle cx="456.27062706270624" cy="327.55775577557756" r="3" id="primary_text_1615802560920_finish_circle" class="primary_text_circle"/>
+</svg>

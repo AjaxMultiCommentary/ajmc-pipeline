@@ -1,0 +1,25 @@
+# OSX
+**/.DS_Store
+.DS_Store
+*.swp
+*~.nib
+icon?
+
+**/Icon?
+**/**/icon?
+
+
+# Drive
+.tmp*
+
+# Thumbnails
+._*
+
+# Pycharm
+.idea/
+
+# Others
+workbench.py
+
+
+

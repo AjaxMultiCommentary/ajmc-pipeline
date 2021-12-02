@@ -1,0 +1,1682 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pc:PcGts xmlns:pc="http://schema.primaresearch.org/PAGE/gts/pagecontent/2019-07-15" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schema.primaresearch.org/PAGE/gts/pagecontent/2019-07-15 http://schema.primaresearch.org/PAGE/gts/pagecontent/2019-07-15/pagecontent.xsd" pcGtsId="OCR-D-OCR_sophoclesplaysa05campgoog_0012">
+    <pc:Metadata>
+        <pc:Creator>OCR-D/core 2.21.0</pc:Creator>
+        <pc:Created>2021-02-23T21:05:40.627580</pc:Created>
+        <pc:LastChange>2021-02-23T21:05:40.627580</pc:LastChange>
+        <pc:MetadataItem type="processingStep" name="preprocessing/optimization/binarization" value="ocrd-cis-ocropy-binarize">
+            <pc:Labels externalModel="ocrd-tool" externalId="parameters">
+                <pc:Label value="ocropy" type="method"/>
+                <pc:Label value="0.5" type="threshold"/>
+                <pc:Label value="False" type="grayscale"/>
+                <pc:Label value="0.0" type="maxskew"/>
+                <pc:Label value="0" type="noise_maxsize"/>
+                <pc:Label value="0" type="dpi"/>
+                <pc:Label value="page" type="level-of-operation"/>
+            </pc:Labels>
+            <pc:Labels externalModel="ocrd-tool" externalId="version">
+                <pc:Label value="0.1.5" type="ocrd-cis-ocropy-binarize"/>
+                <pc:Label value="2.21.0" type="ocrd/core"/>
+            </pc:Labels>
+        </pc:MetadataItem>
+        <pc:MetadataItem type="processingStep" name="preprocessing/optimization/cropping" value="ocrd-anybaseocr-crop">
+            <pc:Labels externalModel="ocrd-tool" externalId="parameters">
+                <pc:Label value="0.04" type="colSeparator"/>
+                <pc:Label value="0.3" type="maxRularArea"/>
+                <pc:Label value="0.05" type="minArea"/>
+                <pc:Label value="0.01" type="minRularArea"/>
+                <pc:Label value="0.75" type="positionBelow"/>
+                <pc:Label value="0.4" type="positionLeft"/>
+                <pc:Label value="0.6" type="positionRight"/>
+                <pc:Label value="10.0" type="rularRatioMax"/>
+                <pc:Label value="3.0" type="rularRatioMin"/>
+                <pc:Label value="0.95" type="rularWidth"/>
+                <pc:Label value="10" type="padding"/>
+            </pc:Labels>
+            <pc:Labels externalModel="ocrd-tool" externalId="version">
+                <pc:Label value="1.1.0" type="ocrd-anybaseocr-crop"/>
+                <pc:Label value="2.21.0" type="ocrd/core"/>
+            </pc:Labels>
+        </pc:MetadataItem>
+        <pc:MetadataItem type="processingStep" name="preprocessing/optimization/binarization" value="ocrd-skimage-binarize">
+            <pc:Labels externalModel="ocrd-tool" externalId="parameters">
+                <pc:Label value="li" type="method"/>
+                <pc:Label value="page" type="level-of-operation"/>
+                <pc:Label value="0" type="dpi"/>
+                <pc:Label value="0" type="window_size"/>
+                <pc:Label value="0.34" type="k"/>
+            </pc:Labels>
+            <pc:Labels externalModel="ocrd-tool" externalId="version">
+                <pc:Label value="0.1.4" type="ocrd-skimage-binarize"/>
+                <pc:Label value="2.21.0" type="ocrd/core"/>
+            </pc:Labels>
+        </pc:MetadataItem>
+        <pc:MetadataItem type="processingStep" name="preprocessing/optimization/despeckling" value="ocrd-skimage-denoise">
+            <pc:Labels externalModel="ocrd-tool" externalId="parameters">
+                <pc:Label value="page" type="level-of-operation"/>
+                <pc:Label value="0" type="dpi"/>
+                <pc:Label value="3" type="maxsize"/>
+            </pc:Labels>
+            <pc:Labels externalModel="ocrd-tool" externalId="version">
+                <pc:Label value="0.1.4" type="ocrd-skimage-denoise"/>
+                <pc:Label value="2.21.0" type="ocrd/core"/>
+            </pc:Labels>
+        </pc:MetadataItem>
+        <pc:MetadataItem type="processingStep" name="preprocessing/optimization/deskewing" value="ocrd-tesserocr-deskew">
+            <pc:Labels externalModel="ocrd-tool" externalId="parameters">
+                <pc:Label value="page" type="operation_level"/>
+                <pc:Label value="0" type="dpi"/>
+                <pc:Label value="1.5" type="min_orientation_confidence"/>
+            </pc:Labels>
+            <pc:Labels externalModel="ocrd-tool" externalId="version">
+                <pc:Label value="0.10.1" type="ocrd-tesserocr-deskew"/>
+                <pc:Label value="2.21.0" type="ocrd/core"/>
+            </pc:Labels>
+        </pc:MetadataItem>
+        <pc:MetadataItem type="processingStep" name="layout/segmentation/region" value="ocrd-cis-ocropy-segment">
+            <pc:Labels externalModel="ocrd-tool" externalId="parameters">
+                <pc:Label value="page" type="level-of-operation"/>
+                <pc:Label value="0" type="dpi"/>
+                <pc:Label value="20" type="maxcolseps"/>
+                <pc:Label value="20" type="maxseps"/>
+                <pc:Label value="10" type="maximages"/>
+                <pc:Label value="4" type="csminheight"/>
+                <pc:Label value="10" type="hlminwidth"/>
+                <pc:Label value="0.01" type="gap_height"/>
+                <pc:Label value="1.5" type="gap_width"/>
+                <pc:Label value="True" type="overwrite_order"/>
+                <pc:Label value="True" type="overwrite_separators"/>
+                <pc:Label value="True" type="overwrite_regions"/>
+                <pc:Label value="True" type="overwrite_lines"/>
+                <pc:Label value="2.4" type="spread"/>
+            </pc:Labels>
+            <pc:Labels externalModel="ocrd-tool" externalId="version">
+                <pc:Label value="0.1.5" type="ocrd-cis-ocropy-segment"/>
+                <pc:Label value="2.21.0" type="ocrd/core"/>
+            </pc:Labels>
+        </pc:MetadataItem>
+        <pc:MetadataItem type="processingStep" name="preprocessing/optimization/dewarping" value="ocrd-cis-ocropy-dewarp">
+            <pc:Labels externalModel="ocrd-tool" externalId="parameters">
+                <pc:Label value="0" type="dpi"/>
+                <pc:Label value="4.0" type="range"/>
+                <pc:Label value="1.0" type="smoothness"/>
+                <pc:Label value="0.05" type="max_neighbour"/>
+            </pc:Labels>
+            <pc:Labels externalModel="ocrd-tool" externalId="version">
+                <pc:Label value="0.1.5" type="ocrd-cis-ocropy-dewarp"/>
+                <pc:Label value="2.21.0" type="ocrd/core"/>
+            </pc:Labels>
+        </pc:MetadataItem>
+        <pc:MetadataItem type="processingStep" name="recognition/text-recognition" value="ocrd-calamari-recognize">
+            <pc:Labels externalModel="ocrd-tool" externalId="parameters">
+                <pc:Label value="/data/calamari_model/*.ckpt.json" type="checkpoint"/>
+                <pc:Label value="word" type="textequiv_level"/>
+                <pc:Label value="confidence_voter_default_ctc" type="voter"/>
+                <pc:Label value="0.001" type="glyph_conf_cutoff"/>
+            </pc:Labels>
+        </pc:MetadataItem>
+    </pc:Metadata>
+    <pc:Page imageFilename="OCR-D-IMG/sophoclesplaysa05campgoog_0012.tif" imageWidth="3030" imageHeight="5024" orientation="-0.271255173234522" readingDirection="left-to-right" textLineOrder="top-to-bottom">
+        <pc:AlternativeImage filename="OCR-D-BIN/OCR-D-BIN_sophoclesplaysa05campgoog_0012.IMG-BIN.png" comments=",binarized"/>
+        <pc:AlternativeImage filename="OCR-D-CROP/OCR-D-CROP_sophoclesplaysa05campgoog_0012-IMG.png" comments=",binarized,cropped"/>
+        <pc:AlternativeImage filename="OCR-D-BIN2/OCR-D-BIN2_sophoclesplaysa05campgoog_0012.IMG-BIN.png" comments=",cropped,binarized"/>
+        <pc:AlternativeImage filename="OCR-D-BIN-DENOISE/OCR-D-BIN-DENOISE_sophoclesplaysa05campgoog_0012.IMG-DEN.png" comments=",cropped,binarized,despeckled"/>
+        <pc:AlternativeImage filename="OCR-D-BIN-DENOISE-DESKEW/OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012.IMG-DESKEW.png" comments=",cropped,binarized,despeckled,deskewed"/>
+        <pc:AlternativeImage filename="OCR-D-SEG/OCR-D-SEG_sophoclesplaysa05campgoog_0012.IMG-CLIP.png" comments=",cropped,binarized,despeckled,deskewed,clipped"/>
+        <pc:Border>
+            <pc:Coords points="286,818 2727,818 2727,4318 286,4318"/>
+        </pc:Border>
+        <pc:ReadingOrder>
+            <pc:OrderedGroup id="reading-order">
+                <pc:RegionRefIndexed index="0" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0001"/>
+                <pc:RegionRefIndexed index="1" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002"/>
+                <pc:RegionRefIndexed index="2" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003"/>
+                <pc:RegionRefIndexed index="3" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0004"/>
+                <pc:RegionRefIndexed index="4" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005"/>
+                <pc:RegionRefIndexed index="5" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0006"/>
+                <pc:RegionRefIndexed index="6" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0007"/>
+                <pc:RegionRefIndexed index="7" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0008"/>
+                <pc:RegionRefIndexed index="8" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0009"/>
+                <pc:RegionRefIndexed index="9" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0010"/>
+                <pc:RegionRefIndexed index="10" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0011"/>
+                <pc:RegionRefIndexed index="11" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0012"/>
+                <pc:RegionRefIndexed index="12" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0013"/>
+                <pc:RegionRefIndexed index="13" regionRef="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0014"/>
+            </pc:OrderedGroup>
+        </pc:ReadingOrder>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0001">
+            <pc:Coords points="1160,818 1113,820 1104,825 1104,875 1120,901 1141,904 1690,908 1874,905 1880,898 1888,873 1888,822 1884,818"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0001_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0001_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0001_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="1172,818 1116,820 1111,820 1106,823 1104,826 1104,875 1109,880 1117,881 1117,896 1120,901 1141,904 1510,906 1712,907 1874,905 1879,899 1879,878 1888,872 1888,823 1883,818"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0001_line0001_word0000">
+                    <pc:Coords points="1230,815 1814,818 1813,966 1229,963"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>CONTENTS.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.910132944583893">
+                    <pc:Unicode>CONTENTS.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>CONTENTS.</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002">
+            <pc:Coords points="2494,1103 286,1099 286,1208 421,2961 427,3009 692,3010 2592,2910 2618,2907 2622,2895 2727,1405 2727,1117 2677,1104"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2663,1104 2656,1111 2655,1122 2445,1120 2428,1126 2391,1127 2387,1129 2382,1141 2377,1145 2376,1154 2370,1160 914,1153 914,1120 909,1115 460,1113 390,1111 328,1100 286,1099 286,1177 769,1179 908,1174 913,1169 2368,1176 2371,1179 2371,1193 2375,1196 2489,1198 2496,1191 2518,1188 2536,1189 2546,1198 2565,1200 2580,1196 2586,1189 2727,1183 2727,1122 2685,1122 2684,1113 2678,1105"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0001_word0000">
+                    <pc:Coords points="465,2929 1065,2932 1064,3038 465,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>IropvCTioN.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0001_word0001">
+                    <pc:Coords points="2618,2940 2754,2940 2753,3046 2617,3046"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>pPage</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0001_word0002">
+                    <pc:Coords points="2810,2940 2858,2941 2857,3047 2809,3046"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>ix</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.850435376167297">
+                    <pc:Unicode>IropvCTioN. pPage ix</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2367,1215 2342,1230 2318,1231 2297,1223 2290,1234 2274,1237 2217,1237 2214,1226 2207,1221 2195,1221 2190,1226 2187,1236 2098,1236 2047,1235 2044,1223 2036,1218 2027,1218 2020,1223 2000,1221 1995,1225 1992,1234 1969,1230 1958,1224 1937,1219 1828,1218 1807,1221 1787,1235 1757,1237 1731,1235 1727,1228 1718,1222 1698,1219 1589,1219 1570,1222 1551,1218 1543,1222 1540,1230 1507,1235 1497,1234 1494,1223 1486,1218 1387,1218 1370,1223 1360,1234 1306,1228 1304,1222 1296,1216 1281,1217 1274,1225 1237,1225 1229,1218 1213,1217 1201,1226 1155,1233 1118,1234 1050,1233 1047,1221 1041,1217 1025,1218 1018,1231 1010,1231 1001,1219 989,1219 980,1231 942,1233 918,1231 894,1217 859,1213 724,1213 709,1216 698,1228 687,1231 670,1229 636,1218 505,1216 483,1217 478,1222 478,1271 483,1276 503,1276 504,1294 510,1301 534,1304 584,1304 592,1310 605,1310 615,1304 668,1297 713,1295 1010,1297 1017,1308 1030,1310 1037,1308 1046,1297 1063,1296 1475,1295 1582,1296 1617,1306 1655,1306 1663,1312 1676,1312 1686,1306 1736,1299 1815,1297 1865,1301 1918,1301 1920,1308 1929,1314 1945,1311 1953,1301 2085,1299 2140,1301 2143,1309 2149,1313 2172,1313 2178,1308 2180,1300 2611,1298 2626,1297 2631,1292 2631,1243 2626,1238 2524,1236 2504,1233 2486,1223 2469,1219"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0000">
+                    <pc:Coords points="548,2930 662,2930 662,3036 548,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§1.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0001">
+                    <pc:Coords points="776,2931 871,2931 871,3037 776,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0002">
+                    <pc:Coords points="947,2932 1071,2932 1070,3038 946,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Ajax</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0003">
+                    <pc:Coords points="1118,2932 1166,2933 1165,3039 1117,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0004">
+                    <pc:Coords points="1213,2933 1299,2933 1298,3039 1212,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0005">
+                    <pc:Coords points="1394,2934 1527,2934 1526,3040 1393,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>liad.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0006">
+                    <pc:Coords points="1688,2935 1736,2935 1735,3041 1687,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>2.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0007">
+                    <pc:Coords points="1840,2936 2021,2937 2020,3043 1839,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Cyclic</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0008">
+                    <pc:Coords points="2078,2937 2239,2938 2238,3044 2077,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>epies.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0002_word0009">
+                    <pc:Coords points="2353,2938 2458,2939 2457,3045 2352,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.954572737216949">
+                    <pc:Unicode>§1. The Ajax of the liad. 2. Cyclic epies. The</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2338,1316 2331,1318 2326,1328 2309,1331 2167,1335 2111,1333 2108,1322 2100,1317 2087,1319 2080,1331 2070,1330 2067,1323 2061,1319 2050,1319 2040,1329 1982,1328 1932,1342 1923,1342 1917,1336 1905,1336 1896,1344 1881,1344 1879,1322 1862,1317 1745,1316 1703,1320 1695,1320 1690,1316 1675,1316 1666,1322 1664,1328 1623,1334 1616,1332 1616,1326 1611,1319 1588,1316 1497,1315 1480,1318 1462,1326 1451,1325 1444,1316 1427,1316 1419,1323 1406,1322 1402,1325 1380,1323 1371,1316 1357,1319 1330,1315 1268,1316 1257,1320 1249,1331 1226,1328 1200,1316 1159,1312 1040,1313 1020,1318 1006,1328 998,1330 968,1329 952,1320 933,1316 834,1315 815,1319 802,1328 757,1331 752,1330 750,1319 743,1314 728,1315 722,1321 720,1331 714,1330 707,1322 697,1322 688,1330 662,1330 660,1318 653,1313 637,1315 629,1328 620,1327 618,1319 612,1314 593,1314 587,1320 573,1318 563,1326 535,1326 531,1316 517,1314 503,1326 471,1327 459,1338 452,1383 459,1391 574,1388 650,1389 651,1400 657,1406 685,1406 692,1398 693,1389 795,1390 820,1400 880,1404 885,1407 1024,1409 1055,1406 1088,1396 1107,1394 1337,1395 1415,1392 1695,1393 1718,1395 1743,1405 1798,1407 1803,1410 1887,1401 1912,1407 1921,1401 2070,1398 2077,1410 2093,1411 2107,1398 2609,1395 2625,1394 2630,1389 2631,1340 2626,1335 2527,1334 2461,1330 2450,1318 2435,1319 2428,1327 2360,1326 2351,1316"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0000">
+                    <pc:Coords points="481,2929 751,2931 751,3037 481,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Aetiopis.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0001">
+                    <pc:Coords points="863,2931 873,2931 873,3037 863,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0002">
+                    <pc:Coords points="947,2932 985,2932 984,3038 946,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>3.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0003">
+                    <pc:Coords points="1106,2932 1199,2933 1198,3039 1105,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0004">
+                    <pc:Coords points="1293,2933 1433,2934 1432,3040 1292,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Little</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0005">
+                    <pc:Coords points="1545,2934 1676,2935 1675,3041 1544,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>liad.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0006">
+                    <pc:Coords points="1778,2936 1797,2936 1796,3042 1777,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0007">
+                    <pc:Coords points="1881,2936 1918,2936 1917,3042 1880,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>4.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0008">
+                    <pc:Coords points="2040,2937 2152,2937 2151,3043 2039,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Ajax</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0009">
+                    <pc:Coords points="2217,2938 2329,2938 2328,3044 2216,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>and</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0003_word0010">
+                    <pc:Coords points="2395,2938 2479,2939 2478,3045 2394,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.954345703125">
+                    <pc:Unicode>Aetiopis. § 3. The Little liad. § 4. Ajax and the</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2326,1410 2299,1414 2281,1424 2266,1427 2224,1419 2181,1415 2130,1418 2095,1430 2038,1428 2035,1419 2030,1415 2013,1415 2005,1427 1996,1427 1994,1419 1987,1414 1970,1414 1964,1419 1963,1425 1958,1427 1831,1428 1825,1415 1806,1414 1801,1418 1798,1428 1688,1428 1687,1417 1679,1409 1663,1410 1657,1418 1656,1428 1408,1428 1398,1427 1395,1417 1387,1412 1374,1414 1367,1425 1358,1425 1355,1418 1349,1413 1338,1413 1328,1423 1275,1424 1269,1420 1261,1420 1256,1424 1227,1424 1201,1422 1196,1412 1181,1410 1174,1412 1168,1420 1120,1419 1111,1410 1099,1410 1089,1413 1083,1422 1067,1424 916,1429 912,1415 899,1411 879,1410 807,1411 797,1415 789,1426 783,1427 695,1425 694,1415 686,1407 666,1409 662,1414 661,1425 652,1424 652,1418 646,1409 631,1408 624,1415 623,1425 605,1426 512,1424 504,1411 489,1409 481,1415 479,1421 459,1421 449,1430 449,1478 457,1486 766,1488 931,1493 948,1494 954,1501 964,1505 984,1505 998,1494 1004,1493 1070,1489 1194,1489 1358,1492 1365,1504 1381,1505 1395,1492 1525,1486 2078,1492 2098,1495 2116,1505 2140,1502 2149,1506 2189,1508 2314,1506 2339,1503 2367,1495 2397,1493 2609,1492 2625,1491 2630,1486 2630,1437 2625,1432 2520,1429 2501,1425 2483,1416 2457,1412"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004_word0000">
+                    <pc:Coords points="485,2929 754,2931 754,3037 485,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Aeacidae.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004_word0001">
+                    <pc:Coords points="858,2931 1092,2932 1091,3038 858,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Legend</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004_word0002">
+                    <pc:Coords points="1135,2932 1257,2933 1256,3039 1134,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>that</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004_word0003">
+                    <pc:Coords points="1326,2933 1447,2934 1446,3040 1325,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Ajax</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004_word0004">
+                    <pc:Coords points="1517,2934 1595,2935 1594,3041 1516,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>was</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004_word0005">
+                    <pc:Coords points="1647,2935 2063,2937 2062,3043 1646,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>invulnerable.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004_word0006">
+                    <pc:Coords points="2158,2937 2167,2937 2166,3043 2157,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004_word0007">
+                    <pc:Coords points="2227,2938 2271,2938 2270,3044 2226,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>5.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0004_word0008">
+                    <pc:Coords points="2383,2938 2487,2939 2486,3045 2382,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.987401008605957">
+                    <pc:Unicode>Aeacidae. Legend that Ajax was invulnerable. § 5. The</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2471,1509 2465,1513 2459,1510 2450,1510 2443,1515 2431,1513 2421,1523 2377,1518 2317,1518 2312,1514 2296,1514 2288,1519 2222,1518 2216,1515 2156,1518 2150,1528 2151,1539 2115,1539 2110,1534 2012,1534 2012,1518 2005,1511 1993,1511 1988,1514 1978,1533 1972,1535 1778,1534 1768,1532 1762,1521 1749,1512 1739,1513 1733,1520 1733,1527 1730,1528 1701,1513 1635,1506 1557,1506 1528,1510 1485,1509 1478,1515 1428,1518 1381,1529 1289,1525 1286,1515 1281,1511 1262,1512 1256,1525 1210,1525 1208,1516 1201,1510 1182,1513 1176,1525 1134,1526 1070,1523 1062,1512 1049,1512 1042,1518 1030,1518 986,1517 978,1511 963,1511 951,1519 902,1524 776,1526 741,1524 738,1515 733,1511 699,1507 693,1512 691,1522 663,1522 657,1518 649,1518 644,1522 633,1523 557,1525 550,1523 545,1511 529,1509 519,1522 509,1522 506,1515 499,1511 491,1511 480,1520 456,1521 448,1529 447,1580 454,1587 509,1588 511,1595 520,1602 536,1600 545,1588 705,1588 742,1593 788,1604 810,1601 815,1604 826,1604 832,1600 876,1598 900,1589 917,1587 1066,1587 1217,1589 1219,1598 1226,1604 1242,1603 1254,1589 1382,1589 1430,1597 1477,1599 1485,1606 1495,1606 1501,1600 1508,1600 1514,1605 1525,1605 1532,1600 1566,1600 1577,1595 1598,1595 1616,1588 1636,1586 1931,1589 1936,1603 1949,1605 1956,1600 1960,1589 2109,1590 2119,1582 2121,1556 2155,1556 2163,1583 2164,1597 2176,1607 2241,1606 2254,1601 2262,1591 2325,1588 2369,1594 2418,1595 2429,1609 2441,1610 2447,1603 2448,1595 2477,1595 2479,1604 2484,1608 2498,1606 2505,1596 2593,1597 2602,1593 2604,1581 2612,1581 2617,1576 2618,1527 2613,1522 2509,1523 2496,1510"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005_word0000">
+                    <pc:Coords points="479,2929 830,2931 830,3037 479,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Ajax-trilogy</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005_word0001">
+                    <pc:Coords points="902,2931 947,2932 946,3038 901,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005_word0002">
+                    <pc:Coords points="1046,2932 1352,2934 1351,3040 1045,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Aeschylus.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005_word0003">
+                    <pc:Coords points="1460,2934 1820,2936 1819,3042 1459,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>(i)Oν</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005_word0004">
+                    <pc:Coords points="1901,2936 2090,2937 2089,3043 1900,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>xoiis.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005_word0005">
+                    <pc:Coords points="2180,2937 2189,2937 2188,3043 2179,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005_word0006">
+                    <pc:Coords points="2261,2938 2315,2938 2314,3044 2260,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>6.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0005_word0007">
+                    <pc:Coords points="2405,2938 2486,2939 2485,3045 2404,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>(ii)</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.933458209037781">
+                    <pc:Unicode>Ajax-trilogy of Aeschylus. (i)Oν xoiis. § 6. (ii)</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0006">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0006.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="1226,1605 1221,1609 1146,1610 1134,1605 1108,1605 1101,1609 1096,1621 1086,1621 1084,1611 1077,1605 1049,1605 1038,1618 959,1620 869,1613 859,1606 842,1606 835,1613 788,1616 766,1631 696,1626 598,1626 592,1612 579,1605 563,1607 556,1614 553,1623 516,1617 504,1607 482,1607 472,1613 453,1613 444,1622 444,1656 446,1669 460,1679 505,1682 509,1694 515,1698 527,1696 534,1685 545,1685 547,1694 555,1700 581,1696 592,1684 628,1681 752,1686 789,1697 839,1699 978,1697 1038,1690 1050,1703 1061,1702 1065,1697 1066,1688 1117,1687 1121,1699 1133,1701 1147,1688 1292,1684 1346,1686 1351,1698 1364,1701 1371,1695 1374,1687 1454,1684 1547,1685 1562,1684 1569,1677 1567,1641 1559,1632 1434,1631 1434,1613 1426,1606 1412,1607 1406,1614 1399,1632 1312,1631 1304,1615 1291,1607 1282,1607 1275,1614"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0006_word0000">
+                    <pc:Coords points="470,2929 734,2931 734,3037 470,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Opoσa.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0006_word0001">
+                    <pc:Coords points="824,2931 843,2931 843,3037 824,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0006_word0002">
+                    <pc:Coords points="888,2931 933,2932 932,3038 887,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>7.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0006_word0003">
+                    <pc:Coords points="1024,2932 1124,2932 1123,3038 1023,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>(iii)</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0006_word0004">
+                    <pc:Coords points="1233,2933 1533,2934 1532,3040 1232,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>aAaμi.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.834032714366913">
+                    <pc:Unicode>Opoσa. § 7. (iii) aAaμi.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2459,1719 2451,1726 2448,1735 2436,1733 2426,1739 2371,1739 2306,1736 2272,1723 2234,1719 2185,1718 2162,1730 2151,1729 2133,1721 2125,1728 2122,1740 2076,1739 2066,1730 2046,1723 1974,1724 1964,1727 1953,1737 1940,1739 1894,1739 1893,1728 1885,1719 1869,1721 1864,1728 1863,1739 1804,1739 1803,1730 1797,1723 1776,1725 1770,1738 1685,1736 1678,1725 1664,1724 1655,1735 1629,1735 1616,1742 1589,1771 1581,1763 1579,1749 1568,1740 1490,1738 1489,1729 1483,1722 1462,1724 1456,1738 1372,1738 1370,1728 1362,1722 1345,1723 1339,1737 1307,1736 1271,1725 1235,1721 1187,1722 1162,1726 1135,1735 1085,1739 1036,1739 1035,1730 1028,1723 1012,1724 1007,1730 1006,1738 999,1737 999,1728 996,1724 982,1722 977,1724 966,1738 931,1739 898,1735 872,1721 830,1717 525,1721 481,1722 477,1725 475,1776 480,1781 491,1782 491,1806 496,1811 589,1814 602,1814 619,1809 638,1798 685,1795 726,1799 967,1803 975,1815 992,1814 1007,1802 1057,1799 1294,1801 1297,1812 1303,1816 1326,1816 1332,1811 1334,1801 1652,1800 1791,1802 1796,1815 1812,1818 1823,1810 1828,1801 1885,1799 1943,1800 1976,1812 2018,1813 2023,1816 2036,1816 2042,1813 2095,1815 2102,1811 2140,1810 2183,1803 2219,1802 2604,1802 2610,1796 2619,1797 2624,1792 2625,1743 2620,1738 2480,1738 2479,1727 2474,1721"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0000">
+                    <pc:Coords points="545,2930 554,2930 554,3036 545,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0001">
+                    <pc:Coords points="600,2930 656,2930 656,3036 600,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>8.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0002">
+                    <pc:Coords points="749,2931 850,2931 850,3037 749,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0003">
+                    <pc:Coords points="924,2931 1054,2932 1053,3038 923,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Aiaæ</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0004">
+                    <pc:Coords points="1091,2932 1147,2933 1146,3039 1090,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0005">
+                    <pc:Coords points="1184,2933 1526,2934 1525,3040 1183,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Sophocles.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0006">
+                    <pc:Coords points="1628,2935 1887,2936 1886,3042 1627,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Analysis.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0007">
+                    <pc:Coords points="1980,2936 1989,2937 1988,3043 1979,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0008">
+                    <pc:Coords points="2036,2937 2082,2937 2081,3043 2035,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>9.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0007_word0009">
+                    <pc:Coords points="2174,2937 2452,2939 2451,3045 2173,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Dramatic</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.959312081336975">
+                    <pc:Unicode>§ 8. The Aiaæ of Sophocles. Analysis. § 9. Dramatic</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2167,1818 2159,1825 2157,1837 2078,1835 2075,1826 2069,1822 2049,1824 2044,1835 1957,1834 1951,1823 1935,1821 1930,1823 1924,1832 1765,1838 1690,1836 1682,1830 1674,1830 1667,1836 1549,1836 1538,1834 1521,1822 1502,1818 1373,1816 1341,1820 1330,1828 1326,1837 1252,1835 1224,1825 1187,1821 1112,1822 1089,1833 1071,1836 991,1836 988,1825 983,1821 964,1822 958,1835 863,1834 831,1831 821,1819 807,1819 797,1827 749,1826 742,1820 726,1819 715,1826 679,1832 590,1834 584,1829 573,1830 567,1817 555,1815 545,1821 543,1834 461,1834 449,1845 447,1886 455,1895 584,1897 587,1908 593,1912 610,1910 621,1897 652,1896 837,1897 918,1900 921,1909 929,1913 947,1914 953,1910 956,1901 999,1899 1015,1899 1020,1911 1038,1913 1046,1907 1050,1899 1057,1899 1078,1909 1092,1912 1180,1915 1209,1911 1234,1901 1257,1898 1533,1899 1600,1896 2254,1902 2299,1911 2336,1911 2345,1916 2356,1916 2366,1911 2392,1910 2429,1902 2574,1899 2579,1895 2590,1895 2595,1890 2595,1841 2590,1836 2446,1837 2426,1835 2395,1824 2348,1822 2272,1823 2243,1827 2237,1823 2221,1823 2212,1828 2210,1837 2188,1837 2187,1827 2183,1821"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0000">
+                    <pc:Coords points="451,2929 601,2930 601,3036 451,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>unity</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0001">
+                    <pc:Coords points="663,2930 716,2931 716,3037 663,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0002">
+                    <pc:Coords points="769,2931 858,2931 858,3037 769,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0003">
+                    <pc:Coords points="920,2931 1061,2932 1060,3038 919,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>play.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0004">
+                    <pc:Coords points="1229,2933 1317,2933 1316,3039 1228,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>10.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0005">
+                    <pc:Coords points="1423,2934 1521,2934 1520,3040 1422,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0006">
+                    <pc:Coords points="1582,2935 1697,2935 1696,3041 1581,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>veto</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0007">
+                    <pc:Coords points="1768,2935 1839,2936 1838,3042 1767,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>on</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0008">
+                    <pc:Coords points="1901,2936 1980,2936 1979,3042 1900,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0009">
+                    <pc:Coords points="2042,2937 2343,2938 2342,3044 2041,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>burial.§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0008_word0010">
+                    <pc:Coords points="2413,2939 2493,2939 2492,3045 2412,3045"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>11.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.96745765209198">
+                    <pc:Unicode>unity of the play. 10. The veto on the burial.§ 11.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2559,1915 2506,1918 2475,1930 2413,1936 2370,1935 2369,1926 2363,1919 2348,1918 2338,1923 2336,1935 2289,1937 2058,1937 2057,1927 2051,1919 2037,1918 2031,1922 2027,1937 1757,1936 1736,1933 1724,1923 1709,1918 1642,1914 1540,1915 1528,1919 1518,1932 1508,1934 1442,1932 1414,1923 1391,1920 1284,1919 1253,1923 1245,1916 1225,1918 1221,1923 1221,1929 1217,1931 1152,1936 1147,1935 1147,1924 1139,1915 1123,1916 1117,1924 1116,1934 975,1935 914,1930 912,1923 904,1917 887,1919 881,1929 869,1927 771,1935 677,1934 676,1923 668,1914 652,1916 647,1923 646,1933 596,1931 564,1918 508,1913 456,1912 447,1924 449,1985 457,1993 1235,1996 1272,1998 1300,2010 1367,2013 1403,2009 1424,1999 1457,1996 2410,1999 2609,1995 2612,1991 2613,1975 2624,1975 2630,1969 2629,1919 2625,1916"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0000">
+                    <pc:Coords points="475,2929 566,2930 566,3036 475,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0001">
+                    <pc:Coords points="641,2930 783,2931 783,3037 641,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>issue</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0002">
+                    <pc:Coords points="850,2931 975,2932 974,3038 850,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>thus</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0003">
+                    <pc:Coords points="1050,2932 1241,2933 1240,3039 1049,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>raised.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0004">
+                    <pc:Coords points="1341,2933 1350,2934 1349,3040 1340,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0005">
+                    <pc:Coords points="1425,2934 1508,2934 1507,3040 1424,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>12.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0006">
+                    <pc:Coords points="1625,2935 1717,2935 1716,3041 1624,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0007">
+                    <pc:Coords points="1783,2936 2100,2937 2099,3043 1782,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>successive</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0008">
+                    <pc:Coords points="2167,2937 2367,2938 2366,3044 2166,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>moods</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0009_word0009">
+                    <pc:Coords points="2442,2939 2492,2939 2491,3045 2441,3045"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.987738728523254">
+                    <pc:Unicode>The issue thus raised. § 12. The successive moods of</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2305,2015 2297,2024 2297,2032 2292,2034 2248,2031 2242,2029 2233,2017 2092,2016 2075,2019 2061,2032 2049,2034 1980,2032 1968,2030 1947,2020 1907,2017 1843,2020 1824,2032 1810,2034 1716,2033 1715,2024 1711,2019 1693,2018 1672,2035 1629,2040 1592,2038 1589,2036 1589,2025 1583,2019 1567,2019 1548,2033 1509,2031 1504,2019 1486,2018 1469,2031 1396,2034 1159,2033 1156,2020 1149,2015 1135,2015 1130,2020 1127,2031 1080,2030 1073,2017 1058,2016 1049,2021 1047,2031 971,2034 838,2030 813,2024 804,2013 792,2013 786,2017 664,2014 644,2020 636,2029 616,2032 545,2031 543,2021 536,2016 521,2018 515,2029 507,2028 504,2020 498,2016 487,2016 477,2026 458,2026 448,2035 447,2086 454,2094 506,2094 508,2102 517,2109 533,2107 542,2095 897,2094 900,2105 906,2109 929,2110 935,2105 937,2095 1150,2096 1245,2092 1517,2095 1524,2106 1537,2107 1544,2102 1547,2095 1583,2095 1633,2088 1711,2094 1714,2105 1720,2110 1731,2110 1744,2103 1751,2095 1795,2095 1825,2096 1847,2106 1898,2107 1903,2110 1947,2104 2015,2111 2094,2110 2152,2098 2378,2097 2380,2106 2386,2111 2410,2112 2415,2108 2418,2098 2588,2095 2604,2093 2609,2088 2609,2039 2604,2034 2328,2033 2327,2023 2323,2017"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0000">
+                    <pc:Coords points="477,2929 615,2930 615,3036 477,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Ajax.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0001">
+                    <pc:Coords points="719,2931 815,2931 815,3037 719,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>His</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0002">
+                    <pc:Coords points="867,2931 1057,2932 1056,3038 867,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>speech</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0003">
+                    <pc:Coords points="1118,2932 1179,2933 1178,3039 1117,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>in</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0004">
+                    <pc:Coords points="1222,2933 1404,2934 1403,3040 1221,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>verses</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0005">
+                    <pc:Coords points="1456,2934 1794,2936 1793,3042 1455,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>646-692.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0006">
+                    <pc:Coords points="1890,2936 1898,2936 1897,3042 1889,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0007">
+                    <pc:Coords points="1968,2936 2046,2937 2045,3043 1967,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>13.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0008">
+                    <pc:Coords points="2141,2937 2236,2938 2235,3044 2140,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>His</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0010_word0009">
+                    <pc:Coords points="2288,2938 2488,2939 2487,3045 2287,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>impre-</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.975333511829376">
+                    <pc:Unicode>Ajax. His speech in verses 646-692. § 13. His impre-</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="1685,2111 1645,2115 1642,2119 1641,2139 1553,2131 1538,2128 1514,2117 1472,2114 1392,2116 1358,2130 1288,2129 1282,2115 1263,2113 1257,2117 1254,2129 1240,2130 1192,2130 1182,2128 1176,2121 1163,2116 1126,2113 1078,2115 1050,2128 995,2126 989,2115 973,2114 968,2116 962,2125 817,2130 585,2128 584,2119 579,2112 565,2110 558,2116 555,2126 549,2122 541,2122 534,2128 453,2127 443,2139 443,2180 452,2190 668,2190 750,2194 753,2204 759,2208 782,2207 793,2193 873,2190 1360,2192 1367,2194 1374,2202 1387,2207 1465,2208 1499,2205 1535,2195 1582,2197 1590,2204 1600,2204 1609,2197 1677,2197 1731,2192 2070,2192 2166,2195 2167,2201 2176,2208 2192,2206 2201,2196 2275,2198 2287,2208 2305,2209 2318,2206 2326,2198 2387,2194 2585,2194 2591,2186 2597,2186 2602,2181 2602,2132 2597,2127 2486,2129 2479,2124 2471,2124 2464,2130 2439,2131 2289,2130 2284,2116 2268,2114 2256,2119 2253,2130 2205,2131 2200,2119 2185,2115 2176,2122 2174,2131 2074,2132 2051,2131 2050,2121 2045,2114 2030,2113 2023,2118 2020,2131 1993,2130 1992,2121 1985,2114 1945,2114 1939,2118 1936,2128 1874,2130 1858,2127 1838,2116 1820,2113"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011_word0000">
+                    <pc:Coords points="459,2929 641,2930 641,3036 459,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>cation</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011_word0001">
+                    <pc:Coords points="711,2930 867,2931 867,3037 711,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>upon</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011_word0002">
+                    <pc:Coords points="936,2932 1023,2932 1022,3038 935,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011_word0003">
+                    <pc:Coords points="1101,2932 1335,2933 1334,3039 1100,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Greeks.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011_word0004">
+                    <pc:Coords points="1534,2934 1612,2935 1611,3041 1533,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>14.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011_word0005">
+                    <pc:Coords points="1751,2935 1846,2936 1845,3042 1750,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011_word0006">
+                    <pc:Coords points="1915,2936 2097,2937 2096,3043 1914,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>divine</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0011_word0007">
+                    <pc:Coords points="2167,2937 2487,2939 2486,3045 2166,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>judgment.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.988605916500092">
+                    <pc:Unicode>cation upon the Greeks. 14. The divine judgment.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0012">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0012.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="1713,2207 1673,2215 1652,2213 1640,2221 1619,2223 1597,2223 1571,2216 1537,2214 1532,2211 1481,2214 1455,2218 1427,2229 1244,2227 1195,2221 1185,2213 1171,2213 1165,2216 1139,2212 1044,2212 1026,2214 991,2225 926,2226 899,2224 873,2214 823,2211 770,2216 737,2228 691,2227 567,2221 565,2215 557,2209 542,2210 534,2219 503,2217 495,2209 484,2209 475,2217 452,2217 443,2226 443,2278 451,2286 727,2289 756,2300 814,2301 819,2304 891,2295 964,2304 971,2300 1029,2299 1068,2290 1181,2291 1186,2304 1202,2306 1213,2298 1217,2290 1248,2288 1424,2290 1455,2303 1526,2305 1562,2302 1594,2291 1638,2288 2028,2292 2460,2290 2621,2288 2626,2283 2626,2234 2621,2229 2254,2229 2218,2224 2215,2218 2206,2212 2198,2212 2192,2215 2186,2212 2161,2211 2069,2211 2054,2214 2041,2224 2027,2227 1928,2228 1887,2225 1859,2212 1838,2209"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0012_word0000">
+                    <pc:Coords points="485,2929 815,2931 815,3037 485,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Athena.§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0012_word0001">
+                    <pc:Coords points="901,2931 979,2932 978,3038 900,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>15.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0012_word0002">
+                    <pc:Coords points="1092,2932 1395,2934 1394,3040 1091,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Odysseus.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0012_word0003">
+                    <pc:Coords points="1595,2935 1682,2935 1681,3041 1594,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>16.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0012_word0004">
+                    <pc:Coords points="1794,2936 2020,2937 2019,3043 1793,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Teucer.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0012_word0005">
+                    <pc:Coords points="2124,2937 2219,2938 2218,3044 2123,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>His</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0012_word0006">
+                    <pc:Coords points="2288,2938 2488,2939 2487,3045 2287,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>scenes</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.98882657289505">
+                    <pc:Unicode>Athena.§ 15. Odysseus. 16. Teucer. His scenes</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2431,2309 2424,2317 2374,2315 2366,2309 2351,2309 2341,2316 2295,2322 2249,2324 2243,2320 2235,2320 2230,2324 2182,2325 2056,2325 2010,2322 2001,2310 1985,2310 1976,2320 1965,2318 1885,2325 1836,2326 1690,2325 1689,2315 1683,2307 1669,2306 1662,2311 1659,2324 1603,2324 1598,2320 1588,2320 1584,2323 1582,2315 1577,2310 1564,2309 1558,2313 1556,2323 1347,2324 1342,2310 1326,2308 1316,2311 1311,2322 1261,2315 1254,2310 1237,2310 1231,2313 1131,2313 1095,2326 1012,2325 1011,2315 1003,2307 983,2309 979,2314 978,2325 951,2326 876,2322 872,2319 843,2320 834,2310 821,2310 812,2320 753,2324 696,2320 694,2312 689,2308 671,2308 664,2317 651,2319 582,2319 575,2307 560,2306 551,2311 549,2319 452,2323 442,2332 442,2371 451,2380 520,2385 773,2388 2062,2388 2112,2390 2115,2398 2121,2402 2144,2402 2150,2397 2151,2391 2157,2389 2319,2386 2605,2386 2620,2385 2625,2380 2625,2331 2620,2326 2476,2322 2456,2320 2454,2313 2449,2309"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0000">
+                    <pc:Coords points="475,2929 559,2930 559,3036 475,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>with</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0001">
+                    <pc:Coords points="643,2930 727,2931 727,3037 643,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0002">
+                    <pc:Coords points="819,2931 1088,2932 1087,3038 819,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Atreidae.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0003">
+                    <pc:Coords points="1222,2933 1432,2934 1431,3040 1221,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Modern</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0004">
+                    <pc:Coords points="1491,2934 1760,2935 1759,3041 1490,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>criticism</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0005">
+                    <pc:Coords points="1827,2936 1894,2936 1893,3042 1826,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>on</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0006">
+                    <pc:Coords points="1953,2936 2054,2937 2053,3043 1952,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>this</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0007">
+                    <pc:Coords points="2121,2937 2239,2938 2238,3044 2120,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>part</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0008">
+                    <pc:Coords points="2289,2938 2348,2938 2347,3044 2288,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0013_word0009">
+                    <pc:Coords points="2407,2939 2491,2939 2490,3045 2406,3045"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.990729451179504">
+                    <pc:Unicode>with the Atreidae. Modern criticism on this part of the</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0014">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0014.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="1337,2402 1307,2406 1297,2414 1295,2423 1288,2425 1075,2422 1057,2419 1041,2408 1015,2404 890,2404 877,2407 858,2418 840,2420 788,2420 754,2411 722,2407 657,2408 642,2411 622,2420 576,2422 533,2421 528,2419 524,2407 506,2406 498,2410 495,2419 450,2419 440,2428 440,2482 465,2498 483,2498 493,2488 545,2485 553,2485 556,2495 562,2499 574,2499 589,2485 597,2485 616,2495 630,2498 716,2500 776,2491 812,2493 819,2498 830,2498 836,2494 903,2494 937,2487 988,2485 1459,2484 1617,2487 1731,2483 1889,2484 1909,2483 1914,2478 1914,2429 1909,2424 1690,2421 1673,2418 1650,2408 1623,2405 1539,2405 1520,2409 1506,2418 1492,2409 1467,2404"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0014_word0000">
+                    <pc:Coords points="461,2929 704,2930 704,3036 461,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>play.§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0014_word0001">
+                    <pc:Coords points="776,2931 857,2931 857,3037 776,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>17.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0014_word0002">
+                    <pc:Coords points="974,2932 1289,2933 1288,3039 973,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Tecmessa.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0014_word0003">
+                    <pc:Coords points="1397,2934 1497,2934 1496,3040 1396,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0014_word0004">
+                    <pc:Coords points="1569,2935 1812,2936 1811,3042 1568,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Chorus.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.973001182079315">
+                    <pc:Unicode>play.§ 17. Tecmessa. The Chorus.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="1845,2519 1838,2523 1795,2520 1708,2520 1695,2525 1688,2537 1678,2539 1598,2539 1595,2528 1590,2524 1571,2525 1565,2539 1480,2537 1478,2528 1470,2522 1453,2524 1447,2537 1400,2535 1356,2523 1287,2522 1224,2537 1150,2541 1104,2539 1087,2526 1053,2521 966,2522 952,2525 939,2534 915,2522 882,2519 755,2519 711,2524 692,2522 684,2526 655,2529 606,2522 485,2523 478,2524 473,2529 473,2578 478,2583 498,2583 500,2598 511,2605 536,2610 579,2610 588,2616 598,2616 610,2610 641,2603 689,2599 1021,2603 1185,2597 1404,2602 1406,2610 1412,2615 1436,2615 1441,2611 1444,2602 1494,2600 1976,2602 2043,2599 2051,2600 2051,2606 2057,2614 2072,2616 2083,2611 2095,2598 2274,2600 2302,2611 2351,2611 2358,2615 2434,2604 2445,2605 2454,2616 2464,2616 2480,2606 2581,2606 2587,2600 2597,2600 2602,2595 2602,2546 2597,2541 2429,2537 2375,2521 2305,2524 2283,2536 2227,2540 2043,2539 2030,2536 2020,2526 1999,2522 1912,2522 1898,2527 1890,2535 1880,2535 1864,2530 1862,2524 1855,2519"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015_word0000">
+                    <pc:Coords points="614,2930 695,2930 695,3036 614,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>18.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015_word0001">
+                    <pc:Coords points="803,2931 902,2931 901,3037 803,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015_word0002">
+                    <pc:Coords points="974,2932 1154,2933 1153,3039 973,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Teucer</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015_word0003">
+                    <pc:Coords points="1199,2933 1253,2933 1252,3039 1198,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015_word0004">
+                    <pc:Coords points="1289,2933 1631,2935 1630,3041 1288,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Sophocles.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015_word0005">
+                    <pc:Coords points="1739,2935 1838,2936 1837,3042 1738,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>His</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015_word0006">
+                    <pc:Coords points="1910,2936 2225,2938 2224,3044 1909,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Eurysaces.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015_word0007">
+                    <pc:Coords points="2315,2938 2324,2938 2323,3044 2314,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0015_word0008">
+                    <pc:Coords points="2378,2938 2459,2939 2458,3045 2377,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>19.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.974611222743988">
+                    <pc:Unicode>18. The Teucer of Sophocles. His Eurysaces. § 19.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2379,2616 2371,2621 2368,2634 2361,2629 2351,2629 2345,2634 2278,2634 2270,2628 2262,2628 2255,2634 2233,2634 2215,2630 2201,2623 2176,2618 2073,2618 2039,2624 2031,2631 2029,2639 1925,2636 1905,2624 1875,2620 1803,2623 1794,2626 1783,2635 1771,2636 1638,2635 1633,2631 1623,2631 1615,2636 1520,2635 1505,2630 1495,2631 1488,2619 1474,2618 1468,2622 1446,2621 1438,2633 1359,2637 1333,2635 1326,2630 1318,2630 1312,2635 1279,2634 1273,2622 1260,2620 1250,2623 1245,2634 1173,2638 1172,2628 1168,2622 1153,2619 1144,2626 1142,2638 1034,2637 1033,2629 1028,2623 1013,2621 1005,2627 1002,2634 993,2633 985,2623 960,2628 916,2626 909,2621 894,2621 885,2627 819,2637 689,2637 681,2631 673,2631 666,2637 608,2637 579,2633 561,2624 543,2620 458,2617 447,2626 442,2691 450,2699 750,2700 751,2707 757,2715 771,2717 782,2709 787,2700 808,2698 996,2701 1002,2713 1018,2714 1031,2701 1069,2700 1757,2698 1779,2702 1804,2712 1869,2714 1895,2710 1921,2700 1957,2697 2421,2698 2616,2695 2621,2691 2621,2642 2616,2636 2411,2636 2399,2634 2398,2625 2393,2617"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0000">
+                    <pc:Coords points="477,2929 573,2930 573,3036 477,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0001">
+                    <pc:Coords points="626,2930 774,2931 774,3037 626,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>story</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0002">
+                    <pc:Coords points="835,2931 888,2931 887,3037 835,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0003">
+                    <pc:Coords points="975,2932 1089,2932 1088,3038 974,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Ajax</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0004">
+                    <pc:Coords points="1141,2933 1194,2933 1193,3039 1140,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>in</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0005">
+                    <pc:Coords points="1246,2933 1386,2934 1385,3040 1245,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>later</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0006">
+                    <pc:Coords points="1439,2934 1753,2935 1752,3041 1438,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>literature.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0007">
+                    <pc:Coords points="1849,2936 1858,2936 1857,3042 1848,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0008">
+                    <pc:Coords points="1928,2936 2007,2937 2006,3043 1927,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>20.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0016_word0009">
+                    <pc:Coords points="2112,2937 2488,2939 2487,3045 2111,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Illustrations</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.989896059036255">
+                    <pc:Unicode>The story of Ajax in later literature. § 20. Illustrations</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0017">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0017.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="774,2716 766,2721 763,2735 700,2735 528,2732 499,2728 490,2718 475,2717 462,2726 448,2726 438,2735 440,2787 451,2795 1141,2799 1147,2790 1157,2790 1162,2785 1162,2736 1157,2731 1043,2731 1030,2728 1026,2731 982,2731 974,2721 961,2721 952,2731 889,2731 876,2728 863,2733 794,2734 793,2725 787,2717"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0017_word0000">
+                    <pc:Coords points="457,2929 601,2930 601,3036 457,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>from</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0017_word0001">
+                    <pc:Coords points="649,2930 881,2931 880,3037 649,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>ancient</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0017_word0002">
+                    <pc:Coords points="961,2932 1057,2932 1056,3038 960,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Art.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.997808218002319">
+                    <pc:Unicode>from ancient Art.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2327,2826 2296,2829 2286,2835 2281,2848 2251,2850 2190,2847 2173,2836 2157,2831 2122,2833 2111,2842 2109,2857 2030,2857 2019,2849 1936,2847 1933,2836 1928,2832 1909,2833 1903,2847 1811,2848 1776,2845 1766,2831 1753,2831 1742,2839 1688,2838 1680,2831 1667,2831 1655,2839 1620,2845 1542,2848 1533,2847 1528,2843 1518,2843 1514,2846 1479,2846 1474,2833 1458,2831 1448,2834 1443,2846 1392,2849 1337,2845 1332,2833 1312,2832 1307,2836 1305,2844 1199,2845 1196,2838 1189,2833 1173,2833 1160,2845 1091,2848 975,2848 973,2839 966,2833 946,2835 942,2840 942,2847 938,2848 932,2846 930,2836 924,2830 912,2830 902,2840 889,2834 869,2831 753,2830 737,2835 728,2847 688,2849 648,2847 626,2836 601,2832 471,2832 466,2837 466,2886 471,2891 491,2892 491,2915 496,2920 578,2923 584,2926 595,2926 658,2912 726,2912 759,2893 784,2893 789,2904 805,2912 1792,2911 1860,2914 1863,2921 1869,2925 1892,2925 1901,2913 1961,2911 1963,2920 1972,2926 1988,2924 1997,2912 2023,2912 2033,2904 2110,2904 2111,2913 2122,2921 2151,2925 2181,2914 2216,2911 2600,2909 2603,2908 2616,2907 2618,2904 2621,2898 2621,2854 2616,2848 2507,2846 2493,2843 2474,2833 2450,2829"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0000">
+                    <pc:Coords points="543,2930 561,2930 561,3036 543,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0001">
+                    <pc:Coords points="606,2930 697,2930 697,3036 606,3036"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>21.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0002">
+                    <pc:Coords points="797,2931 1079,2932 1078,3038 797,3037"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Evidence</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0003">
+                    <pc:Coords points="1133,2932 1206,2933 1205,3039 1132,3038"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>for</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0004">
+                    <pc:Coords points="1261,2933 1342,2933 1341,3039 1260,3039"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0005">
+                    <pc:Coords points="1406,2934 1524,2934 1523,3040 1405,3040"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>date</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0006">
+                    <pc:Coords points="1588,2935 1633,2935 1632,3041 1587,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0007">
+                    <pc:Coords points="1697,2935 1788,2936 1787,3042 1696,3041"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0008">
+                    <pc:Coords points="1842,2936 1988,2937 1987,3043 1841,3042"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>play.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0009">
+                    <pc:Coords points="2106,2937 2115,2937 2114,3043 2105,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0010">
+                    <pc:Coords points="2160,2937 2251,2938 2250,3044 2159,3043"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>22.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0018_word0011">
+                    <pc:Coords points="2360,2938 2460,2939 2459,3045 2359,3044"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.976930379867554">
+                    <pc:Unicode>§ 21. Evidence for the date of the play. § 22. The</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0019">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0019.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="491,2929 482,2935 480,2943 475,2940 452,2943 441,2952 439,2981 425,2998 427,3009 684,3009 699,3008 704,3003 704,2954 699,2949 557,2945 553,2936 546,2932 528,2935 523,2944 510,2944 505,2932"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0002_line0019_word0000">
+                    <pc:Coords points="470,2929 607,2930 607,3036 470,3035"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>title.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.999539852142334">
+                    <pc:Unicode>title.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>IropvCTioN. pPage ix
+§1. The Ajax of the liad. 2. Cyclic epies. The
+Aetiopis. § 3. The Little liad. § 4. Ajax and the
+Aeacidae. Legend that Ajax was invulnerable. § 5. The
+Ajax-trilogy of Aeschylus. (i)Oν xoiis. § 6. (ii)
+Opoσa. § 7. (iii) aAaμi.
+§ 8. The Aiaæ of Sophocles. Analysis. § 9. Dramatic
+unity of the play. 10. The veto on the burial.§ 11.
+The issue thus raised. § 12. The successive moods of
+Ajax. His speech in verses 646-692. § 13. His impre-
+cation upon the Greeks. 14. The divine judgment.
+Athena.§ 15. Odysseus. 16. Teucer. His scenes
+with the Atreidae. Modern criticism on this part of the
+play.§ 17. Tecmessa. The Chorus.
+18. The Teucer of Sophocles. His Eurysaces. § 19.
+The story of Ajax in later literature. § 20. Illustrations
+from ancient Art.
+§ 21. Evidence for the date of the play. § 22. The
+title.</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003">
+            <pc:Coords points="745,3078 286,3078 286,3200 361,3481 365,3487 614,3489 1062,3470 2541,3367 2542,3207 2538,3206 2424,3190 1432,3092 893,3078"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="812,3078 798,3086 777,3080 757,3092 744,3094 440,3095 414,3094 370,3081 286,3079 286,3158 680,3158 752,3163 759,3171 771,3171 779,3163 1130,3157 1135,3168 1149,3170 1160,3158 1410,3162 1414,3159 1416,3151 1427,3151 1432,3146 1432,3097 1427,3092 1199,3091 1124,3094 950,3093 921,3089 880,3079"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0001_word0000">
+                    <pc:Coords points="432,3388 852,3390 851,3506 431,3504"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>MAuscirrs,</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0001_word0001">
+                    <pc:Coords points="922,3390 1236,3392 1235,3508 921,3506"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Eprrios,</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0001_word0002">
+                    <pc:Coords points="1297,3392 1490,3393 1489,3509 1296,3508"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Erc..</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.840200126171112">
+                    <pc:Unicode>MAuscirrs, Eprrios, Erc..</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="1852,3189 1825,3193 1821,3198 1820,3221 1807,3221 1800,3213 1788,3213 1780,3221 1763,3220 1762,3200 1759,3196 1751,3194 1638,3195 1627,3199 1621,3210 1614,3213 1532,3211 1531,3202 1524,3195 1507,3196 1502,3201 1500,3210 1452,3207 1440,3195 1428,3195 1419,3201 1370,3195 1292,3196 1252,3210 1225,3209 1204,3199 1188,3196 1106,3194 1084,3196 1063,3207 1047,3210 839,3212 717,3209 656,3196 471,3196 465,3202 464,3251 469,3256 479,3257 479,3282 482,3286 502,3288 645,3288 664,3285 697,3274 708,3274 714,3282 724,3284 731,3281 736,3274 753,3273 1040,3273 1110,3286 1277,3289 1305,3286 1335,3275 1360,3274 1581,3273 1613,3275 1640,3285 1707,3287 1776,3279 1786,3285 1797,3285 1805,3279 1861,3279 1950,3272 2541,3269 2542,3207 2450,3204 2448,3198 2440,3192 2438,3192 2425,3193 2418,3200 2367,3198 2360,3193 2345,3193 2336,3199 2263,3209 2205,3209 2197,3203 2189,3202 2182,3208 2143,3208 2138,3203 2128,3203 2116,3209 2056,3211 2034,3209 2020,3198 2002,3193"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0000">
+                    <pc:Coords points="482,3388 528,3389 527,3505 481,3504"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0001">
+                    <pc:Coords points="592,3389 628,3389 627,3505 591,3505"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>1,</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0002">
+                    <pc:Coords points="693,3389 738,3390 737,3506 692,3505"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>2.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0003">
+                    <pc:Coords points="858,3390 949,3391 948,3507 857,3506"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Mss.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0004">
+                    <pc:Coords points="1050,3391 1059,3391 1058,3507 1049,3507"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0005">
+                    <pc:Coords points="1123,3391 1160,3392 1159,3508 1122,3507"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>3.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0006">
+                    <pc:Coords points="1252,3392 1499,3393 1498,3509 1251,3508"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Scholia.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0007">
+                    <pc:Coords points="1600,3394 1609,3394 1608,3510 1599,3510"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0008">
+                    <pc:Coords points="1692,3394 1728,3394 1727,3510 1691,3510"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>4.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0009">
+                    <pc:Coords points="1838,3395 1939,3395 1938,3511 1837,3511"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>The</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0010">
+                    <pc:Coords points="1994,3396 2141,3396 2140,3512 1993,3512"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>state</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0011">
+                    <pc:Coords points="2196,3397 2251,3397 2250,3513 2195,3513"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>of</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0002_word0012">
+                    <pc:Coords points="2306,3397 2398,3397 2397,3513 2305,3513"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>the</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.958160221576691">
+                    <pc:Unicode>§§ 1, 2. Mss. § 3. Scholia. § 4. The state of the</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0003">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0003.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2354,3287 2346,3293 2343,3302 2330,3300 2324,3306 2290,3306 2287,3295 2281,3291 2261,3293 2256,3306 2221,3308 2122,3307 2111,3302 2099,3305 2080,3303 2048,3292 1961,3291 1945,3296 1938,3308 1929,3310 1777,3309 1772,3305 1762,3304 1758,3307 1755,3296 1748,3291 1733,3293 1728,3299 1727,3309 1708,3310 1544,3309 1478,3306 1474,3303 1408,3305 1403,3296 1387,3294 1377,3297 1370,3308 1308,3312 1207,3310 1176,3307 1134,3297 1036,3295 1019,3299 1007,3310 984,3313 783,3311 742,3296 656,3294 632,3298 601,3308 580,3309 575,3305 565,3305 553,3310 493,3310 467,3305 461,3309 451,3309 440,3319 437,3364 444,3372 465,3373 1171,3374 1204,3375 1206,3383 1212,3388 1236,3388 1241,3384 1244,3374 1287,3372 1612,3373 1619,3385 1641,3386 1647,3382 1649,3374 1654,3372 2135,3371 2175,3372 2177,3379 2183,3384 2207,3385 2212,3381 2214,3374 2220,3372 2541,3367 2541,3308 2373,3306 2371,3295 2362,3287"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0003_word0000">
+                    <pc:Coords points="395,3388 526,3389 525,3505 394,3504"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>text.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0003_word0001">
+                    <pc:Coords points="648,3389 918,3390 917,3506 647,3505"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Lacunae.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0003_word0002">
+                    <pc:Coords points="1040,3391 1326,3392 1325,3508 1039,3507"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Proposed</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0003_word0003">
+                    <pc:Coords points="1392,3393 1857,3395 1856,3511 1391,3509"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>transpositions.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0003_word0004">
+                    <pc:Coords points="1963,3395 2429,3398 2428,3514 1962,3511"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Interpolations.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.997759222984314">
+                    <pc:Unicode>text. Lacunae. Proposed transpositions. Interpolations.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0004">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0004.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="613,3389 596,3392 581,3404 567,3407 537,3406 512,3398 482,3393 444,3394 434,3403 433,3430 424,3447 409,3457 371,3454 362,3461 362,3482 363,3484 366,3487 604,3488 626,3486 641,3477 659,3473 1056,3470 1061,3465 1062,3416 1057,3411 845,3408 836,3407 834,3398 825,3392 813,3394 807,3405 791,3404 789,3395 783,3390 769,3390 763,3395 708,3389"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0004_word0000">
+                    <pc:Coords points="469,3388 479,3388 478,3504 468,3504"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>§</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0004_word0001">
+                    <pc:Coords points="547,3389 585,3389 584,3505 546,3505"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>5.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0003_line0004_word0002">
+                    <pc:Coords points="692,3389 963,3391 962,3507 691,3505"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Editions.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.963782429695129">
+                    <pc:Unicode>§ 5. Editions.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>MAuscirrs, Eprrios, Erc..
+§§ 1, 2. Mss. § 3. Scholia. § 4. The state of the
+text. Lacunae. Proposed transpositions. Interpolations.
+§ 5. Editions.</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0004">
+            <pc:Coords points="530,3540 294,3541 286,3546 286,3611 293,3618 723,3620 1096,3617 1112,3611 1115,3607 1115,3557 1111,3553 1103,3552 735,3541"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0004_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0004_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0004_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="702,3540 695,3549 653,3549 596,3555 423,3550 374,3545 367,3540 294,3541 286,3546 286,3611 293,3618 668,3619 747,3617 1095,3617 1102,3612 1109,3612 1110,3611 1115,3607 1115,3558 1110,3553 789,3554 724,3550 716,3541 714,3540"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0004_line0001_word0000">
+                    <pc:Coords points="353,3538 630,3539 630,3637 353,3636"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>MrrRicAL</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0004_line0001_word0001">
+                    <pc:Coords points="722,3540 1049,3541 1049,3639 722,3638"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>ALsIs.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.703553199768066">
+                    <pc:Unicode>MrrRicAL ALsIs.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>MrrRicAL ALsIs.</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005">
+            <pc:Coords points="1611,3680 317,3691 294,3698 286,3703 286,3769 364,3865 724,3867 945,3867 2482,3775 2539,3764 2539,3698 2170,3685"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="1648,3680 1634,3683 1615,3697 1555,3699 1531,3696 1495,3686 1467,3683 1388,3683 1373,3686 1354,3696 1330,3698 722,3701 693,3698 684,3689 673,3689 663,3698 369,3701 338,3700 329,3691 318,3691 309,3699 292,3699 286,3703 286,3764 290,3767 321,3768 383,3765 1552,3763 1603,3769 1611,3775 1621,3775 1629,3770 1680,3770 1725,3764 1794,3762 2366,3761 2471,3764 2475,3773 2487,3773 2490,3773 2501,3764 2539,3764 2539,3698 2265,3699 2210,3695 2153,3685 2084,3685 2040,3696 1842,3701 1811,3697 1782,3687 1759,3682 1687,3680"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0001_word0000">
+                    <pc:Coords points="397,3786 649,3787 648,3887 396,3886"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>ANciEr</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0001_word0001">
+                    <pc:Coords points="750,3788 1077,3789 1076,3889 749,3888"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Avvrr</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0001_word0002">
+                    <pc:Coords points="1169,3790 1211,3790 1210,3890 1168,3890"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>To</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0001_word0003">
+                    <pc:Coords points="1312,3790 1413,3791 1412,3891 1311,3890"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>rE</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0001_word0004">
+                    <pc:Coords points="1505,3791 1690,3792 1689,3892 1504,3891"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>PLA;</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0001_word0005">
+                    <pc:Coords points="1791,3793 2110,3794 2109,3894 1790,3893"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>DRAMAris</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0001_word0006">
+                    <pc:Coords points="2202,3795 2555,3796 2554,3896 2201,3895"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>PsoNAE;</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.792226493358612">
+                    <pc:Unicode>ANciEr Avvrr To rE PLA; DRAMAris PsoNAE;</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0002">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0002.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="467,3786 462,3789 352,3790 347,3795 347,3844 347,3845 350,3848 359,3850 359,3858 364,3865 938,3867 944,3859 949,3859 954,3854 954,3805 949,3800 551,3799 501,3793 484,3786"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0005_line0002_word0000">
+                    <pc:Coords points="472,3786 839,3788 838,3888 471,3886"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>SrvcrE</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.761276543140411">
+                    <pc:Unicode>SrvcrE</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>ANciEr Avvrr To rE PLA; DRAMAris PsoNAE;
+SrvcrE</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0006">
+            <pc:Coords points="294,3934 286,3939 286,4002 287,4007 295,4016 566,4017 589,4007 592,4003 592,3953 588,3949 349,3934"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0006_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0006_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0006_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="294,3934 286,3939 286,3989 287,4007 295,4016 565,4017 571,4008 587,4008 587,4008 592,4003 592,3954 587,3949 432,3948 355,3935"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0006_line0001_word0000">
+                    <pc:Coords points="332,3934 473,3934 473,4046 332,4046"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>Trxr</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.801057696342468">
+                    <pc:Unicode>Trxr</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>Trxr</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0007">
+            <pc:Coords points="319,4082 292,4091 286,4095 286,4155 289,4158 729,4158 746,4145 746,4095 743,4091"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0007_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0007_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0007_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="319,4082 311,4090 295,4090 293,4090 286,4095 286,4155 289,4158 403,4155 729,4158 736,4150 739,4150 746,4145 746,4096 742,4091 377,4092 342,4091 331,4082"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0007_line0001_word0000">
+                    <pc:Coords points="335,4082 673,4083 672,4177 334,4176"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>APPNDIx.</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.754670262336731">
+                    <pc:Unicode>APPNDIx.</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>APPNDIx.</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0008">
+            <pc:Coords points="288,4230 286,4232 286,4308 649,4308 669,4304 677,4298 677,4248 673,4244"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0008_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0008_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0008_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="288,4230 286,4232 286,4307 380,4306 640,4308 652,4307 661,4305 665,4303 671,4302 677,4298 677,4249 672,4244 386,4242 357,4239 329,4231"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0008_line0001_word0000">
+                    <pc:Coords points="318,4231 670,4232 669,4330 317,4329"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>INDIcCEs·</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.847907185554504">
+                    <pc:Unicode>INDIcCEs·</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>INDIcCEs·</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0009">
+            <pc:Coords points="2543,3074 2543,3134 2555,3154 2644,3155 2727,3150 2727,3089 2665,3077"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0009_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0009_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0009_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2543,3074 2543,3133 2550,3134 2550,3145 2555,3154 2631,3154 2704,3151 2727,3150 2727,3090 2684,3088 2669,3084 2663,3077"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0009_line0001_word0000">
+                    <pc:Coords points="2657,3075 2701,3075 2701,3177 2657,3177"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>lv</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.700111508369446">
+                    <pc:Unicode>lv</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>lv</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0010">
+            <pc:Coords points="2542,3535 2541,3594 2548,3612 2552,3615 2727,3615 2727,3551 2663,3538"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0010_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0010_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0010_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2541,3593 2547,3596 2547,3609 2547,3610 2552,3615 2727,3615 2727,3551 2680,3548 2668,3545 2661,3538 2635,3540 2605,3536 2542,3535"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0010_line0001_word0000">
+                    <pc:Coords points="2687,3536 2705,3536 2705,3642 2687,3642"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>x</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.954636335372925">
+                    <pc:Unicode>x</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>x</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0011">
+            <pc:Coords points="2559,3796 2555,3800 2555,3851 2564,3873 2568,3876 2727,3875 2727,3796"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0011_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0011_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0011_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2560,3796 2555,3801 2555,3850 2563,3856 2563,3871 2563,3871 2568,3876 2727,3875 2727,3797"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0011_line0001_word0000">
+                    <pc:Coords points="2668,3797 2689,3797 2688,3921 2667,3921"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>3</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.951903939247131">
+                    <pc:Unicode>3</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>3</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0012">
+            <pc:Coords points="2539,3946 2540,3972 2605,4007 2727,4006 2727,3946"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0012_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0012_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2539,3971 2607,3971 2608,3983 2600,3998 2605,4007 2727,4006 2727,3946 2539,3946"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0012_line0001_word0000">
+                    <pc:Coords points="2644,3946 2686,3946 2686,4030 2644,4030"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>10</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.804405927658081">
+                    <pc:Unicode>10</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>10</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0013">
+            <pc:Coords points="2603,4088 2578,4089 2564,4101 2564,4142 2573,4151 2656,4165 2727,4165 2727,4088"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0013_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0013_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0013_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2627,4089 2579,4089 2574,4093 2567,4098 2564,4102 2564,4142 2571,4149 2574,4151 2583,4153 2612,4155 2650,4164 2650,4164 2689,4165 2727,4165 2727,4089"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0013_line0001_word0000">
+                    <pc:Coords points="2591,4088 2690,4089 2689,4193 2590,4192"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>213</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.996146500110626">
+                    <pc:Unicode>213</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>213</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+        <pc:TextRegion id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0014">
+            <pc:Coords points="2670,4242 2572,4245 2561,4255 2561,4298 2569,4306 2630,4317 2727,4307 2727,4242"/>
+            <pc:TextLine id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0014_line0001">
+                <pc:AlternativeImage filename="OCR-D-SEG-LINE-RESEG-DEWARP/OCR-D-SEG-LINE-RESEG-DEWARP_sophoclesplaysa05campgoog_0012_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0014_OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0014_line0001.IMG-DEWARP.png" comments="binarized,despeckled,dewarped"/>
+                <pc:Coords points="2684,4242 2572,4245 2561,4256 2561,4298 2569,4306 2624,4308 2633,4317 2645,4315 2653,4308 2727,4307 2727,4307 2727,4242"/>
+                <pc:Word id="OCR-D-BIN-DENOISE-DESKEW_sophoclesplaysa05campgoog_0012_region0014_line0001_word0000">
+                    <pc:Coords points="2592,4241 2688,4242 2687,4334 2591,4333"/>
+                    <pc:TextEquiv>
+                        <pc:Unicode>241</pc:Unicode>
+                    </pc:TextEquiv>
+                </pc:Word>
+                <pc:TextEquiv conf="0.984927892684937">
+                    <pc:Unicode>241</pc:Unicode>
+                </pc:TextEquiv>
+            </pc:TextLine>
+            <pc:TextEquiv>
+                <pc:Unicode>241</pc:Unicode>
+            </pc:TextEquiv>
+        </pc:TextRegion>
+    </pc:Page>
+</pc:PcGts>
