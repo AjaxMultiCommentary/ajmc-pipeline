@@ -105,12 +105,12 @@ def find_all_tesshocr_tags(element: bs4.element.Tag, name: str) -> List[bs4.elem
 
 
 
-# #%%
+#%%
 # from oclr.utils.image_processing import draw_rectangles
 # import cv2
 #
-# page = TessHocrPage('sophoclesplaysa05campgoog_0146')
+# page = PagexmlPage('sophokle1v3soph_0115')
 # matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.regions], page.image.matrix.copy(), (255, 0, 0), 3)
 # matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.lines], matrix, (0, 255, 0))
 # matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.words], matrix)
-# cv2.imwrite('/Users/sven/Desktop/testtesseract.png', matrix)
+# cv2.imwrite('/Users/sven/Desktop/schneidewin115.png', matrix)

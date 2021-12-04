@@ -121,4 +121,3 @@ def find_all_pagexml_tags(element: bs4.element.Tag, name: str) -> List[bs4.eleme
         else name
 
     return element.find_all(name=name)
-

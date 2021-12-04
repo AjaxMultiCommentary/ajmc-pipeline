@@ -66,6 +66,7 @@ class Image:  # todo
         """np.ndarray of the image image matrix. Its shape is (height, width, channels)."""
         return cv2.imread(os.path.join(PATHS['base_dir'], self.id.split('_')[0], PATHS['png'], self.filename))
 
+
     @lazy_property
     def contours(self):
         return find_contours(self.matrix)
