@@ -51,6 +51,13 @@ def draw_rectangles(rectangles: List[RectangleType], matrix: np.ndarray, color: 
 
     return matrix
 
+def draw_page_regions_lines_words(page,
+                                  output_path:str):
+    matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.regions], page.image.matrix.copy(), (255, 0, 0), 3)
+    matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.lines], matrix, (0, 255, 0))
+    matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.words], matrix)
+    cv2.imwrite(output_path, matrix)
+
 
 class Image:  # todo
     """Default class for images"""
