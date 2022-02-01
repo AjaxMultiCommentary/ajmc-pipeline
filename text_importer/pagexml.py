@@ -1,6 +1,6 @@
 from typing import List
 import bs4
-from commons.types import ElementType, PathType
+from commons.custom_typing_types import ElementType, PathType
 from oclr.utils.geometry import Shape
 from text_importer.base_classes import Element, Page, Commentary
 from commons.utils import lazy_property
@@ -61,7 +61,7 @@ class PagexmlElement(Element):
         return self._get_children('words')
 
     def _get_children(self, name: str = None) -> List['PagexmlElement']:
-        return [self.__class__(el, self.page) for el in find_all_pagexml_tags(element=self.markup, name=name)]
+        return [self.__class__(tag, self.page) for tag in find_all_pagexml_tags(element=self.markup, name=name)]
 
     def _get_parent(self, name: str = None):
         if name == 'page':

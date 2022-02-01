@@ -1,7 +1,7 @@
 """Functions and helpers to manage the files """
 
 import os
-from commons.types import PathType
+from commons.custom_typing_types import PathType
 from commons.variables import PATHS
 
 

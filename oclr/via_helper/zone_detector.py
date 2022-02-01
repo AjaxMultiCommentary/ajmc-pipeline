@@ -3,15 +3,15 @@ from typing import List
 import os
 import numpy as np
 from oclr.utils import image_processing
-from oclr.utils.geometry import Shape, is_rectangle_within_rectangle, remove_artifacts_from_contours
-
+from oclr.utils.geometry import Shape, is_rectangle_within_rectangle
+from oclr.utils.image_processing import remove_artifacts_from_contours
 
 
 def detect_zones(img_path: str,
                  output_dir: str,
                  dilation_kernel_size: int,
                  dilation_iterations: int,
-                 artifact_size,
+                 artifact_size_threshold: int,
                  draw_rectangles: bool,
                  via_csv_dict: dict) -> dict:
     """Automatically detects regions of interest for every image in `IMG_DIR`, using a simple dilation process.
@@ -30,11 +30,11 @@ def detect_zones(img_path: str,
 
     # Finding contours
     contours: List[Shape] = image_processing.find_contours(binarized, do_binarize=False)
-    contours = remove_artifacts_from_contours(contours, artifact_size)
+    contours = remove_artifacts_from_contours(contours, artifact_size_threshold)
 
     # Finding dilation contours
     dilated_contours: List[Shape] = image_processing.find_contours(dilation, do_binarize=False)
-    dilated_contours = remove_artifacts_from_contours(dilated_contours, artifact_size)
+    dilated_contours = remove_artifacts_from_contours(dilated_contours, artifact_size_threshold)
 
     dilated_contours_shrinked = []
 

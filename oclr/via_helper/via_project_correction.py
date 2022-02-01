@@ -5,7 +5,8 @@ from commons.variables import PATHS
 import os
 import cv2
 from typing import List
-from oclr.utils.geometry import Shape, is_rectangle_within_rectangle, remove_artifacts_from_contours
+from oclr.utils.geometry import Shape, is_rectangle_within_rectangle
+from oclr.utils.image_processing import remove_artifacts_from_contours
 from oclr.utils import image_processing
 
 
@@ -43,3 +44,20 @@ for i in range(len(contours)):
 cv2.imshow("coucou", image)
 contours[0]
 cv2.imwrite("/Users/sven/ajmc/data/olr/test_draw_.jpg", image)
+
+
+#%%
+
+## TOKEEP : verifies via integrity (here only making sure that pages contains either 0 or 2 commentary sections.
+import json
+with open('/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/lestragdiesdeso00tourgoog/olr/via_project.json', "r") as f:
+    via_project = json.loads(f.read())
+
+
+for key, page in via_project['_via_img_metadata'].items():
+    regions_count = 0
+    for region in page['regions']:
+        if region['region_attributes']['text']=='commentary':
+            regions_count+=1
+    if regions_count != 0 and regions_count!=2:
+        print(key)

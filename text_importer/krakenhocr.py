@@ -10,7 +10,8 @@ Notes:
 
 from typing import List
 import bs4
-from commons.types import ElementType
+from commons.custom_typing_types import ElementType
+from oclr.utils.geometry import is_point_within_rectangle, Shape, get_bounding_rectangle_from_points
 from text_importer.base_classes import Element, Page, Commentary
 from commons.utils import lazy_property
 from text_importer.utils import parse_xml, get_hocr_tag_coords
@@ -59,8 +60,12 @@ class KrakenHocrElement(Element):
         return self._get_children('lines')
 
     @lazy_property
+    def contours(self):
+        return find_included_contours(self, self.page.image.contours)
+
+    @lazy_property
     def words(self):
-        return self._get_children('words')
+        return shrink_elements_to_contours(self._get_children('words'), self.contours)
 
     def _get_children(self, name: str = None) -> List['KrakenHocrElement']:
         return [self.__class__(el, self.page) for el in self._find_tags(name)]
@@ -107,12 +112,29 @@ def find_all_krakenhocr_tags(element: bs4.element.Tag, name: str) -> List[bs4.el
     return element.find_all(attrs={'class': name})
 
 
-# %%
-# from oclr.utils.image_processing import draw_rectangles
-# import cv2
-#
-# page = KrakenHocrPage('sophoclesplaysa05campgoog_0146')
-# matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.regions], page.image.matrix.copy(), (255, 0, 0), 3)
-# matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.lines], matrix, (0, 255, 0))
-# matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.words], matrix, thickness=1)
-# cv2.imwrite('/Users/sven/Desktop/testkraken.png', matrix)
+
+def find_included_contours(element:ElementType, contours: List[Shape]) -> List[Shape]:
+    e_contours = [c for c in contours
+                  if any([is_point_within_rectangle(p, element.coords.bounding_rectangle) for p in c.points])
+                  and max([p[1] for p in c.points]) <= element.coords.bounding_rectangle[2][1]
+                  and min([p[1] for p in c.points]) >= element.coords.bounding_rectangle[0][1]]
+    return e_contours
+
+def shrink_elements_to_contours(elements: ElementType, contours: List[Shape]) -> List[ElementType]:
+
+    for el in elements:
+        # find contours with at least which have at least one point in word and which would not make the box taller
+        e_contours = [c for c in contours
+                      if any([is_point_within_rectangle(p, el.coords.bounding_rectangle) for p in c.points])
+                      and max([p[1] for p in c.points]) <= el.coords.bounding_rectangle[2][1]
+                      and min([p[1] for p in c.points]) >= el.coords.bounding_rectangle[0][1]]
+
+        # get the words new coords
+        word_points = [p for c in e_contours for p in c.points]
+        word_points = word_points if word_points else [[0, 0], [0, 0], [0, 0], [0, 0]]
+
+        el._coords = Shape(get_bounding_rectangle_from_points(word_points))
+
+    return elements
+
+

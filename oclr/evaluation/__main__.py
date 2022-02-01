@@ -15,7 +15,7 @@ import cv2
 # TODO : retrieve mean edit edit distance per word
 
 def main(args, general_results, via_project):
-    # ==================================== PRELIMINARY AFFECTATIONS ========================================================
+    # ==================================== PRELIMINARY AFFECTATIONS ====================================================
     # Actualizing args
     args.ocr_engine = "ocrd" if ("ocr-d" in args.OCR_DIR.lower() or "ocrd" in args.OCR_DIR.lower()) else "lace"
     args.olr_annotation_type = "via" if args.via_project is not None else "lace"

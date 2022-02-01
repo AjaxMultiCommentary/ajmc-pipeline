@@ -9,7 +9,7 @@ from text_importer.krakenhocr import KrakenHocrCommentary
 from commons.variables import PATHS
 
 
-def create_pagexml_pipeline_parser() -> argparse.ArgumentParser:
+def create_default_pipeline_parser() -> argparse.ArgumentParser:
     """Adds `pipeline.py` relative arguments to the parser"""
 
     parser = argparse.ArgumentParser()
@@ -24,7 +24,7 @@ def create_pagexml_pipeline_parser() -> argparse.ArgumentParser:
                         nargs='+',
                         type=list,
                         required=False,
-                        help='The respective format to process commentary in')
+                        help='The respective ocr format to process commentary in')
 
     parser.add_argument('--json_dir',
                         type=str,
@@ -61,12 +61,15 @@ def initialize_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
 
     else:  # For testing, without cli
         args = parser.parse_args([])
-        args.commentary_ids = ['sophokle1v3soph', 'cu31924087948174', 'Wecklein1894']
-        args.commentary_formats = ['pagexml'] * 3
+        # args.commentary_ids = ['sophokle1v3soph', 'cu31924087948174', 'Wecklein1894']
+        # args.commentary_formats = ['pagexml'] * 3
+        args.commentary_ids = ['lestragdiesdeso00tourgoog']
+        args.commentary_formats = ['tesshocr']
         args.region_types = ['introduction', 'preface', 'commentary', 'footnote']
         args.make_xmis = True
+        args.xmi_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/lestragdiesdeso00tourgoog/ner/annotation/tesshocr'
+        args.json_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/lestragdiesdeso00tourgoog/canonical/tesshocr'
         args.make_jsons = True
-        args.region_types = ['introduction', 'commentary', 'footnotes', 'preface']
 
         return args
 
@@ -76,12 +79,11 @@ def main():
                           'krakenhocr': KrakenHocrCommentary,
                           'tesshocr': TessHocrCommentary}
 
-    args = initialize_args(create_pagexml_pipeline_parser())
+    args = initialize_args(create_default_pipeline_parser())
 
     for commentary_id, commentary_format in zip(args.commentary_ids, args.commentary_formats):
 
         commentary = commentary_classes[commentary_format](commentary_id)
-
 
         args.json_dir = os.path.join(PATHS['base_dir'], commentary_id, 'canonical', commentary_format)
         os.makedirs(args.json_dir, exist_ok=True)
@@ -116,6 +118,8 @@ def main():
                         rebuilt_to_xmi(rebuild, args.xmi_dir, typesystem_path=PATHS['typesystem'])
 
 
-
 if __name__ == '__main__':
     main()
+
+
+

@@ -1,7 +1,7 @@
 from typing import List, Union, Iterable, Optional
 import numpy as np
 from commons.utils import lazy_property
-from commons.types import RectangleType
+from commons.custom_typing_types import RectangleType
 
 
 class Shape:
@@ -26,7 +26,7 @@ class Shape:
             of the rectangle from the upper left corner clockwise.
             points: a list of list of points `[[x:int,y:int], ...]`
         """
-        self.bounding_rectangle = bounding_rectangle
+        self.bounding_rectangle: RectangleType = bounding_rectangle
         self.points = points if points else bounding_rectangle
 
     @classmethod
@@ -42,7 +42,7 @@ class Shape:
         """
 
         points = points.squeeze()
-        assert points.shape[-1] == 2, """The array's shape must be (N,2) or squeezable to (N,2)"""
+        assert points.shape[-1] == 2 and points.shape[0]>1, """The array's shape must be (N,2) or squeezable to (N,2)"""
         points = points.tolist()
         return cls(get_bounding_rectangle_from_points(points), points)
 
@@ -75,6 +75,7 @@ def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterab
         A list of four lists of x-y-points representing the four points of the rectangle from the upper
         left corner clockwise."""
 
+
     if type(points) == np.ndarray:
         points = points.squeeze()
         assert len(points.shape) == 2 and points.shape[-1] == 2
@@ -90,13 +91,6 @@ def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterab
         y_min, y_max = min(y_coords), max(y_coords)
 
         return [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
-
-
-def remove_artifacts_from_contours(contours: List[Shape],
-                                   min_perimeter: float) -> List[Shape]:
-    """Removes contours if the perimeter of their bounding rectangle is inferior to `min_perimeter`"""
-
-    return [c for c in contours if (2 * (c.xywh[2] + c.xywh[3])) > min_perimeter]
 
 
 def is_point_within_rectangle(point: Union[Iterable[int], np.ndarray], container: RectangleType) -> bool:

@@ -5,7 +5,7 @@ from oclr.utils.geometry import Shape
 import os
 from commons.utils import lazy_property
 from commons.variables import PATHS
-from commons.types import RectangleType, PathType
+from commons.custom_typing_types import RectangleType, PathType
 
 
 def binarize(image: np.ndarray):
@@ -14,13 +14,18 @@ def binarize(image: np.ndarray):
     return cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)[1]
 
 
-def find_contours(image: np.ndarray, do_binarize: bool = True) -> List[np.ndarray]:
+def find_contours(image: np.ndarray, do_binarize: bool = True, remove_artifacts=True) -> List[Shape]:
     """Binarizes `image` and finds contours using `cv2.findContours`."""
 
     temp = binarize(image) if do_binarize else image
-    contours, _ = cv2.findContours(temp, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contours, _ = cv2.findContours(temp, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)  # alternative: CHAIN_APPROX_NONE
+    contours = [Shape.from_numpy_array(c) for c in contours if len(c)>1]
 
-    return [Shape.from_numpy_array(c) for c in contours]
+    if remove_artifacts:
+        contours = remove_artifacts_from_contours(contours, 0.002*image.shape[0])
+
+    return contours
+
 
 
 def draw_rectangles(rectangles: List[RectangleType], matrix: np.ndarray, color: Tuple[int, int, int] = (0, 0, 255),
@@ -51,11 +56,17 @@ def draw_rectangles(rectangles: List[RectangleType], matrix: np.ndarray, color: 
 
     return matrix
 
-def draw_page_regions_lines_words(page,
-                                  output_path:str):
-    matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.regions], page.image.matrix.copy(), (255, 0, 0), 3)
-    matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.lines], matrix, (0, 255, 0))
-    matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.words], matrix)
+
+def draw_page_regions_lines_words(page, output_path: str,
+                                  region_elements:bool=False):
+    matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.regions],
+                             page.image.matrix.copy(), (255, 0, 0), 3)
+    if region_elements:
+        matrix = draw_rectangles([r.coords.bounding_rectangle for region in page.regions for r in region.lines], matrix, (0, 255, 0), thickness=2)
+        matrix = draw_rectangles([r.coords.bounding_rectangle for region in page.regions for r in region.words], matrix, thickness=1)
+    else:
+        matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.lines], matrix, (0, 255, 0), thickness=2)
+        matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.words], matrix,thickness=1)
     cv2.imwrite(output_path, matrix)
 
 
@@ -73,22 +84,9 @@ class Image:  # todo
         """np.ndarray of the image image matrix. Its shape is (height, width, channels)."""
         return cv2.imread(os.path.join(PATHS['base_dir'], self.id.split('_')[0], PATHS['png'], self.filename))
 
-
     @lazy_property
     def contours(self):
         return find_contours(self.matrix)
-
-    @lazy_property
-    def overlap_matrix(self):  # todo is this still requested.
-
-        overlap_matrix = np.ndarray((4, self.matrix.shape[0], self.matrix.shape[1]), dtype=object)
-        overlap_matrix[:, :, :] = ''
-        overlap_matrix[3, :, :] = -1
-
-        # Add contours points to overlap_matrix
-        for i, contour in enumerate(self.contours):
-            for point in contour:
-                self.overlap_matrix[3, point[0][1], point[0][0]] = i
 
     def crop(self, rect: RectangleType, margin: int = 0) -> 'Image':
         """Gets the slice of `self.matrix` corresponding to `rect`.
@@ -104,9 +102,15 @@ class Image:  # todo
 
         return Image(self.id, matrix=cropped)
 
-
     def write(self, output_path: PathType):
         cv2.imwrite(output_path, self.matrix())
 
 
+def remove_artifacts_from_contours(contours: List[Shape],
+                                   artifact_size_threshold: float) -> List[Shape]:
+    """Removes contours if the perimeter of their bounding rectangle is inferior to `artifact_size_threshold`"""
 
+    contours_ = [c for c in contours if (2 * (c.xywh[2] + c.xywh[3])) > artifact_size_threshold]
+    print(f"""Removed {len(contours)-len(contours_)} artifacts""")
+
+    return contours_

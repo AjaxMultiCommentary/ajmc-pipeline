@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 from abc import ABC, abstractmethod
@@ -6,12 +7,12 @@ from typing import Dict, Optional, List, Union
 import bs4.element
 from commons.utils import lazy_property
 from commons.variables import PATHS
-from commons.types import PageType, ElementType, CommentaryType, PathType
+from commons.custom_typing_types import PageType, ElementType, CommentaryType, PathType
 from oclr.utils.geometry import (
     Shape,
     is_rectangle_partly_within_rectangle,
     get_bounding_rectangle_from_points,
-    is_rectangle_within_rectangle
+    is_rectangle_within_rectangle, is_point_within_rectangle
 )
 from oclr.utils.image_processing import Image
 from oclr.utils.region_processing import order_olr_regions, get_page_region_dicts_from_via
@@ -212,7 +213,7 @@ class Page(Element):
             name: The name of the `bs4.element.Tag` to retrieve. Should be `'words'|'lines'|'regions'`
 
         Returns:
-            A list of `PagexmlElement` objects, except for regions, where it returns a list of `Region` objects
+            A list of Elements objects, except for regions, where it returns a list of `Region` objects
         """
 
         if name in ['regions', 'olr_regions']:
@@ -235,8 +236,8 @@ class Page(Element):
 
         Note:
             This instantiate `Region` objects and may therefore take time. For a more efficient computation,
-            preselect the desired region types. But warning, don't create canonical regions
-            out of pre-selected regions only !
+            preselect the desired region types. But warning, don't create canonical jsons
+            with of pre-selected regions only !
 
         Returns:
             A list region objects
@@ -250,6 +251,8 @@ class Page(Element):
             regions = [Region(r, self) for r in regions if r['region_attributes']['text'] in region_types]
 
         return order_olr_regions([r for r in regions if r.words])
+
+        
 
 
 class Region(Element):
@@ -291,7 +294,7 @@ class Region(Element):
         self.page = page
         self._markup = via_dict
 
-        # Get the initial coords  # TODO : see if this must be changed in via directly
+        # Get the initial coords 
         self.initial_coords = Shape.from_xywh(x=self.markup['shape_attributes']['x'],
                                               y=self.markup['shape_attributes']['y'],
                                               w=self.markup['shape_attributes']['width'],
@@ -324,8 +327,28 @@ class Region(Element):
 
     def _get_children(self, name: Optional[str] = None, *args, **kwargs) -> List[ElementType]:
         """Retrieves elements that are geographically contained within the region"""
-        return [el for el in getattr(self.page, name) if
-                is_rectangle_within_rectangle(el.coords.bounding_rectangle, self.coords.bounding_rectangle)]
+
+        if 'line' in name.lower():  # Reconstruct region lines
+            region_lines = []
+            for line in self.page.lines:
+                if is_rectangle_partly_within_rectangle(line.coords, self.coords, threshold=0.25):
+                    line_ = copy.copy(line)
+                    line_words = []
+                    for word in line_.words:
+                        if is_rectangle_within_rectangle(word.coords.bounding_rectangle, self.coords.bounding_rectangle):
+                            line_words.append(word)
+
+                    line_._words = line_words
+                    line_points = [xy for w in line_._words for xy in w.coords.bounding_rectangle]
+                    line_._coords = Shape(get_bounding_rectangle_from_points(line_points)) \
+                        if line_points else Shape.from_points([(0, 0)])  # todo, shouldn't this be the default return of shape ?
+                    region_lines.append(line_)
+
+            return region_lines
+
+        else:
+            return [el for el in getattr(self.page, name) if
+                    is_rectangle_within_rectangle(el.coords.bounding_rectangle, self.coords.bounding_rectangle)]
 
     def _get_coords(self):
         return self._coords

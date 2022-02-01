@@ -112,11 +112,11 @@ def annotation_helper_args(parser: "ArgumentParser") -> "ArgumentParser":
         help="Number of iterations in dilation, default 1")
 
     parser.add_argument(
-        "--artifact_threshold",
-        default=0.01,
-        type=float,
-        help="Size-threshold under which contours are to be considered as artifacts and removed, expressed as a "
-             "percentage of image height. Default is 0.01")
+        "--artifact_size_threshold",
+        default=15,
+        type=int,
+        help="Minimum perimeter (in pixels) of the contours to be kept. Below this threshold contours are discarded."
+             "Recommended is around 0.01*image_width")
 
 
     parser.add_argument(
@@ -143,22 +143,21 @@ else:
     #                           "--evaluation_level", "word",  # "line" level not implemented yet # TODO
     #                           "--dilation_kernel_size", "27",
     #                           "--dilation_iterations", "2",
-    #                           "--artifact_threshold", "0.020",
     #                           # "--fuzzy_eval"
     #                           # "--draw_rectangles"
     #                           # "--merge_zones"
     #                           ])
 
-    args = parser.parse_args(["--OUTPUT_DIR", "/Users/sven/oclr/via_helper",
-                              "--IMG_DIR", "/Users/sven/oclr/via_helper/data/test_png",
+    args = parser.parse_args(["--OUTPUT_DIR", "/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/lestragdiesdeso00tourgoog/olr/project_initiation",
+                              "--IMG_DIR", "/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/lestragdiesdeso00tourgoog/images/png",
                               # #"--SVG_DIR", "/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary_data/jebb/ocr/evaluation/groundtruth/svg",
                               # "--GROUNDTRUTH_DIR", "/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary_data/lobeck/ocr/evaluation/groundtruth/html/",
                               # "--OCR_DIR", "/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary_data/lobeck/ocr/evaluation/groundtruth/html/",
                               # "--via_project", "/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary_data/lobeck/olr/via_project.json",
                               # "--evaluation_level", "word", # "line" level not implemented yet
-                              "--dilation_kernel_size", "27",
+                              "--dilation_kernel_size", "29",
                               "--dilation_iterations", "2",
-                              "--artifact_threshold", "0.020",
-                              "--draw_rectangles",
+                              "--artifact_size_threshold", "10",
+                              # "--draw_rectangles",
                               # "--merge_zones"
                               ])

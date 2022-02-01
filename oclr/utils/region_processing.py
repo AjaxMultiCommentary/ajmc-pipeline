@@ -1,5 +1,5 @@
 from typing import List
-from commons.types import PageType
+from commons.custom_typing_types import PageType
 
 
 def get_page_region_dicts_from_via(page_id: str, via_project: dict) -> List[dict]:

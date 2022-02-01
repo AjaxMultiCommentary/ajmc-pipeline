@@ -1,11 +1,11 @@
 import os
-from commons.variables import PATHS, open_commentaries
+from commons.variables import PATHS, pd_commentaries
 from text_importer.pagexml import PagexmlPage
 import pandas as pd
 
-sheet = {c: {'page': [], 'region': [], 'word_count': []} for c in open_commentaries}
+sheet = {c: {'page': [], 'region': [], 'word_count': []} for c in pd_commentaries}
 
-for commentary_id in open_commentaries:
+for commentary_id in pd_commentaries:
     print("Process commentary  " + commentary_id)
     pages_ids = [p[:-4] for p in os.listdir(os.path.join(PATHS['base_dir'], commentary_id, PATHS['png'])) if
                  p.endswith('.png')]
@@ -27,6 +27,6 @@ for commentary_id in open_commentaries:
             sheet[commentary_id]['word_count'].append(count)
 
 with pd.ExcelWriter('/Users/sven/Desktop/temp.xlsx') as writer:
-    for commentary_id in open_commentaries:
+    for commentary_id in pd_commentaries:
         df = pd.DataFrame(sheet[commentary_id])
         df.to_excel(writer, sheet_name=commentary_id, index=False)

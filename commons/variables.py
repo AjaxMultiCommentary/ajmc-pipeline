@@ -2,9 +2,10 @@ PATHS = {'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentar
          'schema': '/Users/sven/ajmc/commons/page.schema.json',
          'png': 'images/png',
          'via_project': 'olr/via_project.json',
-         'pagexml': 'ocr/ocrs/tess_final/',  # todo
+         'pagexml': 'ocr/ocrs/tess_final/',  # todo change this system to custom folders !!! (e.g. you can chose the folder in args
          'tesshocr': 'ocr/ocrs/tess_hocr',
-         'krakenhocr': 'ocr/evaluation/groundtruth/html',
+         # 'krakenhocr': 'ocr/evaluation/groundtruth/html',
+         'krakenhocr': 'ocr/ocrs/lace_retrained_sophoclesplaysa05campgoog-2021-05-24-08-15-12-porson-with-sophoclesplaysa05campgoog-2021-05-23-22-17-38/outputs',
          'json': 'canonical',
          'xmi': 'ner/annotation',
          'typesystem': '/Users/sven/ajmc/data/xmi_annotation/TypeSystem.xml'
@@ -21,7 +22,7 @@ via_csv_dict_template = {'filename': [],
                          'region_shape_attributes': [],
                          'region_attributes': []}
 
-open_commentaries = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
+pd_commentaries = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
 
 olr_regions_types = ['app_crit',
                      'appendix',

@@ -1,6 +1,6 @@
 from typing import List
 import bs4
-from commons.types import ElementType
+from commons.custom_typing_types import ElementType
 from oclr.utils.geometry import Shape
 from text_importer.base_classes import Element, Page, Commentary
 from text_importer.file_management import get_page_ocr_path
@@ -100,17 +100,14 @@ def find_all_tesshocr_tags(element: bs4.element.Tag, name: str) -> List[bs4.elem
         return element.find_all(attrs={'class': name})
 
     else:
-        return element.find_all(attrs={'class': ['ocr_line', 'ocr_']})
+        return element.find_all(attrs={'class': ['ocr_line', 'ocrx_line', 'ocr_textfloat', 'ocr_header']})
 
 
 
 
-#%%
-# from oclr.utils.image_processing import draw_rectangles
-# import cv2
-#
-# page = PagexmlPage('sophokle1v3soph_0115')
-# matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.regions], page.image.matrix.copy(), (255, 0, 0), 3)
-# matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.lines], matrix, (0, 255, 0))
-# matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.words], matrix)
-# cv2.imwrite('/Users/sven/Desktop/schneidewin115.png', matrix)
+
+from oclr.utils.image_processing import draw_rectangles
+import cv2
+
+page = TessHocrPage('lestragdiesdeso00tourgoog_0115')
+page.regions
