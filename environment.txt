@@ -1,0 +1,11 @@
+bs4
+dkpro-cassis
+jsonschema
+Levenshtein
+lxml
+numpy
+openpyxl
+pandas
+pytest
+typing
+
