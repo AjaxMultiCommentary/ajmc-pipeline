@@ -261,7 +261,11 @@ def commentary_evaluation(commentary: 'Commentary',
 
     return bow_error_counts, coord_error_counts, editops
 
-# Todo : Add a full commentary evaluation with all models and runs.
 
+def evaluate_all():
+    """Evaluate all commentaries and runs"""
+
+
+#todo add fuzzy eval
 
 

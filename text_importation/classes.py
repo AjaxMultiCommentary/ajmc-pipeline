@@ -4,7 +4,7 @@ import os
 from time import strftime
 from typing import Dict, Optional, List, Union
 import bs4.element
-from utils.utils import lazy_property
+from utils.general_utils import lazy_property
 from commons.variables import paths
 from utils.geometry import (
     Shape,

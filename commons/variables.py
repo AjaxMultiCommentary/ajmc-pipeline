@@ -1,13 +1,13 @@
 import re
 
-paths = {'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/',
-         'schema': '/Users/sven/ajmc/commons/page.schema.json',
+paths = {'base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/',
+         'schema': '/scratch/sven/tmp/ajmc/commons/page.schema.json',
          'groundtruth': 'ocr/groundtruth/evaluation',
          'png': 'images/png',
          'via_project': 'olr/via_project.json',
          'json': 'canonical',
          'xmi': 'ner/annotation',
-         'typesystem': '/Users/sven/ajmc/data/xmi_annotation/TypeSystem.xml',
+         'typesystem': '/scratch/sven/tmp/ajmc/data/xmi_annotation/TypeSystem.xml',
          'olr_initiation': 'olr/annotation/project_initiation'
          }
 
