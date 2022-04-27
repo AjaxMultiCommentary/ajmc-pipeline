@@ -21,5 +21,7 @@ icon?
 # Others
 workbench.py
 
-
+# Ziqi
+*.pyc
+ocr/exps/*
 
