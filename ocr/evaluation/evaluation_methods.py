@@ -3,7 +3,7 @@ import os
 from typing import List, Dict, Tuple, Union, Optional
 import Levenshtein
 from commons.variables import ordered_olr_regions_types
-from utils.utils import safe_divide
+from utils.general_utils import safe_divide
 from utils.geometry import is_rectangle_partly_within_rectangle, is_rectangle_within_rectangle
 from ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts
@@ -225,7 +225,7 @@ def commentary_evaluation(commentary: 'Commentary',
     bow_error_counts, coord_error_counts, editops = None, None, None
     soups = []
 
-    for gt_page in commentary.groundtruth_pages:
+    for gt_page in commentary.ocr_groundtruth_pages:
         pred_page = [p for p in commentary.pages if p.id == gt_page.id][0]
 
         bow_error_counts = bag_of_word_evaluation(gt_bag=[w.text for w in gt_page.words],
@@ -246,7 +246,7 @@ def commentary_evaluation(commentary: 'Commentary',
         os.makedirs(output_dir, exist_ok=True)
 
         for i, soup in enumerate(soups):
-            with open(os.path.join(output_dir, commentary.groundtruth_pages[i].id + ".html"), "w") as html_file:
+            with open(os.path.join(output_dir, commentary.ocr_groundtruth_pages[i].id + ".html"), "w") as html_file:
                 html_file.write(str(soup))
 
         # Sort and write editops record
@@ -268,4 +268,5 @@ def evaluate_all():
 
 #todo add fuzzy eval
 
-
+commentary = Commentary('cu31924087948174', '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/tess_eng_grc/outputs')
+commentary_evaluation(commentary=commentary,)

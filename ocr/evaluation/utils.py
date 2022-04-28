@@ -3,9 +3,6 @@ import re
 import Levenshtein
 import pandas as pd
 from bs4 import BeautifulSoup
-import numpy as np
-from oclr.utils import file_management
-import numpy as np
 from typing import List, Dict, Tuple
 import cv2
 from commons.variables import charsets

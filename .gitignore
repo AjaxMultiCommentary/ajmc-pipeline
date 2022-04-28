@@ -17,9 +17,11 @@ icon?
 
 # Pycharm
 .idea/
+__pycache__
 
 # Others
 workbench.py
+/data/
 
 
 

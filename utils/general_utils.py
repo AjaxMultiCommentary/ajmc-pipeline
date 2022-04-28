@@ -1,7 +1,7 @@
 """General utilities"""
 
 import timeit
-from typing import List, Tuple
+from typing import List, Tuple, Iterable, Generator
 
 import numpy as np
 
@@ -40,3 +40,21 @@ def safe_divide(dividend, divisor):
 
 
 RectangleType = List[Tuple[int, int]]
+
+
+def recursive_iterator(iterable: Iterable, iterable_types: Tuple[Iterable] = (list, tuple)) -> Generator:
+    """Iterates recursively through an iterable potentially containing iterables of `iterable_types`."""
+    for x in iterable:
+        if isinstance(x, iterable_types):
+            for y in recursive_iterator(x):
+                yield y
+        else:
+            yield x
+
+
+def get_unique_elements(iterable: Iterable, iterable_types: Tuple[Iterable] = (list, tuple)) -> List[str]:
+    """Get the list of elements from any potentially recursive iterable."""
+    return list(set([l for l in recursive_iterator(iterable, iterable_types)]))
+
+
+

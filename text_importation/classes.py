@@ -52,10 +52,20 @@ class Commentary:
                 for p_id in self._get_page_ids()]
 
     @lazy_property
-    def groundtruth_pages(self):
+    def ocr_groundtruth_pages(self):
         gt_dir = os.path.join(paths['base_dir'], self.id, paths['groundtruth'])
         return [Page(page_id=fname[:-5], commentary=self, ocr_path=os.path.join(gt_dir, fname))
                 for fname in os.listdir(gt_dir) if fname.startswith(self.id)]
+
+    @lazy_property
+    def olr_groundtruth_pages(self, ):
+        """Returns the list of `Page`s which have at least one annotated region."""
+        return [
+            Page(page_id=item['filename'].split('.')[0],
+                 ocr_path=get_page_ocr_path(item['filename'].split('.')[0], ocr_dir=self.ocr_dir),
+                 commentary=self) for key, item in self.via_project['_via_img_metadata'].items() if
+            any([r['region_attributes']['text'] not in ['commentary','undefined'] for r in item['regions']])
+        ]
 
     @lazy_property
     def regions(self):

@@ -1,6 +1,7 @@
 import re
 
-paths = {'base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/',
+paths = {#'base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/',
+         'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
          'schema': '/scratch/sven/tmp/ajmc/commons/page.schema.json',
          'groundtruth': 'ocr/groundtruth/evaluation',
          'png': 'images/png',
@@ -22,7 +23,9 @@ via_csv_dict_template = {'filename': [],
                          'region_shape_attributes': [],
                          'region_attributes': []}
 
-pd_commentaries = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
+
+commentary_ids = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Garvie1998', 'Kamerbeek1953', 'Paduano1982', 'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174', 'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph']
+pd_commentary_ids = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
 
 olr_regions_types = ['app_crit',
                      'appendix',
@@ -92,5 +95,4 @@ charsets = {
     'punctuation': re.compile(r'([\u0020-\u002F]|[\u003A-\u003F]|[\u005B-\u0060]|[\u007B-\u007E]|\u00A8|\u00B7)',
                               re.UNICODE)
 }
-
 

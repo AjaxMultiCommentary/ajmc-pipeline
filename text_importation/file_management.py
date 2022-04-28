@@ -15,8 +15,10 @@ def get_page_ocr_path(page_id: str, ocr_dir:str = None, ocr_run: str = None) -> 
 
     if len(files) == 0:
         print(f"""WARNING : {page_id} matches no file in {ocr_dir}, skipping...""")
+        return ""
 
-    return os.path.join(ocr_dir, files[0])
+    else:
+        return os.path.join(ocr_dir, files[0])
 
 
 def get_ocr_run_fullname(commentary_id: str, ocr_run: str) -> str:
