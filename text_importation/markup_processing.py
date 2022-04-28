@@ -2,7 +2,7 @@
 formats (json, hocr, page-XML...)"""
 
 import bs4
-from utils.geometry import Shape
+from common_utils.geometry import Shape
 from typing import List
 
 

@@ -16,11 +16,11 @@ plt.rcParams['savefig.dpi'] = 300
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.getcwd()))
 PARENT_DIR = os.path.dirname(PROJECT_DIR)
 
-sys.path.append(os.path.join(PROJECT_DIR, "commons"))
+sys.path.append(os.path.join(PROJECT_DIR, "common_utils"))
 import variables
 
 # Data dir with whole images
-RAW_DATA_DIR = variables.paths.get("base_dir", "")
+RAW_DATA_DIR = variables.PATHS.get("base_dir", "")
 RAW_COMMENTARY_DIRS = ['Wecklein1894', 'Kamerbeek1953', 'sophoclesplaysa05campgoog', 'Paduano1982', 'lestragdiesdeso00tourgoog', 
                         'Untersteiner1934', 'Ferrari1974', 'sophokle1v3soph', 'DeRomilly1976', 'Finglass2011', 'Colonna1975', 
                         'bsb10234118', 'cu31924087948174', 'Garvie1998']

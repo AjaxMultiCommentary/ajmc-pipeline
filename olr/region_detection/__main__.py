@@ -1,7 +1,7 @@
 import os
 from olr.region_detection.utils import write_csv_manually, detect_regions
-from utils.cli import args
-from commons.variables import via_csv_dict_template
+from common_utils.cli import args
+from common_utils.variables import VIA_CSV_DICT_TEMPLATE
 
 
 
@@ -15,7 +15,7 @@ for filename in os.listdir(args.img_dir):
                        dilation_iterations=args.dilation_iterations,
                        artifact_size_threshold=args.artifact_size_threshold,
                        draw_rectangles=args.draw_rectangles,
-                       via_csv_dict=via_csv_dict_template)
+                       via_csv_dict=VIA_CSV_DICT_TEMPLATE)
 
-write_csv_manually("detected_annotations.csv", via_csv_dict_template, args.output_dir)
-print("{} zones were automatically detected".format(len(via_csv_dict_template["filename"])))
+write_csv_manually("detected_annotations.csv", VIA_CSV_DICT_TEMPLATE, args.output_dir)
+print("{} zones were automatically detected".format(len(VIA_CSV_DICT_TEMPLATE["filename"])))

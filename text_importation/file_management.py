@@ -1,14 +1,14 @@
 """Functions and helpers to manage the files """
 
 import os
-from commons.variables import paths
+from common_utils.variables import PATHS
 
 
 def get_page_ocr_path(page_id: str, ocr_dir:str = None, ocr_run: str = None) -> str:
     """Gets the path to a page's ocr"""
 
     if not ocr_dir:
-        ocr_dir = os.path.join(paths['base_dir'], page_id.split('_')[0], 'ocr/runs', ocr_run, 'outputs')
+        ocr_dir = os.path.join(PATHS['base_dir'], page_id.split('_')[0], 'ocr/runs', ocr_run, 'outputs')
     files = [f for f in os.listdir(ocr_dir) if page_id in f]
 
     assert len(files) <= 1, f"""There are {len(files)} files matching the name {page_id} in {ocr_dir}. Please check."""
@@ -22,12 +22,12 @@ def get_page_ocr_path(page_id: str, ocr_dir:str = None, ocr_run: str = None) -> 
 
 
 def get_ocr_run_fullname(commentary_id: str, ocr_run: str) -> str:
-    return [p for p in os.listdir(os.path.join(paths['base_dir'], commentary_id, 'ocr/runs')) if ocr_run in p][0]
+    return [p for p in os.listdir(os.path.join(PATHS['base_dir'], commentary_id, 'ocr/runs')) if ocr_run in p][0]
 
 
 def get_ocr_dir_from_ocr_run(commentary_id: str, ocr_run: str) -> str:
     """Converts an ocr-run directory name to the absolute path to its outputs."""
-    return os.path.join(paths['base_dir'], commentary_id, 'ocr/runs/', ocr_run, 'outputs')
+    return os.path.join(PATHS['base_dir'], commentary_id, 'ocr/runs/', ocr_run, 'outputs')
 
 
 def guess_ocr_format(ocr_path: str) -> str:

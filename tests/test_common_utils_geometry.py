@@ -1,5 +1,5 @@
 import numpy as np
-import utils.geometry as geo
+import common_utils.geometry as geo
 from text_importation.classes import Page
 
 points = [[1, 2], [3, 4], [5, 6], [1, 2]]

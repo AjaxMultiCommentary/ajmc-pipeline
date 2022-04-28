@@ -3,7 +3,7 @@ import os
 from typing import Union, List, Dict
 from cassis import load_cas_from_xmi, load_typesystem, Cas
 
-from commons.variables import paths
+from common_utils.variables import PATHS
 
 
 def basic_rebuild(page: dict,
@@ -114,7 +114,7 @@ def compute_image_links(page: dict,
 
 def rebuilt_to_xmi(page: dict,  # todo : should this accept CommentaryPage objects ?
                    output_dir: str,
-                   typesystem_path: str = paths['typesystem'],
+                   typesystem_path: str = PATHS['typesystem'],
                    iiif_mappings=None,
                    pct_coordinates=False):
     """

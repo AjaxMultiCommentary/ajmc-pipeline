@@ -1,12 +1,12 @@
 """This module contains function to enhance via project jsons by reshaping regions and reorganising reading order."""
 
 import json
-from commons.variables import paths
+from common_utils.variables import PATHS
 import os
 import cv2
 from typing import List
-from utils.geometry import Shape
-from utils import image_processing
+from common_utils.geometry import Shape
+from common_utils import image_processing
 
 with open('/data/olr/via_project.json', "r") as f:
     via_project = json.loads(f.read())
@@ -15,7 +15,7 @@ pages = via_project["_via_img_metadata"]
 
 page = pages['sophokle1v3soph_0000.png69464']
 commentary_id = "sophokle1v3soph"
-img_path = os.path.join(paths["base_dir"], commentary_id, paths["png"], page["filename"])
+img_path = os.path.join(PATHS["base_dir"], commentary_id, PATHS["png"], page["filename"])
 
 image = cv2.imread(img_path)
 

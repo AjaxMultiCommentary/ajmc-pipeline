@@ -1,7 +1,7 @@
 from text_importation.classes import Commentary
-from commons.variables import commentary_ids
+from common_utils.variables import COMMENTARY_IDS
 
-commentary_ids = [i for i in commentary_ids if not i in ['Garvie1998', 'Kamerbeek1953']]
+commentary_ids = [i for i in COMMENTARY_IDS if not i in ['Garvie1998', 'Kamerbeek1953']]
 df_dict = {k: [] for k in ['commentary_id', 'pages', 'lines', 'words', 'paratext', 'primary_text', 'commentary']}
 
 for commentary_id in commentary_ids:

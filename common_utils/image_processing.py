@@ -1,10 +1,10 @@
 import cv2
 from typing import List, Tuple, Optional
 import numpy as np
-from utils.geometry import Shape
+from common_utils.geometry import Shape
 import os
-from utils.general_utils import lazy_property, RectangleType
-from commons.variables import paths
+from common_utils.general_utils import lazy_property, RectangleType
+from common_utils.variables import PATHS
 
 
 def binarize(img_matrix: np.ndarray):
@@ -92,7 +92,7 @@ class Image:
         self.filename = page_id + '.' + format_
         if matrix is not None:
             self._matrix = matrix
-        self.path = path if path else os.path.join(paths['base_dir'], self.id.split('_')[0], paths['png'], self.filename)
+        self.path = path if path else os.path.join(PATHS['base_dir'], self.id.split('_')[0], PATHS['png'], self.filename)
 
     @lazy_property
     def matrix(self) -> np.ndarray:

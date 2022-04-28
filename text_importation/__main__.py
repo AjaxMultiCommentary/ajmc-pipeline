@@ -4,7 +4,7 @@ import os
 import sys
 from text_importation.classes import Commentary
 from text_importation.rebuild import basic_rebuild, rebuilt_to_xmi
-from commons.variables import paths
+from common_utils.variables import PATHS
 
 
 def create_default_pipeline_parser() -> argparse.ArgumentParser:
@@ -80,10 +80,10 @@ def main():
 
         commentary = Commentary(commentary_id)
 
-        args.json_dir = os.path.join(paths['base_dir'], commentary_id, 'canonical', commentary_format)
+        args.json_dir = os.path.join(PATHS['base_dir'], commentary_id, 'canonical', commentary_format)
         os.makedirs(args.json_dir, exist_ok=True)
 
-        args.xmi_dir = os.path.join(paths['base_dir'], commentary_id, 'ner/annotation', commentary_format)
+        args.xmi_dir = os.path.join(PATHS['base_dir'], commentary_id, 'ner/annotation', commentary_format)
         os.makedirs(args.xmi_dir, exist_ok=True)
 
         if args.make_jsons and args.make_xmis:
@@ -110,7 +110,7 @@ def main():
 
                     rebuild = basic_rebuild(page, args.region_types)
                     if len(rebuild['fulltext']) > 0:  # handles the empty-page case
-                        rebuilt_to_xmi(rebuild, args.xmi_dir, typesystem_path=paths['typesystem'])
+                        rebuilt_to_xmi(rebuild, args.xmi_dir, typesystem_path=PATHS['typesystem'])
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ from hipe_commons.helpers.tsv import tsv_to_dict
 from typing import List
 import torch
 from nlp.data_preparation.utils import sort_ner_labels, align_labels, align_elements
-from utils.general_utils import get_unique_elements
+from common_utils.general_utils import get_unique_elements
 
 class HipeDataset(torch.utils.data.Dataset):
 

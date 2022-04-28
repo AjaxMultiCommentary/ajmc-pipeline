@@ -1,6 +1,6 @@
 from typing import List, Union, Iterable, Optional
 import numpy as np
-from utils.general_utils import lazy_property, RectangleType
+from common_utils.general_utils import lazy_property, RectangleType
 
 
 class Shape:

@@ -5,9 +5,9 @@ import numpy as np
 import os
 import csv
 
-from utils import image_processing
-from utils.geometry import Shape, is_rectangle_within_rectangle
-from utils.image_processing import remove_artifacts_from_contours
+from common_utils import image_processing
+from common_utils.geometry import Shape, is_rectangle_within_rectangle
+from common_utils.image_processing import remove_artifacts_from_contours
 
 
 def correct_csv_manually(csv_filename: str):

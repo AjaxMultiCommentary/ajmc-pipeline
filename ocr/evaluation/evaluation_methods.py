@@ -2,9 +2,9 @@ import csv
 import os
 from typing import List, Dict, Tuple, Union, Optional
 import Levenshtein
-from commons.variables import ordered_olr_regions_types
-from utils.general_utils import safe_divide
-from utils.geometry import is_rectangle_partly_within_rectangle, is_rectangle_within_rectangle
+from common_utils.variables import ORDERED_OLR_REGION_TYPES
+from common_utils.general_utils import safe_divide
+from common_utils.geometry import is_rectangle_partly_within_rectangle, is_rectangle_within_rectangle
 from ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts
 from text_importation.classes import Page, Commentary
@@ -146,7 +146,7 @@ def coord_based_page_evaluation(gt_page: 'Page',
                             {level:
                                  {count: 0 for count in ['total', 'evaluated', 'false']}
                              for level in ['words', 'chars'] + charsets}
-                        for region in ['global'] + ordered_olr_regions_types}
+                        for region in ['global'] + ORDERED_OLR_REGION_TYPES}
 
     if not editops_record:
         editops_record = {}
@@ -201,7 +201,7 @@ def coord_based_page_evaluation(gt_page: 'Page',
                 break
 
     # Compute error rates
-    for region in ['global'] + ordered_olr_regions_types:
+    for region in ['global'] + ORDERED_OLR_REGION_TYPES:
         for level in ['words', 'chars'] + charsets:
             error_counts[region][level]['cr'] = 1 - safe_divide(error_counts[region][level]['false'],
                                                                 error_counts[region][level]['evaluated'])

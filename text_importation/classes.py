@@ -4,16 +4,16 @@ import os
 from time import strftime
 from typing import Dict, Optional, List, Union
 import bs4.element
-from utils.general_utils import lazy_property
-from commons.variables import paths
-from utils.geometry import (
+from common_utils.general_utils import lazy_property
+from common_utils.variables import PATHS
+from common_utils.geometry import (
     Shape,
     is_rectangle_partly_within_rectangle,
     get_bounding_rectangle_from_points,
     is_rectangle_within_rectangle, are_rectangles_overlapping,
     shrink_to_included_contours
 )
-from utils.image_processing import Image
+from common_utils.image_processing import Image
 from olr.utils.region_processing import order_olr_regions, get_page_region_dicts_from_via
 import jsonschema as js
 from text_importation.file_management import get_page_ocr_path, get_ocr_dir_from_ocr_run, guess_ocr_format, \
@@ -53,7 +53,7 @@ class Commentary:
 
     @lazy_property
     def ocr_groundtruth_pages(self):
-        gt_dir = os.path.join(paths['base_dir'], self.id, paths['groundtruth'])
+        gt_dir = os.path.join(PATHS['base_dir'], self.id, PATHS['groundtruth'])
         return [Page(page_id=fname[:-5], commentary=self, ocr_path=os.path.join(gt_dir, fname))
                 for fname in os.listdir(gt_dir) if fname.startswith(self.id)]
 
@@ -81,12 +81,12 @@ class Commentary:
 
     @lazy_property
     def via_project(self):
-        with open(os.path.join(paths['base_dir'], self.id, paths['via_project']), 'r') as file:
+        with open(os.path.join(PATHS['base_dir'], self.id, PATHS['via_project']), 'r') as file:
             return json.load(file)
 
     def _get_page_ids(self) -> List[str]:
         """Gets the ids of the pages contained in Commentary by scanning the png files"""
-        images_dir = os.path.join(paths['base_dir'], self.id, paths['png'])
+        images_dir = os.path.join(PATHS['base_dir'], self.id, PATHS['png'])
         return [p[:-4] for p in os.listdir(images_dir) if p.endswith('.png')]
 
 
@@ -116,7 +116,7 @@ class Page:
     # ===============================  Properties  ===============================
     @lazy_property
     def groundtruth_page(self):
-        gt_dir = os.path.join(paths['base_dir'], self.commentary.id, paths['groundtruth'])
+        gt_dir = os.path.join(PATHS['base_dir'], self.commentary.id, PATHS['groundtruth'])
         gt_path = get_page_ocr_path(self.id, gt_dir)
         if os.path.exists(gt_path):
             return Page(self.id,
@@ -185,7 +185,7 @@ class Page:
 
         return data
 
-    def to_json(self, output_dir: str, schema_path: str = paths['schema']):
+    def to_json(self, output_dir: str, schema_path: str = PATHS['schema']):
         """Validate `self.canonical_data` & serializes it to json."""
 
         with open(schema_path, 'r') as file:

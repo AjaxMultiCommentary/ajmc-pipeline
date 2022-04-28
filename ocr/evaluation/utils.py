@@ -5,7 +5,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from typing import List, Dict, Tuple
 import cv2
-from commons.variables import charsets
+from common_utils.variables import CHARSETS
 
 
 def initialize_soup(img_width: int, img_height: int) -> "BeautifulSoup":
@@ -218,7 +218,7 @@ def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> i
     """
 
     try:
-        pattern = charsets[charset]
+        pattern = CHARSETS[charset]
     except KeyError:
         pattern = re.compile(charset, re.UNICODE)
 
@@ -245,7 +245,7 @@ def count_chars_by_charset(string: str, charset: str) -> int:
         int: the number of charset-matching characters in `string`.
     """
     try:
-        pattern = charsets[charset]
+        pattern = CHARSETS[charset]
     except KeyError:
         pattern = re.compile(charset, flags=re.UNICODE)
 
