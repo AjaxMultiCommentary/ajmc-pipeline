@@ -23,5 +23,7 @@ __pycache__
 workbench.py
 data/
 
-
+# Ziqi
+*.pyc
+ocr/exps/*
 
