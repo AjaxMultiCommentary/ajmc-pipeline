@@ -1,6 +1,6 @@
 from typing import List, Union, Iterable, Optional
 import numpy as np
-from common_utils.general_utils import lazy_property, RectangleType
+from common_utils.miscellaneous import lazy_property, RectangleType
 
 
 class Shape:
@@ -69,7 +69,10 @@ class Shape:
 
 
 def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> RectangleType:
-    """Gets the bounding rectangle from a sequence of x-y points. 
+    """Gets the bounding rectangle (i.e. the minimal rectangle containing all points) from a sequence of x-y points.
+
+    Args:
+        points: A sequence of (x, y) points, e.g. `[(1,2), (1,5), (3,5)]`
     
     Returns:
         A list of four lists of x-y-points representing the four points of the rectangle from the upper
@@ -77,7 +80,8 @@ def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterab
 
     if type(points) == np.ndarray:
         points = points.squeeze()
-        assert len(points.shape) == 2 and points.shape[-1] == 2
+        assert len(points.shape) == 2 and points.shape[-1] == 2, """Points-array must be in 
+        the shape (number_of_points, 2)"""
         x_min, x_max = points[:, 0].min(), points[:, 0].max()
         y_min, y_max = points[:, 1].min(), points[:, 1].max()
 
@@ -92,12 +96,12 @@ def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterab
         return [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
 
 
-def is_point_within_rectangle(point: Union[Iterable[int], np.ndarray], container: RectangleType) -> bool:
-    """Checks wheter a point is contained within a rectangle."""
-    return all([point[0] >= container[0][0],
-                point[1] >= container[0][1],
-                point[0] <= container[2][0],
-                point[1] <= container[2][1]])
+def is_point_within_rectangle(point: Union[Iterable[int], np.ndarray], rectangle: RectangleType) -> bool:
+    """Checks wheter a `point` is contained within a `rectangle`."""
+    return all([point[0] >= rectangle[0][0],
+                point[1] >= rectangle[0][1],
+                point[0] <= rectangle[2][0],
+                point[1] <= rectangle[2][1]])
 
 
 def is_rectangle_within_rectangle(contained: RectangleType, container: RectangleType) -> bool:
@@ -132,8 +136,9 @@ def measure_overlap_area(r1: RectangleType, r2: RectangleType) -> int:
     return inter_width * inter_height
 
 
-def is_rectangle_partly_within_rectangle(contained: Shape, container: Shape, threshold: float) -> bool:
-    """Asserts more than `threshold` of `contained`'s area is within `container`."""
+def are_rectangles_overlapping_with_threshold(contained: Shape, container: Shape, threshold: float) -> bool:
+    """Asserts more than `threshold` of `contained`'s area is within `container`. Is not merged with
+    `are_rectangles_overlapping` for effisciency purposes. """
     return measure_overlap_area(contained.bounding_rectangle, container.bounding_rectangle) > threshold * contained.area
 
 

@@ -1,10 +1,11 @@
-"""General utilities"""
+"""Miscellaneous helpers and utilities."""
 
 import timeit
 from typing import List, Tuple, Iterable, Generator
-
 import numpy as np
 
+
+RectangleType = List[Tuple[int, int]]
 
 def lazy_property(func):
     """Decorator. Makes property computation lazy."""
@@ -38,8 +39,6 @@ def safe_divide(dividend, divisor):
     """Simple division which return `np.nan` if `divisor` equals zero."""
     return dividend / divisor if divisor != 0 else np.nan
 
-
-RectangleType = List[Tuple[int, int]]
 
 
 def recursive_iterator(iterable: Iterable, iterable_types: Tuple[Iterable] = (list, tuple)) -> Generator:

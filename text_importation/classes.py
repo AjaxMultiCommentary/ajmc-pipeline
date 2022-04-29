@@ -4,11 +4,11 @@ import os
 from time import strftime
 from typing import Dict, Optional, List, Union
 import bs4.element
-from common_utils.general_utils import lazy_property
+from common_utils.miscellaneous import lazy_property
 from common_utils.variables import PATHS
 from common_utils.geometry import (
     Shape,
-    is_rectangle_partly_within_rectangle,
+    are_rectangles_overlapping_with_threshold,
     get_bounding_rectangle_from_points,
     is_rectangle_within_rectangle, are_rectangles_overlapping,
     shrink_to_included_contours
@@ -296,7 +296,7 @@ class Region:
                                          h=self.markup['shape_attributes']['height'])
 
         words = [w for w in self.page.words
-                 if is_rectangle_partly_within_rectangle(w.coords, initial_coords, word_inclusion_threshold)]
+                 if are_rectangles_overlapping_with_threshold(w.coords, initial_coords, word_inclusion_threshold)]
 
         # resize region
         words_points = [xy for w in words for xy in w.coords.bounding_rectangle]

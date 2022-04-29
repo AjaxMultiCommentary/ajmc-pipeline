@@ -3,7 +3,7 @@ from typing import List, Tuple, Optional
 import numpy as np
 from common_utils.geometry import Shape
 import os
-from common_utils.general_utils import lazy_property, RectangleType
+from common_utils.miscellaneous import lazy_property, RectangleType
 from common_utils.variables import PATHS
 
 
