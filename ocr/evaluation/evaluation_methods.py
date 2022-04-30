@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple, Union, Optional
 import Levenshtein
 from common_utils.variables import ORDERED_OLR_REGION_TYPES
 from common_utils.miscellaneous import safe_divide
-from common_utils.geometry import are_rectangles_overlapping_with_threshold, is_rectangle_within_rectangle
+from common_utils.geometry import is_rectangle_within_rectangle_with_threshold, is_rectangle_within_rectangle, are_rectangles_overlapping_with_threshold
 from ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts
 from text_importation.classes import Page, Commentary
@@ -90,8 +90,7 @@ def simple_coordinates_based_evaluation(gt_words: List['TextElement'],
     for gt_word in gt_words:
 
         for i, pred_word in enumerate(pred_words_):
-            if are_rectangles_overlapping_with_threshold(pred_word.coords, gt_word.coords, overlap_threshold) and \
-                    are_rectangles_overlapping_with_threshold(gt_word.coords, pred_word.coords, overlap_threshold):
+            if are_rectangles_overlapping_with_threshold(pred_word.coords.bounding_rectangle, gt_word.coords.bounding_rectangle, overlap_threshold):
                 total_characters += len(gt_word.text)
                 total_edit_distance += Levenshtein.distance(pred_word.text, gt_word.text)
                 matched_words += 1
@@ -166,9 +165,7 @@ def coord_based_page_evaluation(gt_page: 'Page',
 
         # Find the corresponding ocr_word
         for i, pred_word in enumerate(pred_words_):
-            if are_rectangles_overlapping_with_threshold(pred_word.coords, gt_word.coords, word_overlap_threshold) and \
-                    are_rectangles_overlapping_with_threshold(gt_word.coords, pred_word.coords, word_overlap_threshold):
-
+            if are_rectangles_overlapping_with_threshold(pred_word.coords.bounding_rectangle, gt_word.coords.bounding_rectangle, word_overlap_threshold):
                 distance = Levenshtein.distance(pred_word.text, gt_word.text)
 
                 for region in gt_word_regions:

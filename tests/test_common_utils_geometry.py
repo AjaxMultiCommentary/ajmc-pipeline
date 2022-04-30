@@ -7,11 +7,12 @@ from text_importation.classes import Page
 
 @pytest.fixture
 def points():
-    return {'base': [(0, 2), (2, 2), (1, 1), (2, 0), (0, 0)],
-            'included': [(0, 1), (1, 1), (1, 1), (1, 0), (0, 0)],
-            'overlapping': [[1, 3], [3, 3], [2, 2], [3, 1], [1, 1]],
+    return {'base': [(0, 0), (2, 0), (1, 1), (2, 2), (0, 2)],
+            'included': [(0, 0), (1, 0), (1, 1), (0, 1)],
+            'overlapping': [[1, 1], [3, 1], [2, 2], [3, 3], [1, 3]],
+            'non_overlapping': [(5, 5), (7, 5), (6, 6), (7, 7), (5, 7)],
             'line': [(0, 0), (1, 1), (2, 2)],
-            'non_overlapping': [(5, 7), (7, 7), (6, 6), (7, 5), (5, 5)]
+            'horizontally_overlapping': [(1, 0), (3, 0), (3, 2), (1, 2)],
             }
 
 
@@ -62,21 +63,31 @@ def test_are_rectangles_overlapping(rectangles):
     assert not geo.are_rectangles_overlapping(rectangles['base'], rectangles['non_overlapping'])
 
 
+def test_compute_rectangle_area(rectangles):
+    assert geo.compute_rectangle_area(rectangles['base'])==4
+
 def test_measure_overlap_area(rectangles):
     # Test with an overlapping and a non-overlapping rectangle
-    assert geo.measure_overlap_area(rectangles['base'], rectangles['included']) == 1
-    assert geo.measure_overlap_area(rectangles['base'], rectangles['base']) == 4
-    assert geo.measure_overlap_area(rectangles['base'], rectangles['non_overlapping']) == 0
+    assert geo.compute_overlap_area(rectangles['base'], rectangles['included']) == 1
+    assert geo.compute_overlap_area(rectangles['base'], rectangles['base']) == 4
+    assert geo.compute_overlap_area(rectangles['base'], rectangles['non_overlapping']) == 0
 
+
+def test_is_rectangle_within_rectangle_with_threshold(rectangles):
+    # Test with two different thresholds with overlapping rects
+    assert geo.is_rectangle_within_rectangle_with_threshold(rectangles['base'], rectangles['overlapping'], 0.20)
+    assert not geo.is_rectangle_within_rectangle_with_threshold(rectangles['base'], rectangles['overlapping'], 0.25)
+    # Test with non overlapping rectangles
+    assert not geo.is_rectangle_within_rectangle_with_threshold(rectangles['base'], rectangles['non_overlapping'], 0.1)
 
 def test_are_rectangles_overlapping_with_threshold(rectangles):
-    # Test with two different thresholds with overlapping rects
-    assert geo.are_rectangles_overlapping(rectangles['base'], rectangles['overlapping'], 0.20)
-    assert not geo.are_rectangles_overlapping(rectangles['base'], rectangles['overlapping'], 0.25)
-    # Test with non overlapping rectangles
-    assert not geo.are_rectangles_overlapping(rectangles['base'], rectangles['non_overlapping'], 0.1)
+    assert geo.are_rectangles_overlapping_with_threshold(rectangles['base'], rectangles['overlapping'], 1/7)
+    assert not geo.are_rectangles_overlapping_with_threshold(rectangles['base'], rectangles['overlapping'], 1/4)
+    assert not geo.are_rectangles_overlapping_with_threshold(rectangles['base'], rectangles['non_overlapping'], 1 / 4)
 
-
-def test_shrink_to_included_contours():
-    # todo
-    pass
+def test_shrink_to_included_contours(points, rectangles):
+    # Make sure it takes only horizontally overlappping shapes
+    contours_1 = [geo.Shape.from_points(points[k]) for k in ['base', 'overlapping', 'horizontally_overlapping']]
+    contours_2 = [geo.Shape.from_points(points[k]) for k in ['base', 'horizontally_overlapping']]
+    assert geo.shrink_to_included_contours(rectangles['base'], contours_1).bounding_rectangle == \
+           geo.shrink_to_included_contours(rectangles['base'], contours_2).bounding_rectangle

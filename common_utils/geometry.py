@@ -48,6 +48,8 @@ class Shape:
 
     @classmethod
     def from_xywh(cls, x: int, y: int, w: int, h: int):
+        """Creates a Shape from `x`, `y`, `w`, `h`, where `x` and `y` are the coordinates of the upper left corner,
+        while `w` and `h` represent width and height respectively."""
         return cls([(x, y), (x + w, y), (x + w, y + h), (x, y + h)])
 
     @lazy_property
@@ -60,7 +62,8 @@ class Shape:
 
     @lazy_property
     def xywh(self) -> List[int]:
-        """Gets the bounding rectangle in `[x,y,w,h]` format"""
+        """Gets the bounding rectangle in `[x,y,w,h]` format, where `x` and `y` are the coordinates of the upper-left
+        corner."""
         return [self.bounding_rectangle[0][0], self.bounding_rectangle[0][1], self.width, self.height]
 
     @lazy_property
@@ -96,6 +99,10 @@ def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterab
         return [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
 
 
+def compute_rectangle_area(rectangle: RectangleType) -> int:
+    return (rectangle[2][0] - rectangle[0][0]) * (rectangle[2][1] - rectangle[0][1])
+
+
 def is_point_within_rectangle(point: Union[Iterable[int], np.ndarray], rectangle: RectangleType) -> bool:
     """Checks wheter a `point` is contained within a `rectangle`."""
     return all([point[0] >= rectangle[0][0],
@@ -105,7 +112,7 @@ def is_point_within_rectangle(point: Union[Iterable[int], np.ndarray], rectangle
 
 
 def is_rectangle_within_rectangle(contained: RectangleType, container: RectangleType) -> bool:
-    """Checks whether a rectangle is stricly contained within another."""
+    """Checks whether a rectangle is entirely contained within another."""
 
     return all([contained[0][0] >= container[0][0],
                 contained[0][1] >= container[0][1],
@@ -119,7 +126,7 @@ def are_rectangles_overlapping(r1: RectangleType, r2: RectangleType) -> bool:
     return any([is_point_within_rectangle(p, r2) for p in r1])
 
 
-def measure_overlap_area(r1: RectangleType, r2: RectangleType) -> int:
+def compute_overlap_area(r1: RectangleType, r2: RectangleType) -> int:
     """Measures the area of intersection between two rectangles.
 
     Args:
@@ -136,11 +143,19 @@ def measure_overlap_area(r1: RectangleType, r2: RectangleType) -> int:
     return inter_width * inter_height
 
 
-def are_rectangles_overlapping_with_threshold(contained: Shape, container: Shape, threshold: float) -> bool:
+def is_rectangle_within_rectangle_with_threshold(contained: RectangleType, container: RectangleType,
+                                                 threshold: float) -> bool:
     """Asserts more than `threshold` of `contained`'s area is within `container`. Is not merged with
     `are_rectangles_overlapping` for effisciency purposes. """
-    return measure_overlap_area(contained.bounding_rectangle, container.bounding_rectangle) > threshold * contained.area
+    contained_area = compute_rectangle_area(contained)
+    return compute_overlap_area(contained, container) > threshold * contained_area
 
+
+def are_rectangles_overlapping_with_threshold(r1: RectangleType, r2: RectangleType, threshold: float) -> bool:
+    """Checks whether the overlapping (intersection) area of two rectangles is higher than `threshold`* union area """
+    inter_area = compute_overlap_area(r1, r2)
+    union_area = compute_rectangle_area(r1) + compute_rectangle_area(r2) - inter_area
+    return inter_area >= threshold * union_area
 
 
 def shrink_to_included_contours(rectangle: RectangleType,
@@ -148,8 +163,8 @@ def shrink_to_included_contours(rectangle: RectangleType,
     """Finds the contours included in `rectangle` and returns a shape objects that minimally contains them.
 
     Note:
-        This function discards the contours that would make `rectangle` taller (i.e. longer on the Y-axis). This
-        is helpful to avoid line-overlapping word-boxes.
+        This function is mainly used to resize word-boxes. It thereforediscards the contours that would make
+        `rectangle` taller (i.e. longer on the Y-axis). This is helpful to avoid line-overlapping word-boxes.
     """
 
     included_contours = [c for c in contours
