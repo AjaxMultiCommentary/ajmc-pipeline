@@ -16,7 +16,7 @@ plt.rcParams['savefig.dpi'] = 300
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.getcwd()))
 PARENT_DIR = os.path.dirname(PROJECT_DIR)
 
-sys.path.append(os.path.join(PROJECT_DIR, "common_utils"))
+sys.path.append(os.path.join(PROJECT_DIR, "commons"))
 import variables
 
 # Data dir with whole images

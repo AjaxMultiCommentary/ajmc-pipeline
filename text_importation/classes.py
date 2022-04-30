@@ -4,16 +4,16 @@ import os
 from time import strftime
 from typing import Dict, Optional, List, Union
 import bs4.element
-from common_utils.miscellaneous import lazy_property
-from common_utils.variables import PATHS
-from common_utils.geometry import (
+from commons.miscellaneous import lazy_property
+from commons.variables import PATHS
+from commons.geometry import (
     Shape,
     is_rectangle_within_rectangle_with_threshold,
     get_bounding_rectangle_from_points,
     is_rectangle_within_rectangle, are_rectangles_overlapping,
     shrink_to_included_contours
 )
-from common_utils.image_processing import Image
+from commons.image import Image
 from olr.utils.region_processing import order_olr_regions, get_page_region_dicts_from_via
 import jsonschema as js
 from text_importation.file_management import get_page_ocr_path, get_ocr_dir_from_ocr_run, guess_ocr_format, \
@@ -41,6 +41,11 @@ class Commentary:
             self.ocr_dir = get_ocr_dir_from_ocr_run(self.id, self.ocr_run)
 
     @lazy_property
+    def paths(self):
+        return {'groundtruth': os.path.join(PATHS['base_dir'], self.id, PATHS['groundtruth']),
+                'images': os.path.join(PATHS['base_dir'], self.id, PATHS['png'])}
+
+    @lazy_property
     def ocr_format(self):
         return self.pages[0].ocr_format
 
@@ -53,9 +58,15 @@ class Commentary:
 
     @lazy_property
     def ocr_groundtruth_pages(self):
-        gt_dir = os.path.join(PATHS['base_dir'], self.id, PATHS['groundtruth'])
-        return [Page(page_id=fname[:-5], commentary=self, ocr_path=os.path.join(gt_dir, fname))
-                for fname in os.listdir(gt_dir) if fname.startswith(self.id)]
+        return [
+            Page(page_id=fname[:-5],
+                 commentary=self,
+                 ocr_path=os.path.join(self.paths['groundtruth'], fname))
+
+            for fname in os.listdir(self.paths['groundtruth'])
+
+            if fname.startswith(self.id)
+        ]
 
     @lazy_property
     def olr_groundtruth_pages(self, ):
@@ -64,7 +75,7 @@ class Commentary:
             Page(page_id=item['filename'].split('.')[0],
                  ocr_path=get_page_ocr_path(item['filename'].split('.')[0], ocr_dir=self.ocr_dir),
                  commentary=self) for key, item in self.via_project['_via_img_metadata'].items() if
-            any([r['region_attributes']['text'] not in ['commentary','undefined'] for r in item['regions']])
+            any([r['region_attributes']['text'] not in ['commentary', 'undefined'] for r in item['regions']])
         ]
 
     @lazy_property
@@ -115,6 +126,13 @@ class Page:
 
     # ===============================  Properties  ===============================
     @lazy_property
+    def paths(self):
+        return {
+            'groundtruth': get_page_ocr_path(self.id, self.commentary.paths['groundtruth']),
+            'image': os.path.join(self.commentary.paths['images'], self.filename)
+        }
+
+    @lazy_property
     def groundtruth_page(self):
         gt_dir = os.path.join(PATHS['base_dir'], self.commentary.id, PATHS['groundtruth'])
         gt_path = get_page_ocr_path(self.id, gt_dir)
@@ -148,7 +166,7 @@ class Page:
 
     @lazy_property
     def image(self):
-        return Image(self.id)
+        return Image(path=self.paths['image'])
 
     @lazy_property
     def text(self):

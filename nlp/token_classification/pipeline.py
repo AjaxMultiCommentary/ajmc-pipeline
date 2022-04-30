@@ -14,7 +14,8 @@ from torch.utils.data import DataLoader, RandomSampler
 from nlp.token_classification.evaluation import evaluate_dataset, seqeval_to_df, evaluate_hipe
 from nlp.token_classification.config import initialize_config
 from nlp.data_preparation.hipe_iob import prepare_datasets
-from nlp.token_classification.utils import set_seed, get_custom_logger
+from nlp.token_classification.utils import set_seed
+from commons.miscellaneous import get_custom_logger
 
 
 def train(config: 'argparse.Namespace',

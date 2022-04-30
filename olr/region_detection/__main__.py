@@ -1,7 +1,7 @@
 import os
 from olr.region_detection.utils import write_csv_manually, detect_regions
-from common_utils.cli import args
-from common_utils.variables import VIA_CSV_DICT_TEMPLATE
+from commons.cli import args
+from commons.variables import VIA_CSV_DICT_TEMPLATE
 
 
 

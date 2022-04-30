@@ -2,9 +2,9 @@ import csv
 import os
 from typing import List, Dict, Tuple, Union, Optional
 import Levenshtein
-from common_utils.variables import ORDERED_OLR_REGION_TYPES
-from common_utils.miscellaneous import safe_divide
-from common_utils.geometry import is_rectangle_within_rectangle_with_threshold, is_rectangle_within_rectangle, are_rectangles_overlapping_with_threshold
+from commons.variables import ORDERED_OLR_REGION_TYPES
+from commons.miscellaneous import safe_divide
+from commons.geometry import is_rectangle_within_rectangle_with_threshold, is_rectangle_within_rectangle, are_rectangles_overlapping_with_threshold
 from ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts
 from text_importation.classes import Page, Commentary

@@ -1,31 +1,7 @@
 import numpy as np
 import pytest
+import commons.geometry as geo
 
-import common_utils.geometry as geo
-from text_importation.classes import Page
-
-
-@pytest.fixture
-def points():
-    return {'base': [(0, 0), (2, 0), (1, 1), (2, 2), (0, 2)],
-            'included': [(0, 0), (1, 0), (1, 1), (0, 1)],
-            'overlapping': [[1, 1], [3, 1], [2, 2], [3, 3], [1, 3]],
-            'non_overlapping': [(5, 5), (7, 5), (6, 6), (7, 7), (5, 7)],
-            'line': [(0, 0), (1, 1), (2, 2)],
-            'horizontally_overlapping': [(1, 0), (3, 0), (3, 2), (1, 2)],
-            }
-
-
-@pytest.fixture
-def rectangles(points):
-    return {k: geo.get_bounding_rectangle_from_points(v) for k, v in points.items()}
-
-
-# points_np = np.array(points_1)
-# shape = geo.Shape.from_points(points_1)
-# rect = np.array([[1, 1], [5, 7]])
-# point = np.array([3, 3])
-# page = Page("sophoclesplaysa05campgoog_0146")
 
 
 def test_shape(points):

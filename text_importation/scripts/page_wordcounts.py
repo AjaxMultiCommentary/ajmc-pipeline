@@ -1,4 +1,4 @@
-from common_utils.variables import pd_commentaries
+from commons.variables import pd_commentaries
 from text_importation.classes import Commentary
 
 import pandas as pd

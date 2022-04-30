@@ -3,7 +3,7 @@ import os
 from typing import Union, List, Dict
 from cassis import load_cas_from_xmi, load_typesystem, Cas
 
-from common_utils.variables import PATHS
+from commons.variables import PATHS
 
 
 def basic_rebuild(page: dict,

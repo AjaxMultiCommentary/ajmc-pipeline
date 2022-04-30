@@ -94,7 +94,7 @@ def annotation_helper_args(parser: "ArgumentParser") -> "ArgumentParser":
                         type=int,
                         help="Number of iterations in dilation, default 1")
 
-    parser.add_argument("--artifact_size_threshold",
+    parser.add_argument("--artifact_perimeter_threshold",
                         default=15,
                         type=int,
                         help="Minimum perimeter (in pixels) of the contours to be kept. "
@@ -138,7 +138,7 @@ else:
                               # "--via_project", "/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary_data/lobeck/olr/via_project.json",
                               "--dilation_kernel_size", "29",
                               "--dilation_iterations", "2",
-                              "--artifact_size_threshold", "10",
+                              "--artifact_perimeter_threshold", "10",
                               "--draw_rectangles",
                               # "--merge_zones"
                               ])

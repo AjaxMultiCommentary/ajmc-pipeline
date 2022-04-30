@@ -4,7 +4,7 @@ import os
 import sys
 from text_importation.classes import Commentary
 from text_importation.rebuild import basic_rebuild, rebuilt_to_xmi
-from common_utils.variables import PATHS
+from commons.variables import PATHS
 
 
 def create_default_pipeline_parser() -> argparse.ArgumentParser:

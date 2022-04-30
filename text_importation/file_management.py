@@ -1,7 +1,7 @@
 """Functions and helpers to manage the files """
 
 import os
-from common_utils.variables import PATHS
+from commons.variables import PATHS
 
 
 def get_page_ocr_path(page_id: str, ocr_dir:str = None, ocr_run: str = None) -> str:

@@ -5,7 +5,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from typing import List, Dict, Tuple
 import cv2
-from common_utils.variables import CHARSETS
+from commons.variables import CHARSETS
 
 
 def initialize_soup(img_width: int, img_height: int) -> "BeautifulSoup":

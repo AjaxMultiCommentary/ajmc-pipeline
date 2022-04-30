@@ -1,12 +1,12 @@
 """This module contains function to enhance via project jsons by reshaping regions and reorganising reading order."""
 
 import json
-from common_utils.variables import PATHS
+from commons.variables import PATHS
 import os
 import cv2
 from typing import List
-from common_utils.geometry import Shape
-from common_utils import image_processing
+from commons.geometry import Shape
+from commons import image
 
 with open('/data/olr/via_project.json', "r") as f:
     via_project = json.loads(f.read())

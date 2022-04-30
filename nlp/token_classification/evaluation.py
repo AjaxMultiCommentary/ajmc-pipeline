@@ -9,7 +9,7 @@ from hipe_commons.helpers.tsv import get_tsv_data
 from torch.utils.data import DataLoader, SequentialSampler
 
 from nlp.token_classification.model import predict, predict_batches
-from nlp.token_classification.utils import get_custom_logger
+from commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
 

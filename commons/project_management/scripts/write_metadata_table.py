@@ -1,4 +1,4 @@
-from common_utils.variables import PATHS
+from commons.variables import PATHS
 import os
 
 from text_importation.classes import Commentary

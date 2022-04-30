@@ -1,6 +1,6 @@
 import os
-from common_utils.variables import PATHS
-from common_utils.project_management import get_62_based_datecode
+from commons.variables import PATHS
+from commons.project_management import get_62_based_datecode
 
 
 def get_kraken_command(commentary_id, model_path):
