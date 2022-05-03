@@ -4,11 +4,14 @@ from typing import List, Dict, Tuple, Union, Optional
 import Levenshtein
 from commons.variables import ORDERED_OLR_REGION_TYPES
 from commons.miscellaneous import safe_divide
-from commons.geometry import is_rectangle_within_rectangle_with_threshold, is_rectangle_within_rectangle, are_rectangles_overlapping_with_threshold
+from commons.geometry import is_rectangle_within_rectangle, are_rectangles_overlapping_with_threshold
 from ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts
 from text_importation.classes import Page, Commentary
+from commons.miscellaneous import get_custom_logger
 
+logger = get_custom_logger(__name__)
+# todo add fuzzy eval
 
 def bag_of_word_evaluation(gt_bag: List[str],
                            pred_bag: List[str],
@@ -66,7 +69,7 @@ def bag_of_word_evaluation(gt_bag: List[str],
 
 def simple_coordinates_based_evaluation(gt_words: List['TextElement'],
                                         pred_words: List['TextElement'],
-                                        overlap_threshold: float = 0.9) -> float:
+                                        overlap_threshold: float = 0.8) -> float:
     """Computes edit distance between spacially overlapping words and returns the CER.
 
      Simple means that this method does NOT deal with word-boxes related issues. It only evaluates gt-words which
@@ -90,14 +93,16 @@ def simple_coordinates_based_evaluation(gt_words: List['TextElement'],
     for gt_word in gt_words:
 
         for i, pred_word in enumerate(pred_words_):
-            if are_rectangles_overlapping_with_threshold(pred_word.coords.bounding_rectangle, gt_word.coords.bounding_rectangle, overlap_threshold):
+            if are_rectangles_overlapping_with_threshold(pred_word.coords.bounding_rectangle,
+                                                         gt_word.coords.bounding_rectangle,
+                                                         overlap_threshold):
                 total_characters += len(gt_word.text)
                 total_edit_distance += Levenshtein.distance(pred_word.text, gt_word.text)
                 matched_words += 1
                 del pred_words_[i]
                 break
 
-    print(f"""Evaluating on {matched_words} words, for a total of {len(gt_words)} words.""")
+    logger.info(f"""Evaluating on {matched_words} words, for a total of {len(gt_words)} words.""")
 
     return total_edit_distance / total_characters
 
@@ -111,7 +116,7 @@ def coord_based_page_evaluation(gt_page: 'Page',
     """Performs a regional and coordinates-based evaluation.
 
     This function returns extremely detailed counts, with word counts, caracter counts by charsets (latin, greek,
-    numbers and punctuation) and correctness rate (`cr`, corresponding to the normalized levenshtein distance) for
+    numbers and punctuation) and correct rate (`cr`, corresponding to the normalized levenshtein distance) for
     each of these elements and for each olr region (commentary, primary text...).
 
     How to read the results? `cr`or `ccr`/`cwr` (correct character/word rate respectively) very straightforward. They
@@ -165,7 +170,8 @@ def coord_based_page_evaluation(gt_page: 'Page',
 
         # Find the corresponding ocr_word
         for i, pred_word in enumerate(pred_words_):
-            if are_rectangles_overlapping_with_threshold(pred_word.coords.bounding_rectangle, gt_word.coords.bounding_rectangle, word_overlap_threshold):
+            if are_rectangles_overlapping_with_threshold(pred_word.coords.bounding_rectangle,
+                                                         gt_word.coords.bounding_rectangle, word_overlap_threshold):
                 distance = Levenshtein.distance(pred_word.text, gt_word.text)
 
                 for region in gt_word_regions:
@@ -261,9 +267,8 @@ def commentary_evaluation(commentary: 'Commentary',
 
 def evaluate_all():
     """Evaluate all commentaries and runs"""
-
-
-#todo add fuzzy eval
-
-commentary = Commentary('cu31924087948174', '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/tess_eng_grc/outputs')
-commentary_evaluation(commentary=commentary,)
+    raise NotImplementedError
+#
+# commentary = Commentary('cu31924087948174',
+#                         '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/tess_eng_grc/outputs')
+# commentary_evaluation(commentary=commentary, )

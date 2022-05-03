@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import re
 
+# Todo See how to sort these
+
 
 def weighted_average_series(series: list, weights: list):
     """
