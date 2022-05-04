@@ -276,3 +276,4 @@ def evaluate_all():
 # commentary = Commentary('cu31924087948174',
 #                         '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/tess_eng_grc/outputs')
 # commentary_evaluation(commentary=commentary, )
+#
