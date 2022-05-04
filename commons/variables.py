@@ -12,6 +12,12 @@ PATHS = {  # 'base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/c
     'olr_initiation': 'olr/annotation/project_initiation'
 }
 
+FOLDER_STRUCTURE_PATHS = {
+    # Only relative paths
+    # Placeholder pattern are between []
+    'ocr_outputs_dir': '[commentary_id]/ocr/runs/[run_name]/outputs'
+}
+
 METADATA_SPREADSHEET_ID = '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE'
 METADATA_WORKSHEET_NAME = 'metadata'
 

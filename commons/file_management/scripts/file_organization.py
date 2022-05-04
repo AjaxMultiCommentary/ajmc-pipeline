@@ -32,7 +32,7 @@ create_folder_in_each_commentary_dir('ner/annotation/xmi')
 #%% encode ocr runs
 
 from datetime import datetime
-from commons.project_management.utils import get_62_based_datecode, int_to_62_based_code
+from commons.file_management.utils import get_62_based_datecode, int_to_62_based_code
 
 codes = []
 for dir_name in os.listdir(PATHS['base_dir']):

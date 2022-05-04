@@ -5,7 +5,7 @@ from time import strftime
 from typing import Dict, Optional, List, Union, Any
 import bs4.element
 from commons.miscellaneous import lazy_property
-from commons.variables import PATHS
+from commons import variables
 from commons.geometry import (
     Shape,
     is_rectangle_within_rectangle_with_threshold,
@@ -16,11 +16,11 @@ from commons.geometry import (
 from commons.image import Image
 from olr.utils.region_processing import order_olr_regions, get_page_region_dicts_from_via
 import jsonschema as js
-from text_importation.file_management import get_page_ocr_path, get_ocr_dir_from_ocr_run, guess_ocr_format, \
-    get_ocr_run_fullname
+from text_importation.file_management import get_page_ocr_path, guess_ocr_format
 from text_importation.markup_processing import parse_markup_file, get_element_coords, \
     get_element_text, find_all_elements
 from commons.miscellaneous import get_custom_logger
+from commons.file_management.utils import verify_path_integrity
 
 logger = get_custom_logger(__name__)
 
@@ -34,21 +34,38 @@ class Commentary:
         ocr_run: Full or partial name of a run in `ocr/runs`. Gets overwriten by `ocr_dir` if the latter is provided.
         """
 
-    def __init__(self, commentary_id: str, ocr_dir: str = None, ocr_run: str = None):
+    def __init__(self,
+                 commentary_id: str = None,
+                 ocr_dir: str = None,
+                 via_path: str = None,
+                 image_dir: str = None,
+                 groundtruth_dir: str = None,
+                 ):
         self.id = commentary_id
-        if ocr_dir:
-            self.ocr_dir = ocr_dir
-            self.ocr_run = None
-        elif ocr_run:
-            self.ocr_run = get_ocr_run_fullname(self.id, ocr_run)
-            self.ocr_dir = get_ocr_dir_from_ocr_run(self.id, self.ocr_run)
+        self.paths = {'ocr_dir': ocr_dir,
+                      'via_path': via_path,
+                      'image_dir': image_dir,
+                      'groundtruth_dir': groundtruth_dir}
+
+    @classmethod
+    def from_structure(cls, ocr_dir: str):
+        f"""Use this method to construct a `Commentary`-object using ajmc's folder structure.
+
+        Args:
+            ocr_dir: Path to the directory in which ocr-outputs are stored. It should end with
+            {variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir']}.
+        """
+        verify_path_integrity(path=ocr_dir, path_pattern=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
+
+
+
 
     @lazy_property
     def paths(self) -> Dict[str, str]:
         """A dictionary containing the useful paths of the commentary."""
-        return {'groundtruth': os.path.join(PATHS['base_dir'], self.id, PATHS['groundtruth']),
-                'images': os.path.join(PATHS['base_dir'], self.id, PATHS['png']),
-                'via_project': os.path.join(PATHS['base_dir'], self.id, PATHS['via_project'])}
+        return {'groundtruth': os.path.join(variables.PATHS['base_dir'], self.id, variables.PATHS['groundtruth']),
+                'images': os.path.join(variables.PATHS['base_dir'], self.id, variables.PATHS['png']),
+                'via_project': os.path.join(variables.PATHS['base_dir'], self.id, variables.PATHS['via_project'])}
 
     @lazy_property
     def ocr_format(self) -> str:
@@ -141,7 +158,7 @@ class Page:
     def paths(self):
         return {
             'groundtruth': get_page_ocr_path(self.id, self.commentary.paths['groundtruth']),
-            'image': os.path.join(self.commentary.paths['images'], self.id+'.png')
+            'image': os.path.join(self.commentary.paths['images'], self.id + '.png')
         }
 
     @lazy_property
@@ -213,7 +230,7 @@ class Page:
 
         return data
 
-    def to_json(self, output_dir: str, schema_path: str = PATHS['schema']):
+    def to_json(self, output_dir: str, schema_path: str = variables.PATHS['schema']):
         """Validate `self.canonical_data` & serializes it to json."""
 
         with open(schema_path, 'r') as file:
@@ -410,4 +427,5 @@ class TextElement:
     def words(self):
         return [TextElement(el, self.page, self.ocr_format) for el in
                 find_all_elements(self.markup, 'words', self.ocr_format)]
+
 

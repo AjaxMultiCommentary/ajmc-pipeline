@@ -24,15 +24,6 @@ def get_page_ocr_path(page_id: str, ocr_dir: str = None, ocr_run: str = None) ->
         return os.path.join(ocr_dir, files[0])
 
 
-def get_ocr_run_fullname(commentary_id: str, ocr_run: str) -> str:
-    return [p for p in os.listdir(os.path.join(PATHS['base_dir'], commentary_id, 'ocr/runs')) if ocr_run in p][0]
-
-
-def get_ocr_dir_from_ocr_run(commentary_id: str, ocr_run: str) -> str:
-    """Converts an ocr-run directory name to the absolute path to its outputs."""
-    return os.path.join(PATHS['base_dir'], commentary_id, 'ocr/runs/', ocr_run, 'outputs')
-
-
 def guess_ocr_format(ocr_path: str) -> str:
     """Guesses the ocr-format of a file.
 
