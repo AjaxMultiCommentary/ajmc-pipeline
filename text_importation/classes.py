@@ -141,7 +141,7 @@ class Page:
     def paths(self):
         return {
             'groundtruth': get_page_ocr_path(self.id, self.commentary.paths['groundtruth']),
-            'image': os.path.join(self.commentary.paths['images'], self.filename)
+            'image': os.path.join(self.commentary.paths['images'], self.id+'.png')
         }
 
     @lazy_property

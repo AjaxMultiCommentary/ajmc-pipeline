@@ -267,6 +267,10 @@ def commentary_evaluation(commentary: 'Commentary',
 
 def evaluate_all():
     """Evaluate all commentaries and runs"""
+    # a single ocr models output for all commentaries
+    # do the evaluate on each of the models outputs
+    # weright average to get the general results
+
     raise NotImplementedError
 #
 # commentary = Commentary('cu31924087948174',
