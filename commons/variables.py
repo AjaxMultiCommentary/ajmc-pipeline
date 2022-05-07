@@ -1,21 +1,23 @@
 import re
 
-PATHS = {  # 'base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/',
+PATHS = {
+    # 'base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/',
     'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
     'schema': '/scratch/sven/tmp/ajmc/data/page.schema.json',
     'groundtruth': 'ocr/groundtruth/evaluation',
     'png': 'images/png',
-    'via_project': 'olr/via_project.json',
+    'via_path': 'olr/via_project.json',
     'json': 'canonical',
     'xmi': 'ner/annotation',
     'typesystem': '/scratch/sven/tmp/ajmc/data/TypeSystem.xml',
-    'olr_initiation': 'olr/annotation/project_initiation'
+    'olr_initiation': 'olr/annotation/project_initiation',
+    'ocr': 'ocr/runs'
 }
 
 FOLDER_STRUCTURE_PATHS = {
     # Only relative paths
     # Placeholder pattern are between []
-    'ocr_outputs_dir': '[commentary_id]/ocr/runs/[run_name]/outputs'
+    'ocr_outputs_dir': '[commentary_id]/ocr/runs/[ocr_run]/outputs'
 }
 
 METADATA_SPREADSHEET_ID = '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE'

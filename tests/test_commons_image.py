@@ -7,8 +7,8 @@ import cv2
 
 
 @pytest.fixture
-def img_matrix(img_path):
-    return cv2.imread(img_path)
+def img_matrix(sample_image_path):
+    return cv2.imread(sample_image_path)
 
 
 def test_find_contours(img_matrix):
@@ -25,8 +25,8 @@ def test_remove_artifacts_from_contours(img_matrix, art_size):
     assert len(contours_) <= len(contours)
 
 
-def test_image(img_path, rectangles):
-    image = img.Image(path=img_path)
+def test_image(sample_image_path, rectangles):
+    image = img.Image(path=sample_image_path)
     assert isinstance(image.matrix, np.ndarray)
     assert isinstance(image.crop(rectangles['base']), img.Image)
 

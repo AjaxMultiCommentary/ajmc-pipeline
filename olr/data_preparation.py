@@ -2,6 +2,7 @@ from transformers import LayoutLMv2Processor, LayoutLMv2Tokenizer, LayoutLMv2For
 from typing import List, Tuple
 from text_importation.classes import Commentary
 from PIL import Image
+from commons import variables
 
 # %% Variables
 
@@ -70,7 +71,7 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
 
 
 # %% Script
-commentary = Commentary('Wecklein1894', ocr_run='tess')
+commentary = Commentary.from_structure(ocr_dir=variables.PATHS['base_dir']+'Wecklein1894/ocr/runs/15i0jT_ocrd_vanilla/outputs' )
 tokenizer = LayoutLMv2Tokenizer.from_pretrained('microsoft/layoutlmv2-base-uncased')
 processor = LayoutLMv2Processor.from_pretrained('microsoft/layoutlmv2-base-uncased',
                                                 tokenizer=tokenizer,

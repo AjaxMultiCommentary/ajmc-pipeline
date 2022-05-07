@@ -1,6 +1,10 @@
+import os
 from string import ascii_letters
 from datetime import datetime
+from typing import Tuple
+
 from commons import variables
+from commons.miscellaneous import get_custom_logger
 
 NUMBERS_LETTERS = '0123456789' + ascii_letters
 
@@ -44,7 +48,7 @@ def verify_path_integrity(path: str, path_pattern: str) -> None:
             assert dir_ in variables.COMMENTARY_IDS, f"""The commentary id ({dir_}) detected 
             in the provided path ({path}) does not match any known commentary_id. """
 
-        # Skip other placeholder patterns (e.g. '[ocr_run_name]').
+        # Skip other placeholder patterns (e.g. '[ocr_run]').
         elif pattern[0] == '[' and pattern[-1] == ']':
             continue
 
@@ -52,3 +56,50 @@ def verify_path_integrity(path: str, path_pattern: str) -> None:
         else:
             assert pattern == dir_, f"""The provided path ({path}) does not seem to be compliant with AJMC's 
             folder structure. Please make sure you are observing the following pattern: \n {path_pattern} """
+
+
+def parse_ocr_path(path:str) -> Tuple[str,str,str]:
+    """Extracts the base_path, commentary_id and ocr_run from an AJMC compliant OCR-outputs path."""
+    dirs = path.rstrip('/').split('/')  # Stripping trailing '/' before splitting
+    dirs_pattern = variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'].strip('/').split('/')
+    base = '/'.join(dirs[:-len(dirs_pattern)])
+    rest = dirs[-len(dirs_pattern):]
+    commentary_id = rest[dirs_pattern.index('[commentary_id]')]
+    ocr_run = rest[dirs_pattern.index('[ocr_run]')]
+
+    return base, commentary_id, ocr_run
+
+
+logger = get_custom_logger(__name__)
+
+
+def get_path_from_id(page_id: str, dir_: str = None) -> str:
+    """Gets the path to a page file (image, ocr...) from its id"""
+
+    files = [f for f in os.listdir(dir_) if page_id in f]
+
+    assert len(files) <= 1, f"""There are {len(files)} files matching the name {page_id} in {dir_}. Please check."""
+
+    if len(files) == 0:
+        logger.info(f"""Page_id {page_id} matches no file in {dir_}, skipping...""")
+        return ""
+
+    else:
+        return os.path.join(dir_, files[0])
+
+
+def guess_ocr_format(ocr_path: str) -> str:
+    """Guesses the ocr-format of a file.
+
+    Args:
+        ocr_path: Absolute path to an ocr output file"""
+
+    if ocr_path[-3:] == 'xml':
+        return 'pagexml'
+    elif ocr_path[-4:] == 'html':
+        return 'krakenhocr'
+    elif ocr_path[-4:] == 'hocr':
+        return 'tesshocr'
+    else:
+        raise NotImplementedError("""The format could not be identified. It looks like the format is neither 
+        `tesshocr`, nor `krakenhocr` nor `pagexml`, which are the only formats this module deals with.""")

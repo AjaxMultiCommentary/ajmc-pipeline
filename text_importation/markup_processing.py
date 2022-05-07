@@ -3,7 +3,7 @@ formats (json, hocr, page-XML...)"""
 
 import bs4
 from commons.geometry import Shape
-from typing import List
+from typing import List, Union
 
 
 # ===========================  GENERIC PARSER  ============================
@@ -105,7 +105,7 @@ def find_all_pagexml_elements(element: bs4.element.Tag, name: str) -> List[bs4.e
         raise NotImplementedError("""Accepted elements are 'lines' and 'words'.""")
 
 
-def find_all_elements(element: bs4.element.Tag, name: str, format: str = 'tesshocr') -> List[bs4.element.Tag]:
+def find_all_elements(element: Union[bs4.element.Tag, bs4.BeautifulSoup], name: str, format: str = 'tesshocr') -> List[bs4.element.Tag]:
     """Generic extractor. Finds all sub-elements with `name` in `element`.
 
     Args:

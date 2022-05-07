@@ -16,11 +16,10 @@ from commons.geometry import (
 from commons.image import Image
 from olr.utils.region_processing import order_olr_regions, get_page_region_dicts_from_via
 import jsonschema as js
-from text_importation.file_management import get_page_ocr_path, guess_ocr_format
 from text_importation.markup_processing import parse_markup_file, get_element_coords, \
     get_element_text, find_all_elements
 from commons.miscellaneous import get_custom_logger
-from commons.file_management.utils import verify_path_integrity
+from commons.file_management.utils import verify_path_integrity, parse_ocr_path, get_path_from_id, guess_ocr_format
 
 logger = get_custom_logger(__name__)
 
@@ -30,9 +29,11 @@ class Commentary:
 
     Args:
         commentary_id: The id of the commentary
-        ocr_dir: Absolute path to an ocr output folder. Prevails over `ocr_run` if provided.
-        ocr_run: Full or partial name of a run in `ocr/runs`. Gets overwriten by `ocr_dir` if the latter is provided.
-        """
+        ocr_dir: Absolute path to an ocr output folder.
+        via_path:
+        image_dir:
+        groundtruth_dir:
+    """
 
     def __init__(self,
                  commentary_id: str = None,
@@ -49,23 +50,21 @@ class Commentary:
 
     @classmethod
     def from_structure(cls, ocr_dir: str):
-        f"""Use this method to construct a `Commentary`-object using ajmc's folder structure.
+        # Todo fix flexible docstrings
+        """Use this method to construct a `Commentary`-object using ajmc's folder structure.
 
         Args:
             ocr_dir: Path to the directory in which ocr-outputs are stored. It should end with
             {variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir']}.
         """
         verify_path_integrity(path=ocr_dir, path_pattern=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
+        base_dir, commentary_id, ocr_run = parse_ocr_path(path=ocr_dir)
+        groundtruth_dir = os.path.join(base_dir, commentary_id, variables.PATHS['groundtruth'])
+        image_dir = os.path.join(variables.PATHS['base_dir'], commentary_id, variables.PATHS['png'])
+        via_path = os.path.join(variables.PATHS['base_dir'], commentary_id, variables.PATHS['via_path'])
 
-
-
-
-    @lazy_property
-    def paths(self) -> Dict[str, str]:
-        """A dictionary containing the useful paths of the commentary."""
-        return {'groundtruth': os.path.join(variables.PATHS['base_dir'], self.id, variables.PATHS['groundtruth']),
-                'images': os.path.join(variables.PATHS['base_dir'], self.id, variables.PATHS['png']),
-                'via_project': os.path.join(variables.PATHS['base_dir'], self.id, variables.PATHS['via_project'])}
+        return cls(commentary_id=commentary_id, ocr_dir=ocr_dir, via_path=via_path, image_dir=image_dir,
+                   groundtruth_dir=groundtruth_dir)
 
     @lazy_property
     def ocr_format(self) -> str:
@@ -75,37 +74,49 @@ class Commentary:
     @lazy_property
     def pages(self) -> List['Page']:
         """The pages contained in the commentaries"""
-        return [Page(p_id,
-                     commentary=self,
-                     ocr_path=get_page_ocr_path(p_id, ocr_dir=self.ocr_dir))
-                for p_id in self._get_page_ids()]
+        pages = []
+        for file in [f for f in os.listdir(self.paths['ocr_dir']) if f[-4:] in ['.xml', 'hocr', 'html']]:
+            pages.append(Page(ocr_path=os.path.join(self.paths['ocr_dir'], file),
+                              page_id=file.split('.')[0],
+                              groundtruth_path=get_path_from_id(file.split('.')[0], self.paths['groundtruth_dir']),
+                              image_path=get_path_from_id(file.split('.')[0], self.paths['image_dir']),
+                              via_path=self.paths['via_path'],
+                              commentary=self))
+
+        return pages
 
     @lazy_property
     def ocr_groundtruth_pages(self) -> Union[List['Page'], list]:
         """The commentary's pages which have a groundtruth file in `self.paths['groundtruth']`."""
-        return [
-            Page(page_id=fname[:-5],
-                 commentary=self,
-                 ocr_path=os.path.join(self.paths['groundtruth'], fname))
+        pages = []
+        for file in [f for f in os.listdir(self.paths['groundtruth_dir']) if f.endswith('.html')]:
+            pages.append(Page(ocr_path=os.path.join(self.paths['groundtruth_dir'], file),
+                              page_id=file.split('.')[0],
+                              groundtruth_path=None,
+                              image_path=get_path_from_id(file.split('.')[0], self.paths['image_dir']),
+                              via_path=self.paths['via_path'],
+                              commentary=self))
 
-            for fname in os.listdir(self.paths['groundtruth'])
-
-            if fname.startswith(self.id)
-        ]
+        return pages
 
     @lazy_property
     def olr_groundtruth_pages(self, ) -> Union[List['Page'], list]:
         """Returns the list of `Page`s which have at least one annotated region which is neither 'commentary' nor
         'undefined'. """
-        return [
-            Page(page_id=v['filename'].split('.')[0],
-                 ocr_path=get_page_ocr_path(v['filename'].split('.')[0], ocr_dir=self.ocr_dir),
-                 commentary=self)
 
-            for k, v in self.via_project['_via_img_metadata'].items()
+        pages = []
+        for k, v in self.via_project['_via_img_metadata'].items():
+            if any([r['region_attributes']['text'] not in ['commentary', 'undefined'] for r in v['regions']]):
+                p_id = v['filename'].split('.')[0]
+                pages.append(Page(ocr_path=get_path_from_id(p_id, self.paths['ocr_dir']),
+                                  page_id = p_id,
+                                  groundtruth_path=get_path_from_id(p_id, dir_=self.paths['groundtruth_dir']),
+                                  image_path=get_path_from_id(p_id, dir_=self.paths['image_dir']),
+                                  via_path=self.paths['via_path'],
+                                  commentary=self))
 
-            if any([r['region_attributes']['text'] not in ['commentary', 'undefined'] for r in v['regions']])
-        ]
+        return pages
+
 
     @lazy_property
     def regions(self):
@@ -120,8 +131,8 @@ class Commentary:
         return [w for p in self.pages for w in p.words]
 
     @lazy_property
-    def via_project(self) -> Dict[str, Any]:
-        with open(self.paths['via_project'], 'r') as file:
+    def via_project(self) -> dict:
+        with open(self.paths['via_path'], 'r') as file:
             return json.load(file)
 
     def _get_page_ids(self) -> List[str]:
@@ -132,40 +143,51 @@ class Commentary:
 class Page:
     """A class representing a commentary page."""
 
-    def __init__(self, page_id: Optional[str] = None, ocr_path: str = None, ocr_run: str = None,
+    def __init__(self,
+                 ocr_path: str,
+                 page_id: Optional[str] = None,
+                 groundtruth_path: Optional[str] = None,
+                 image_path: Optional[str] = None,
+                 via_path: Optional[str] = None,
                  commentary: Optional[Commentary] = None):
         """Default constructor.
 
         Args:
-            page_id: The page identifier (e.g. `'sophoclesplaysa05campgoog_0147'`).
-            ocr_path: The full or partial name of the ocr_run.
+            ocr_path: Absolute path to an OCR output file
             commentary: The commentary to which the page belongs.
         """
-
-        self.id = page_id if page_id else ocr_path.split['/'][-1].split('.')[0]
-        if ocr_path:
-            self.ocr_path = ocr_path
-            self.ocr_run = None
-        elif ocr_run:
-            self.ocr_run = get_ocr_run_fullname(self.id.split('_')[0], ocr_run)
-            self.ocr_path = get_page_ocr_path(self.id, ocr_run=self.ocr_run)
-
-        self.commentary = commentary if commentary else Commentary(self.id.split("_")[0], ocr_run=self.ocr_run)
-
-    # ===============================  Properties  ===============================
-    # Todo : think of a better implementation for this : it should come in __init__ with ocr_path
-    @lazy_property
-    def paths(self):
-        return {
-            'groundtruth': get_page_ocr_path(self.id, self.commentary.paths['groundtruth']),
-            'image': os.path.join(self.commentary.paths['images'], self.id + '.png')
+        self.id = page_id
+        self.commentary = commentary
+        self.paths = {
+            'ocr_path': ocr_path,
+            'groundtruth_path': groundtruth_path,
+            'image_path': image_path,
+            'via_path': via_path
         }
 
+    @classmethod
+    def from_structure(cls, ocr_path: str, commentary: Optional[Commentary] = None):
+        """Builds Page object from an OCR-path"""
+
+        commentary = commentary if commentary else Commentary.from_structure(ocr_dir='/'.join(ocr_path.split('/')[:-1]))
+        page_id = ocr_path.split('/')[-1].split('.')[0]
+
+        return cls(ocr_path=ocr_path,
+                   page_id=page_id,
+                   groundtruth_path=get_path_from_id(page_id=page_id, dir_=commentary.paths['groundtruth_dir']),
+                   image_path=get_path_from_id(page_id=page_id, dir_=commentary.paths['image_dir']),
+                   via_path=commentary.paths['via_path'],
+                   commentary=commentary)
+
+    # ===============================  Properties  ===============================
     @lazy_property
     def groundtruth_page(self) -> Union['Page', None]:
-        if os.path.exists(self.paths['groundtruth']):
-            return Page(self.id,
-                        ocr_path=self.paths['groundtruth'],
+        if os.path.exists(self.paths['groundtruth_path']):
+            return Page(ocr_path=self.paths['groundtruth_path'],
+                        page_id=self.id,
+                        groundtruth_path=None,
+                        image_path=self.paths['image_path'],
+                        via_path=self.paths['via_path'],
                         commentary=self.commentary)
         else:
             logger.warning(f"""Page {self.id} has no groundtruth page.""")
@@ -173,7 +195,7 @@ class Page:
 
     @lazy_property
     def ocr_format(self) -> str:
-        return guess_ocr_format(self.ocr_path)
+        return guess_ocr_format(self.paths['ocr_path'])
 
     @lazy_property
     def regions(self):
@@ -182,8 +204,12 @@ class Page:
 
     @lazy_property
     def lines(self):
-        return [TextElement(line, self, self.ocr_format) for line in
-                find_all_elements(self.markup, 'lines', self.ocr_format)]
+        return [
+            TextElement(markup=line,
+                        page=self,
+                        ocr_format=self.ocr_format)
+            for line in find_all_elements(self.markup, 'lines', self.ocr_format)
+        ]
 
     @lazy_property
     def words(self):
@@ -192,8 +218,16 @@ class Page:
     # ===============================  Other properties  ===============================
 
     @lazy_property
+    def via_project(self) -> dict:
+        if self.commentary:
+            return self.commentary.via_project
+        else:
+            with open(self.paths['via_path'], 'r') as file:
+                return json.load(file)
+
+    @lazy_property
     def image(self) -> Image:
-        return Image(path=self.paths['image'])
+        return Image(path=self.paths['image_path'])
 
     @lazy_property
     def text(self) -> str:
@@ -201,7 +235,7 @@ class Page:
 
     @lazy_property
     def markup(self) -> bs4.BeautifulSoup:
-        return parse_markup_file(self.ocr_path)
+        return parse_markup_file(self.paths['ocr_path'])
 
     @lazy_property
     def canonical_data(self) -> Dict[str, Any]:
@@ -259,7 +293,7 @@ class Page:
             A list region objects
         """
 
-        regions = get_page_region_dicts_from_via(self.id, self.commentary.via_project)
+        regions = get_page_region_dicts_from_via(self.id, self.via_project)
 
         if region_types == 'all':
             regions = [Region(r, self) for r in regions]
@@ -427,5 +461,3 @@ class TextElement:
     def words(self):
         return [TextElement(el, self.page, self.ocr_format) for el in
                 find_all_elements(self.markup, 'words', self.ocr_format)]
-
-
