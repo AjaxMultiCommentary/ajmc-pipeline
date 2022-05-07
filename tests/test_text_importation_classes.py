@@ -1,8 +1,8 @@
 import os
 
-from text_importation import classes
+from ajmc.text_importation import classes
 import pytest
-from commons import image
+from ajmc.commons import image
 
 
 @pytest.fixture()
@@ -60,7 +60,7 @@ def test_page(sample_ocr_path,
                                    via_path=sample_via_path,
                                    commentary=commentary_from_paths)
 
-    page_from_structure = classes.Page.from_structure(sample_ocr_path,commentary_from_paths)
+    page_from_structure = classes.Page.from_structure(sample_ocr_path, commentary_from_paths)
 
     for page in [page_from_paths, page_from_structure]:
 

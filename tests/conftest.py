@@ -1,7 +1,7 @@
 import os
-from commons import variables
+from ajmc.commons import variables
 import pytest
-from commons import geometry as geo
+from ajmc.commons import geometry as geo
 
 
 @pytest.fixture()
@@ -48,7 +48,7 @@ def sample_ocr_run():
 
 @pytest.fixture()
 def sample_ocr_dir(test_base_dir, sample_commentary_id, sample_ocr_run):
-    return os.path.join(test_base_dir, sample_commentary_id, variables.PATHS['ocr'], sample_ocr_run, 'outputs' )
+    return os.path.join(test_base_dir, sample_commentary_id, variables.PATHS['ocr'], sample_ocr_run, 'outputs')
 
 @pytest.fixture()
 def sample_ocr_path(sample_ocr_dir, sample_page_id):
