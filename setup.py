@@ -96,7 +96,7 @@ setup(
     keywords="ocr, olr, nlp, digital-humanities",  # Optional
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
-    package_dir={"": "ajmc"},  # Optional
+    # package_dir={"": "ajmc"},  # Optional
     # You can just specify package directories manually here if your project is
     # simple. Or you can use find_packages().
     #
@@ -106,7 +106,7 @@ setup(
     #
     #   py_modules=["my_module"],
     #
-    packages=find_packages(where="ajmc"),  # Required
+    packages=find_packages(),  # Required
     # Specify which Python versions you support. In contrast to the
     # 'Programming Language' classifiers above, 'pip install' will check this
     # and refuse to install the project if the version does not match. See
@@ -121,7 +121,6 @@ setup(
     install_requires=[
         'bs4',
         'datasets',
-        'detectron2 @ git+https://github.com/facebookresearch/detectron2.git@dc1b7d14331005eab9c6b67cbf0397d552793b3f',
         'dkpro-cassis',
         'jsonschema',
         'Levenshtein',
@@ -131,7 +130,6 @@ setup(
         'openpyxl',
         'pandas',
         'Pillow',
-        'pytest',
         'regex',
         'transformers',
         'typing',
@@ -146,7 +144,10 @@ setup(
     # Similar to `install_requires` above, these must be valid existing
     # projects.
     extras_require={  # Optional
-        "dev": ["torch==1.11.0"],
+        "dev": ["torch==1.11.0",
+                'detectron2 @ git+https://github.com/facebookresearch/detectron2.git@dc1b7d14331005eab9c6b67cbf0397d552793b3f',
+                'pytest',
+                ],
         # "test": [""],
     },
     # If there are data files included in your packages that need to be

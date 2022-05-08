@@ -1,6 +1,6 @@
 import os
 
-from transformers import LayoutLMv2Processor, LayoutLMv2Tokenizer, LayoutLMv2ForTokenClassification#, LayoutLMv2FeatureExtractor
+from transformers import LayoutLMv2Processor, LayoutLMv2Tokenizer, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
 from typing import List
 from ajmc.text_importation.classes import Commentary
 from PIL import Image
