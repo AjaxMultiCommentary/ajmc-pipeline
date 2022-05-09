@@ -5,7 +5,9 @@ import sys
 from ajmc.text_importation.classes import Commentary
 from ajmc.text_importation.rebuild import basic_rebuild, rebuilt_to_xmi
 from ajmc.commons.variables import PATHS
+from ajmc.commons.miscellaneous import get_custom_logger
 
+logger = get_custom_logger(__name__)
 
 def create_default_pipeline_parser() -> argparse.ArgumentParser:
     """Adds `__main__.py` relative arguments to the parser"""
@@ -88,7 +90,7 @@ def main():
 
         if args.make_jsons and args.make_xmis:
             for page in commentary.pages:
-                print('Processing page  ' + page.id)
+                logger.info('Processing page  ' + page.id)
                 page.to_json(output_dir=args.json_dir)
                 rebuild = basic_rebuild(page.canonical_data, args.region_types)
                 if len(rebuild['fulltext']) > 0:  # h andles the empty-page case
@@ -96,17 +98,17 @@ def main():
 
         elif args.make_jsons:
             for page in commentary.pages:
-                print('Canonizing page  ' + page.id)
+                logger.info('Canonizing page  ' + page.id)
                 page.to_json(output_dir=args.json_dir)
 
 
         elif args.make_xmis:
 
             for filename in os.listdir(args.json_dir):
-                print('Xmi-ing page  ' + page.id)
+                logger.info('Xmi-ing page  ' + page.id)
                 if filename.endswith('.json'):
                     with open(os.path.join(args.json_dir, filename), 'r') as f:
-                        page = json.loads(f.read())
+                        page = json.loads(f.read())  # Why can't this be done directly from commentary ?
 
                     rebuild = basic_rebuild(page, args.region_types)
                     if len(rebuild['fulltext']) > 0:  # handles the empty-page case

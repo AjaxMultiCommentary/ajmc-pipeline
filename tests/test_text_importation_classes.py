@@ -1,8 +1,12 @@
+import json
 import os
+
+import jsonschema
 
 from ajmc.text_importation import classes
 import pytest
 from ajmc.commons import image
+from ajmc.commons import variables
 
 
 @pytest.fixture()
@@ -20,7 +24,7 @@ def commentary_from_paths(sample_commentary_id,
 
 @pytest.fixture()
 def commentary_from_structure(sample_ocr_dir):
-    return classes.Commentary.from_structure(ocr_dir=sample_ocr_dir)
+    return classes.Commentary.from_folder_structure(ocr_dir=sample_ocr_dir)
 
 
 def test_commentary(commentary_from_structure, commentary_from_paths, sample_ocr_dir, sample_groundtruth_dir):
@@ -71,4 +75,13 @@ def test_page(sample_ocr_path,
         assert all([isinstance(r, classes.Region) for r in page.regions])
         assert all([isinstance(l, classes.TextElement) for l in page.lines])
         assert all([isinstance(w, classes.TextElement) for w in page.words])
+
+        # Validate page.json
+        with open(os.path.join('..',variables.PATHS['schema'] ), 'r') as file:
+            schema = json.loads(file.read())
+
+        jsonschema.validate(instance=page.canonical_data, schema=schema)
+
+
+
 

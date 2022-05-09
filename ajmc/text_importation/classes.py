@@ -15,7 +15,7 @@ from ajmc.commons.geometry import (
 )
 from ajmc.commons.image import Image
 from ajmc.olr.utils.region_processing import order_olr_regions, get_page_region_dicts_from_via
-import jsonschema as js
+import jsonschema
 from ajmc.text_importation.markup_processing import parse_markup_file, get_element_coords, \
     get_element_text, find_all_elements
 from ajmc.commons.miscellaneous import get_custom_logger
@@ -25,15 +25,7 @@ logger = get_custom_logger(__name__)
 
 
 class Commentary:
-    """`Commentary` objects reprensent a single ocr run of a commentary.
-
-    Args:
-        commentary_id: The id of the commentary
-        ocr_dir: Absolute path to an ocr output folder.
-        via_path:
-        image_dir:
-        groundtruth_dir:
-    """
+    """`Commentary` objects reprensent a single ocr run of a commentary."""
 
     def __init__(self,
                  commentary_id: str = None,
@@ -41,16 +33,27 @@ class Commentary:
                  via_path: str = None,
                  image_dir: str = None,
                  groundtruth_dir: str = None,
+                 _base_dir: str = None,  # Only useful for Commentary.from_structure()
                  ):
+        """Default constructor, where custom paths can be provided.
+
+        Args:
+            commentary_id: The id of the commentary
+            ocr_dir: Absolute path to an ocr output folder.
+            via_path:
+            image_dir:
+            groundtruth_dir:
+        """
         self.id = commentary_id
         self.paths = {'ocr_dir': ocr_dir,
                       'via_path': via_path,
                       'image_dir': image_dir,
-                      'groundtruth_dir': groundtruth_dir}
+                      'groundtruth_dir': groundtruth_dir,
+                      'base_dir':_base_dir}
 
+    # Todo fix flexible docstrings
     @classmethod
-    def from_structure(cls, ocr_dir: str):
-        # Todo fix flexible docstrings
+    def from_folder_structure(cls, ocr_dir: str):
         """Use this method to construct a `Commentary`-object using ajmc's folder structure.
 
         Args:
@@ -60,11 +63,11 @@ class Commentary:
         verify_path_integrity(path=ocr_dir, path_pattern=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
         base_dir, commentary_id, ocr_run = parse_ocr_path(path=ocr_dir)
         groundtruth_dir = os.path.join(base_dir, commentary_id, variables.PATHS['groundtruth'])
-        image_dir = os.path.join(variables.PATHS['base_dir'], commentary_id, variables.PATHS['png'])
-        via_path = os.path.join(variables.PATHS['base_dir'], commentary_id, variables.PATHS['via_path'])
+        image_dir = os.path.join(base_dir, commentary_id, variables.PATHS['png'])
+        via_path = os.path.join(base_dir, commentary_id, variables.PATHS['via_path'])
 
         return cls(commentary_id=commentary_id, ocr_dir=ocr_dir, via_path=via_path, image_dir=image_dir,
-                   groundtruth_dir=groundtruth_dir)
+                   groundtruth_dir=groundtruth_dir, _base_dir=base_dir)
 
     @lazy_property
     def ocr_format(self) -> str:
@@ -168,7 +171,7 @@ class Page:
     def from_structure(cls, ocr_path: str, commentary: Optional[Commentary] = None):
         """Builds Page object from an OCR-path"""
 
-        commentary = commentary if commentary else Commentary.from_structure(ocr_dir='/'.join(ocr_path.split('/')[:-1]))
+        commentary = commentary if commentary else Commentary.from_folder_structure(ocr_dir='/'.join(ocr_path.split('/')[:-1]))
         page_id = ocr_path.split('/')[-1].split('.')[0]
 
         return cls(ocr_path=ocr_path,
@@ -269,7 +272,7 @@ class Page:
         with open(schema_path, 'r') as file:
             schema = json.loads(file.read())
 
-        js.validate(instance=self.canonical_data, schema=schema)
+        jsonschema.validate(instance=self.canonical_data, schema=schema)
 
         with open(os.path.join(output_dir, self.id + '.json'), 'w') as f:
             json.dump(self.canonical_data, f, indent=4, ensure_ascii=False)

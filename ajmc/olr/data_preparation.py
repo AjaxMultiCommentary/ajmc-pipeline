@@ -73,7 +73,7 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
 
 
 # %% Script
-commentary = Commentary.from_structure(ocr_dir=os.path.join(variables.PATHS['base_dir'], 'Wecklein1894/ocr/runs/15i0jT_ocrd_vanilla/outputs'))
+commentary = Commentary.from_folder_structure(ocr_dir=os.path.join(variables.PATHS['base_dir'], 'Wecklein1894/ocr/runs/15i0jT_ocrd_vanilla/outputs'))
 tokenizer = LayoutLMv2Tokenizer.from_pretrained('microsoft/layoutlmv2-base-uncased')
 processor = LayoutLMv2Processor.from_pretrained('microsoft/layoutlmv2-base-uncased',
                                                 tokenizer=tokenizer,
