@@ -13,7 +13,18 @@ These steps are covered by the `ajmc`'s sub-packages.
 
 # Setup
 
-Please install `ajmc` from source, using `git clone https://github.com/AjaxMultiCommentary/ajmc`. `requirements.txt` 
+## Install from source
+
+Please install `ajmc` using `git clone https://github.com/AjaxMultiCommentary/ajmc`. `requirements.txt` 
 specifies the pip-requirements for creating an environment 
 (for instance with [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)). 
 
+
+
+## Install with PIP
+
+```shell
+git clone https://github.com/AjaxMultiCommentary/ajmc
+cd ajmc
+pip install .
+```
