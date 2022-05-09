@@ -24,7 +24,5 @@ specifies the pip-requirements for creating an environment
 ## Install with PIP
 
 ```shell
-git clone https://github.com/AjaxMultiCommentary/ajmc
-cd ajmc
-pip install .
+python -m pip install git+'https://github.com/AjaxMultiCommentary/ajmc'
 ```
