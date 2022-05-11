@@ -86,7 +86,7 @@ class Commentary:
                               via_path=self.paths['via_path'],
                               commentary=self))
 
-        return pages
+        return sorted(pages, key=lambda x: x.id)
 
     @lazy_property
     def ocr_groundtruth_pages(self) -> Union[List['Page'], list]:
@@ -100,7 +100,7 @@ class Commentary:
                               via_path=self.paths['via_path'],
                               commentary=self))
 
-        return pages
+        return sorted(pages, key=lambda x: x.id)
 
     @lazy_property
     def olr_groundtruth_pages(self, ) -> Union[List['Page'], list]:
@@ -118,7 +118,7 @@ class Commentary:
                                   via_path=self.paths['via_path'],
                                   commentary=self))
 
-        return pages
+        return sorted(pages, key=lambda x: x.id)
 
     @lazy_property
     def regions(self):

@@ -6,7 +6,7 @@ from ajmc.text_importation.classes import Commentary
 from PIL import Image
 from ajmc.commons import variables
 
-# %% Variables
+# Variables
 
 # Select only the regions of interest we want
 rois = ['app_crit',
@@ -62,7 +62,7 @@ labels_to_ids = {
 }
 
 
-# %% Functions
+# Functions
 def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, img_height: int, ):
     return [
         int(1000 * (rectangle[0][0] / img_width)),
@@ -73,7 +73,7 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
 
 
 # %% Script
-commentary = Commentary.from_folder_structure(ocr_dir=os.path.join(variables.PATHS['base_dir'], 'Wecklein1894/ocr/runs/15i0jT_ocrd_vanilla/outputs'))
+commentary = Commentary.from_folder_structure(ocr_dir=os.path.join(variables.PATHS['base_dir'], 'Wecklein1894/ocr/runs/13p0am_lace_base/outputs'))
 tokenizer = LayoutLMv2Tokenizer.from_pretrained('microsoft/layoutlmv2-base-uncased')
 processor = LayoutLMv2Processor.from_pretrained('microsoft/layoutlmv2-base-uncased',
                                                 tokenizer=tokenizer,
@@ -103,11 +103,14 @@ for r in page.regions:
             word_labels.append(labels_to_ids[r.region_type])
 
 # Tokenize, truncate and pad
-tokens = tokenizer(words,
+
+tokens = tokenizer(text=words,
+                   boxes=word_boxes,
                    padding=True,
                    truncation=True,
                    is_split_into_words=True,
-                   return_overflowing_tokens=True)
+                   return_overflowing_tokens=True
+                   )
 
 #%% Align labels and boxes
 from ajmc.nlp.data_preparation.utils import align_elements
