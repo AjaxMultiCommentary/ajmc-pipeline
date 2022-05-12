@@ -139,7 +139,7 @@ class Commentary:
 
     def _get_page_ids(self) -> List[str]:
         """Gets the ids of the pages contained in Commentary by scanning the png files"""
-        return [p[:-4] for p in os.listdir(self.paths['images']) if p.endswith('.png')]
+        return [p[:-4] for p in os.listdir(self.paths['image_dir']) if p.endswith('.png')]
 
 
 class Page:
