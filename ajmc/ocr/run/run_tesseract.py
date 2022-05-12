@@ -355,10 +355,12 @@ def check_dataset_size(commentary_names, mode, cleaned_suffix="clean"):
 def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=None):
     timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
     base_dir = os.path.join(PARENT_DIR,'ajmc_eval/')
+    if custom_lang:
+        assert (isinstance(custom_lang, dict) and len(custom_lang) == len(commentary_ids)), "note that custom_lang should be a dict containing the same number of items as commentary_ids"
     for commentary_id in commentary_ids:
         if custom_lang:
             print("using custom language combination")
-            model_str = f"{custom_lang}+{greek_model_name}"
+            model_str = f"{custom_lang[commentary_id]}+{greek_model_name}"
         else:
             if commentary_id not in TESSDATA_MAP:
                 raise NotImplementedError(f"current commentary id not supported: {commentary_id}. \
@@ -367,10 +369,11 @@ def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=N
         print(f"using language: {model_str}")
 
         output_name = f"{timestamp}_evaluation_{greek_model_name}/{commentary_id}"
+        ocr_dir=os.path.join(PROJECT_DIR, "ocr", "exps", output_name)
         
         commentary = Commentary(
             commentary_id, 
-            ocr_dir=os.path.join(PROJECT_DIR, "ocr", "exps", output_name), 
+            ocr_dir=ocr_dir, 
             via_path=os.path.join(base_dir, commentary_id, 'olr/via_project.json'),
             image_dir=os.path.join(base_dir, commentary_id, 'ocr/groundtruth/images'),
             groundtruth_dir=os.path.join(base_dir, commentary_id, 'ocr/groundtruth/evaluation'),
