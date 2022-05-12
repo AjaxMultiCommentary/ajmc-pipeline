@@ -16,11 +16,15 @@ plt.rcParams['savefig.dpi'] = 300
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.getcwd()))
 PARENT_DIR = os.path.dirname(PROJECT_DIR)
 
-sys.path.append(os.path.join(PROJECT_DIR, "commons"))
-import variables
+# sys.path.append(os.path.join(PROJECT_DIR, "commons"))
+# sys.path.append(os.path.join(PROJECT_DIR, "text_importation"))
+# sys.path.append(os.path.join(PROJECT_DIR, "ocr", "evaluation"))
+from commons import variables
+from evaluation.evaluation_methods import commentary_evaluation
+from text_importation.classes import Commentary
 
 # Data dir with whole images
-RAW_DATA_DIR = variables.PATHS.get("base_dir", "")
+RAW_DATA_DIR = variables.paths.get("base_dir", "")
 RAW_COMMENTARY_DIRS = ['Wecklein1894', 'Kamerbeek1953', 'sophoclesplaysa05campgoog', 'Paduano1982', 'lestragdiesdeso00tourgoog', 
                         'Untersteiner1934', 'Ferrari1974', 'sophokle1v3soph', 'DeRomilly1976', 'Finglass2011', 'Colonna1975', 
                         'bsb10234118', 'cu31924087948174', 'Garvie1998']
@@ -42,7 +46,19 @@ POGRETRA_COMMENTARY_DIRS = ['German-serifs/ldpd_10922736_000', 'German-serifs/OU
 TESSDATA_DIR = os.path.join(PARENT_DIR, 'ts', 'tessdata')
 TESSDATA_BEST_DIR = os.path.join(PARENT_DIR, 'ts', 'tessdata_best')
 
-def get_commentary_dir(commentary_name, mode="train", cleaned=False, create_if_missing=False):
+TESSDATA_MAP = {
+    # "cu31924087948174": "eng+{}+GT4HistOCR_50000000.997_191951",
+    # "sophokle1v3soph": "deu+{}+GT4HistOCR_50000000.997_191951"
+    "cu31924087948174": "eng+grc+{}",
+    "sophokle1v3soph": "deu+grc+{}"
+}
+
+# TODO: change the dir here
+EVALUATION_DIR = os.path.join(PARENT_DIR, "ajmc_eval")
+
+EXP_DIR = os.path.join(PROJECT_DIR, "ocr", "exps")
+
+def get_commentary_dir(commentary_name, mode="train", cleaned_suffix="", create_if_missing=False):
     '''
         Get the dir name from given arguments
 
@@ -51,18 +67,18 @@ def get_commentary_dir(commentary_name, mode="train", cleaned=False, create_if_m
             - mode: the organization of the dataset. 'train' means that it has a folder called 'GT-pairs' and 
                     it includes line images and their ground truth; 'raw' means that it has a folder called 
                     'images/png' and it only includes images for whole pages and there is no ground truth
-            - cleaned: whether the dataset has been cleaned by function 'clean_data_tesstrain'. If set to True,
+            - cleaned_suffix: whether the dataset has been cleaned by function 'clean_data_tesstrain'. If set to True,
                     then the resulting folder will have a suffix '-clean'
             - create_if_missing: when there is no such folder, set this to True to allow the code to create it,
                     otherwise it will raise a FileNotFoundError
     '''
     assert(mode in ["train", "raw", "pogretra"])
     if mode == "train":
-        commentary_dir = os.path.join(TRAIN_DATA_DIR, commentary_name, "GT-pairs-clean" if cleaned else "GT-pairs")
+        commentary_dir = os.path.join(TRAIN_DATA_DIR, commentary_name, f"GT-pairs-{cleaned_suffix}" if cleaned_suffix else "GT-pairs")
     elif mode == "raw":
-        commentary_dir = os.path.join(RAW_DATA_DIR, commentary_name, "images", "png-clean" if cleaned else "png")
+        commentary_dir = os.path.join(RAW_DATA_DIR, commentary_name, "images", f"png-{cleaned_suffix}" if cleaned_suffix else "png")
     else:
-        commentary_dir = os.path.join(POGRETRA_DATA_DIR, f"{commentary_name}-clean" if cleaned else commentary_name)
+        commentary_dir = os.path.join(POGRETRA_DATA_DIR, f"{commentary_name}-{cleaned_suffix}" if cleaned_suffix else commentary_name)
     if not os.path.isdir(commentary_dir):
         if create_if_missing:
             print(f"creating dir: {commentary_dir}")
@@ -71,7 +87,7 @@ def get_commentary_dir(commentary_name, mode="train", cleaned=False, create_if_m
             raise FileNotFoundError(f"folder doesn't exist: {commentary_dir}. Check your folder settings, or enable 'create_if_missing' in function get_commentary_dir.")
     return commentary_dir
 
-def get_fig_name(commentary_name, fig_name, mode="train", cleaned=False):
+def get_fig_name(commentary_name, fig_name, mode="train", cleaned_suffix=""):
     '''
         Get the path of a figure given the arguments
 
@@ -82,15 +98,15 @@ def get_fig_name(commentary_name, fig_name, mode="train", cleaned=False):
             - mode: the organization of the dataset. 'train' means that it has a folder called 'GT-pairs' and 
                     it includes line images and their ground truth; 'raw' means that it has a folder called 
                     'images/png' and it only includes images for whole pages and there is no ground truth
-            - cleaned: whether the dataset has been cleaned by function 'clean_data_tesstrain'. If set to True,
+            - cleaned_suffix: whether the dataset has been cleaned by function 'clean_data_tesstrain'. If set to True,
                     then the resulting folder will have a suffix '-clean'
     '''
-    commentary_dir = get_commentary_dir(commentary_name, mode, cleaned)
+    commentary_dir = get_commentary_dir(commentary_name, mode, cleaned_suffix)
     fig = os.path.join(commentary_dir, f"{commentary_name}_{fig_name}") if mode in ["raw", "train"] else os.path.join(commentary_dir, fig_name)
     assert(os.path.isfile(fig))
     return fig
 
-def get_fig_idxs(commentary_name, mode="train", cleaned=False, verbose=False):
+def get_fig_idxs(commentary_name, mode="train", cleaned_suffix="", verbose=False):
     '''
         Get a list of figures' indices from a given dataset
 
@@ -99,11 +115,11 @@ def get_fig_idxs(commentary_name, mode="train", cleaned=False, verbose=False):
             - mode: the organization of the dataset. 'train' means that it has a folder called 'GT-pairs' and 
                     it includes line images and their ground truth; 'raw' means that it has a folder called 
                     'images/png' and it only includes images for whole pages and there is no ground truth
-            - cleaned: whether the dataset has been cleaned by function 'clean_data_tesstrain'. If set to True,
+            - cleaned_suffix: whether the dataset has been cleaned by function 'clean_data_tesstrain'. If set to True,
                     then the resulting folder will have a suffix '-clean'
             - verbose: set to True to print the fig_list and the length of it
     '''
-    commentary_dir = get_commentary_dir(commentary_name, mode, cleaned)
+    commentary_dir = get_commentary_dir(commentary_name, mode, cleaned_suffix)
     init_fig_list = [item for item in list(os.listdir(commentary_dir)) if item.endswith("png")]
     fig_list = sorted([item.replace(f"{commentary_name}_", "") if mode in ["raw", "train"] else item for item in init_fig_list])
     if verbose:
@@ -111,26 +127,27 @@ def get_fig_idxs(commentary_name, mode="train", cleaned=False, verbose=False):
         if len(fig_list) >= 200:
             print("too many images. only showing the first 100 and last 100.")
             print(fig_list[0:100])
+            print("......")
             print(fig_list[-100:])
         else:
             print(fig_list)
     return fig_list
 
-def show_fig(commentary_name, fig_name, mode="train", cleaned=False):
+def show_fig(commentary_name, fig_name, mode="train", cleaned_suffix=""):
     '''
         Show an image in the screen.
     '''
-    fig = get_fig_name(commentary_name, fig_name, mode, cleaned)
+    fig = get_fig_name(commentary_name, fig_name, mode, cleaned_suffix)
     img = cv2.imread(fig)
     plt.imshow(img)
     plt.axis("off")
     return img
 
-def clean_data_tesstrain(commentary_name, mode="train", cleaned=False):
+def clean_data_tesstrain(commentary_name, mode="train", cleaned_suffix=""):
     '''
         Remove .box and .lstmf files from the dataset. These files are created by tesstrain.
     '''
-    commentary_dir = get_commentary_dir(commentary_name, mode, cleaned)
+    commentary_dir = get_commentary_dir(commentary_name, mode, cleaned_suffix)
     count = 0
     for file in os.listdir(commentary_dir):
         if file.endswith(".box") or file.endswith(".lstmf"):
@@ -139,11 +156,11 @@ def clean_data_tesstrain(commentary_name, mode="train", cleaned=False):
             count += 1
     print(f"In total remove {count} files.")
 
-def check_missing_gt(commentary_name, mode="train", cleaned=False):
+def check_missing_gt(commentary_name, mode="train", cleaned_suffix=""):
     '''
         Given a dataset, check whether there is any bad ground truth files (missing or empty).
     '''
-    commentary_dir = get_commentary_dir(commentary_name, mode, cleaned)
+    commentary_dir = get_commentary_dir(commentary_name, mode, cleaned_suffix)
     missing = []
     for file in sorted(list(os.listdir(commentary_dir))):
         if file.endswith(".png"):
@@ -161,8 +178,8 @@ def clean_gt_folder(commentary_name, mode="train"):
         Given a dataset, create a clean version and exclude all bad ground truth files (missing or empty)
     '''
     commentary_dir = get_commentary_dir(commentary_name, mode)
-    clean_commentary_dir = get_commentary_dir(commentary_name, mode, cleaned=True, create_if_missing=True)
-    missing = check_missing_gt(commentary_name, mode, cleaned=False)
+    clean_commentary_dir = get_commentary_dir(commentary_name, mode, cleaned_suffix="clean", create_if_missing=True)
+    missing = check_missing_gt(commentary_name, mode, cleaned_suffix="")
     count = 0
     for filename in os.listdir(commentary_dir):
         if filename.endswith(".png") and filename not in missing and os.path.isfile(os.path.join(commentary_dir, filename.replace(".png", ".gt.txt"))):
@@ -171,7 +188,7 @@ def clean_gt_folder(commentary_name, mode="train"):
             count += 1
     print(f"Copy {count} GT-pairs. Skip {len(missing)} GT-pairs because they have bad ground truth file.")
 
-def test_ocr(exp_name, tessdata_dir, commentary_name, fig_idx, lang="eng+fra+grc", mode="train", save=False, viz=True, verbose=True, add_timestamp=True, cleaned=False):
+def test_ocr(exp_name, tessdata_dir, commentary_name, fig_idx, img_suffix="", lang="eng+fra+grc", mode="train", save=False, viz=True, verbose=True, add_timestamp=True, cleaned_suffix=""):
     '''
         Use Tesseract to recognize a given image, save the relevant output and visualize the OCR result.
 
@@ -190,63 +207,76 @@ def test_ocr(exp_name, tessdata_dir, commentary_name, fig_idx, lang="eng+fra+grc
             - viz: whether or not to visualize the OCR results.
             - verbose: whether or not to print the messages
             - add_timestamp: If add_timestamp is set to True, then a timestamp will be added to the folder name
-            - cleaned: whether the dataset has been cleaned by function 'clean_data_tesstrain'. If set to True,
+            - cleaned_suffix: whether the dataset has been cleaned by function 'clean_data_tesstrain'. If set to True,
                     then the resulting folder will have a suffix '-clean'
             
     '''
-    fig_name = get_fig_name(commentary_name, fig_idx, mode, cleaned)
+    fig_name = get_fig_name(commentary_name, fig_idx, mode, cleaned_suffix)
 
-    img = cv2.imread(fig_name)
+    if add_timestamp:
+        timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+        output_name = f"{timestamp}_{exp_name}"
+    else:
+        output_name = exp_name
 
-    return test_ocr_raw(exp_name, tessdata_dir, img, fig_name, lang=lang, save=save, viz=viz, verbose=verbose, add_timestamp=add_timestamp)
+    return test_ocr_raw(output_name, tessdata_dir, fig_name, img_suffix=img_suffix, lang=lang, save=save, viz=viz, verbose=verbose)
 
-def test_ocr_raw(exp_name, tessdata_dir, img, output_name, lang="eng+fra+grc", save=False, viz=True, verbose=True, add_timestamp=True):
+def test_ocr_raw(output_name, tessdata_dir, fig_name, img=None, img_suffix="", 
+    lang="eng+fra+grc", save=False, viz=True, verbose=True, exp_folder=EXP_DIR, lstm_config="-c lstm_choice_mode=2"):
     '''
         Use Tesseract to recognize a given image, save the relevant output and visualize the OCR result.
 
         params:
-            - exp_name: the output folder. The folder will appear in ocr/exps. If add_timestamp is set to
+            - output_folder: the output folder. The folder will appear in ocr/exps. If add_timestamp is set to
                     True, then a timestamp will be added to the folder name
             - tessdata_dir: the folder to store the tessdata. Equivelant to use TESSDATA_PREFIX.
-            - img: the opened img file.
-            - output_name: the output prefix for OCR results.
+            - fig_name: name of the figure.
             - lang: language models to use. Use '+' to concatenate multiple language models
-            - mode: the organization of the dataset. 'train' means that it has a folder called 'GT-pairs' and 
-                    it includes line images and their ground truth; 'raw' means that it has a folder called 
-                    'images/png' and it only includes images for whole pages and there is no ground truth
             - save: whether or not to save the OCR results to the folder.
             - viz: whether or not to visualize the OCR results.
             - verbose: whether or not to print the messages
-            - add_timestamp: If add_timestamp is set to True, then a timestamp will be added to the folder name
-            - cleaned: whether the dataset has been cleaned by function 'clean_data_tesstrain'. If set to True,
-                    then the resulting folder will have a suffix '-clean'
             
     '''
 
-    if add_timestamp:
-        timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-        output_folder = os.path.join(PROJECT_DIR, "ocr", "exps", f"{timestamp}_{exp_name}")
-    else:
-        output_folder = os.path.join(PROJECT_DIR, "ocr", "exps", exp_name)
+    # check existence of the language files
+    lang_files = lang.split("+")
+    for f in lang_files:
+        if not os.path.isfile(os.path.join(tessdata_dir,f+".traineddata")):
+            print(f"language {f}.traineddata not found.")
 
-    custom_config = f"--tessdata-dir {tessdata_dir} -l {lang} --oem 1 -c lstm_choice_mode=2"
-    output = pytesseract.image_to_string(img, config=custom_config)
+    output_folder = os.path.join(exp_folder, output_name)
+
+    if img is None:
+        assert os.path.isfile(fig_name), f"No such figure: {fig_name}"
+        img = cv2.imread(fig_name)
+
+    custom_config = f"--tessdata-dir {tessdata_dir} -l {lang} --oem 1 {lstm_config}"
+    fig_basename = os.path.splitext(os.path.basename(fig_name))[0]
+    if img_suffix:
+        fig_basename += "_" + img_suffix
+    if verbose:
+        os.makedirs(output_folder, exist_ok=True)
+
+        output = pytesseract.image_to_string(img, config=custom_config)
+        print(f"OCR output: {output}")
+
+        output_file = os.path.join(output_folder, os.path.basename(fig_basename)+".str")
+        with open(output_file, "w", encoding="utf-8") as f_out:
+            f_out.write(output)
+            print(f"string output saved to {output_file}") if verbose else None
+
     output_hocr = pytesseract.image_to_pdf_or_hocr(img, extension="hocr", config=custom_config).decode("utf-8")
 
     if save:
         os.makedirs(output_folder, exist_ok=True)
 
-        output_file = os.path.join(output_folder, os.path.basename(output_name)+".str")
-        output_file_hocr = os.path.join(output_folder, os.path.basename(output_name)+".hocr")
-
-        with open(output_file, "w", encoding="utf-8") as f_out:
-            f_out.write(output)
-            print(f"string output saved to {output_file}") if verbose else None
+        output_file_hocr = os.path.join(output_folder, os.path.basename(fig_basename)+".hocr")
 
         with open(output_file_hocr, "w", encoding="utf-8") as f_out:
             f_out.write(output_hocr)
-            print(f"hocr output saved to {output_file_hocr}") if verbose else None
+            print(f"hocr output saved to {output_file_hocr}")
 
+    assert verbose or not viz
     if viz:
         fig, axs = plt.subplots(1,2)
         axs[0].imshow(img)
@@ -255,18 +285,17 @@ def test_ocr_raw(exp_name, tessdata_dir, img, output_name, lang="eng+fra+grc", s
         axs[1].axis("off")
         plt.show(fig)
 
-    print(f"OCR output:\n{output}") if verbose else None
-    return output
+    return output if verbose else None
 
-def batch_ocr(exp_name, tessdata_dir, commentary_name, lang="eng+fra+grc", mode="train", save=True, viz=False, verbose=False, cleaned=False):
+def batch_ocr(exp_name, tessdata_dir, commentary_name, lang="eng+fra+grc", mode="train", save=True, viz=False, verbose=False, cleaned_suffix=""):
     timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
     exp_name = f"{timestamp}_{exp_name}"
 
-    for fig_idx in tqdm(get_fig_idxs(commentary_name, mode, cleaned)):
-        output = test_ocr(exp_name, tessdata_dir, commentary_name, fig_idx, lang, mode, save, viz, verbose, add_timestamp=False, cleaned=cleaned)
+    for fig_idx in tqdm(get_fig_idxs(commentary_name, mode, cleaned_suffix)):
+        output = test_ocr(exp_name, tessdata_dir, commentary_name, fig_idx, lang, mode, save, viz, verbose, add_timestamp=False, cleaned_suffix=cleaned_suffix)
         
 
-def train(model_name, commentary_names, mode, output_dir, cleaned=True, config_file=None):
+def train(model_name, commentary_names, mode, output_dir, cleaned_suffix="clean", config_file=None):
     TESSTRAIN_DIR = os.path.join(PARENT_DIR, "ts", "tesstrain")
     sh_file = os.path.join(TESSTRAIN_DIR, "tmp_train.sh")
 
@@ -278,7 +307,7 @@ def train(model_name, commentary_names, mode, output_dir, cleaned=True, config_f
             tmp_file.write(msg)
 
     timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-    log_file = os.path.join(TESSTRAIN_DIR, f"log-{timestamp}.txt")
+    log_file = os.path.join(TESSTRAIN_DIR, f"log-{timestamp}-{cleaned_suffix}.txt")
 
     print(f"See {log_file} for the training output.")
 
@@ -293,7 +322,7 @@ def train(model_name, commentary_names, mode, output_dir, cleaned=True, config_f
 
     for commentary_name in commentary_names:
 
-        commentary_dir = get_commentary_dir(commentary_name, mode=mode, cleaned=cleaned)
+        commentary_dir = get_commentary_dir(commentary_name, mode=mode, cleaned_suffix=cleaned_suffix)
     
         cmd_line += f"GROUND_TRUTH_DIR={commentary_dir} "
 
@@ -314,3 +343,37 @@ def train(model_name, commentary_names, mode, output_dir, cleaned=True, config_f
 
         f_out.write(log_str(cmd_line, log_file))
     os.system(f"sh {sh_file}")
+
+def check_dataset_size(commentary_names, mode, cleaned_suffix="clean"):
+    count = 0
+    for commentary_name in commentary_names:
+
+        commentary_dir = get_commentary_dir(commentary_name, mode=mode, cleaned_suffix=cleaned_suffix)
+    
+        for fig_name in os.listdir(commentary_dir):
+            if fig_name.endswith(".png") and os.path.isfile(os.path.join(commentary_dir, fig_name.replace(".png", ".gt.txt"))):
+                count += 1
+    print(f"There are in total {count} images within datasets: {commentary_names}")
+
+def evaluate_model(commentary_ids, tessdata_dir, greek_model_name):
+    timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+    for commentary_id in commentary_ids:
+        if commentary_id not in TESSDATA_MAP:
+            raise NotImplementedError(f"current commentary id not supported: {commentary_id}. \
+            Please update TESSDATA_MAP to include this commentary.")
+        model_str = TESSDATA_MAP[commentary_id].format(greek_model_name)
+        print(f"using language: {model_str}")
+
+        output_name = f"{timestamp}_evaluation_{greek_model_name}/{commentary_id}"
+        ocr_dir = os.path.join(PROJECT_DIR, "ocr", "exps", output_name)
+        
+        commentary = Commentary(commentary_id, ocr_dir)
+        page_filenames = [os.path.join(EVALUATION_DIR, commentary_id, "ocr", "groundtruth", "images", item+".png") for item in commentary._get_page_ids()]
+
+        for img_filename in page_filenames:
+            print(img_filename)
+            test_ocr_raw(output_name, tessdata_dir, img_filename, lang=model_str, save=True, viz=False, verbose=False, lstm_config="")
+        
+        commentary_evaluation(commentary=commentary,output_dir=ocr_dir)
+
+    print("done")
