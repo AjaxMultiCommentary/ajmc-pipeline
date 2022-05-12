@@ -14,17 +14,14 @@ plt.rcParams['figure.dpi'] = 300
 plt.rcParams['savefig.dpi'] = 300
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.getcwd()))
-PARENT_DIR = os.path.dirname(PROJECT_DIR)
+PARENT_DIR = os.path.dirname(os.path.dirname(PROJECT_DIR))
+sys.path.append(os.path.dirname(PROJECT_DIR))
 
-# sys.path.append(os.path.join(PROJECT_DIR, "commons"))
-# sys.path.append(os.path.join(PROJECT_DIR, "text_importation"))
-# sys.path.append(os.path.join(PROJECT_DIR, "ocr", "evaluation"))
-from commons import variables
-from evaluation.evaluation_methods import commentary_evaluation
-from text_importation.classes import Commentary
+from ajmc.ocr.evaluation.evaluation_methods import commentary_evaluation
+from ajmc.text_importation.classes import Commentary
 
 # Data dir with whole images
-RAW_DATA_DIR = variables.paths.get("base_dir", "")
+RAW_DATA_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/'
 RAW_COMMENTARY_DIRS = ['Wecklein1894', 'Kamerbeek1953', 'sophoclesplaysa05campgoog', 'Paduano1982', 'lestragdiesdeso00tourgoog', 
                         'Untersteiner1934', 'Ferrari1974', 'sophokle1v3soph', 'DeRomilly1976', 'Finglass2011', 'Colonna1975', 
                         'bsb10234118', 'cu31924087948174', 'Garvie1998']
@@ -47,10 +44,10 @@ TESSDATA_DIR = os.path.join(PARENT_DIR, 'ts', 'tessdata')
 TESSDATA_BEST_DIR = os.path.join(PARENT_DIR, 'ts', 'tessdata_best')
 
 TESSDATA_MAP = {
-    # "cu31924087948174": "eng+{}+GT4HistOCR_50000000.997_191951",
-    # "sophokle1v3soph": "deu+{}+GT4HistOCR_50000000.997_191951"
-    "cu31924087948174": "eng+grc+{}",
-    "sophokle1v3soph": "deu+grc+{}"
+    "cu31924087948174": "eng+{}+GT4HistOCR_50000000.997_191951",
+    "sophokle1v3soph": "deu+{}+GT4HistOCR_50000000.997_191951"
+    # "cu31924087948174": "eng+grc+{}",
+    # "sophokle1v3soph": "deu+grc+{}"
 }
 
 # TODO: change the dir here
@@ -355,19 +352,29 @@ def check_dataset_size(commentary_names, mode, cleaned_suffix="clean"):
                 count += 1
     print(f"There are in total {count} images within datasets: {commentary_names}")
 
-def evaluate_model(commentary_ids, tessdata_dir, greek_model_name):
+def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=None):
     timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+    base_dir = os.path.join(PARENT_DIR,'ajmc_eval/')
     for commentary_id in commentary_ids:
-        if commentary_id not in TESSDATA_MAP:
-            raise NotImplementedError(f"current commentary id not supported: {commentary_id}. \
-            Please update TESSDATA_MAP to include this commentary.")
-        model_str = TESSDATA_MAP[commentary_id].format(greek_model_name)
+        if custom_lang:
+            print("using custom language combination")
+            model_str = f"{custom_lang}+{greek_model_name}"
+        else:
+            if commentary_id not in TESSDATA_MAP:
+                raise NotImplementedError(f"current commentary id not supported: {commentary_id}. \
+                Please update TESSDATA_MAP to include this commentary.")
+            model_str = TESSDATA_MAP[commentary_id].format(greek_model_name)
         print(f"using language: {model_str}")
 
         output_name = f"{timestamp}_evaluation_{greek_model_name}/{commentary_id}"
-        ocr_dir = os.path.join(PROJECT_DIR, "ocr", "exps", output_name)
         
-        commentary = Commentary(commentary_id, ocr_dir)
+        commentary = Commentary(
+            commentary_id, 
+            ocr_dir=os.path.join(PROJECT_DIR, "ocr", "exps", output_name), 
+            via_path=os.path.join(base_dir, commentary_id, 'olr/via_project.json'),
+            image_dir=os.path.join(base_dir, commentary_id, 'ocr/groundtruth/images'),
+            groundtruth_dir=os.path.join(base_dir, commentary_id, 'ocr/groundtruth/evaluation'),
+        )
         page_filenames = [os.path.join(EVALUATION_DIR, commentary_id, "ocr", "groundtruth", "images", item+".png") for item in commentary._get_page_ids()]
 
         for img_filename in page_filenames:

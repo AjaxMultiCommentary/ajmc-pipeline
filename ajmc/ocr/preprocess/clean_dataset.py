@@ -16,9 +16,11 @@ from langdetect import detect_langs, lang_detect_exception
 
 sys.stdout.reconfigure(encoding='utf-8') # useful for printing greek texts
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))) # include ocr folder
-from run.run_tesseract import PROJECT_DIR, PARENT_DIR, RAW_COMMENTARY_DIRS, TRAIN_COMMENTARY_DIRS, TESSDATA_DIR, TESSDATA_BEST_DIR, POGRETRA_COMMENTARY_DIRS
-from run.run_tesseract import get_commentary_dir
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.getcwd()))
+sys.path.append(os.path.dirname(PROJECT_DIR))
+
+from ajmc.ocr.run.run_tesseract import PARENT_DIR, RAW_COMMENTARY_DIRS, TRAIN_COMMENTARY_DIRS, TESSDATA_DIR, TESSDATA_BEST_DIR, POGRETRA_COMMENTARY_DIRS
+from ajmc.ocr.run.run_tesseract import get_commentary_dir
 
 def count_freq(charset, text):
     for char in text:

@@ -6,12 +6,10 @@ import numpy as np
 from tqdm import tqdm
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.getcwd()))
-sys.path.append(os.path.join(PROJECT_DIR))
-sys.path.append(os.path.join(PROJECT_DIR, "text_importation"))
-sys.path.append(os.path.join(PROJECT_DIR, "ocr"))
+sys.path.append(os.path.dirname(PROJECT_DIR))
 
-from run.run_tesseract import PROJECT_DIR, PARENT_DIR, RAW_COMMENTARY_DIRS, TRAIN_COMMENTARY_DIRS, TESSDATA_DIR, TESSDATA_BEST_DIR, POGRETRA_COMMENTARY_DIRS
-from run.run_tesseract import get_commentary_dir
+from ajmc.ocr.run.run_tesseract import PARENT_DIR, RAW_COMMENTARY_DIRS, TRAIN_COMMENTARY_DIRS, TESSDATA_DIR, TESSDATA_BEST_DIR, POGRETRA_COMMENTARY_DIRS
+from ajmc.ocr.run.run_tesseract import get_commentary_dir
 
 def print_height_stats(h_map):
     height_list = list(h_map.values())
