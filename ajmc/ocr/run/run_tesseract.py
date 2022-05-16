@@ -50,10 +50,10 @@ TESSDATA_MAP = {
     # "sophokle1v3soph": "deu+grc+{}"
 }
 
-# TODO: change the dir here
-EVALUATION_DIR = os.path.join(PARENT_DIR, "ajmc_eval")
-
 EXP_DIR = os.path.join(PROJECT_DIR, "ocr", "exps")
+
+# TODO: change the dir here
+EVALUATION_DIR = os.path.join(EXP_DIR, "evaluation")
 
 def get_commentary_dir(commentary_name, mode="train", cleaned_suffix="", create_if_missing=False):
     '''
@@ -354,7 +354,6 @@ def check_dataset_size(commentary_names, mode, cleaned_suffix="clean"):
 
 def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=None):
     timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-    base_dir = os.path.join(PARENT_DIR,'ajmc_eval/')
     if custom_lang:
         assert (isinstance(custom_lang, dict) and len(custom_lang) == len(commentary_ids)), "note that custom_lang should be a dict containing the same number of items as commentary_ids"
     for commentary_id in commentary_ids:
@@ -368,22 +367,23 @@ def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=N
             model_str = TESSDATA_MAP[commentary_id].format(greek_model_name)
         print(f"using language: {model_str}")
 
-        output_name = f"{timestamp}_evaluation_{greek_model_name}/{commentary_id}"
-        ocr_dir=os.path.join(PROJECT_DIR, "ocr", "exps", output_name)
-        
-        commentary = Commentary(
-            commentary_id, 
-            ocr_dir=ocr_dir, 
-            via_path=os.path.join(base_dir, commentary_id, 'olr/via_project.json'),
-            image_dir=os.path.join(base_dir, commentary_id, 'ocr/groundtruth/images'),
-            groundtruth_dir=os.path.join(base_dir, commentary_id, 'ocr/groundtruth/evaluation'),
-        )
-        page_filenames = [os.path.join(EVALUATION_DIR, commentary_id, "ocr", "groundtruth", "images", item+".png") for item in commentary._get_page_ids()]
+        output_name = f"evaluation/{commentary_id}/ocr/runs/{timestamp}_evaluation_{greek_model_name}/outputs"
+        evaluation_name = f"evaluation/{commentary_id}/ocr/runs/{timestamp}_evaluation_{greek_model_name}/evaluation"
+        ocr_dir = os.path.join(PROJECT_DIR, "ocr", "exps", output_name)
+        evaluation_dir = os.path.join(PROJECT_DIR, "ocr", "exps", evaluation_name)
+
+        ground_truth_dir = os.path.join(EVALUATION_DIR, commentary_id, "images", "png")
+        page_filenames = [os.path.join(ground_truth_dir, item) for item in os.listdir(ground_truth_dir) if item.endswith(".png")]
 
         for img_filename in page_filenames:
             print(img_filename)
             test_ocr_raw(output_name, tessdata_dir, img_filename, lang=model_str, save=True, viz=False, verbose=False, lstm_config="")
+
+        commentary = Commentary.from_folder_structure(ocr_dir)
         
-        commentary_evaluation(commentary=commentary,output_dir=ocr_dir)
+        # page_filenames = [os.path.join(EVALUATION_DIR, commentary_id, "ocr", "groundtruth", "images", item+".png") for item in commentary._get_page_ids()]
+        # page_filenames = [p.path['image_path'] for p in commentary.pages]
+
+        commentary_evaluation(commentary=commentary,output_dir=evaluation_dir)
 
     print("done")
