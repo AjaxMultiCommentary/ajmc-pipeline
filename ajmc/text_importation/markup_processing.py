@@ -9,7 +9,7 @@ from typing import List, Union
 # ===========================  GENERIC PARSER  ============================
 def parse_markup_file(path: str) -> bs4.BeautifulSoup:
     """Generic parser which works for PageXML and HOCR files"""
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding="utf-8") as f:
         return bs4.BeautifulSoup(f.read(), 'xml')
 
 

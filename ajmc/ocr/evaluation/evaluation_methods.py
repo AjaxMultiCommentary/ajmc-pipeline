@@ -249,12 +249,12 @@ def commentary_evaluation(commentary: 'Commentary',
         os.makedirs(output_dir, exist_ok=True)
 
         for i, soup in enumerate(soups):
-            with open(os.path.join(output_dir, commentary.ocr_groundtruth_pages[i].id + ".html"), "w") as html_file:
+            with open(os.path.join(output_dir, commentary.ocr_groundtruth_pages[i].id + ".html"), "w", encoding="utf-8") as html_file:
                 html_file.write(str(soup))
 
         # Sort and write editops record
         editops = {k: v for k, v in sorted(editops.items(), key=lambda item: item[1], reverse=True)}
-        with open(os.path.join(output_dir, "editops.tsv"), 'w') as csv_file:
+        with open(os.path.join(output_dir, "editops.tsv"), 'w', encoding="utf-8") as csv_file:
             spamwriter = csv.writer(csv_file, delimiter='\t', quotechar='"')
             spamwriter.writerow(['Operation', 'From', 'To', 'Count'])
             for k, v in editops.items():
