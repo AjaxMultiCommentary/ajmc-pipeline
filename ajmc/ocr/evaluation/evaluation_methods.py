@@ -244,7 +244,7 @@ def commentary_evaluation(commentary: 'Commentary',
 
     if write_files:
         if not output_dir:
-            output_dir = os.path.join(commentary.ocr_dir, os.pardir, 'evaluation')
+            output_dir = os.path.join(commentary.paths['ocr_dir'], os.pardir, 'evaluation')
 
         os.makedirs(output_dir, exist_ok=True)
 

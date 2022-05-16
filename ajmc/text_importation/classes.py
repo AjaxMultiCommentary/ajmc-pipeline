@@ -49,7 +49,7 @@ class Commentary:
                       'via_path': via_path,
                       'image_dir': image_dir,
                       'groundtruth_dir': groundtruth_dir,
-                      'base_dir':_base_dir}
+                      'base_dir': _base_dir}
 
     # Todo fix flexible docstrings
     @classmethod

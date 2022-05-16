@@ -104,13 +104,32 @@ for r in page.regions:
 
 # Tokenize, truncate and pad
 
-tokens = tokenizer(text=words,
-                   boxes=word_boxes,
+#%%
+tokens = tokenizer(text=words[:50],
+                   boxes=word_boxes[:50],
+                   word_labels=word_labels[:50],
                    padding=True,
                    truncation=True,
                    is_split_into_words=True,
-                   return_overflowing_tokens=True
+                   max_length=512,
+                   return_overflowing_tokens=True,
+                   # return_offsets_mapping=True
                    )
+
+#%%
+input_ids = [tokens['input_ids']]
+bboxes = [tokens['bbox']]
+token_type_ids = [tokens['token_type_ids']]
+attention_masks = [tokens['attention_mask']]
+
+
+
+tokens = tokenizer(text=words,
+                   boxes=word_boxes,
+                   word_labels=word_labels,
+                   padding=True,
+                   truncation=False,
+                   is_split_into_words=True)
 
 #%% Align labels and boxes
 from ajmc.nlp.data_preparation.utils import align_elements
