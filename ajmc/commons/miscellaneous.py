@@ -22,8 +22,49 @@ def lazy_property(func):
     return property(inner)
 
 
+def docstring_formatter(**kwargs):
+    """Decorator with arguments used to format the docstring of a functions.
+
+    `docstring_formatter` is a decorator with arguments, which means that it takes any set of `kwargs` as argument and
+    returns a decorator. It should therefore always be called with parentheses (unlike traditional decorators - see
+    below). It follows the grammar of `str.format()`, i.e. `{my_format_value}`.
+    grammar.
+
+    Example:
+        For instance, this code :
+
+        ```Python
+        @docstring_formatter(greeting = 'hello')
+        def my_func():
+            "A simple greeter that says {greeting}"
+            # Do your stuff
+        ```
+
+        Is actually equivalent with :
+
+        ```Python
+        def my_func():
+            "A simple greeter that says {greeting}"
+            # Do your stuff
+
+        my_func.__doc__ = my_func.__doc__.format(greeting = 'hello')
+        ```
+    """
+
+    def inner_decorator(func):
+        func.__doc__ = func.__doc__.format(**kwargs)
+        return func
+
+    return inner_decorator
+
+
+
 def timer(iterations: int = 3, number: int = 1_000):
-    """Decorator with arguments. Computes the execution time of a function."""
+    """Decorator with arguments. Computes the execution time of a function.
+
+    `timer` is a decorator with arguments, which means that it takes any set of `iterations` and `number` as arguments
+    and returns a decorator. It should therefore always be called with parentheses (unlike traditional decorators).
+    """
 
     def timer_decorator(func):
         def inner(*args, **kwargs):
