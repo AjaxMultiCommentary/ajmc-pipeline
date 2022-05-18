@@ -4,7 +4,7 @@ import os
 from time import strftime
 from typing import Dict, Optional, List, Union, Any
 import bs4.element
-from ajmc.commons.miscellaneous import lazy_property
+from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, docstring_formatter
 from ajmc.commons import variables
 from ajmc.commons.geometry import (
     Shape,
@@ -18,7 +18,6 @@ from ajmc.olr.utils.region_processing import order_olr_regions, get_page_region_
 import jsonschema
 from ajmc.text_importation.markup_processing import parse_markup_file, get_element_coords, \
     get_element_text, find_all_elements
-from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.commons.file_management.utils import verify_path_integrity, parse_ocr_path, get_path_from_id, guess_ocr_format
 
 logger = get_custom_logger(__name__)
@@ -51,23 +50,29 @@ class Commentary:
                       'groundtruth_dir': groundtruth_dir,
                       'base_dir': _base_dir}
 
-    # Todo fix flexible docstrings
     @classmethod
-    def from_folder_structure(cls, ocr_dir: str):
+    @docstring_formatter(output_dir_format=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
+    def from_folder_structure(cls, ocr_dir: Optional[str] = None, commentary_id: Optional[str] = None):
         """Use this method to construct a `Commentary`-object using ajmc's folder structure.
 
         Args:
             ocr_dir: Path to the directory in which ocr-outputs are stored. It should end with
-            {variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir']}.
+            {output_dir_format}.
+            commentary_id: for dev purposes only, do not use :)
         """
-        verify_path_integrity(path=ocr_dir, path_pattern=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
-        base_dir, commentary_id, ocr_run = parse_ocr_path(path=ocr_dir)
-        groundtruth_dir = os.path.join(base_dir, commentary_id, variables.PATHS['groundtruth'])
-        image_dir = os.path.join(base_dir, commentary_id, variables.PATHS['png'])
-        via_path = os.path.join(base_dir, commentary_id, variables.PATHS['via_path'])
+        if ocr_dir:
+            verify_path_integrity(path=ocr_dir, path_pattern=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
+            base_dir, commentary_id, ocr_run = parse_ocr_path(path=ocr_dir)
 
-        return cls(commentary_id=commentary_id, ocr_dir=ocr_dir, via_path=via_path, image_dir=image_dir,
-                   groundtruth_dir=groundtruth_dir, _base_dir=base_dir)
+        elif commentary_id:
+            base_dir = variables.PATHS['base_dir']
+
+        return cls(commentary_id=commentary_id,
+                   ocr_dir=ocr_dir,
+                   via_path=os.path.join(base_dir, commentary_id, variables.PATHS['via_path']),
+                   image_dir=os.path.join(base_dir, commentary_id, variables.PATHS['png']),
+                   groundtruth_dir=os.path.join(base_dir, commentary_id, variables.PATHS['groundtruth']),
+                   _base_dir=base_dir)
 
     @lazy_property
     def ocr_format(self) -> str:
@@ -171,7 +176,8 @@ class Page:
     def from_structure(cls, ocr_path: str, commentary: Optional[Commentary] = None):
         """Builds Page object from an OCR-path"""
 
-        commentary = commentary if commentary else Commentary.from_folder_structure(ocr_dir='/'.join(ocr_path.split('/')[:-1]))
+        commentary = commentary if commentary else Commentary.from_folder_structure(
+            ocr_dir='/'.join(ocr_path.split('/')[:-1]))
         page_id = ocr_path.split('/')[-1].split('.')[0]
 
         return cls(ocr_path=ocr_path,

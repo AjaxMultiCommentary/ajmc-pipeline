@@ -1,6 +1,5 @@
 import re
 
-
 PATHS = {
     # 'base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/',
     'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
@@ -32,9 +31,10 @@ VIA_CSV_DICT_TEMPLATE = {'filename': [],
                          'region_shape_attributes': [],
                          'region_attributes': []}
 
-COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Garvie1998', 'Kamerbeek1953', 'Paduano1982',
-                  'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174', 'lestragdiesdeso00tourgoog',
-                  'sophoclesplaysa05campgoog', 'sophokle1v3soph']
+COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Finglass2011', 'Garvie1998', 'Kamerbeek1953',
+                  'Paduano1982', 'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174',
+                  'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph']
+
 PD_COMMENTARY_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
 
 OLR_REGION_TYPES = ['app_crit',

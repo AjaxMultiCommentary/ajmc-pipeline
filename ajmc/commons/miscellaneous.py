@@ -5,6 +5,7 @@ import logging
 import timeit
 from typing import List, Tuple, Iterable, Generator
 import numpy as np
+import pandas as pd
 from jsonschema import Draft6Validator
 
 RectangleType = List[Tuple[int, int]]
@@ -124,3 +125,14 @@ def get_custom_logger(name: str,
     logger.addHandler(stream_handler)
 
     return logger
+
+
+def read_google_sheet(sheet_id:str, sheet_name:str, **kwargs) -> pd.DataFrame:
+    """A simple function to read a google sheet in a `pd.DataFrame`.
+
+    Works at 2022-05-17. See https://towardsdatascience.com/read-data-from-google-sheets-into-pandas-without-the-google-sheets-api-5c468536550
+    for more info.
+    """
+
+    url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
+    return pd.read_csv(url, **kwargs)
