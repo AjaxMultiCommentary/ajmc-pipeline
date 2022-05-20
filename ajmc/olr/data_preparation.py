@@ -1,7 +1,10 @@
 import os
-
-from transformers import LayoutLMv2Processor, LayoutLMv2Tokenizer, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
-from typing import List
+from torch import tensor
+from transformers import LayoutLMv2Processor, LayoutLMv2Tokenizer, LayoutLMv2ForTokenClassification, \
+    LayoutLMv2FeatureExtractor
+from transformers import LayoutXLMProcessor, LayoutXLMTokenizer, \
+    LayoutLMv2FeatureExtractor  # LayoutCLM is NOT implemented for token classification 😩
+from typing import List, Any
 from ajmc.text_importation.classes import Commentary
 from PIL import Image
 from ajmc.commons import variables
@@ -61,6 +64,14 @@ labels_to_ids = {
     'undefined': 0
 }
 
+# Special tokens values
+special_tokens = {
+    'start': {'input_ids': 101, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 1},
+    'end': {'input_ids': 102, 'bbox': [1000, 1000, 1000, 1000], 'token_type_ids': 0, 'labels': -100,
+            'attention_mask': 1},
+    'pad': {'input_ids': 0, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 0},
+}
+
 
 # Functions
 def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, img_height: int, ):
@@ -72,92 +83,88 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
     ]
 
 
+def split_list(list_: list, n: int, pad: object) -> List[List[object]]:
+    """Divides a list into a list of lists with n elements, padding the last chunk with `pad`."""
+    chunks = []
+    for x in range(0, len(tokens[k]), n):
+        chunk = list_[x: n + x]
+
+        if len(chunk) < n:
+            chunk += [pad for _ in range(n - len(chunk))]
+
+        chunks.append(chunk)
+
+    return chunks
+
+
+params = {'splits': ['train','dev'],
+          'batch_size': 1,
+          'model_inputs': ['input_ids', 'bbox', 'token_type_ids', 'labels', 'attention_mask', 'image'],
+          'max_length': 512}
 # %% Script
-commentary = Commentary.from_folder_structure(ocr_dir=os.path.join(variables.PATHS['base_dir'], 'Wecklein1894/ocr/runs/13p0am_lace_base/outputs'))
 tokenizer = LayoutLMv2Tokenizer.from_pretrained('microsoft/layoutlmv2-base-uncased')
 processor = LayoutLMv2Processor.from_pretrained('microsoft/layoutlmv2-base-uncased',
                                                 tokenizer=tokenizer,
                                                 revision='no_ocr')
-feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained('microsoft/layoutlmv2-base-uncased')
+feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained('microsoft/layoutlmv2-base-uncased', apply_ocr=False)
 model = LayoutLMv2ForTokenClassification.from_pretrained('microsoft/layoutlmv2-base-uncased', num_labels=6)
 
+# %% Get pages
+commentary = Commentary.from_folder_structure(
+    ocr_dir=os.path.join(variables.PATHS['base_dir'], 'Wecklein1894/ocr/runs/13p0am_lace_base/outputs'))
+
+from ajmc.commons.miscellaneous import read_google_sheet
+
+sheet_id = '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
+olr_gt = read_google_sheet(sheet_id, 'olr_gt')
+#%%
+split_ids = {s: list(olr_gt.loc[(olr_gt['split'] == s) & (olr_gt['id'] == commentary.id)]['page_id']) for s in params['splits']}
+split_pages = {s: [p for p in commentary.pages if p.id in split_ids[s]] for s in params['splits']}
+
+
+#%%
+encodings = {s:[] for s in params['splits']}
+
+for s in params['splits']:
+    for page in split_pages[s]:
+
+        # Get the lists of words, boxes and labels for a single page
+        words = []
+        word_boxes = []
+        word_labels = []
+        for r in page.regions:
+            if r.region_type in rois:
+                for w in r.words:
+                    words.append(w.text)
+                    word_boxes.append(normalize_bounding_rectangles(w.coords.bounding_rectangle,
+                                                                    page.image.width,
+                                                                    page.image.height))
+                    word_labels.append(labels_to_ids[r.region_type])
+
+        # Tokenize, truncate and pad
+        # We tokenize without truncation, as LayoutLMV2Tokenizer does not handle overflowing tokens properly.
+        tokens = tokenizer(text=words,
+                           boxes=word_boxes,
+                           word_labels=word_labels,
+                           is_split_into_words=True)
+
+        # We now do a manual truncation
+        encoding = {}
+        for k in tokens.keys():
+            tokens[k] = tokens[k][1:-1]  # We start by triming the first and last tokens
+            tokens[k] = split_list(tokens[k], params['max_length'] - 2, special_tokens['pad'][k]) # We divide our list in lists of len 510
+            tokens[k] = [[special_tokens['start'][k]] + ex + [special_tokens['end'][k]] for ex in tokens[k]]
+
+        # We create a list of input dicts
+        inputs_list = []
+        for i in range(len(tokens['input_ids'])):
+            inputs = {k: tensor([tokens[k][i]]) for k in
+                      special_tokens['start'].keys()}  # ⚠️ adding a list in `[tokens[k][i]]` to create a simili batch
+            inputs_list.append(inputs)
+
+        image = Image.open(page.image.path).convert('RGB')
+        image = feature_extractor(image, return_tensors='pt')
+
 # %%
-
-
-encodings = []
-
-# for page in commentary.olr_groundtruth_pages[0:33]:
-page = commentary.olr_groundtruth_pages[6]
-
-# Get the lists of words, boxes and labels for a single page
-words = []
-word_boxes = []
-word_labels = []
-for r in page.regions:
-    if r.region_type in rois:
-        for w in r.words:
-            words.append(w.text)
-            word_boxes.append(normalize_bounding_rectangles(w.coords.bounding_rectangle,
-                                                            page.image.width,
-                                                            page.image.height))
-            word_labels.append(labels_to_ids[r.region_type])
-
-# Tokenize, truncate and pad
-
-#%%
-tokens = tokenizer(text=words[:50],
-                   boxes=word_boxes[:50],
-                   word_labels=word_labels[:50],
-                   padding=True,
-                   truncation=True,
-                   is_split_into_words=True,
-                   max_length=512,
-                   return_overflowing_tokens=True,
-                   # return_offsets_mapping=True
-                   )
-
-#%%
-input_ids = [tokens['input_ids']]
-bboxes = [tokens['bbox']]
-token_type_ids = [tokens['token_type_ids']]
-attention_masks = [tokens['attention_mask']]
-
-
-
-tokens = tokenizer(text=words,
-                   boxes=word_boxes,
-                   word_labels=word_labels,
-                   padding=True,
-                   truncation=False,
-                   is_split_into_words=True)
-
-#%% Align labels and boxes
-from ajmc.nlp.data_preparation.utils import align_elements
-
-word_boxes = [align_elements(e.word_ids, word_boxes) for e in tokens.encodings]
-word_labels = [align_elements(e.word_ids, word_labels) for e in tokens.encodings]
-
-image = Image.open(page.image.path).convert('RGB')
-image = feature_extractor(image)
-images = []
-
-encoding = processor(image, words, boxes=word_boxes, word_labels=word_labels, return_tensors="pt",
-                     truncation=True, padding=True, return_overflowing_tokens=True)
-encodings.append(encoding)
-
-outputs = model(**{k: encoding[k] for k in encoding.keys() if k not in ['overflow_to_sample_mapping']})
-
-# data[split]['batchencoding'] = tokenizer(data[split]['TOKEN'],
-#                                          padding=True,
-#                                          truncation=True,
-#                                          is_split_into_words=True,
-#                                          return_overflowing_tokens=True)
-#
-# data[split]['labels'] = [align_labels(e.word_ids, data[split][config.labels_column], config.labels_to_ids)
-#                          for e in data[split]['batchencoding'].encodings]
-#
-# data[split]['words'] = [align_elements(e.word_ids, data[split]['TOKEN']) for e in
-#                         data[split]['batchencoding'].encodings]
-#
-# data[split]['tsv_line_numbers'] = [align_elements(e.word_ids, data[split]['n']) for e in
-#                                    data[split]['batchencoding'].encodings]
+outputs = model(image=image['pixel_values'], **inputs_list[0])
+# WORKS

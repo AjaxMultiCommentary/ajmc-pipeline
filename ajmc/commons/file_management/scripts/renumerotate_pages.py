@@ -15,7 +15,7 @@ def mv_file(old: str, new: str):
     os.system(command)
 
 
-commentary_id = 'Kamerbeek1953'
+commentary_id = ''
 ocr_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/Kamerbeek1953/ocr/runs/17u09o_kraken/outputs'
 new_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/Kamerbeek1953/ocr/runs/17u09o_kraken/outputs_'
 # %% Rename images
