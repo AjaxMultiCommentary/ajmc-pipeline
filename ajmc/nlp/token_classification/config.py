@@ -56,6 +56,20 @@ def create_pipeline_parser() -> argparse.ArgumentParser:
                         help="The path to a config json file from which to extract config. "
                              "Overwrites other specified config")
 
+    parser.add_argument("--predict_paths",
+                        type=list,
+                        nargs="+",
+                        required=False,
+                        default=[],
+                        help="A list of tsv files to predict")
+
+    parser.add_argument("--predict_urls",
+                        type=list,
+                        nargs="+",
+                        required=False,
+                        default=[],
+                        help="A list of tsv files-urls to predict")
+
     # ================ DATA RELATED ====================================================================================
     parser.add_argument("--labels_column",
                         type=str,
@@ -79,6 +93,16 @@ def create_pipeline_parser() -> argparse.ArgumentParser:
                         action="store_true",
                         default=False,
                         help="Performs CLEF-HIPE evaluation, alone or at the end of training if `do_train`.")
+
+    parser.add_argument("--do_predict",
+                        action="store_true",
+                        default=False,
+                        help="Predicts on `predict_urls` or/and `predict_paths`")
+
+    parser.add_argument("--evaluate_during_training",
+                        action="store_true",
+                        default=False,
+                        help="Whether to evaluate during training.")
 
     parser.add_argument("--do_debug",
                         action="store_true",

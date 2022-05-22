@@ -126,7 +126,6 @@ def get_custom_logger(name: str,
 
     return logger
 
-
 def read_google_sheet(sheet_id:str, sheet_name:str, **kwargs) -> pd.DataFrame:
     """A simple function to read a google sheet in a `pd.DataFrame`.
 

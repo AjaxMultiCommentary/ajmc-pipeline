@@ -5,6 +5,7 @@ It runs on a single GPU."""
 import json
 import logging
 import time
+
 import pandas as pd
 import os
 import numpy as np
@@ -14,7 +15,7 @@ from torch.utils.data import DataLoader, RandomSampler
 from ajmc.nlp.token_classification.evaluation import evaluate_dataset, seqeval_to_df, evaluate_hipe
 from ajmc.nlp.token_classification.config import initialize_config
 from ajmc.nlp.data_preparation.hipe_iob import prepare_datasets
-from ajmc.nlp.token_classification.utils import set_seed
+from ajmc.nlp.utils import set_seed
 from ajmc.commons.miscellaneous import get_custom_logger
 
 
@@ -96,48 +97,66 @@ def train(config: 'argparse.Namespace',
                 if config.do_debug:
                     break
 
-
-
         # ============================ Evaluate and append during training ============================
-        epoch_results = evaluate_dataset(eval_dataset, model, config.batch_size, config.device,
-                                                       config.ids_to_labels, config.do_debug)
-        epoch_results = seqeval_to_df(epoch_results)
+        if config.evaluate_during_training:
+            epoch_results = evaluate_dataset(eval_dataset, model, config.batch_size, config.device,
+                                             config.ids_to_labels, config.do_debug)
+            epoch_results = seqeval_to_df(epoch_results)
 
-        epoch_data = pd.DataFrame({("TRAINING", "EP"): [epoch_num + 1],
-                                   ("TRAINING", "TIME"): [time.time() - epoch_time],
-                                   ("TRAINING", "LOSS"): [np.mean(loss_batches_list)]})
-        epoch_results = pd.concat([epoch_data, epoch_results], axis=1)
-        train_results = pd.concat([train_results, epoch_results], axis=0, ignore_index=True)
+            epoch_data = pd.DataFrame({("TRAINING", "EP"): [epoch_num + 1],
+                                       ("TRAINING", "TIME"): [time.time() - epoch_time],
+                                       ("TRAINING", "LOSS"): [np.mean(loss_batches_list)]})
+            epoch_results = pd.concat([epoch_data, epoch_results], axis=1)
+            train_results = pd.concat([train_results, epoch_results], axis=0, ignore_index=True)
 
-        # ========================= Save best model and write its results ===============================
-        if round(epoch_results[('ALL', 'F1')][0], 4) > round(best_f1, 4):
+            # ========================= Save best model and write its results ===============================
+            if round(epoch_results[('ALL', 'F1')][0], 4) > round(best_f1, 4):
 
-            count_no_improvement = 0
-            best_f1 = epoch_results[('ALL', 'F1')][0]
+                count_no_improvement = 0
+                best_f1 = epoch_results[('ALL', 'F1')][0]
+                epoch_results.to_csv(os.path.join(config.seqeval_output_dir, "best_results.tsv"), sep='\t', index=False)
 
-            best_model_dir = os.path.join(config.output_dir, "best_model")
-            model.save_pretrained(best_model_dir)
-            tokenizer.save_pretrained(best_model_dir)
-            torch.save(config, os.path.join(best_model_dir, "training_args.bin"))
-            epoch_results.to_csv(os.path.join(config.output_dir, "results/seqeval/best_results.tsv"), sep='\t',
-                                 index=False)
+                model.save_pretrained(config.model_save_dir)
+                tokenizer.save_pretrained(config.model_save_dir)
+                torch.save(config, os.path.join(config.model_save_dir, "training_args.bin"))
 
-        else:
-            count_no_improvement += 1
 
-        if (count_no_improvement == config.early_stopping_patience and config.do_early_stopping) or config.do_debug:
+                epoch_results.to_csv(os.path.join(config.seqeval_output_dir, 'best_results.tsv'), sep='\t',
+                                     index=False)
+
+            else:
+                count_no_improvement += 1
+
+            if count_no_improvement == config.early_stopping_patience and config.do_early_stopping:
+                break
+
+        if config.do_debug:
             break
-
-    train_results.to_csv(os.path.join(config.output_dir, "results/seqeval/train_results.tsv"), sep='\t', index=False)
+    if config.evaluate_during_training:
+        train_results.to_csv(os.path.join(config.seqeval_output_dir, "train_results.tsv"), sep='\t', index=False)
+    else:
+        model.save_pretrained(config.model_save_dir)
+        tokenizer.save_pretrained(config.model_save_dir)
+        torch.save(config, os.path.join(config.model_save_dir, "training_args.bin"))
 
 
 def main(config):
     logger.info(f'Runing pipeline on {config.output_dir.split("/")[-1]}')
+
     # Create directories
     os.makedirs(config.output_dir, exist_ok=config.overwrite_output_dir)
-    os.makedirs(os.path.join(config.output_dir, 'best_model'), exist_ok=config.overwrite_output_dir)
-    os.makedirs(os.path.join(config.output_dir, 'results/seqeval'), exist_ok=config.overwrite_output_dir)
-    os.makedirs(os.path.join(config.output_dir, 'results/hipe_eval'), exist_ok=config.overwrite_output_dir)
+
+    config.model_save_dir = os.path.join(config.output_dir, "model")
+    os.makedirs(config.model_save_dir, exist_ok=config.overwrite_output_dir)
+
+    config.predictions_dir = os.path.join(config.output_dir, "predictions")
+    os.makedirs(config.predictions_dir, exist_ok=config.overwrite_output_dir)
+
+    config.seqeval_output_dir = os.path.join(config.output_dir, 'results/seqeval')
+    os.makedirs(config.seqeval_output_dir, exist_ok=config.overwrite_output_dir)
+
+    config.hipe_output_dir = os.path.join(config.output_dir, 'results/hipe_eval')
+    os.makedirs(config.hipe_output_dir, exist_ok=config.overwrite_output_dir)
 
     # Save config
     with open(os.path.join(config.output_dir, 'config.json'), 'w') as f:
@@ -151,23 +170,41 @@ def main(config):
     datasets = prepare_datasets(config, tokenizer)
 
     model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name_or_path,
-                                                                         num_labels=config.num_labels)
+                                                                    num_labels=config.num_labels
+                                                                         )
     model.to(config.device)
 
     if config.do_train:
-        train(config, model, datasets['train'], datasets['eval'], tokenizer)
+        train(config=config,
+              model=model,
+              train_dataset=datasets['train'],
+              eval_dataset=datasets['eval'] if config.evaluate_during_training else None,
+              tokenizer=tokenizer)
 
-    if config.do_eval:
+    if config.do_hipe_eval:
         evaluate_hipe(dataset=datasets['eval'],
                       model=model,
                       device=config.device,
                       ids_to_labels=config.ids_to_labels,
-                      output_dir=config.output_dir,
+                      output_dir=config.hipe_output_dir,
                       labels_column=config.labels_column,
                       hipe_script_path=config.hipe_script_path,
                       groundtruth_tsv_path=config.eval_path,
                       groundtruth_tsv_url=config.eval_url,
                       )
+
+    if config.do_predict:
+        for url in config.predict_urls:
+            predict_and_write_tsv(model=model, device=config.device, output_dir=config.predictions_dir,
+                                  tokenizer=tokenizer, ids_to_labels=config.ids_to_labels,
+                                  labels_column=config.labels_column, url=url)
+
+        for path in config.predict_paths:
+            predict_and_write_tsv(model=model, device=config.device, output_dir=config.predictions_dir,
+                                  tokenizer=tokenizer, ids_to_labels=config.ids_to_labels,
+                                  labels_column=config.labels_column, url=path)
+
+
 
 
 if __name__ == '__main__':

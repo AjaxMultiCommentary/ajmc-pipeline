@@ -1,5 +1,5 @@
 import os
-from torch import tensor
+import torch
 from transformers import LayoutLMv2Processor, LayoutLMv2Tokenizer, LayoutLMv2ForTokenClassification, \
     LayoutLMv2FeatureExtractor
 from transformers import LayoutXLMProcessor, LayoutXLMTokenizer, \
@@ -72,6 +72,10 @@ special_tokens = {
     'pad': {'input_ids': 0, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 0},
 }
 
+params = {'splits': ['train','dev'],
+          'batch_size': 1,
+          'model_inputs': ['input_ids', 'bbox', 'token_type_ids', 'labels', 'attention_mask', 'image'],
+          'max_length': 512}
 
 # Functions
 def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, img_height: int, ):
@@ -97,10 +101,30 @@ def split_list(list_: list, n: int, pad: object) -> List[List[object]]:
     return chunks
 
 
-params = {'splits': ['train','dev'],
-          'batch_size': 1,
-          'model_inputs': ['input_ids', 'bbox', 'token_type_ids', 'labels', 'attention_mask', 'image'],
-          'max_length': 512}
+
+# TODO : restart HERE============# TODO : restart HERE============# TODO : restart HERE============# TODO : restart HERE============# TODO : restart HERE============
+class LayoutLMDataset(torch.utils.data.Dataset):
+
+    def __init__(self,
+                 batch_encoding: "BatchEncoding",
+                 labels: List[List[int]],
+                 tsv_line_numbers: List[List[int]],
+                 words: List[List[str]]):
+        self.batch_encoding = batch_encoding
+        self.labels = labels
+        self.tsv_line_numbers = tsv_line_numbers
+        self.words = words
+        self.token_offsets = [e.word_ids for e in batch_encoding.encodings]
+
+    def __getitem__(self, idx):
+        item = {k: torch.tensor(v[idx]) for k, v in self.batch_encoding.items() if k!='overflow_to_sample_mapping'}
+        item['labels'] = torch.tensor(self.labels[idx])
+        return item
+
+    def __len__(self):
+        return len(self.labels)
+
+# TODO : restart HERE============# TODO : restart HERE============# TODO : restart HERE============# TODO : restart HERE============# TODO : restart HERE============
 # %% Script
 tokenizer = LayoutLMv2Tokenizer.from_pretrained('microsoft/layoutlmv2-base-uncased')
 processor = LayoutLMv2Processor.from_pretrained('microsoft/layoutlmv2-base-uncased',
@@ -156,14 +180,17 @@ for s in params['splits']:
             tokens[k] = [[special_tokens['start'][k]] + ex + [special_tokens['end'][k]] for ex in tokens[k]]
 
         # We create a list of input dicts
-        inputs_list = []
-        for i in range(len(tokens['input_ids'])):
-            inputs = {k: tensor([tokens[k][i]]) for k in
-                      special_tokens['start'].keys()}  # ⚠️ adding a list in `[tokens[k][i]]` to create a simili batch
-            inputs_list.append(inputs)
-
         image = Image.open(page.image.path).convert('RGB')
-        image = feature_extractor(image, return_tensors='pt')
+        image = feature_extractor(image, return_tensors='pt')['pixel_values']
+
+        for i in range(len(tokens['input_ids'])):
+            inputs = {k: torch.tensor([tokens[k][i]]) for k in
+                      special_tokens['start'].keys()}  # ⚠️ adding a list in `[tokens[k][i]]` to create a simili batch
+            inputs['image'] = image['pixel']
+
+            encodings[s].append(inputs)
+
+
 
 # %%
 outputs = model(image=image['pixel_values'], **inputs_list[0])
