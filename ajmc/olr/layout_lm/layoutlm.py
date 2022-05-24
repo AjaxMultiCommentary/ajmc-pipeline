@@ -158,7 +158,7 @@ def prepare_data(split_pages: Dict[str, List['Page']],
                     encodings[s][k].append(tokens[k][i])
                 encodings[s]['image'].append(image[0].copy())
 
-            if i==2 :#and do_debug:
+            if i==2 and do_debug:
                 break
 
     return {s: LayoutLMDataset(**encodings[s]) for s in split_pages.keys()}

@@ -131,6 +131,7 @@ setup(
         'pandas',
         'Pillow',
         'regex',
+        'seqeval',
         'transformers',
         'typing',
 
