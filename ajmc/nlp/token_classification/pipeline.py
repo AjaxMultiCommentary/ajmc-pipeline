@@ -5,15 +5,12 @@ It runs on a single GPU."""
 import json
 import logging
 import time
-
 import pandas as pd
 import os
 import numpy as np
 import torch
 import transformers
 from torch.utils.data import DataLoader, RandomSampler
-
-import ajmc.olr.layout_lm.config
 from ajmc.nlp.token_classification.evaluation import evaluate_dataset, seqeval_to_df, evaluate_hipe
 from ajmc.nlp.token_classification.config import initialize_config
 from ajmc.nlp.data_preparation.hipe_iob import prepare_datasets
@@ -105,7 +102,7 @@ def train(config: 'argparse.Namespace',
         # ============================ Evaluate and append during training ============================
         if config.evaluate_during_training:
             epoch_results = evaluate_dataset(eval_dataset, model, config.batch_size, config.device,
-                                             ajmc.olr.layout_lm.config.ids_to_labels, config.do_debug)
+                                             config.ids_to_labels, config.do_debug)
             epoch_results = seqeval_to_df(epoch_results)
 
             epoch_data = pd.DataFrame({("TRAINING", "EP"): [epoch_num + 1],
@@ -191,7 +188,7 @@ def main(config):
         evaluate_hipe(dataset=datasets['eval'],
                       model=model,
                       device=config.device,
-                      ids_to_labels=ajmc.olr.layout_lm.config.ids_to_labels,
+                      ids_to_labels=config.ids_to_labels,
                       output_dir=config.hipe_output_dir,
                       labels_column=config.labels_column,
                       hipe_script_path=config.hipe_script_path,
@@ -202,12 +199,12 @@ def main(config):
     if config.do_predict:
         for url in config.predict_urls:
             predict_and_write_tsv(model=model, device=config.device, output_dir=config.predictions_dir,
-                                  tokenizer=tokenizer, ids_to_labels=ajmc.olr.layout_lm.config.ids_to_labels,
+                                  tokenizer=tokenizer, ids_to_labels=config.ids_to_labels,
                                   labels_column=config.labels_column, url=url)
 
         for path in config.predict_paths:
             predict_and_write_tsv(model=model, device=config.device, output_dir=config.predictions_dir,
-                                  tokenizer=tokenizer, ids_to_labels=ajmc.olr.layout_lm.config.ids_to_labels,
+                                  tokenizer=tokenizer, ids_to_labels=config.ids_to_labels,
                                   labels_column=config.labels_column, url=path)
 
 

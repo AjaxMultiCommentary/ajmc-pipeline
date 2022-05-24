@@ -1,8 +1,6 @@
 from hipe_commons.helpers.tsv import tsv_to_dict
 from typing import List, Dict, Iterable, Tuple, Generator, Optional
 import torch
-
-import ajmc.olr.layout_lm.config
 from ajmc.nlp.data_preparation.utils import sort_ner_labels, align_labels, align_elements
 from ajmc.commons.miscellaneous import get_unique_elements, recursive_iterator
 
@@ -37,8 +35,8 @@ def prepare_datasets(config: 'argparse.Namespace', tokenizer):
 
     config.unique_labels = sort_ner_labels(
         get_unique_elements([data[k][config.labels_column] for k in data.keys()]))
-    ajmc.olr.layout_lm.config.labels_to_ids = {label: i for i, label in enumerate(config.unique_labels)}
-    ajmc.olr.layout_lm.config.ids_to_labels = {id: tag for tag, id in ajmc.olr.layout_lm.config.labels_to_ids.items()}
+    config.labels_to_ids = {label: i for i, label in enumerate(config.unique_labels)}
+    config.ids_to_labels = {id: tag for tag, id in config.labels_to_ids.items()}
     config.num_labels = len(config.unique_labels)
 
     for split in data.keys():
@@ -49,7 +47,7 @@ def prepare_datasets(config: 'argparse.Namespace', tokenizer):
                                                  return_overflowing_tokens=True)
 
         data[split]['labels'] = [align_labels(e.word_ids, data[split][config.labels_column],
-                                              ajmc.olr.layout_lm.config.labels_to_ids)
+                                              config.labels_to_ids)
                                  for e in data[split]['batchencoding'].encodings]
 
         data[split]['words'] = [align_elements(e.word_ids, data[split]['TOKEN']) for e in

@@ -168,14 +168,13 @@ def main(config):
     pass
 
 
-config = create_olr_config('/Users/sven/packages/ajmc/data/configs/simple_config.json')
+config = create_olr_config('/Users/sven/packages/ajmc/data/configs/simple_config_local.json')
 create_dirs(config)
 
 tokenizer = LayoutLMv2Tokenizer.from_pretrained(config.model_name_or_path)
 feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained(config.model_name_or_path, apply_ocr=False)
 model = LayoutLMv2ForTokenClassification.from_pretrained(config.model_name_or_path, num_labels=config.num_labels)
 
-#%%
 pages = get_pages(ocr_output_dirs=config.ocr_dirs, splits=config.splits)
 datasets = prepare_data(split_pages=pages,
                         model_inputs=config.model_inputs,

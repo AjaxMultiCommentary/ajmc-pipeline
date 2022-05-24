@@ -63,6 +63,11 @@ def evaluate_dataset(dataset: ajmc.nlp.data_preparation.hipe_iob.HipeDataset,
         [ids_to_labels[l] for l in label if l != -100]
         for label in groundtruth
     ]
+    print("predictions are : -----------------------------------------------")
+    print(predictions)
+    print(' ')
+    print('Gt are : -----------------------------------------------')
+    print(groundtruth)
 
     return seqeval_evaluation(predictions, groundtruth)
 
