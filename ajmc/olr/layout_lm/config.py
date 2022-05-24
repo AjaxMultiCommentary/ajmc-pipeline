@@ -60,7 +60,7 @@ labels_to_ids = {
     'others': 0
 }
 ids_to_labels = {v: k for k, v in labels_to_ids.items()}
-ids_to_ner_labels = {'B-' + v: k for k, v in labels_to_ids.items()}
+ids_to_ner_labels = {v: 'B-' + k for k, v in labels_to_ids.items()}
 
 special_tokens = {
     'start': {'input_ids': 101, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 1},
