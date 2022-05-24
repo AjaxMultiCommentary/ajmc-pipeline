@@ -23,6 +23,7 @@ def lazy_property(func):
     return property(inner)
 
 
+# Toldo : One could also add automatic typing, if necessary (i.e. taking type hints directly from params.
 def docstring_formatter(**kwargs):
     """Decorator with arguments used to format the docstring of a functions.
 
@@ -57,7 +58,6 @@ def docstring_formatter(**kwargs):
         return func
 
     return inner_decorator
-
 
 
 def timer(iterations: int = 3, number: int = 1_000):
@@ -126,7 +126,8 @@ def get_custom_logger(name: str,
 
     return logger
 
-def read_google_sheet(sheet_id:str, sheet_name:str, **kwargs) -> pd.DataFrame:
+
+def read_google_sheet(sheet_id: str, sheet_name: str, **kwargs) -> pd.DataFrame:
     """A simple function to read a google sheet in a `pd.DataFrame`.
 
     Works at 2022-05-17. See https://towardsdatascience.com/read-data-from-google-sheets-into-pandas-without-the-google-sheets-api-5c468536550

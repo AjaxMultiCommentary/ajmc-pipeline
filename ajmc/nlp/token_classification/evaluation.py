@@ -9,6 +9,7 @@ from hipe_commons.helpers.tsv import get_tsv_data
 from torch.utils.data import DataLoader, SequentialSampler
 
 import ajmc.nlp.data_preparation.hipe_iob
+from ajmc.nlp.data_preparation.utils import write_predictions_to_tsv
 from ajmc.nlp.token_classification.model import predict, predict_batches
 from ajmc.commons.miscellaneous import get_custom_logger
 
@@ -18,7 +19,7 @@ logger = get_custom_logger(__name__)
 def seqeval_evaluation(predictions: List[List[str]], groundtruth: List[List[str]]):
     """Simple wrapper around seqeval."""
     metric = datasets.load_metric('seqeval')
-    return metric.compute(predictions=predictions, references=groundtruth)
+    return metric.compute(predictions=predictions, references=groundtruth, zero_division=0)
 
 
 def evaluate_dataset(dataset: ajmc.nlp.data_preparation.hipe_iob.HipeDataset,

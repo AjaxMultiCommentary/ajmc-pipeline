@@ -12,12 +12,16 @@ import numpy as np
 import torch
 import transformers
 from torch.utils.data import DataLoader, RandomSampler
+
+import ajmc.olr.layout_lm.config
 from ajmc.nlp.token_classification.evaluation import evaluate_dataset, seqeval_to_df, evaluate_hipe
 from ajmc.nlp.token_classification.config import initialize_config
 from ajmc.nlp.data_preparation.hipe_iob import prepare_datasets
+from ajmc.nlp.token_classification.model import predict_and_write_tsv
 from ajmc.nlp.utils import set_seed
 from ajmc.commons.miscellaneous import get_custom_logger
 
+logger = get_custom_logger(__name__)
 
 def train(config: 'argparse.Namespace',
           model: transformers.PreTrainedModel,
@@ -38,6 +42,7 @@ def train(config: 'argparse.Namespace',
     :param eval_dataset: The `torch.utils.data.Dataset` on which to evaluate the model
     :param tokenizer: The model's tokenizer.
     """
+    model.to(config.device)
 
     train_sampler = RandomSampler(train_dataset)
     train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=config.batch_size)
@@ -100,7 +105,7 @@ def train(config: 'argparse.Namespace',
         # ============================ Evaluate and append during training ============================
         if config.evaluate_during_training:
             epoch_results = evaluate_dataset(eval_dataset, model, config.batch_size, config.device,
-                                             config.ids_to_labels, config.do_debug)
+                                             ajmc.olr.layout_lm.config.ids_to_labels, config.do_debug)
             epoch_results = seqeval_to_df(epoch_results)
 
             epoch_data = pd.DataFrame({("TRAINING", "EP"): [epoch_num + 1],
@@ -139,10 +144,7 @@ def train(config: 'argparse.Namespace',
         tokenizer.save_pretrained(config.model_save_dir)
         torch.save(config, os.path.join(config.model_save_dir, "training_args.bin"))
 
-
-def main(config):
-    logger.info(f'Runing pipeline on {config.output_dir.split("/")[-1]}')
-
+def create_dirs(config):
     # Create directories
     os.makedirs(config.output_dir, exist_ok=config.overwrite_output_dir)
 
@@ -158,6 +160,11 @@ def main(config):
     config.hipe_output_dir = os.path.join(config.output_dir, 'results/hipe_eval')
     os.makedirs(config.hipe_output_dir, exist_ok=config.overwrite_output_dir)
 
+def main(config):
+    logger.info(f'Runing pipeline on {config.output_dir.split("/")[-1]}')
+
+    create_dirs(config)
+
     # Save config
     with open(os.path.join(config.output_dir, 'config.json'), 'w') as f:
         json.dump(config.__dict__, f, skipkeys=True, indent=4, sort_keys=True,
@@ -170,9 +177,8 @@ def main(config):
     datasets = prepare_datasets(config, tokenizer)
 
     model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name_or_path,
-                                                                    num_labels=config.num_labels
+                                                                    num_labels=config.num_labels,  # This is defined in hipe_iob. not the best way
                                                                          )
-    model.to(config.device)
 
     if config.do_train:
         train(config=config,
@@ -185,7 +191,7 @@ def main(config):
         evaluate_hipe(dataset=datasets['eval'],
                       model=model,
                       device=config.device,
-                      ids_to_labels=config.ids_to_labels,
+                      ids_to_labels=ajmc.olr.layout_lm.config.ids_to_labels,
                       output_dir=config.hipe_output_dir,
                       labels_column=config.labels_column,
                       hipe_script_path=config.hipe_script_path,
@@ -196,12 +202,12 @@ def main(config):
     if config.do_predict:
         for url in config.predict_urls:
             predict_and_write_tsv(model=model, device=config.device, output_dir=config.predictions_dir,
-                                  tokenizer=tokenizer, ids_to_labels=config.ids_to_labels,
+                                  tokenizer=tokenizer, ids_to_labels=ajmc.olr.layout_lm.config.ids_to_labels,
                                   labels_column=config.labels_column, url=url)
 
         for path in config.predict_paths:
             predict_and_write_tsv(model=model, device=config.device, output_dir=config.predictions_dir,
-                                  tokenizer=tokenizer, ids_to_labels=config.ids_to_labels,
+                                  tokenizer=tokenizer, ids_to_labels=ajmc.olr.layout_lm.config.ids_to_labels,
                                   labels_column=config.labels_column, url=path)
 
 
@@ -214,22 +220,8 @@ if __name__ == '__main__':
     )
     main(config)
 
-#%%
-# from hipe_commons.helpers.tsv import get_tsv_data
-# logger = get_custom_logger(__name__, )
-# config = initialize_config(json_path='/scratch/sven/tmp/HIPE-2022-baseline/token_classification/data/ajmc_de_coarse.json')
-# tokenizer = transformers.AutoTokenizer.from_pretrained(config.model_name_or_path)
-#
-# data = get_tsv_data(url=config.train_url)
-# len(data.split('\n'))
-# datasets = prepare_datasets(config, tokenizer)
-#
-# model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name_or_path,
-#                                                                      num_labels=config.num_labels)
-# model.to(config.device)
 
-
-# todo reimplement freeze, additionnal data and compare with ner for classics
+# todo reimplement freeze, additionnal data and
 
 
 
