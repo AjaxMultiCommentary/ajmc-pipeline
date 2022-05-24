@@ -63,16 +63,19 @@ def evaluate_dataset(dataset: ajmc.nlp.data_preparation.hipe_iob.HipeDataset,
         [ids_to_labels[l] for l in label if l != -100]
         for label in groundtruth
     ]
-    print("predictions are : -----------------------------------------------")
-    print(predictions)
-    print(' ')
-    print('Gt are : -----------------------------------------------')
-    print(groundtruth)
+    logger.debug("predictions are : -----------------------------------------------")
+    logger.debug(predictions)
+    logger.debug(' ')
+    logger.debug('Gt are : -----------------------------------------------')
+    logger.debug(groundtruth)
+    logger.info("""corrects   =   """, sum([p == g for p, g in zip(predictions, groundtruth)]))
+    logger.info("""total   =   """, len(predictions))
 
     return seqeval_evaluation(predictions, groundtruth)
 
+
 def evaluate_iob_files(output_dir: str, groundtruth_path: str, preds_path: str, method: str,
-                       hipe_script_path: str = None, output_suffix: str = None, task:str = 'nerc_coarse'):
+                       hipe_script_path: str = None, output_suffix: str = None, task: str = 'nerc_coarse'):
     """Evaluates CLEF-HIPE compliant files.
      If `method` is set to `"hipe"`, runs run CLEF-HIPE-evaluation within `os.system`. Else if `method` is set to
      `"seqeval`, imports the files as dfs."""
@@ -114,7 +117,7 @@ def evaluate_iob_files(output_dir: str, groundtruth_path: str, preds_path: str, 
 
 
 def seqeval_to_df(seqeval_output: dict,
-                  do_debug :bool= False) -> pd.DataFrame:
+                  do_debug: bool = False) -> pd.DataFrame:
     """Transforms `seqeval_output` to a MultiIndex pd.DataFrame.
 
     :param seqeval_output: A dict containing:
@@ -137,19 +140,19 @@ def seqeval_to_df(seqeval_output: dict,
             for subkey in seqeval_output[key].keys():
                 to_df[(key, abbreviations[subkey])] = [seqeval_output[key][subkey]]
 
-    ordered_keys = [("ALL", key) for key in ["F1", "A", "P", "R"]] + [k for k in to_df.keys() if k[0] !='ALL']
+    ordered_keys = [("ALL", key) for key in ["F1", "A", "P", "R"]] + [k for k in to_df.keys() if k[0] != 'ALL']
 
     if do_debug:
         to_df_debug = {}
         for key in ordered_keys:
             try:
-                to_df_debug[key] =to_df[key]
+                to_df_debug[key] = to_df[key]
             except KeyError:
                 to_df_debug[key] = 0
         return pd.DataFrame(to_df_debug)
 
     else:
-        return pd.DataFrame({key :to_df[key] for key in ordered_keys})
+        return pd.DataFrame({key: to_df[key] for key in ordered_keys})
 
 
 def evaluate_hipe(dataset: 'token_classification.data_preparation.HipeDataset',
@@ -163,7 +166,6 @@ def evaluate_hipe(dataset: 'token_classification.data_preparation.HipeDataset',
                   groundtruth_tsv_url: str = None,
                   batch_size: int = 8,
                   do_debug: bool = False):
-
     """Performs the entire pipeline to hipe-evaluate a model, i.e. :
         - Getting the model's prediction on a dataset
         - Reconstructing a HIPE-compliant tsv with these prediction
