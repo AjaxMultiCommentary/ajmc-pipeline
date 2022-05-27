@@ -7,7 +7,8 @@ import torch
 import transformers
 from hipe_commons.helpers.tsv import get_tsv_data
 from torch.utils.data import DataLoader, SequentialSampler
-
+from ajmc.commons.miscellaneous import docstring_formatter
+from ajmc.commons.docstrings import docstrings
 import ajmc.nlp.data_preparation.hipe_iob
 from ajmc.nlp.data_preparation.utils import write_predictions_to_tsv
 from ajmc.nlp.token_classification.model import predict, predict_batches
@@ -22,6 +23,7 @@ def seqeval_evaluation(predictions: List[List[str]], groundtruth: List[List[str]
     return metric.compute(predictions=predictions, references=groundtruth, zero_division=0)
 
 
+@docstring_formatter(**docstrings)
 def evaluate_dataset(dataset: ajmc.nlp.data_preparation.hipe_iob.HipeDataset,
                      model: transformers.PreTrainedModel,
                      batch_size: int,
@@ -30,13 +32,12 @@ def evaluate_dataset(dataset: ajmc.nlp.data_preparation.hipe_iob.HipeDataset,
                      do_debug: bool = False):
     """Evaluate an entire dataset using seqeval. Is used during the main train loop.
 
-    :param dataset: A `HipeDataset` object.
+    :param dataset: {custom_dataset}
     :param model: Self explanatory
     :param batch_size: Self explanatory
     :param device: Self explanatory
-    :param ids_to_labels: a dict mapping the label numbers (int) used by the model to the original
-     label names (str), e.g. `{0: "O", 1: "B-PERS", ...}`
-    :param do_debug: Breaks the eval loop after the first batch.
+    :param ids_to_labels: {ids_to_labels}
+    :param do_debug: {do_debug}
     """
 
     dataloader = DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=batch_size)
@@ -63,13 +64,6 @@ def evaluate_dataset(dataset: ajmc.nlp.data_preparation.hipe_iob.HipeDataset,
         [ids_to_labels[l] for l in label if l != -100]
         for label in groundtruth
     ]
-    logger.debug("predictions are : -----------------------------------------------")
-    logger.debug(predictions)
-    logger.debug(' ')
-    logger.debug('Gt are : -----------------------------------------------')
-    logger.debug(groundtruth)
-    logger.info("""corrects   =   """, sum([p == g for p, g in zip(predictions, groundtruth)]))
-    logger.info("""total   =   """, len(predictions))
 
     return seqeval_evaluation(predictions, groundtruth)
 
@@ -116,7 +110,7 @@ def evaluate_iob_files(output_dir: str, groundtruth_path: str, preds_path: str, 
             results.to_csv(os.path.join(output_dir, "{}_results.tsv".format(method)), sep="\t", index=False)
 
 
-def seqeval_to_df(seqeval_output: dict,
+def seqeval_to_df(seqeval_output: Dict[str, Union[Dict[str, float], float]],
                   do_debug: bool = False) -> pd.DataFrame:
     """Transforms `seqeval_output` to a MultiIndex pd.DataFrame.
 

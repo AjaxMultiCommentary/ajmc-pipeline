@@ -68,27 +68,28 @@ class LayoutLMDataset(torch.utils.data.Dataset):
         return len(self.input_ids)
 
 
-# Get pages
-def get_pages(ocr_output_dirs: List[str], splits: List[str]) -> Dict[str, List['Page']]:
-    split_pages = {s: [] for s in splits}
+def get_pages(data_dict: Dict[str, Dict[str, List[str]]])-> Dict[str, List['Page']]:
+    """
+    Args:
+        data_dict: A dict of format `{'set': {'ocr_dir':['split','split]}, }
+    """
 
-    for ocr_output_dir in ocr_output_dirs:
-        commentary = Commentary.from_folder_structure(ocr_dir=ocr_output_dir)
+    # Read sheet  # Todo : create a variable for this
+    sheet_id = '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
+    olr_gt = read_google_sheet(sheet_id, 'olr_gt')
 
-        # Read sheet  # Todo : create a variable for this
-        sheet_id = '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
-        olr_gt = read_google_sheet(sheet_id, 'olr_gt')
-
-        split_ids = {s: list(olr_gt.loc[(olr_gt['split'] == s) & (olr_gt['id'] == commentary.id)]['page_id']) for s in
-                     splits}
-        for split in splits:
-            split_pages[split] += [p for p in commentary.pages if p.id in split_ids[split]]
-
-    return split_pages
+    set_pages = {}
+    for s in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
+        set_pages[s] = []
+        for ocr_dir in data_dict[s].keys():  # Iterate over ocr_dirs
+            commentary = Commentary.from_folder_structure(ocr_dir=ocr_dir)
+            filter_ = [(olr_gt['id'][i] == commentary.id and olr_gt['split'][i] in data_dict[s][ocr_dir]) for i in
+                       range(len(olr_gt['page_id']))]
+            set_pages[s] += [p for p in commentary.pages if p.id in list(olr_gt['page_id'][filter_])]
 
 
 @docstring_formatter(**docstrings)
-def prepare_data(split_pages: Dict[str, List['Page']],
+def prepare_data(page_sets: Dict[str, List['Page']],
                  model_inputs: List[str],
                  labels_to_ids: Dict[str, int],
                  regions_to_coarse_labels: Dict[str, str],
@@ -102,7 +103,7 @@ def prepare_data(split_pages: Dict[str, List['Page']],
     """Prepares data for LayoutLMV2.
 
     Args:
-        split_pages: A dict containing a list of `Page`s per split.
+        page_sets: A dict containing a list of `Page`s per split.
         model_inputs: List of inputs the model wants (inputs_ids, attention_mask,...)
         labels_to_ids: {labels_to_ids}
         regions_to_coarse_labels:
@@ -115,10 +116,10 @@ def prepare_data(split_pages: Dict[str, List['Page']],
 
     """
 
-    encodings = {s: {k: [] for k in model_inputs} for s in split_pages.keys()}
+    encodings = {s: {k: [] for k in model_inputs} for s in page_sets.keys()}
 
-    for s in split_pages.keys():
-        for i, page in enumerate(split_pages[s]):
+    for s in page_sets.keys():
+        for i, page in enumerate(page_sets[s]):
 
             # Get the lists of words, boxes and labels for a single page
             words = []
@@ -161,7 +162,7 @@ def prepare_data(split_pages: Dict[str, List['Page']],
             if i == 2 and do_debug:
                 break
 
-    return {s: LayoutLMDataset(**encodings[s]) for s in split_pages.keys()}
+    return {s: LayoutLMDataset(**encodings[s]) for s in page_sets.keys()}
 
 
 def main(config):
@@ -175,8 +176,8 @@ tokenizer = LayoutLMv2Tokenizer.from_pretrained(config.model_name_or_path)
 feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained(config.model_name_or_path, apply_ocr=False)
 model = LayoutLMv2ForTokenClassification.from_pretrained(config.model_name_or_path, num_labels=config.num_labels)
 
-pages = get_pages(ocr_output_dirs=config.ocr_dirs, splits=config.splits)
-datasets = prepare_data(split_pages=pages,
+pages = get_pages(ocr_output_dirs=config.data_dirs_and_sets)
+datasets = prepare_data(page_sets=pages,
                         model_inputs=config.model_inputs,
                         labels_to_ids=config.labels_to_ids,
                         regions_to_coarse_labels=config.regions_to_coarse_labels,
