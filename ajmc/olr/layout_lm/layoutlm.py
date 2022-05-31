@@ -1,3 +1,4 @@
+import json
 import os
 from ajmc.commons.miscellaneous import docstring_formatter
 from ajmc.commons.docstrings import docstrings
@@ -68,7 +69,7 @@ class LayoutLMDataset(torch.utils.data.Dataset):
         return len(self.input_ids)
 
 
-def get_pages(data_dict: Dict[str, Dict[str, List[str]]])-> Dict[str, List['Page']]:
+def get_pages(data_dict: Dict[str, Dict[str, List[str]]]) -> Dict[str, List['Page']]:
     """
     Args:
         data_dict: A dict of format `{'set': {'ocr_dir':['split','split]}, }
@@ -79,13 +80,15 @@ def get_pages(data_dict: Dict[str, Dict[str, List[str]]])-> Dict[str, List['Page
     olr_gt = read_google_sheet(sheet_id, 'olr_gt')
 
     set_pages = {}
-    for s in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
-        set_pages[s] = []
-        for ocr_dir in data_dict[s].keys():  # Iterate over ocr_dirs
+    for set in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
+        set_pages[set] = []
+        for ocr_dir in data_dict[set].keys():  # Iterate over ocr_dirs
             commentary = Commentary.from_folder_structure(ocr_dir=ocr_dir)
-            filter_ = [(olr_gt['id'][i] == commentary.id and olr_gt['split'][i] in data_dict[s][ocr_dir]) for i in
+            filter_ = [(olr_gt['id'][i] == commentary.id and olr_gt['split'][i] in data_dict[set][ocr_dir]) for i in
                        range(len(olr_gt['page_id']))]
-            set_pages[s] += [p for p in commentary.pages if p.id in list(olr_gt['page_id'][filter_])]
+            set_pages[set] += [p for p in commentary.pages if p.id in list(olr_gt['page_id'][filter_])]
+
+    return set_pages
 
 
 @docstring_formatter(**docstrings)
@@ -142,7 +145,7 @@ def prepare_data(page_sets: Dict[str, List['Page']],
                                is_split_into_words=True)
 
             # We now do a manual truncation
-            encoding = {}
+
             for k in tokens.keys():
                 tokens[k] = tokens[k][1:-1]  # We start by triming the first and last tokens
                 tokens[k] = split_list(tokens[k], max_length - 2,
@@ -166,26 +169,66 @@ def prepare_data(page_sets: Dict[str, List['Page']],
 
 
 def main(config):
-    pass
+    # config = create_olr_config('/Users/sven/packages/ajmc/data/configs/simple_config_local.json')
+    create_dirs(config)
+
+    with open(os.path.join(config.output_dir, 'config.json'), 'w') as f:
+        json.dump(config.__dict__, f, skipkeys=True, indent=4, sort_keys=True,
+                  default=lambda o: '<not serializable>')
+
+    tokenizer = LayoutLMv2Tokenizer.from_pretrained(config.model_name_or_path)
+    feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained(config.model_name_or_path, apply_ocr=False)
+    model = LayoutLMv2ForTokenClassification.from_pretrained(config.model_name_or_path, num_labels=config.num_labels)
+
+    pages = get_pages(data_dict=config.data_dirs_and_sets)
+    datasets = prepare_data(page_sets=pages,
+                            model_inputs=config.model_inputs,
+                            labels_to_ids=config.labels_to_ids,
+                            regions_to_coarse_labels=config.regions_to_coarse_labels,
+                            rois=config.rois,
+                            special_tokens=config.special_tokens,
+                            tokenizer=tokenizer,
+                            feature_extractor=feature_extractor,
+                            do_debug=config.do_debug)
+
+    train(config=config, model=model, train_dataset=datasets['train'], eval_dataset=datasets['eval'],
+          tokenizer=tokenizer)
 
 
-config = create_olr_config('/Users/sven/packages/ajmc/data/configs/simple_config_local.json')
-create_dirs(config)
+def page_to_layoutlm_encodings(page,
+                               rois,
+                               labels_to_ids,
+                               regions_to_coarse_labels,
+                               tokenizer,
+                               max_length,
+                               feature_extractor,
+                               special_tokens=None):
+    # Get the lists of words, boxes and labels for a single page
+    words = [w.text for r in page.regions if r.region_type in rois for w in r.words]
 
-tokenizer = LayoutLMv2Tokenizer.from_pretrained(config.model_name_or_path)
-feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained(config.model_name_or_path, apply_ocr=False)
-model = LayoutLMv2ForTokenClassification.from_pretrained(config.model_name_or_path, num_labels=config.num_labels)
+    word_boxes = [normalize_bounding_rectangles(w.coords.bounding_rectangle, page.image.width, page.image.height)
+                  for r in page.regions if r.region_type in rois for w in r.words]
 
-pages = get_pages(ocr_output_dirs=config.data_dirs_and_sets)
-datasets = prepare_data(page_sets=pages,
-                        model_inputs=config.model_inputs,
-                        labels_to_ids=config.labels_to_ids,
-                        regions_to_coarse_labels=config.regions_to_coarse_labels,
-                        rois=config.rois,
-                        special_tokens=config.special_tokens,
-                        tokenizer=tokenizer,
-                        feature_extractor=feature_extractor,
-                        do_debug=config.do_debug)
+    word_labels = [labels_to_ids[regions_to_coarse_labels[r.region_type]]
+                   for r in page.regions if r.region_type in rois for w in r.words]
 
-train(config=config, model=model, train_dataset=datasets['train'], eval_dataset=datasets['dev'],
-      tokenizer=tokenizer)
+    # Tokenize, truncate and pad
+    # We tokenize without truncation, as LayoutLMV2Tokenizer does not handle overflowing tokens properly.
+    encodings = tokenizer(text=words,
+                          boxes=word_boxes,
+                          word_labels=word_labels,
+                          is_split_into_words=True)
+
+    # We now do a manual truncation
+    for k in encodings.keys():
+        encodings[k] = encodings[k][1:-1]  # We start by triming the first and last tokens
+        encodings[k] = split_list(encodings[k], max_length - 2,
+                                  special_tokens['pad'][k])  # We divide our list in lists of len 510
+        encodings[k] = [[special_tokens['start'][k]] + ex + [special_tokens['end'][k]] for ex in encodings[k]]
+
+    # Add the image for each input
+    image = Image.open(page.image.path).convert('RGB')
+    image = feature_extractor(image)['pixel_values']
+    encodings['image'] = [image[0].copy() for _ in range(len(encodings['input_ids']))]
+
+    return encodings

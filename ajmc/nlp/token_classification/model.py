@@ -6,11 +6,12 @@ import transformers
 from torch.utils.data import DataLoader
 from torch.utils.data import DataLoader, SequentialSampler
 
-from ajmc.nlp.data_preparation.hipe_iob import create_prediction_dataset
+from ajmc.nlp.token_classification.data_preparation.hipe_iob import create_prediction_dataset
 from ajmc.commons.miscellaneous import get_custom_logger
-from ajmc.nlp.data_preparation.utils import write_predictions_to_tsv
+from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
 
 logger = get_custom_logger(__name__)
+
 
 def predict(inputs: Dict[str, torch.tensor], model: 'transformers.models', device: torch.device):
     """Predicts for a batch or a single example.
@@ -28,8 +29,6 @@ def predict(inputs: Dict[str, torch.tensor], model: 'transformers.models', devic
         return np.argmax(outputs[1].detach().cpu().numpy(), axis=2)
 
 
-
-# Todo I think this should run directly on a dataset
 def predict_batches(batches: Union[torch.utils.data.dataloader.DataLoader, List[Dict[str, torch.tensor]]],
                     model: transformers.PreTrainedModel,
                     device: torch.device,

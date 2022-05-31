@@ -1,5 +1,4 @@
-import pytest
-from ajmc.nlp.data_preparation.utils import align_labels, align_elements
+from ajmc.nlp.token_classification.data_preparation.utils import align_labels, align_elements
 
 
 def test_align_labels(test_tokens_to_words_offsets,

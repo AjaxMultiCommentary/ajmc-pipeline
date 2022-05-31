@@ -13,12 +13,13 @@ import transformers
 from torch.utils.data import DataLoader, RandomSampler
 from ajmc.nlp.token_classification.evaluation import evaluate_dataset, seqeval_to_df, evaluate_hipe
 from ajmc.nlp.token_classification.config import initialize_config
-from ajmc.nlp.data_preparation.hipe_iob import prepare_datasets
+from ajmc.nlp.token_classification.data_preparation.hipe_iob import prepare_datasets
 from ajmc.nlp.token_classification.model import predict_and_write_tsv
 from ajmc.nlp.utils import set_seed
 from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
+
 
 def train(config: 'argparse.Namespace',
           model: transformers.PreTrainedModel,
@@ -118,13 +119,10 @@ def train(config: 'argparse.Namespace',
                 best_f1 = epoch_results[('ALL', 'F1')][0]
                 epoch_results.to_csv(os.path.join(config.seqeval_output_dir, "best_results.tsv"), sep='\t', index=False)
 
-                model.save_pretrained(config.model_save_dir)
-                tokenizer.save_pretrained(config.model_save_dir)
-                torch.save(config, os.path.join(config.model_save_dir, "training_args.bin"))
-
-
-                epoch_results.to_csv(os.path.join(config.seqeval_output_dir, 'best_results.tsv'), sep='\t',
-                                     index=False)
+                if config.do_save:
+                    model.save_pretrained(config.model_save_dir)
+                    tokenizer.save_pretrained(config.model_save_dir)
+                    torch.save(config, os.path.join(config.model_save_dir, "training_args.bin"))
 
             else:
                 count_no_improvement += 1
@@ -136,10 +134,12 @@ def train(config: 'argparse.Namespace',
             break
     if config.evaluate_during_training:
         train_results.to_csv(os.path.join(config.seqeval_output_dir, "train_results.tsv"), sep='\t', index=False)
-    else:
+
+    elif config.do_save:
         model.save_pretrained(config.model_save_dir)
         tokenizer.save_pretrained(config.model_save_dir)
         torch.save(config, os.path.join(config.model_save_dir, "training_args.bin"))
+
 
 def create_dirs(config):
     # Create directories
@@ -156,6 +156,7 @@ def create_dirs(config):
 
     config.hipe_output_dir = os.path.join(config.output_dir, 'results/hipe_eval')
     os.makedirs(config.hipe_output_dir, exist_ok=config.overwrite_output_dir)
+
 
 def main(config):
     logger.info(f'Runing pipeline on {config.output_dir.split("/")[-1]}')
@@ -174,7 +175,8 @@ def main(config):
     datasets = prepare_datasets(config, tokenizer)
 
     model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name_or_path,
-                                                                    num_labels=config.num_labels,  # This is defined in hipe_iob. not the best way
+                                                                         num_labels=config.num_labels,
+                                                                         # This is defined in hipe_iob. not the best way
                                                                          )
 
     if config.do_train:
@@ -208,8 +210,6 @@ def main(config):
                                   labels_column=config.labels_column, url=path)
 
 
-
-
 if __name__ == '__main__':
     logger = get_custom_logger(__name__, level=logging.DEBUG)
     config = initialize_config(
@@ -217,8 +217,4 @@ if __name__ == '__main__':
     )
     main(config)
 
-
 # todo reimplement freeze, additionnal data and
-
-
-
