@@ -69,4 +69,5 @@ def resize_dataset(clean_suffix="clean-threshold", img_suffix=".png", target_hei
         print_height_stats(height_map)
         print_height_stats(height_map_resize)
 
-resize_dataset(clean_suffix="clean-threshold", img_suffix=".png", target_height=20)
+for target in [10, 30, 40, 50, 60, 70]:
+    resize_dataset(clean_suffix="clean-threshold-1.0", img_suffix=".png", target_height=target)

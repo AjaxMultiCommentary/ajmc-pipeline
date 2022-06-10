@@ -129,10 +129,16 @@ class LangIdentifier:
 
         # threshold
         elif self.mode.lower() in ["threshold"]:
-            tmp = self.model.findall(gt_text)
-            conf = len(tmp) / len(gt_text)
-            lang = "greek" if conf >= self.threshold else "non-greek"
-            lang_info = {"lang": lang, "conf": conf}
+            cleaned_gt_text = "".join([item for item in gt_text if item.isalnum()])
+            if cleaned_gt_text:
+                tmp = self.model.findall(cleaned_gt_text)
+                conf = len(tmp) / len(cleaned_gt_text)
+                lang = "greek" if conf >= self.threshold else "non-greek"
+                lang_info = {"lang": lang, "conf": conf}
+            else:
+                conf = 1.0
+                lang = "non-greek"
+                lang_info = {"lang": lang, "conf": conf}
 
         else:
             raise NotImplementedError(f"Language identification model created, but it doesn't have an implementation for detection: {self.mode}")
@@ -202,12 +208,16 @@ def clean_dataset(folder, clean_folder, target_lang=["greek"], img_suffix="png",
         with open(output_file, "w", encoding="utf-8") as f_out:
             json.dump(log, f_out, indent=2, ensure_ascii=False)
 
-method = "googletrans"
+method = "threshold"
+threshold = 1.0
 remove_existing_folders = False
 
 for subdir_name in POGRETRA_COMMENTARY_DIRS:
     subdir = get_commentary_dir(subdir_name, "pogretra", cleaned_suffix="", create_if_missing=False)
-    clean_folder = get_commentary_dir(subdir_name, "pogretra", cleaned_suffix=f"clean-{method}", create_if_missing=True)
+    if method.lower() in ["googletrans"]:
+        clean_folder = get_commentary_dir(subdir_name, "pogretra", cleaned_suffix=f"clean-{method}", create_if_missing=True)
+    elif method.lower() in ["threshold"]:
+        clean_folder = get_commentary_dir(subdir_name, "pogretra", cleaned_suffix=f"clean-{method}-{threshold}", create_if_missing=True)
     if remove_existing_folders:
         print(f"Now removing {clean_folder}")
         try:
@@ -219,4 +229,4 @@ for subdir_name in POGRETRA_COMMENTARY_DIRS:
         if method.lower() in ["googletrans"]:
             clean_dataset(subdir, clean_folder, target_lang=["greek"], img_suffix=".png", method=method)
         elif method.lower() in ["threshold"]:
-            clean_dataset(subdir, clean_folder, target_lang=["greek"], img_suffix=".png", method=method, threshold=0.5)
+            clean_dataset(subdir, clean_folder, target_lang=["greek"], img_suffix=".png", method=method, threshold=threshold)

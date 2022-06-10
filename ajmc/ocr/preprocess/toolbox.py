@@ -1,5 +1,6 @@
+import cv2
 import numpy as np
-from skimage import color
+from skimage import color, img_as_ubyte
 from skimage.util import random_noise
 from skimage.filters import threshold_otsu, butterworth
 from skimage.morphology import binary_closing, binary_opening, binary_erosion, binary_dilation, skeletonize
@@ -30,6 +31,9 @@ def preprocess_img(img, instructions=[]):
         tmp_kernel[half,:] = 1
         return tmp_kernel
 
+    def ones(size):
+        return np.ones((size,size))
+
     # 3x3 kernel
     kernel_3x3 = np.ones((3,3))
 
@@ -41,26 +45,39 @@ def preprocess_img(img, instructions=[]):
     threshold = threshold_otsu(tmp_img)
     tmp_img = tmp_img > threshold
     steps.append(["otsu", tmp_img])
-   
-    # erosion
-    tmp_img = binary_erosion(tmp_img, footprint=np.ones((3,3)))
-    steps.append(["erosion", tmp_img])
-
-    # opening
-    tmp_img = binary_opening(tmp_img, footprint=cross_kernel(3))
-    steps.append(["opening", tmp_img])
 
     # skeletonize
     # tmp_img = 1-skeletonize(1-tmp_img, method='lee')
     # steps.append(["skeletonize", tmp_img])
 
+    # resize
+    scale_percent = 3 # percent of original size
+    width = int(tmp_img.shape[1] * scale_percent)
+    height = int(tmp_img.shape[0] * scale_percent)
+    dim = (width, height)
+    tmp_img = cv2.resize(img_as_ubyte(tmp_img), dim, interpolation = cv2.INTER_AREA)
+    steps.append(["resize", tmp_img])
+
+    # opening
+    # tmp_img = binary_closing(tmp_img, footprint=cross_kernel(3))
+    # steps.append(["opening", img_as_ubyte(tmp_img)])
+
+    # erosion
+    tmp_img = binary_dilation(tmp_img, footprint=ones(3))
+    steps.append(["erosion", img_as_ubyte(tmp_img)])
+
     # closing
-    # tmp_img = binary_closing(tmp_img, footprint=cross_kernel(5))
-    # steps.append(["closing", tmp_img])
+    tmp_img = binary_opening(tmp_img, footprint=cross_kernel(5))
+    steps.append(["closing", img_as_ubyte(tmp_img)])
+
+    # resize
+    dim = (img.shape[1], img.shape[0])
+    tmp_img = cv2.resize(img_as_ubyte(tmp_img), dim, interpolation = cv2.INTER_AREA)
+    steps.append(["resize", tmp_img])
 
     # dilation
-    # tmp_img = binary_dilation(tmp_img, footprint=cross_kernel(3))
-    # steps.append(["dilation", tmp_img])
+    # tmp_img = binary_erosion(tmp_img, footprint=ones(4))
+    # steps.append(["dilation", img_as_ubyte(tmp_img)])
 
     return steps
 
