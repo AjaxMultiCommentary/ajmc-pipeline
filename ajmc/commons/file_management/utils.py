@@ -81,7 +81,7 @@ def get_path_from_id(page_id: str, dir_: str = None) -> str:
     assert len(files) <= 1, f"""There are {len(files)} files matching the name {page_id} in {dir_}. Please check."""
 
     if len(files) == 0:
-        logger.info(f"""Page_id {page_id} matches no file in {dir_}, skipping...""")
+        logger.debug(f"""Page_id {page_id} matches no file in {dir_}, skipping...""")
         return ""
 
     else:

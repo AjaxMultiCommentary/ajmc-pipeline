@@ -62,23 +62,16 @@ labels_to_ids = {
 ids_to_labels = {v: k for k, v in labels_to_ids.items()}
 ids_to_ner_labels = {v: 'B-' + k for k, v in labels_to_ids.items()}
 
-special_tokens = {
-    'start': {'input_ids': 101, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 1},
-    'end': {'input_ids': 102, 'bbox': [1000, 1000, 1000, 1000], 'token_type_ids': 0, 'labels': -100,
-            'attention_mask': 1},
-    'pad': {'input_ids': 0, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 0},
-}
-
 
 def create_olr_config(json_path: Optional[str] = None):
     config = initialize_config(json_path=json_path)
     config.regions_to_coarse_labels = regions_to_coarse_labels
     config.labels_to_ids = labels_to_ids
-    config.ids_to_labels = ids_to_ner_labels
+    config.ids_to_labels = ids_to_ner_labels  # TODO : ⚠️ Check this weird thing out you lazy bum !
+    config.ids_to_raw_labels = ids_to_labels
     config.model_inputs = ['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image', 'labels']
     config.splits = ['train', 'dev']
     config.rois = rois
-    config.special_tokens = special_tokens
     config.num_labels = len(list(labels_to_ids.keys()))
 
     return config

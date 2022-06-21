@@ -23,7 +23,6 @@ def test_bag_of_word_evaluation():
 
 
 def test_coord_based_page_evaluation():
-    # Todo : not very elegant
     base_dir = '/Users/sven/packages/ajmc/'
 
     gt_page = Page(ocr_path=base_dir+'data/ocr/evaluation_test/gt_sophoclesplaysa05campgoog_0146.html',

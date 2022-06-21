@@ -1,17 +1,25 @@
 from hipe_commons.helpers.tsv import tsv_to_dict
 from typing import List, Optional
 import torch
-from ajmc.nlp.token_classification.data_preparation.utils import sort_ner_labels, align_labels, align_elements
+from ajmc.nlp.token_classification.data_preparation.utils import sort_ner_labels, align_labels, align_to_tokenized
 from ajmc.commons.miscellaneous import get_unique_elements
+from ajmc.commons.docstrings import docstrings, docstring_formatter
 
 
 class HipeDataset(torch.utils.data.Dataset):
 
+    @docstring_formatter(batch_encoding=docstrings['BatchEncoding'])
     def __init__(self,
                  batch_encoding: "BatchEncoding",
                  tsv_line_numbers: List[List[int]],
                  words: List[List[str]],
                  labels: Optional[List[List[int]]] = None):
+        """Default constructor.
+
+        Args:
+            batch_encoding: {batch_encoding}
+        """
+
         self.batch_encoding = batch_encoding
         self.labels = labels
         self.tsv_line_numbers = tsv_line_numbers
@@ -51,10 +59,10 @@ def prepare_datasets(config: 'argparse.Namespace', tokenizer):
                                               config.labels_to_ids)
                                  for e in data[split]['batchencoding'].encodings]
 
-        data[split]['words'] = [align_elements(e.word_ids, data[split]['TOKEN']) for e in
+        data[split]['words'] = [align_to_tokenized(e.word_ids, data[split]['TOKEN']) for e in
                                 data[split]['batchencoding'].encodings]
 
-        data[split]['tsv_line_numbers'] = [align_elements(e.word_ids, data[split]['n']) for e in
+        data[split]['tsv_line_numbers'] = [align_to_tokenized(e.word_ids, data[split]['n']) for e in
                                            data[split]['batchencoding'].encodings]
 
     datasets = {}
@@ -76,10 +84,10 @@ def create_prediction_dataset(tokenizer, path: Optional[str] = None, url: Option
                                       is_split_into_words=True,
                                       return_overflowing_tokens=True)
 
-    data['words'] = [align_elements(e.word_ids, data['TOKEN']) for e in
+    data['words'] = [align_to_tokenized(e.word_ids, data['TOKEN']) for e in
                      data['batchencoding'].encodings]
 
-    data['tsv_line_numbers'] = [align_elements(e.word_ids, data['n']) for e in
+    data['tsv_line_numbers'] = [align_to_tokenized(e.word_ids, data['n']) for e in
                                 data['batchencoding'].encodings]
 
     data['labels'] = [[0 for _ in x] for x in data['tsv_line_numbers']]  # dummy labels without which I get an untracable error from HF

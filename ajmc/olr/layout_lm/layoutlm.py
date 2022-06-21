@@ -1,17 +1,23 @@
 import json
 import os
-from ajmc.commons.miscellaneous import docstring_formatter
-from ajmc.commons.docstrings import docstrings
+import random
+
+from ajmc.commons.docstrings import docstrings, docstring_formatter
 import numpy as np
 import torch
 from torch.utils.data import RandomSampler
-from transformers import LayoutLMv2Tokenizer, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
-from typing import List, Optional, Dict, Any
+from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
+from typing import List, Optional, Dict, Any, Union, Tuple
+
+from ajmc.commons.variables import COLORS
+from ajmc.nlp.token_classification.config import initialize_config
+from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized
+from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.nlp.token_classification.pipeline import create_dirs, train
 from ajmc.text_importation.classes import Commentary
 from PIL import Image
 from ajmc.commons.miscellaneous import read_google_sheet
-from ajmc.olr.layout_lm.config import create_olr_config
+from ajmc.commons import variables
 
 
 # Functions
@@ -24,83 +30,111 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
     ]
 
 
-def split_list(list_: list, n: int, pad: object) -> List[List[object]]:
-    """Divides a list into a list of lists with n elements, padding the last chunk with `pad`."""
-    chunks = []
-    for x in range(0, len(list_), n):
-        chunk = list_[x: n + x]
-
-        if len(chunk) < n:
-            chunk += [pad for _ in range(n - len(chunk))]
-
-        chunks.append(chunk)
-
-    return chunks
-
-
 class LayoutLMDataset(torch.utils.data.Dataset):
 
-    def __init__(self,
-                 input_ids: List[List[int]],
-                 bbox: List[List[List[int]]],
-                 token_type_ids: List[List[int]],
-                 attention_mask: List[List[int]],
-                 image: List[np.ndarray],
-                 labels: Optional[List[List[int]]] = None):
-        self.input_ids = input_ids
-        self.bbox = bbox
-        self.token_type_ids = token_type_ids
-        self.attention_mask = attention_mask
-        self.image = image
-        self.labels = labels
+    @docstring_formatter(encodings=docstrings['BatchEncoding'])
+    def __init__(self, encodings: Union['BatchEncoding', Dict[str, List[List[int]]]], ):
+        """Default constructor.
+
+        Args:
+            encodings: {encodings}
+        """
+        self.encodings = encodings
+        self.model_inputs = ['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image']
 
     def __getitem__(self, idx):
-        item = {'input_ids': torch.tensor(self.input_ids[idx]),
-                'bbox': torch.tensor(self.bbox[idx]),
-                'token_type_ids': torch.tensor(self.token_type_ids[idx]),
-                'attention_mask': torch.tensor(self.attention_mask[idx]),
-                'image': torch.tensor(self.image[idx])}
-        if self.labels:
-            item['labels'] = torch.tensor(self.labels[idx])
+        item = {k: torch.tensor(self.encodings[k][idx]) for k in self.model_inputs}
+        if 'labels' in self.encodings.keys():
+            item['labels'] = torch.tensor(self.encodings['labels'][idx])
 
         return item
 
     def __len__(self):
-        return len(self.input_ids)
+        return len(self.encodings.encodings)
 
 
-def get_pages(data_dict: Dict[str, Dict[str, List[str]]]) -> Dict[str, List['Page']]:
+def get_olr_split_pages(commentary: Commentary,
+                        splits: List[str]) -> List['Page']:
+    """Gets the data from splits on the olr_gt sheet."""
+
+    olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
+
+    filter_ = [(olr_gt['commentary_id'][i] == commentary.id and olr_gt['split'][i] in splits) for i in
+               range(len(olr_gt['page_id']))]
+
+    return [p for p in commentary.pages if p.id in list(olr_gt['page_id'][filter_])]
+
+
+
+def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
+                        sampling: Optional[Dict[str, float]] = None) -> Dict[str, List['Page']]:
     """
     Args:
-        data_dict: A dict of format `{'set': {'ocr_dir':['split','split]}, }
+        data_dict: A dict of format `{'set': {'ocr_dir':['split','split']}, }
+        sampling: A dict of format `{'set': sample_size}` with 0>sample_size>1.
     """
 
-    # Read sheet  # Todo : create a variable for this
-    sheet_id = '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
-    olr_gt = read_google_sheet(sheet_id, 'olr_gt')
-
     set_pages = {}
-    for set in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
-        set_pages[set] = []
-        for ocr_dir in data_dict[set].keys():  # Iterate over ocr_dirs
+    for set_ in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
+        set_pages[set_] = []
+        for ocr_dir in data_dict[set_].keys():  # Iterate over ocr_dirs
             commentary = Commentary.from_folder_structure(ocr_dir=ocr_dir)
-            filter_ = [(olr_gt['id'][i] == commentary.id and olr_gt['split'][i] in data_dict[set][ocr_dir]) for i in
-                       range(len(olr_gt['page_id']))]
-            set_pages[set] += [p for p in commentary.pages if p.id in list(olr_gt['page_id'][filter_])]
+            set_pages[set_] += get_olr_split_pages(commentary, data_dict[set_][ocr_dir])
+
+    if sampling:
+        random.seed(42)
+        for set_, sample_size in sampling.items():
+            set_pages[set_] = random.sample(set_pages[set_], k=int(sample_size*len(set_pages[set_])))
 
     return set_pages
 
 
+def page_to_layoutlmv2_encodings(page,
+                                 rois,
+                                 labels_to_ids,
+                                 regions_to_coarse_labels,
+                                 tokenizer,
+                                 feature_extractor: Optional['FeatureExtractor'] = None,
+                                 get_labels: bool = True,
+                                 unknownify_tokens: bool = False):
+    feature_extractor = feature_extractor if feature_extractor else \
+        LayoutLMv2FeatureExtractor.from_pretrained('microsoft/layoutlmv2-base-uncased', apply_ocr=False)
+
+    # Get the lists of words, boxes and labels for a single page
+    words = [w.text for r in page.regions if r.region_type in rois for w in r.words]
+
+    if unknownify_tokens:
+        words = [tokenizer.unk_token for _ in words]
+
+    word_boxes = [normalize_bounding_rectangles(w.coords.bounding_rectangle, page.image.width, page.image.height)
+                  for r in page.regions if r.region_type in rois for w in r.words]
+
+    word_labels = [labels_to_ids[regions_to_coarse_labels[r.region_type]]
+                   for r in page.regions if r.region_type in rois for w in r.words] if get_labels else None
+
+    # Tokenize, truncate and pad
+    encodings = tokenizer(text=words,
+                          boxes=word_boxes,
+                          word_labels=word_labels,
+                          truncation=True,
+                          padding='max_length',
+                          return_overflowing_tokens=True)
+
+    # Add the image for each input
+    image = Image.open(page.image.path).convert('RGB')
+    image = feature_extractor(image)['pixel_values']
+    encodings['image'] = [image[0].copy() for _ in range(len(encodings['input_ids']))]
+
+    return encodings
+
+
 @docstring_formatter(**docstrings)
 def prepare_data(page_sets: Dict[str, List['Page']],
-                 model_inputs: List[str],
                  labels_to_ids: Dict[str, int],
                  regions_to_coarse_labels: Dict[str, str],
                  rois: List[str],
-                 special_tokens: Dict[str, Dict[str, Any]],
                  tokenizer,
-                 feature_extractor,
-                 max_length: int = 512,
+                 unknownify_tokens:bool = False,
                  do_debug: bool = False
                  ) -> Dict[str, LayoutLMDataset]:
     """Prepares data for LayoutLMV2.
@@ -111,61 +145,114 @@ def prepare_data(page_sets: Dict[str, List['Page']],
         labels_to_ids: {labels_to_ids}
         regions_to_coarse_labels:
         rois: The regions to focus on
-        special_tokens: e.g. `{{'start': {{'input_ids':100, ...}}, ...}}`
+        special_tokens: {special_tokens}
         tokenizer:
-        feature_extractor:
-        max_length: {max_length}
+        unknownify_tokens:
         do_debug:
 
     """
 
-    encodings = {s: {k: [] for k in model_inputs} for s in page_sets.keys()}
+    encodings = {}
 
     for s in page_sets.keys():
+        split_encodings = None
         for i, page in enumerate(page_sets[s]):
+            if split_encodings is None:
+                split_encodings = page_to_layoutlmv2_encodings(page=page,
+                                                               rois=rois,
+                                                               labels_to_ids=labels_to_ids,
+                                                               regions_to_coarse_labels=regions_to_coarse_labels,
+                                                               tokenizer=tokenizer,
+                                                               unknownify_tokens=unknownify_tokens)
+            else:
+                page_encodings = page_to_layoutlmv2_encodings(page=page,
+                                                              rois=rois,
+                                                              labels_to_ids=labels_to_ids,
+                                                              regions_to_coarse_labels=regions_to_coarse_labels,
+                                                              tokenizer=tokenizer,
+                                                              unknownify_tokens=unknownify_tokens)
+                for k in split_encodings.keys():
+                    split_encodings[k] += page_encodings[k]
 
-            # Get the lists of words, boxes and labels for a single page
-            words = []
-            word_boxes = []
-            word_labels = []
-            for r in page.regions:
-                if r.region_type in rois:
-                    for w in r.words:
-                        words.append(w.text)
-                        word_boxes.append(normalize_bounding_rectangles(w.coords.bounding_rectangle,
-                                                                        page.image.width,
-                                                                        page.image.height))
-                        word_labels.append(labels_to_ids[regions_to_coarse_labels[r.region_type]])
-
-            # Tokenize, truncate and pad
-            # We tokenize without truncation, as LayoutLMV2Tokenizer does not handle overflowing tokens properly.
-            tokens = tokenizer(text=words,
-                               boxes=word_boxes,
-                               word_labels=word_labels,
-                               is_split_into_words=True)
-
-            # We now do a manual truncation
-
-            for k in tokens.keys():
-                tokens[k] = tokens[k][1:-1]  # We start by triming the first and last tokens
-                tokens[k] = split_list(tokens[k], max_length - 2,
-                                       special_tokens['pad'][k])  # We divide our list in lists of len 510
-                tokens[k] = [[special_tokens['start'][k]] + ex + [special_tokens['end'][k]] for ex in tokens[k]]
-
-            # We create a list of input dicts
-            image = Image.open(page.image.path).convert('RGB')
-            image = feature_extractor(image)['pixel_values']
-
-            # Appending to encodings
-            for i in range(len(tokens['input_ids'])):
-                for k in tokens.keys():
-                    encodings[s][k].append(tokens[k][i])
-                encodings[s]['image'].append(image[0].copy())
+                split_encodings._encodings += page_encodings.encodings
 
             if i == 2 and do_debug:
                 break
 
-    return {s: LayoutLMDataset(**encodings[s]) for s in page_sets.keys()}
+        encodings[s] = split_encodings
+
+    return {s: LayoutLMDataset(encodings[s]) for s in page_sets.keys()}
+
+
+# Todo : this must be a general function for token classification.
+def align_predicted_page(page: 'Page',
+                         rois,
+                         labels_to_ids,
+                         ids_to_labels,
+                         regions_to_coarse_labels,
+                         tokenizer,
+                         model,
+                         unknownify_tokens: bool = False
+                         ) -> Tuple[List['TextElement'], List[str]]:
+
+    encodings = page_to_layoutlmv2_encodings(page, rois=rois, labels_to_ids=labels_to_ids,
+                                             regions_to_coarse_labels=regions_to_coarse_labels, tokenizer=tokenizer,
+                                             get_labels=False, unknownify_tokens=unknownify_tokens)
+
+    words = [w for r in page.regions if r.region_type in rois for w in
+             r.words]  # this is the way words are selected in `page_to_layoutlmv2_encodings`
+
+    dataset = LayoutLMDataset(encodings=encodings)
+
+    # Merge tokens offsets together
+    word_ids_list: List[Union[int, None]] = [el for encoding in dataset.encodings.encodings for el in encoding.word_ids]
+
+    # Predictions is an array, with the same shape as dataset.encodings
+    predictions = predict_dataset(dataset=dataset, model=model, batch_size=1)
+    # Merge predictions together
+    prediction_list = predictions.tolist()  # A list of lists
+    prediction_list = [el for sublist in prediction_list for el in sublist]
+    aligned_labels = align_from_tokenized(word_ids_list, prediction_list)
+    aligned_labels = [ids_to_labels[l] for l in aligned_labels]
+
+    assert len(aligned_labels) == len(words)
+
+    return words, aligned_labels
+
+
+def draw_pages(pages,
+               rois,
+               labels_to_ids,
+               ids_to_labels,
+               regions_to_coarse_labels,
+               tokenizer,
+               model,
+               output_dir: str,
+               unknownify_tokens: bool = False,
+               ):
+    from ajmc.olr.layout_lm.draw import draw_page_labels, draw_caption
+
+    labels_to_colors = {l: c + tuple([125]) for l, c in zip(labels_to_ids.keys(), COLORS['distinct'].values())}
+
+    for page in pages:
+        page_words, page_labels = align_predicted_page(page,
+                                                       rois,
+                                                       labels_to_ids,
+                                                       ids_to_labels,
+                                                       regions_to_coarse_labels,
+                                                       tokenizer,
+                                                       model,
+                                                       unknownify_tokens=unknownify_tokens
+                                                       )
+
+        img = Image.open(page.image.path)
+        img = draw_page_labels(img=img,
+                         words=page_words,
+                         labels=page_labels,
+                         labels_to_colors=labels_to_colors)
+        img = draw_caption(img, labels_to_colors=labels_to_colors)
+
+        img.save(os.path.join(output_dir, page.id+'.png'))
 
 
 def main(config):
@@ -176,59 +263,37 @@ def main(config):
         json.dump(config.__dict__, f, skipkeys=True, indent=4, sort_keys=True,
                   default=lambda o: '<not serializable>')
 
-    tokenizer = LayoutLMv2Tokenizer.from_pretrained(config.model_name_or_path)
-    feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained(config.model_name_or_path, apply_ocr=False)
+    tokenizer = LayoutLMv2TokenizerFast.from_pretrained(config.model_name_or_path)
     model = LayoutLMv2ForTokenClassification.from_pretrained(config.model_name_or_path, num_labels=config.num_labels)
 
-    pages = get_pages(data_dict=config.data_dirs_and_sets)
+    pages = get_data_dict_pages(data_dict=config.data_dirs_and_sets, sampling=config.sampling)
+
     datasets = prepare_data(page_sets=pages,
-                            model_inputs=config.model_inputs,
                             labels_to_ids=config.labels_to_ids,
                             regions_to_coarse_labels=config.regions_to_coarse_labels,
                             rois=config.rois,
-                            special_tokens=config.special_tokens,
                             tokenizer=tokenizer,
-                            feature_extractor=feature_extractor,
+                            unknownify_tokens=config.unknownify_tokens,
                             do_debug=config.do_debug)
 
-    train(config=config, model=model, train_dataset=datasets['train'], eval_dataset=datasets['eval'],
-          tokenizer=tokenizer)
+    # train(config=config, model=model, train_dataset=datasets['train'], eval_dataset=datasets['eval'],
+    #       tokenizer=tokenizer)
+
+    # draw
+    draw_pages(pages=pages['eval'],
+               rois=config.rois,
+               labels_to_ids=config.labels_to_ids,
+               ids_to_labels=config.ids_to_raw_labels,
+               regions_to_coarse_labels=config.regions_to_coarse_labels,
+               tokenizer=tokenizer,
+               model=model,
+               output_dir=config.predictions_dir,
+               unknownify_tokens=config.unknownify_tokens)
 
 
-def page_to_layoutlm_encodings(page,
-                               rois,
-                               labels_to_ids,
-                               regions_to_coarse_labels,
-                               tokenizer,
-                               max_length,
-                               feature_extractor,
-                               special_tokens=None):
-    # Get the lists of words, boxes and labels for a single page
-    words = [w.text for r in page.regions if r.region_type in rois for w in r.words]
-
-    word_boxes = [normalize_bounding_rectangles(w.coords.bounding_rectangle, page.image.width, page.image.height)
-                  for r in page.regions if r.region_type in rois for w in r.words]
-
-    word_labels = [labels_to_ids[regions_to_coarse_labels[r.region_type]]
-                   for r in page.regions if r.region_type in rois for w in r.words]
-
-    # Tokenize, truncate and pad
-    # We tokenize without truncation, as LayoutLMV2Tokenizer does not handle overflowing tokens properly.
-    encodings = tokenizer(text=words,
-                          boxes=word_boxes,
-                          word_labels=word_labels,
-                          is_split_into_words=True)
-
-    # We now do a manual truncation
-    for k in encodings.keys():
-        encodings[k] = encodings[k][1:-1]  # We start by triming the first and last tokens
-        encodings[k] = split_list(encodings[k], max_length - 2,
-                                  special_tokens['pad'][k])  # We divide our list in lists of len 510
-        encodings[k] = [[special_tokens['start'][k]] + ex + [special_tokens['end'][k]] for ex in encodings[k]]
-
-    # Add the image for each input
-    image = Image.open(page.image.path).convert('RGB')
-    image = feature_extractor(image)['pixel_values']
-    encodings['image'] = [image[0].copy() for _ in range(len(encodings['input_ids']))]
-
-    return encodings
+if __name__ == '__main__':
+    from ajmc.olr.layout_lm.config import create_olr_config
+    config = create_olr_config(
+        json_path='/Users/sven/packages/ajmc/data/configs/simple_config_local.json'
+    )
+    main(config)

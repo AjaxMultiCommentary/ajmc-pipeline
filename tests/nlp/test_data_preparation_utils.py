@@ -1,4 +1,4 @@
-from ajmc.nlp.token_classification.data_preparation.utils import align_labels, align_elements
+from ajmc.nlp.token_classification.data_preparation.utils import align_labels, align_to_tokenized
 
 
 def test_align_labels(test_tokens_to_words_offsets,
@@ -10,9 +10,9 @@ def test_align_labels(test_tokens_to_words_offsets,
     assert len(aligned) == len(test_tokens_to_words_offsets)
 
 
-def test_align_elements(test_tokens_to_words_offsets,
+def test_align_to_tokenized(test_tokens_to_words_offsets,
                         test_labels):
-    aligned = align_elements(tokens_to_words_offsets=test_tokens_to_words_offsets,
-                             elements=test_labels)
+    aligned = align_to_tokenized(tokens_to_words_offsets=test_tokens_to_words_offsets,
+                                 to_align=test_labels)
 
     assert len(aligned) == len(test_tokens_to_words_offsets)

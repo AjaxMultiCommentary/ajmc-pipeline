@@ -76,6 +76,15 @@ def create_pipeline_parser() -> argparse.ArgumentParser:
                         required=False,
                         help="Name of the tsv col to extract labels from")
 
+    parser.add_argument("--unknownify_tokens",
+                        type=str,
+                        required=False,
+                        help="Sets all tokens to '[UNK]'. Useful for ablation experiments.")
+
+    parser.add_argument("--sampling",
+                        required=False,
+                        default=None,
+                        help="Sets all tokens to '[UNK]'. Useful for ablation experiments.")
     # ================ MODEL INFO ======================================================================================
     parser.add_argument("--model_name_or_path",
                         type=str,

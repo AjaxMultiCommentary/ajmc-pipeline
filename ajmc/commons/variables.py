@@ -20,8 +20,11 @@ FOLDER_STRUCTURE_PATHS = {
     'ocr_outputs_dir': '[commentary_id]/ocr/runs/[ocr_run]/outputs'
 }
 
-METADATA_SPREADSHEET_ID = '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE'
-METADATA_WORKSHEET_NAME = 'metadata'
+# Sheet names corresponds to the dictionary's keys
+SPREADSHEETS_IDS = {
+    'metadata': '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE',
+    'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
+}
 
 VIA_CSV_DICT_TEMPLATE = {'filename': [],
                          'file_size': [],
@@ -104,4 +107,35 @@ CHARSETS = {
     'numbers': re.compile(r'([0-9])', re.UNICODE),
     'punctuation': re.compile(r'([\u0020-\u002F]|[\u003A-\u003F]|[\u005B-\u0060]|[\u007B-\u007E]|\u00A8|\u00B7)',
                               re.UNICODE)
+}
+
+COLORS = {
+    # https://coolors.co/b2001e-f02282-461e44-3b9ff1-125b4f-98e587-ffc802-af7159
+    'distinct': {
+        'red': (178, 0, 30),
+        'pink': (240, 34, 130),
+        'blue': (59, 159, 241),
+        'green': (152, 229, 135),
+        'yellow': (255, 200, 2),
+        'brown': (175, 113, 89),
+        'dark_green': (18, 91, 79),
+        'purple': (70, 30, 68)
+    },
+    # https://coolors.co/f72585-b5179e-7209b7-560bad-480ca8-3a0ca3-3f37c9-4361ee-4895ef-4cc9f0
+    'hues': {
+        'pink': (247, 37, 133),
+        'byzantine': (181, 23, 158),
+        'purple1': (114, 9, 183),
+        'purple2': (86, 11, 173),
+        'trypan_blue1': (72, 12, 168),
+        'trypan_blue2': (58, 12, 163),
+        'persian_blue': (63, 55, 201),
+        'ultramarine_blue': (67, 97, 238),
+        'dodger_blue': (72, 149, 239),
+        'vivid_sky_blue': (76, 201, 240)
+    }
+    # Other color palettes
+    # https://coolors.co/97dffc-93caf6-8eb5f0-858ae3-7364d2-613dc1-5829a7-4e148c-461177-3d0e61
+    # https://coolors.co/b7094c-a01a58-892b64-723c70-5c4d7d-455e89-2e6f95-1780a1-0091ad
+    # https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167
 }

@@ -1,5 +1,6 @@
 import pytest
 
+
 # Todo : see that you unify this with `sample_objects.py`
 labels = ['O', 'B-PERS', 'I-PERS', 'B-LOC', 'I-LOC']
 

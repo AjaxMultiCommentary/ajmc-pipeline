@@ -1,10 +1,12 @@
 import copy
+import re
 import json
 import os
 from time import strftime
 from typing import Dict, Optional, List, Union, Any
 import bs4.element
-from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, docstring_formatter
+from ajmc.commons.miscellaneous import lazy_property, get_custom_logger
+from ajmc.commons.docstrings import docstring_formatter
 from ajmc.commons import variables
 from ajmc.commons.geometry import (
     Shape,
@@ -467,5 +469,8 @@ class TextElement:
 
     @lazy_property
     def words(self):
-        return [TextElement(el, self.page, self.ocr_format) for el in
-                find_all_elements(self.markup, 'words', self.ocr_format)]
+        words = [TextElement(el, self.page, self.ocr_format) for el in
+                 find_all_elements(self.markup, 'words', self.ocr_format)]
+
+        #trim space words and empty words
+        return [w for w in words if re.sub(r'\s+', '', w.text) != '']

@@ -1,8 +1,10 @@
-from typing import Iterable, List, Dict, Union
+from typing import Iterable, List, Dict, Union, Any
+from ajmc.commons.docstrings import docstring_formatter, docstrings
 
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_custom_logger, split_list
 
 logger = get_custom_logger(__name__)
+
 
 def sort_ner_labels(labels: Iterable[str]):
     """Sorts a list of CoLLN-compliant labels alphabetically, starting 'O'."""
@@ -46,9 +48,19 @@ def align_labels(tokens_to_words_offsets: 'transformers.tokenizers.Encoding',
     return aligned_labels
 
 
-def align_elements(tokens_to_words_offsets: 'transformers.tokenizers.Encoding',
-                   elements: List[object]) -> List[object]:
-    """Align `elements` to a list of offsets, appending `None` if the offset is None."""
+def align_to_tokenized(tokens_to_words_offsets: 'transformers.tokenizers.Encoding',
+                       to_align: List[object]) -> List[object]:
+    """Align `to_align` to a list of offsets, appending `None` if the offset is None.
+
+    This is used to align a list of elements to their tokenized equivalent, for instance to align words
+    to tokens. Example :
+
+        ```python
+        words = ['Hello', 'world']
+        tokens = ['he', '#llo', 'w', '#o', '#rld']
+        # aligned words would be ['Hello', None, 'world', None, None]
+        ```
+    """
 
     previous_token_index = None
     aligned_elements = []
@@ -58,10 +70,41 @@ def align_elements(tokens_to_words_offsets: 'transformers.tokenizers.Encoding',
             aligned_elements.append(None)
 
         elif token_index != previous_token_index:
-            aligned_elements.append(elements[token_index])
+            aligned_elements.append(to_align[token_index])
 
         else:
             aligned_elements.append(None)
+        previous_token_index = token_index
+
+    return aligned_elements
+
+
+def align_from_tokenized(tokens_to_words_offsets: List[Union[None, int]],
+                         to_align: List[object]) -> List[object]:
+    """Returns the elements of `to_align` if the corresponding element in `tokens_to_words_offsets` is not and is
+    different from the previous one.
+
+    This is used to align a list of tokenized elements to their untokenized equivalent, for instance to align labels
+    to word. It does the contrary to `align_to_tokenized`. Example :
+
+        ```python
+        tokens = ['he', '#llo', 'w', '#o', '#rld']
+        offsets= [ 0,    0,      1,   1,    1    ]
+        labels = [ 0,    1,      2,   3,    2    ]
+        words =  ['Hello',      'world'          ]
+
+        # aligned labels would be [0, 2]
+        ```
+    """
+    previous_token_index = None
+    aligned_elements = []
+
+    for i, token_index in enumerate(tokens_to_words_offsets):
+        if token_index is None:
+            continue
+        if token_index != previous_token_index:
+            aligned_elements.append(to_align[i])
+
         previous_token_index = token_index
 
     return aligned_elements
@@ -91,3 +134,32 @@ def write_predictions_to_tsv(words: List[List[Union[str, None]]],
 
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write('\n'.join(['\t'.join(l) for l in tsv_lines]))
+
+
+@docstring_formatter(max_length=docstrings['max_length'], special_tokens=docstrings['special_tokens'])
+def manual_truncation(tokens, inputs: Dict[str, list], special_tokens: Dict[str, Dict[str, Any]], max_length):
+    """Manually truncates and pads model inputs.
+
+    Args:
+        inputs: Dict-like outputs of the tokenizer, containing the **untruncated** model's features (e.g.
+            'inputs_ids', 'attention_mask'...).
+        special_tokens: {special_tokens}
+        max_length: {max_length}
+    """
+
+    # LEGACY. FOR LAYOUTLM. Note : special tokens are attributes of the tokenizer, find them there.
+    # special_tokens = {
+    #     'start': {'input_ids': 101, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 1},
+    #     'end': {'input_ids': 102, 'bbox': [1000, 1000, 1000, 1000], 'token_type_ids': 0, 'labels': -100,
+    #             'attention_mask': 1},
+    #     'pad': {'input_ids': 0, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 0},
+    # }
+
+    for k in inputs.keys():
+        inputs[k] = inputs[k][1:-1]  # We start by triming the first and last tokens
+        tokens[k] = split_list(inputs[k], max_length - 2,
+                               special_tokens['pad'][k])  # We divide our list in lists of len 510
+        inputs[k] = [[special_tokens['start'][k]] + ex + [special_tokens['end'][k]] for ex in inputs[k]]
+
+    return inputs
+

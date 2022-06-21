@@ -7,11 +7,10 @@ import torch
 import transformers
 from hipe_commons.helpers.tsv import get_tsv_data
 from torch.utils.data import DataLoader, SequentialSampler
-from ajmc.commons.miscellaneous import docstring_formatter
-from ajmc.commons.docstrings import docstrings
+from ajmc.commons.docstrings import docstrings, docstring_formatter
 import ajmc.nlp.token_classification.data_preparation.hipe_iob
 from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
-from ajmc.nlp.token_classification.model import predict, predict_batches
+from ajmc.nlp.token_classification.model import predict, predict_batches, predict_dataset
 from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
@@ -47,10 +46,10 @@ def evaluate_dataset(dataset: ajmc.nlp.token_classification.data_preparation.hip
 
     for batch in dataloader:
         if predictions is None:
-            predictions = predict(batch, model, device)
+            predictions = predict(batch, model)
             groundtruth = batch["labels"].numpy()
         else:
-            predictions = np.append(predictions, predict(batch, model, device), axis=0)
+            predictions = np.append(predictions, predict(batch, model), axis=0)
             groundtruth = np.append(groundtruth, batch["labels"].numpy(), axis=0)
         if do_debug:
             break
@@ -176,9 +175,7 @@ def evaluate_hipe(dataset: 'token_classification.data_preparation.HipeDataset',
         with open(groundtruth_tsv_path, 'w', encoding='utf-8') as f:
             f.write(groundtruth_tsv_data)
 
-    # Todo : this could be harmonized with model.predict_and_write
-    dataloader = DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=batch_size)
-    predictions = predict_batches(dataloader, model, device=device, do_debug=do_debug).tolist()
+    predictions = predict_dataset(dataset=dataset, model=model, do_debug=do_debug).tolist()
 
     # get the labels, append None if token has no line number
     predictions = [

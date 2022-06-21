@@ -23,43 +23,6 @@ def lazy_property(func):
     return property(inner)
 
 
-# Toldo : One could also add automatic typing, if necessary (i.e. taking type hints directly from params.
-def docstring_formatter(**kwargs):
-    """Decorator with arguments used to format the docstring of a functions.
-
-    `docstring_formatter` is a decorator with arguments, which means that it takes any set of `kwargs` as argument and
-    returns a decorator. It should therefore always be called with parentheses (unlike traditional decorators - see
-    below). It follows the grammar of `str.format()`, i.e. `{my_format_value}`.
-    grammar.
-
-    Example:
-        For instance, this code :
-
-        ```Python
-        @docstring_formatter(greeting = 'hello')
-        def my_func():
-            "A simple greeter that says {greeting}"
-            # Do your stuff
-        ```
-
-        Is actually equivalent with :
-
-        ```Python
-        def my_func():
-            "A simple greeter that says {greeting}"
-            # Do your stuff
-
-        my_func.__doc__ = my_func.__doc__.format(greeting = 'hello')
-        ```
-    """
-
-    def inner_decorator(func):
-        func.__doc__ = func.__doc__.format(**kwargs)
-        return func
-
-    return inner_decorator
-
-
 def timer(iterations: int = 3, number: int = 1_000):
     """Decorator with arguments. Computes the execution time of a function.
 
@@ -136,3 +99,34 @@ def read_google_sheet(sheet_id: str, sheet_name: str, **kwargs) -> pd.DataFrame:
 
     url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
     return pd.read_csv(url, **kwargs)
+
+
+def split_list(list_: list, n: int, pad: object) -> List[List[object]]:
+    """Divides a list into a list of lists with n elements, padding the last chunk with `pad`."""
+    chunks = []
+    for x in range(0, len(list_), n):
+        chunk = list_[x: n + x]
+
+        if len(chunk) < n:
+            chunk += [pad for _ in range(n - len(chunk))]
+
+        chunks.append(chunk)
+
+    return chunks
+
+
+def aligned_print(*args, **kwargs):
+    """Prints `args`, respecting custom spaces between each arg. Used to print aligned rows in a for loop.
+
+    Args:
+        kwargs: should contain space : List[int] : the list of space between each arg.
+    """
+    if 'spaces' not in kwargs.keys():
+        kwargs['spaces'] = [20] * len(args)
+
+    to_print = ''
+    for arg, space in zip(args, kwargs['spaces']):
+        to_print += str(arg) + (' ' * max(space - len(str(arg)), 1))
+    print(to_print)
+
+

@@ -200,12 +200,12 @@ def main(config):
 
     if config.do_predict:
         for url in config.predict_urls:
-            predict_and_write_tsv(model=model, device=config.device, output_dir=config.predictions_dir,
+            predict_and_write_tsv(model=model, output_dir=config.predictions_dir,
                                   tokenizer=tokenizer, ids_to_labels=config.ids_to_labels,
                                   labels_column=config.labels_column, url=url)
 
         for path in config.predict_paths:
-            predict_and_write_tsv(model=model, device=config.device, output_dir=config.predictions_dir,
+            predict_and_write_tsv(model=model, output_dir=config.predictions_dir,
                                   tokenizer=tokenizer, ids_to_labels=config.ids_to_labels,
                                   labels_column=config.labels_column, url=path)
 
