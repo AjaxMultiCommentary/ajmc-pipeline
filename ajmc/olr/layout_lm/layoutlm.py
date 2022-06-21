@@ -251,17 +251,19 @@ def main(config):
                             unknownify_tokens=config.unknownify_tokens,
                             do_debug=config.do_debug)
 
-    train(config=config, model=model, train_dataset=datasets['train'], eval_dataset=datasets['eval'],
-          tokenizer=tokenizer)
+    if config.do_train:
+        train(config=config, model=model, train_dataset=datasets['train'], eval_dataset=datasets['eval'],
+              tokenizer=tokenizer)
 
     # draw
-    draw_pages(pages=pages['eval'],
-               rois=config.rois,
-               labels_to_ids=config.labels_to_ids,
-               ids_to_labels=config.ids_to_raw_labels,
-               regions_to_coarse_labels=config.regions_to_coarse_labels,
-               tokenizer=tokenizer,
-               model=model,
-               output_dir=config.predictions_dir,
-               unknownify_tokens=config.unknownify_tokens)
+    if config.do_draw:
+        draw_pages(pages=pages['eval'],
+                   rois=config.rois,
+                   labels_to_ids=config.labels_to_ids,
+                   ids_to_labels=config.ids_to_raw_labels,
+                   regions_to_coarse_labels=config.regions_to_coarse_labels,
+                   tokenizer=tokenizer,
+                   model=model,
+                   output_dir=config.predictions_dir,
+                   unknownify_tokens=config.unknownify_tokens)
 

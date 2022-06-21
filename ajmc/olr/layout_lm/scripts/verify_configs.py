@@ -17,6 +17,7 @@ for fname in os.listdir(configs_dir):
         config["do_debug"] = False
         config["do_save"] = True
         config["do_train"] = True
+        config["do_draw"] = False
         config["epochs"] = 50
         config["evaluate_during_training"] = True
         config["gradient_accumulation_steps"] = 2
