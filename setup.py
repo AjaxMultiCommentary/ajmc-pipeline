@@ -129,7 +129,7 @@ setup(
         'opencv-python',
         'openpyxl',
         'pandas',
-        'Pillow',
+        'Pillow>=9',
         'regex',
         'seqeval',
         'transformers',

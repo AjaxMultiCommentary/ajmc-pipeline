@@ -75,3 +75,5 @@ def create_olr_config(json_path: Optional[str] = None):
     config.num_labels = len(list(labels_to_ids.keys()))
 
     return config
+
+
