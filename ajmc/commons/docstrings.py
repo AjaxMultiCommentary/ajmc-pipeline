@@ -43,7 +43,8 @@ docstrings = dict()  # Creating docstrings on the fly in order to refer to previ
 docstrings['BatchEncoding'] = """The default ouput of HuggingFace's `TokenizerFast`. As [docs](https://huggingface.co/docs/transformers/v4.19.2/en/main_classes/tokenizer#transformers.BatchEncoding)
         have it, "This class is derived from a python dictionary and can be used as a dictionary. In addition, this class exposes utility methods to map from word/character space to token space". 
         The object contains `data` and `encodings`. Data is directly callable and has the form of a `Dict[str, List[List[int]]]` where keys are model inputs. Encodings is a 
-        list of example, containing notably the offsets.""",
+        list of example, containing notably the offsets. Please note that not using a `TokenizerFast` (i.e. using a `Tokenizer` instead) can lead to the cumbersome
+        situation in which `self.encodings` is set to `None`.""",
 
 docstrings['custom_dataset'] = """A dataset inheriting from `torch.utils.data.Dataset`, implementing at least `__len__` and 
         `__getitem__()`, where each item is a dict alike `{{"model_input": tensor(), ...}}` corresponding
@@ -56,6 +57,8 @@ docstrings['ids_to_labels'] = """A dict mapping the label numbers (int) used by 
 docstrings['labels_to_ids'] = 'A dict mapping label-names to their respective ids, e.g. `{{"cat":0, "dog":1, ...}}`.',
 
 docstrings['transformers_model'] = """A `transformers.models`."""
+
+docstrings['transformers_model_inputs_names'] = """The name of the inputs required by the model, e.g. `['input_ids', 'attention_mask',...]`."""
 
 docstrings['transformers_model_inputs'] = """A mapping to between the names of the model's requirements and `torch.Tensor` of size (max_length, batch_size).
     Example : `{'input_ids': torch.tensor([[int, int, ...], [int, int, ...]])`."""

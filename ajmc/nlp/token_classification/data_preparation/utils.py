@@ -1,6 +1,8 @@
 from typing import Iterable, List, Dict, Union, Any
-from ajmc.commons.docstrings import docstring_formatter, docstrings
 
+import torch
+from hipe_commons.helpers.tsv import get_tsv_data
+from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.miscellaneous import get_custom_logger, split_list
 
 logger = get_custom_logger(__name__)
@@ -163,3 +165,32 @@ def manual_truncation(tokens, inputs: Dict[str, list], special_tokens: Dict[str,
 
     return inputs
 
+
+class CustomDataset(torch.utils.data.Dataset):
+    """A custom dataset to wrap a transformers `BatchEncoding` resulting from a TokenizerFast, i.e. """
+
+    @docstring_formatter(**docstrings)
+    def __init__(self,
+                 encodings: 'BatchEncoding',
+                 model_inputs_names: List[str]):
+        """Default constructor.
+
+        Args:
+            encodings: {BatchEncoding}
+            model_inputs_names: {transformers_model_inputs_names}
+        """
+        assert encodings.encodings is not None, """The provided `BatchEncoding` as `self.encodings` set to `None`. 
+        Please use a `TokenizerFast` to avoid this."""
+
+        self.encodings = encodings
+        self.model_inputs = model_inputs_names
+
+    def __getitem__(self, idx):
+        item = {k: torch.tensor(self.encodings[k][idx]) for k in self.model_inputs}
+        if 'labels' in self.encodings.keys():
+            item['labels'] = torch.tensor(self.encodings['labels'][idx])
+
+        return item
+
+    def __len__(self):
+        return len(self.encodings.encodings)

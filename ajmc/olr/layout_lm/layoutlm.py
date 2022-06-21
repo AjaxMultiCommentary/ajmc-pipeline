@@ -3,17 +3,13 @@ import os
 import random
 
 from ajmc.commons.docstrings import docstrings, docstring_formatter
-import numpy as np
-import torch
-from torch.utils.data import RandomSampler
 from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
-from typing import List, Optional, Dict, Any, Union, Tuple
-
+from typing import List, Optional, Dict, Union, Tuple
+from ajmc.nlp.token_classification.pipeline import train
 from ajmc.commons.variables import COLORS
-from ajmc.nlp.token_classification.config import initialize_config
-from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized
+from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset
 from ajmc.nlp.token_classification.model import predict_dataset
-from ajmc.nlp.token_classification.pipeline import create_dirs, train
+from ajmc.nlp.token_classification.pipeline import create_dirs
 from ajmc.text_importation.classes import Commentary
 from PIL import Image
 from ajmc.commons.miscellaneous import read_google_sheet
@@ -28,29 +24,6 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
         int(1000 * (rectangle[2][0] / img_width)),
         int(1000 * (rectangle[2][1] / img_height))
     ]
-
-
-class LayoutLMDataset(torch.utils.data.Dataset):
-
-    @docstring_formatter(encodings=docstrings['BatchEncoding'])
-    def __init__(self, encodings: Union['BatchEncoding', Dict[str, List[List[int]]]], ):
-        """Default constructor.
-
-        Args:
-            encodings: {encodings}
-        """
-        self.encodings = encodings
-        self.model_inputs = ['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image']
-
-    def __getitem__(self, idx):
-        item = {k: torch.tensor(self.encodings[k][idx]) for k in self.model_inputs}
-        if 'labels' in self.encodings.keys():
-            item['labels'] = torch.tensor(self.encodings['labels'][idx])
-
-        return item
-
-    def __len__(self):
-        return len(self.encodings.encodings)
 
 
 def get_olr_split_pages(commentary: Commentary,
@@ -136,12 +109,12 @@ def prepare_data(page_sets: Dict[str, List['Page']],
                  tokenizer,
                  unknownify_tokens:bool = False,
                  do_debug: bool = False
-                 ) -> Dict[str, LayoutLMDataset]:
+                 ) -> Dict[str, CustomDataset]:
     """Prepares data for LayoutLMV2.
 
     Args:
         page_sets: A dict containing a list of `Page`s per split.
-        model_inputs: List of inputs the model wants (inputs_ids, attention_mask,...)
+        model_inputs_names: List of inputs the model wants (inputs_ids, attention_mask,...)
         labels_to_ids: {labels_to_ids}
         regions_to_coarse_labels:
         rois: The regions to focus on
@@ -181,7 +154,8 @@ def prepare_data(page_sets: Dict[str, List['Page']],
 
         encodings[s] = split_encodings
 
-    return {s: LayoutLMDataset(encodings[s]) for s in page_sets.keys()}
+    # Todo : change this
+    return {s: CustomDataset(encodings[s], ['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image']) for s in page_sets.keys()}
 
 
 # Todo : this must be a general function for token classification.
@@ -202,7 +176,8 @@ def align_predicted_page(page: 'Page',
     words = [w for r in page.regions if r.region_type in rois for w in
              r.words]  # this is the way words are selected in `page_to_layoutlmv2_encodings`
 
-    dataset = LayoutLMDataset(encodings=encodings)
+    dataset = CustomDataset(encodings=encodings,
+                            model_inputs_names=['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image'])
 
     # Merge tokens offsets together
     word_ids_list: List[Union[int, None]] = [el for encoding in dataset.encodings.encodings for el in encoding.word_ids]
@@ -276,8 +251,8 @@ def main(config):
                             unknownify_tokens=config.unknownify_tokens,
                             do_debug=config.do_debug)
 
-    # train(config=config, model=model, train_dataset=datasets['train'], eval_dataset=datasets['eval'],
-    #       tokenizer=tokenizer)
+    train(config=config, model=model, train_dataset=datasets['train'], eval_dataset=datasets['eval'],
+          tokenizer=tokenizer)
 
     # draw
     draw_pages(pages=pages['eval'],
@@ -290,10 +265,3 @@ def main(config):
                output_dir=config.predictions_dir,
                unknownify_tokens=config.unknownify_tokens)
 
-
-if __name__ == '__main__':
-    from ajmc.olr.layout_lm.config import create_olr_config
-    config = create_olr_config(
-        json_path='/Users/sven/packages/ajmc/data/configs/simple_config_local.json'
-    )
-    main(config)
