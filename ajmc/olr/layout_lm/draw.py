@@ -16,7 +16,7 @@ def draw_page_labels(img: 'PIL.Image',
 
     for word, label in zip(words, labels):
         xy = tuple([word.coords.bounding_rectangle[0], word.coords.bounding_rectangle[2]])
-        draw.rounded_rectangle(xy=xy, fill=labels_to_colors[label], radius=4)
+        draw.rectangle(xy=xy, fill=labels_to_colors[label])
 
     return draw_img
 
@@ -56,8 +56,8 @@ def draw_caption(img: 'PIL.Image',
     for i, (label, color) in enumerate(labels_to_colors.items()):
         xy = (margin_left, previous_y)
         w, h = font.getsize(label)
-        draw.rounded_rectangle(xy=((xy[0] - pad, xy[1] - pad), (xy[0] + w + pad, xy[1] + h + pad)),
-                               fill=color, radius=int(font_height / 8))
+        draw.rectangle(xy=((xy[0] - pad, xy[1] - pad), (xy[0] + w + pad, xy[1] + h + pad)),
+                               fill=color)
 
         draw.text(xy=xy, text=label, font=font, fill=(0, 0, 0))
         previous_y += line_space + font_height
