@@ -63,7 +63,7 @@ def train(config: 'argparse.Namespace',
     logger.info(f"""Running training on {len(train_dataset)} examples, for {config.epochs} epochs.""")
 
     global_step = 0
-    best_f1 = 0.5
+    best_f1 = 0.3
     count_no_improvement = 0
     train_results = pd.DataFrame()
 
