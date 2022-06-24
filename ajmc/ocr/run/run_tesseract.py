@@ -3,6 +3,7 @@ import cv2
 import sys
 import yaml
 import shutil
+import numpy as np
 import pytesseract
 from tqdm import tqdm
 from datetime import datetime
@@ -19,6 +20,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 
 from ajmc.ocr.evaluation.evaluation_methods import commentary_evaluation
 from ajmc.text_importation.classes import Commentary
+from ajmc.ocr.preprocess import toolbox
 
 # Data dir with whole images
 RAW_DATA_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/'
@@ -245,7 +247,10 @@ def test_ocr_raw(output_name, tessdata_dir, fig_name, img=None, img_suffix="",
 
     if img is None:
         assert os.path.isfile(fig_name), f"No such figure: {fig_name}"
+        print(f"using image from {fig_name}")
         img = cv2.imread(fig_name)
+    else:
+        print("Surpass fig_name, using the img in the argument.")
 
     custom_config = f"--tessdata-dir {tessdata_dir} -l {lang} --oem 1 {lstm_config}"
     fig_basename = os.path.splitext(os.path.basename(fig_name))[0]
@@ -300,11 +305,13 @@ def train(model_name, commentary_names, mode, output_dir, cleaned_suffix="clean"
         return f"{cmd} 2>&1 | tee -a {file} >/dev/full; \n"
 
     def log(msg, file):
+        folder = os.path.dirname(file)
+        os.makedirs(folder, exist_ok=True)
         with open(file, "a+") as tmp_file:
             tmp_file.write(msg)
 
     timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-    log_file = os.path.join(TESSTRAIN_DIR, f"log-{timestamp}-{cleaned_suffix}.txt")
+    log_file = os.path.join(output_dir, model_name, f"log-{timestamp}-{cleaned_suffix}.txt")
 
     print(f"See {log_file} for the training output.")
 
@@ -335,9 +342,11 @@ def train(model_name, commentary_names, mode, output_dir, cleaned_suffix="clean"
     log(cmd_line,log_file)
     print(cmd_line)
 
+    langdata_dir = os.path.join(PARENT_DIR, "ts", "langdata", "grc")
     with open(sh_file, "w") as f_out:
         f_out.write(f"cd {TESSTRAIN_DIR};\n")
-
+        # f_out.write(f"mkdir {os.path.join(output_dir, model_name)}\n")
+        f_out.write(f"cp {langdata_dir}/grc.config {os.path.join(output_dir, model_name, model_name+'.config')};\n")
         f_out.write(log_str(cmd_line, log_file))
     os.system(f"sh {sh_file}")
 
@@ -352,38 +361,48 @@ def check_dataset_size(commentary_names, mode, cleaned_suffix="clean"):
                 count += 1
     print(f"There are in total {count} images within datasets: {commentary_names}")
 
-def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=None):
+def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=None, test_preprocess=False):
     timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
     if custom_lang:
         assert (isinstance(custom_lang, dict) and len(custom_lang) == len(commentary_ids)), "note that custom_lang should be a dict containing the same number of items as commentary_ids"
     for commentary_id in commentary_ids:
         if custom_lang:
             print("using custom language combination")
-            model_str = f"{custom_lang[commentary_id]}+{greek_model_name}"
+            lang_list = custom_lang[commentary_id]
         else:
             if commentary_id not in TESSDATA_MAP:
                 raise NotImplementedError(f"current commentary id not supported: {commentary_id}. \
                 Please update TESSDATA_MAP to include this commentary.")
-            model_str = TESSDATA_MAP[commentary_id].format(greek_model_name)
-        print(f"using language: {model_str}")
+            lang_list = [TESSDATA_MAP[commentary_id].format(greek_model_name)]
+        for model_str in lang_list:
+            print(f"using language: {model_str}")
+            if test_preprocess:
+                output_name = f"evaluation/{commentary_id}/ocr/runs/{timestamp}_preprocess_{model_str}/outputs"
+                evaluation_name = f"evaluation/{commentary_id}/ocr/runs/{timestamp}_preprocess_{model_str}/evaluation"
+            else:
+                output_name = f"evaluation/{commentary_id}/ocr/runs/{timestamp}_{model_str}/outputs"
+                evaluation_name = f"evaluation/{commentary_id}/ocr/runs/{timestamp}_{model_str}/evaluation"
+            ocr_dir = os.path.join(PROJECT_DIR, "ocr", "exps", output_name)
+            evaluation_dir = os.path.join(PROJECT_DIR, "ocr", "exps", evaluation_name)
 
-        output_name = f"evaluation/{commentary_id}/ocr/runs/{timestamp}_evaluation_{greek_model_name}/outputs"
-        evaluation_name = f"evaluation/{commentary_id}/ocr/runs/{timestamp}_evaluation_{greek_model_name}/evaluation"
-        ocr_dir = os.path.join(PROJECT_DIR, "ocr", "exps", output_name)
-        evaluation_dir = os.path.join(PROJECT_DIR, "ocr", "exps", evaluation_name)
+            ground_truth_dir = os.path.join(EVALUATION_DIR, commentary_id, "images", "png")
+            page_filenames = [os.path.join(ground_truth_dir, item) for item in os.listdir(ground_truth_dir) if item.endswith(".png")]
 
-        ground_truth_dir = os.path.join(EVALUATION_DIR, commentary_id, "images", "png")
-        page_filenames = [os.path.join(ground_truth_dir, item) for item in os.listdir(ground_truth_dir) if item.endswith(".png")]
+            for img_filename in page_filenames:
+                print(img_filename)
+                if test_preprocess:
+                    img = cv2.imread(img_filename)
+                    preprocessed_img = toolbox.preprocess_img(img)[-1][1]
+                    cv2.imwrite(os.path.join(ocr_dir, os.path.basename(img_filename)), preprocessed_img)
+                    test_ocr_raw(output_name, tessdata_dir, img_filename, img=preprocessed_img, lang=model_str, save=True, viz=False, verbose=False, lstm_config="")
+                else:
+                    test_ocr_raw(output_name, tessdata_dir, img_filename, lang=model_str, save=True, viz=False, verbose=False, lstm_config="")
 
-        for img_filename in page_filenames:
-            print(img_filename)
-            test_ocr_raw(output_name, tessdata_dir, img_filename, lang=model_str, save=True, viz=False, verbose=False, lstm_config="")
+            commentary = Commentary.from_folder_structure(ocr_dir)
+            
+            # page_filenames = [os.path.join(EVALUATION_DIR, commentary_id, "ocr", "groundtruth", "images", item+".png") for item in commentary._get_page_ids()]
+            # page_filenames = [p.path['image_path'] for p in commentary.pages]
 
-        commentary = Commentary.from_folder_structure(ocr_dir)
-        
-        # page_filenames = [os.path.join(EVALUATION_DIR, commentary_id, "ocr", "groundtruth", "images", item+".png") for item in commentary._get_page_ids()]
-        # page_filenames = [p.path['image_path'] for p in commentary.pages]
-
-        commentary_evaluation(commentary=commentary,output_dir=evaluation_dir)
+            commentary_evaluation(commentary=commentary,output_dir=evaluation_dir)
 
     print("done")
