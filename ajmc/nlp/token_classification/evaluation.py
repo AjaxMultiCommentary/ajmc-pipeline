@@ -23,7 +23,7 @@ def seqeval_evaluation(predictions: List[List[str]], groundtruth: List[List[str]
 
 
 @docstring_formatter(**docstrings)
-def evaluate_dataset(dataset: ajmc.nlp.token_classification.data_preparation.hipe_iob.HipeDataset,
+def evaluate_dataset(dataset: torch.utils.data.Dataset,
                      model: transformers.PreTrainedModel,
                      batch_size: int,
                      device: torch.device,
