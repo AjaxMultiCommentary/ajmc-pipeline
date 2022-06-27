@@ -31,7 +31,7 @@ for fname in next(os.walk(base_path))[1]:  # Walk in dirs only
 
             ocr_dir = os.path.join(new_prefix, ocr_dir[len(old_prefix):])
             output_dir = os.path.join(new_prefix, config['predictions_dir'][len(old_prefix):])
-            commentary = Commentary.from_folder_structure(ocr_dir=ocr_dir)
+            commentary = Commentary.from_ajmc_structure(ocr_dir=ocr_dir)
             pages+= get_olr_split_pages(commentary, splits)
 
         tokenizer = LayoutLMv2TokenizerFast.from_pretrained(model_name_or_path)

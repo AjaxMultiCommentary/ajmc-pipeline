@@ -24,7 +24,7 @@ sample_groundtruth_page_path = os.path.join(sample_groundtruth_dir, sample_page_
 sample_image_dir = os.path.join(sample_base_dir, sample_commentary_id, variables.PATHS['png'])
 sample_image_path = os.path.join(sample_image_dir, sample_page_id + '.png')
 
-sample_commentary = Commentary.from_folder_structure(sample_ocr_dir)
+sample_commentary = Commentary.from_ajmc_structure(sample_ocr_dir)
 sample_page = [p for p in sample_commentary.pages if p.id == sample_page_id][0]
 
 

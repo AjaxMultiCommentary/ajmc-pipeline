@@ -24,13 +24,11 @@ def commentary_from_paths(sample_commentary_id,
 
 @pytest.fixture()
 def commentary_from_structure(sample_ocr_dir):
-    return classes.Commentary.from_folder_structure(ocr_dir=sample_ocr_dir)
+    return classes.Commentary.from_ajmc_structure(ocr_dir=sample_ocr_dir)
 
 
 def test_commentary(commentary_from_structure, commentary_from_paths, sample_ocr_dir, sample_groundtruth_dir):
     for comm in [commentary_from_paths, commentary_from_structure]:
-        # Test ocr ocr_format
-        assert type(comm.ocr_format) == str
 
         # test Commentary.pages
         assert all([isinstance(p, classes.Page) for p in comm.pages])
@@ -39,9 +37,6 @@ def test_commentary(commentary_from_structure, commentary_from_paths, sample_ocr
         # Test Commentary.groundtruth_pages
         assert all([isinstance(p, classes.Page) for p in comm.ocr_groundtruth_pages])
         assert len(comm.ocr_groundtruth_pages) == len([f for f in os.listdir(sample_groundtruth_dir) if comm.id in f])
-
-        # Test Commentary.olr_groundtruth_pages
-        assert all([isinstance(p, classes.Page) for p in comm.olr_groundtruth_pages])
 
         # See test_page() for regions, lines, words
 
@@ -57,30 +52,27 @@ def test_page(sample_ocr_path,
               sample_via_path,
               commentary_from_paths):
 
-    page_from_paths = classes.Page(ocr_path=sample_ocr_path,
+    page = classes.Page(ocr_path=sample_ocr_path,
                                    page_id=sample_page_id,
                                    groundtruth_path=sample_groundtruth_path,
                                    image_path=sample_image_path,
                                    via_path=sample_via_path,
                                    commentary=commentary_from_paths)
 
-    page_from_structure = classes.Page.from_structure(sample_ocr_path, commentary_from_paths)
 
-    for page in [page_from_paths, page_from_structure]:
+    assert isinstance(page.ocr_format, str)
 
-        assert isinstance(page.ocr_format, str)
+    assert isinstance(page.image, image.Image)
 
-        assert isinstance(page.image, image.Image)
+    assert all([isinstance(r, classes.Region) for r in page.regions])
+    assert all([isinstance(l, classes.Line) for l in page.lines])
+    assert all([isinstance(w, classes.Word) for w in page.words])
 
-        assert all([isinstance(r, classes.Region) for r in page.regions])
-        assert all([isinstance(l, classes.TextElement) for l in page.lines])
-        assert all([isinstance(w, classes.TextElement) for w in page.words])
+    # Validate page.json
+    with open(os.path.join('..',variables.PATHS['schema'] ), 'r') as file:
+        schema = json.loads(file.read())
 
-        # Validate page.json
-        with open(os.path.join('..',variables.PATHS['schema'] ), 'r') as file:
-            schema = json.loads(file.read())
-
-        jsonschema.validate(instance=page.canonical_data, schema=schema)
+    jsonschema.validate(instance=page.canonical_data, schema=schema)
 
 
 

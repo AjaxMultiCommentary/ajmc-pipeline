@@ -54,7 +54,7 @@ with open(via_path, 'w', encoding='utf-8') as f:
     f.write(text_mod)
 
 # %% test it
-comm = Commentary.from_folder_structure(ocr_dir=ocr_dir)
+comm = Commentary.from_ajmc_structure(ocr_dir=ocr_dir)
 comm_ = Commentary(
     via_path=archived_via_path,
     ocr_dir=ocr_dir)

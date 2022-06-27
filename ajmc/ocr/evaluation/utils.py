@@ -37,7 +37,7 @@ def initialize_soup(img_width: int, img_height: int) -> "BeautifulSoup":
     return soup
 
 
-def insert_text_in_soup(soup: "BeautifulSoup", word: "TextElement", is_gt: bool, is_false: bool) -> "BeautifulSoup":
+def insert_text_in_soup(soup: "BeautifulSoup", word: 'Word', is_gt: bool, is_false: bool) -> "BeautifulSoup":
     """Adds content to `soup` object.
 
     This function is used to add single words to the `soup` object initialized by `initialize_soup`, thereby

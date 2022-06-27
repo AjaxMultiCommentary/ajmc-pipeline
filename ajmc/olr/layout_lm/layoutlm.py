@@ -51,7 +51,7 @@ def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
     for set_ in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
         set_pages[set_] = []
         for ocr_dir in data_dict[set_].keys():  # Iterate over ocr_dirs
-            commentary = Commentary.from_folder_structure(ocr_dir=ocr_dir)
+            commentary = Commentary.from_ajmc_structure(ocr_dir=ocr_dir)
             set_pages[set_] += get_olr_split_pages(commentary, data_dict[set_][ocr_dir])
 
     if sampling:
@@ -167,7 +167,7 @@ def align_predicted_page(page: 'Page',
                          tokenizer,
                          model,
                          unknownify_tokens: bool = False
-                         ) -> Tuple[List['TextElement'], List[str]]:
+                         ) -> Tuple[List['Word'], List[str]]:
 
     encodings = page_to_layoutlmv2_encodings(page, rois=rois, labels_to_ids=labels_to_ids,
                                              regions_to_coarse_labels=regions_to_coarse_labels, tokenizer=tokenizer,

@@ -1,0 +1,22 @@
+{
+  "id": "sophoclesplaysa05campgoog",
+  "paths": {
+    "image": "test/"
+  },
+  "words": [
+    {
+      "text": "bonjour",
+      "coords": [0,0,10,10]
+    },
+    {
+      "text": "bonjour",
+      "coords": [0,0,10,10]
+    }
+  ],
+  "pages": [
+    {
+      "id":"sophoclesplaysa05campgoog_0146",
+      "words": [15000, 16000]
+    }
+  ]
+}

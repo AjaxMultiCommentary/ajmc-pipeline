@@ -64,5 +64,5 @@ def test_shrink_to_included_contours(points, rectangles):
     # Make sure it takes only horizontally overlappping shapes
     contours_1 = [geo.Shape.from_points(points[k]) for k in ['base', 'overlapping', 'horizontally_overlapping']]
     contours_2 = [geo.Shape.from_points(points[k]) for k in ['base', 'horizontally_overlapping']]
-    assert geo.shrink_to_included_contours(rectangles['base'], contours_1).bounding_rectangle == \
-           geo.shrink_to_included_contours(rectangles['base'], contours_2).bounding_rectangle
+    assert geo.adjust_to_included_contours(rectangles['base'], contours_1).bounding_rectangle == \
+           geo.adjust_to_included_contours(rectangles['base'], contours_2).bounding_rectangle

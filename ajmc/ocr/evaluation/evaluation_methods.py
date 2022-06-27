@@ -67,8 +67,8 @@ def bag_of_word_evaluation(gt_bag: List[str],
     return error_counts
 
 
-def simple_coordinates_based_evaluation(gt_words: List['TextElement'],
-                                        pred_words: List['TextElement'],
+def simple_coordinates_based_evaluation(gt_words: List['Word'],
+                                        pred_words: List['Word'],
                                         overlap_threshold: float = 0.8) -> float:
     """Computes edit distance between spacially overlapping words and returns the CER.
 

@@ -34,10 +34,10 @@ class Commentary:
                  via_path: str = None,
                  image_dir: str = None,
                  groundtruth_dir: str = None,
-                 _base_dir: str = None,  # Only useful for Commentary.from_ajmc_structure()
+                 _base_dir: str = None,  # Only useful for Commentary.from_structure()
 
                  ):
-        """Default constructor.
+        """Default constructor, where custom paths can be provided.
 
         Args:
             commentary_id: The id of the commentary
@@ -55,7 +55,7 @@ class Commentary:
 
     @classmethod
     @docstring_formatter(output_dir_format=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
-    def from_ajmc_structure(cls, ocr_dir: str):
+    def from_folder_structure(cls, ocr_dir: Optional[str] = None, commentary_id: Optional[str] = None):
         """Use this method to construct a `Commentary`-object using ajmc's folder structure.
 
         Args:
@@ -63,9 +63,12 @@ class Commentary:
             {output_dir_format}.
             commentary_id: for dev purposes only, do not use :)
         """
+        if ocr_dir:
+            verify_path_integrity(path=ocr_dir, path_pattern=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
+            base_dir, commentary_id, ocr_run = parse_ocr_path(path=ocr_dir)
 
-        verify_path_integrity(path=ocr_dir, path_pattern=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
-        base_dir, commentary_id, ocr_run = parse_ocr_path(path=ocr_dir)
+        elif commentary_id:
+            base_dir = variables.PATHS['base_dir']
 
         return cls(commentary_id=commentary_id,
                    ocr_dir=ocr_dir,
@@ -74,49 +77,10 @@ class Commentary:
                    groundtruth_dir=os.path.join(base_dir, commentary_id, variables.PATHS['groundtruth']),
                    _base_dir=base_dir)
 
-    @classmethod
-    @docstring_formatter()
-    def from_custom_paths(cls,
-                          commentary_id: str = None,
-                          ocr_dir: str = None,
-                          via_path: str = None,
-                          image_dir: str = None,
-                          groundtruth_dir: str = None,
-                          ):
-        """Construct a `Commentary`-object using custom paths.
-
-        This is usefull when you want to instantiate a `Commentary` without using `ajmc`'s folder structure. Note that
-        only the requested paths must be provided. For instance, the object will be created if you do not provided the
-        path to the images. But logically, you won't be able to access fonctionnalities that requires it (for instance
-        `Commentary.pages[0].image`).
-
-        Args:
-            commentary_id:
-            ocr_dir: Path to the directory in which ocr-outputs are stored.
-            via_path:
-            image_dir:
-            groundtruth_dir:
-
-        """
-
-        return cls(commentary_id=commentary_id,
-                   ocr_dir=ocr_dir,
-                   via_path=via_path,
-                   image_dir=image_dir,
-                   groundtruth_dir=groundtruth_dir)
-
-    @classmethod
-    def from_canonical(cls, canonical_path: str):
-        """Constructs a `Commentary` object from a canonical json."""
-
-        # Read json
-        with open(canonical_path, 'r') as file:
-            canonical = json.load(file)
-
-        # Create object distribute attributes
-        # todo : continue to distribute objects here (words etc)
-        return cls(commentary_id=canonical['id'],
-                   pages=[Page.from_canonical(p) for p in canonical['pages']])
+    @lazy_property
+    def ocr_format(self) -> str:
+        """The format of the commentary's ocr (e.g. 'hocr', 'pagexml'...)."""
+        return self.pages[0].ocr_format
 
     @lazy_property
     def pages(self) -> List['Page']:
@@ -147,6 +111,24 @@ class Commentary:
         return sorted(pages, key=lambda x: x.id)
 
     @lazy_property
+    def olr_groundtruth_pages(self, ) -> Union[List['Page'], list]:
+        """Returns the list of `Page`s which have at least one annotated region which is neither 'commentary' nor
+        'undefined'. """
+
+        pages = []
+        for k, v in self.via_project['_via_img_metadata'].items():
+            if any([r['region_attributes']['text'] not in ['commentary', 'undefined'] for r in v['regions']]):
+                p_id = v['filename'].split('.')[0]
+                pages.append(Page(ocr_path=get_path_from_id(p_id, self.paths['ocr_dir']),
+                                  page_id=p_id,
+                                  groundtruth_path=get_path_from_id(p_id, dir_=self.paths['groundtruth_dir']),
+                                  image_path=get_path_from_id(p_id, dir_=self.paths['image_dir']),
+                                  via_path=self.paths['via_path'],
+                                  commentary=self))
+
+        return sorted(pages, key=lambda x: x.id)
+
+    @lazy_property
     def regions(self):
         return [r for p in self.pages for r in p.regions]
 
@@ -163,46 +145,64 @@ class Commentary:
         with open(self.paths['via_path'], 'r') as file:
             return json.load(file)
 
-    def to_canonical(self):
-
-        for page in self.pages:
-            pass
+    def _get_page_ids(self) -> List[str]:
+        """Gets the ids of the pages contained in Commentary by scanning the png files"""
+        return [p[:-4] for p in os.listdir(self.paths['image_dir']) if p.endswith('.png')]
 
 
 class Page:
     """A class representing a commentary page."""
 
     def __init__(self,
-                 page_id: str,
                  ocr_path: str,
-                 commentary: Commentary = None,
+                 page_id: Optional[str] = None,
                  groundtruth_path: Optional[str] = None,
                  image_path: Optional[str] = None,
-                 words: Optional[str] = None):  # todo finish this with all the requested blabla
+                 via_path: Optional[str] = None,
+                 commentary: Optional[Commentary] = None):
         """Default constructor.
 
         Args:
             ocr_path: Absolute path to an OCR output file
             commentary: The commentary to which the page belongs.
         """
-
         self.id = page_id
         self.commentary = commentary
         self.paths = {
             'ocr_path': ocr_path,
             'groundtruth_path': groundtruth_path,
             'image_path': image_path,
+            'via_path': via_path
         }
 
-    # Todo : implement
     @classmethod
-    def from_ocr(cls, ocr_path):
-        raise NotImplementedError
+    def from_structure(cls, ocr_path: str, commentary: Optional[Commentary] = None):
+        """Builds Page object from an OCR-path"""
 
-    # Todo : implement
-    @classmethod
-    def from_canonical(cls, canonical_path):
-        raise NotImplementedError
+        commentary = commentary if commentary else Commentary.from_folder_structure(
+            ocr_dir='/'.join(ocr_path.split('/')[:-1]))
+        page_id = ocr_path.split('/')[-1].split('.')[0]
+
+        return cls(ocr_path=ocr_path,
+                   page_id=page_id,
+                   groundtruth_path=get_path_from_id(page_id=page_id, dir_=commentary.paths['groundtruth_dir']),
+                   image_path=get_path_from_id(page_id=page_id, dir_=commentary.paths['image_dir']),
+                   via_path=commentary.paths['via_path'],
+                   commentary=commentary)
+
+    # ===============================  Properties  ===============================
+    @lazy_property
+    def groundtruth_page(self) -> Union['Page', None]:
+        if os.path.exists(self.paths['groundtruth_path']):
+            return Page(ocr_path=self.paths['groundtruth_path'],
+                        page_id=self.id,
+                        groundtruth_path=None,
+                        image_path=self.paths['image_path'],
+                        via_path=self.paths['via_path'],
+                        commentary=self.commentary)
+        else:
+            logger.warning(f"""Page {self.id} has no groundtruth page.""")
+            return None
 
     @lazy_property
     def ocr_format(self) -> str:
@@ -211,19 +211,30 @@ class Page:
     @lazy_property
     def regions(self):
         """Gets page regions, removing empty regions and reordering them."""
-        return [Region(r, self) for r in get_page_region_dicts_from_via(self.id, self.commentary.via_project)]
+        return self.get_regions()
 
     @lazy_property
-    def lines(self) -> List['Line']:
-        return [Line(markup=line, page=self, ocr_format=self.ocr_format)
-                for line in find_all_elements(self.markup, 'lines', self.ocr_format)]
-
-        # todo : this belongs in central page coords optim.
-        # return [l for l in lines if re.sub(r'\s+', '', l.text) != '']  # Remove empty words
+    def lines(self):
+        return [
+            TextElement(markup=line,
+                        page=self,
+                        ocr_format=self.ocr_format)
+            for line in find_all_elements(self.markup, 'lines', self.ocr_format)
+        ]
 
     @lazy_property
-    def words(self) -> List['Word']:
+    def words(self):
         return [w for l in self.lines for w in l.words]
+
+    # ===============================  Other properties  ===============================
+
+    @lazy_property
+    def via_project(self) -> dict:
+        if self.commentary:
+            return self.commentary.via_project
+        else:
+            with open(self.paths['via_path'], 'r') as file:
+                return json.load(file)
 
     @lazy_property
     def image(self) -> Image:
@@ -275,74 +286,35 @@ class Page:
         with open(os.path.join(output_dir, self.id + '.json'), 'w') as f:
             json.dump(self.canonical_data, f, indent=4, ensure_ascii=False)
 
-    def readjust_coords(self, word_inclusion_threshold):
-        # This assumes we are starting from the untouched OCR output
+    def get_regions(self, region_types: Union[List[str], str] = 'all') -> List['Region']:
+        """Gets the regions belonging to `page` from the `via_project`.
 
-        # Process lines and words
-        lines = []
-        for l in self.lines:
-            l._words = [w for w in l.words if re.sub(r'\s+', '', w.text) != '']  # Remove empty words
-            if l.words:  # Removes empty lines
-                for w in l.words:  # Adjust word boxes
-                    w._coords = adjust_to_included_contours(w.coords.bounding_rectangle, self.image.contours)
-                # adjust line boxes
-                l._coords = Shape.from_points([xy for w in l.words for xy in w.coords.bounding_rectangle])
-                lines.append(l)
-        self._lines = lines
+        What this does is :
+            1. Extracting page region dicts from via
+            2. Instantiating `Region` objects
+            3. Removing empty regions
+            4. Rebuilding region reading order
 
-        # Process regions
-        # Readjust region coords with contained words
-        for r in self.regions:
-            words = [w for w in self.words
-                     if is_rectangle_within_rectangle_with_threshold(contained=w.coords.bounding_rectangle,
-                                                                     container=r.coords.bounding_rectangle,
-                                                                     threshold=word_inclusion_threshold)]
+        Note:
+            This instantiate `Region` objects and may therefore take time. For a more efficient computation,
+            preselect the desired region types. But warning, don't create canonical jsons
+            with of pre-selected regions only !
 
-            # resize region
-            words_points = [xy for w in words for xy in w.coords.bounding_rectangle]
-            r._coords = Shape(get_bounding_rectangle_from_points(words_points)) if words_points else r.coords
+        Returns:
+            A list region objects
+        """
 
-        self._regions = [r for r in self.regions if not (r.region_type == 'undefined' and not r.words)]
-        self._regions = sort_to_reading_order(regions=self.regions)
+        regions = get_page_region_dicts_from_via(self.id, self.via_project)
 
+        if region_types == 'all':
+            regions = [Region(r, self) for r in regions]
+        else:
+            regions = [Region(r, self) for r in regions if r['region_attributes']['text'] in region_types]
 
-        # Cut lines according to regions
-        for r in self.regions:
-            if r.region_type not in ['undefined', 'line_number_commentary']:
-                r._lines = []
+        regions = [r for r in regions if not (r.region_type == 'undefined' and not r.words)]
+        regions = sort_to_reading_order(regions)
 
-                for l in self.lines:
-                    # If the line is entirely in the region, append it
-                    if is_rectangle_within_rectangle(contained=l.coords.bounding_rectangle,
-                                                     container=r.coords.bounding_rectangle):
-                        r._lines.append(l)
-
-                    # If the line is only partially in the region, handle the line splitting problem.
-                    elif any([is_rectangle_within_rectangle(w.coords.bounding_rectangle, r.coords.bounding_rectangle)
-                              for w in l.words]):
-
-                        # Create the new line and append it both to region and page lines
-                        l_ = copy.copy(l)
-                        l_._words = [w for w in l.words if is_rectangle_within_rectangle(w.coords.bounding_rectangle,
-                                                                                         r.coords.bounding_rectangle)]
-                        l_._coords = Shape.from_points([xy for w in l_.words for xy in w.coords.bounding_rectangle])
-                        r._lines.append(l_)
-                        self._lines.append(l_)
-
-                        # Actualize the old line
-                        l._words = [w for w in l.words if w not in l_]
-                        l._coords = Shape.from_points([xy for w in l.words for xy in w.coords.bounding_rectangle])
-
-        # Actualize reading order
-        self._lines = sort_to_reading_order(self.lines)
-        self._words = [w for l in self.lines for w in l.words]
-
-
-
-
-# Todo : check that you select only words which are not empty
-# Todo : check that you select only lines which are not empty
-# Todo : check that you select only regions which are not empty
+        return regions
 
 
 class Region:
@@ -365,51 +337,28 @@ class Region:
             The words included in the region.
     """
 
-    def __init__(self, via_dict: Dict[str, dict], page: 'Page'):
+    def __init__(self, via_dict: Dict[str, dict], page: 'Page', word_inclusion_threshold: float = 0.7):
         self.region_type = via_dict['region_attributes']['text']
         self.page = page
         self.markup = via_dict
-        self._line_inclusion_threshold = 0.9
-        self._word_inclusion_threshold = 0.7
+        self._word_inclusion_threshold = word_inclusion_threshold
 
     # =================== Parents and children ================
     @lazy_property
     def lines(self):
-        # Todo : This should not be available for raw regions
-        return [l for l in self.page.lines
-                if is_rectangle_within_rectangle_with_threshold(contained=l.coords.bounding_rectangle,
-                                                                container=self.coords.bounding_rectangle,
-                                                                threshold=self._line_inclusion_threshold)]
+        return self.get_readjusted_lines()
 
     @lazy_property
     def words(self):
-        return [w for w in self.page.words
-                if is_rectangle_within_rectangle_with_threshold(contained=w.coords.bounding_rectangle,
-                                                                container=self.coords.bounding_rectangle,
-                                                                threshold=self._word_inclusion_threshold)]
+        return [w for line in self.lines for w in line.words]
 
     @lazy_property
     def coords(self):
-        """Automatically readjusts the region coordinates, so that exactly fit the words contained in the region.
-
-                This is done by :
-
-                        1. Finding the words in the region's page which are contained in the region's initial via_coords.
-                        This is done using `is_rectangle_partly_within_rectangle` with `word_inclusion_threshold`.
-                        2. Actualizing the coords to fit the exact bounding rectangle of contained words."""
-        return Shape.from_xywh(x=self.markup['shape_attributes']['x'],
-                               y=self.markup['shape_attributes']['y'],
-                               w=self.markup['shape_attributes']['width'],
-                               h=self.markup['shape_attributes']['height'])
-
-        # todo add this in central
-        # included_words = [w for w in self.page.words
-        #                   if is_rectangle_within_rectangle_with_threshold(w.coords.bounding_rectangle,
-        #                                                                   raw_coords.bounding_rectangle,
-        #                                                                   0.7)]
-        # words_points = [xy for w in included_words for xy in w.coords.bounding_rectangle]
-        #
-        # return Shape(get_bounding_rectangle_from_points(words_points)) if words_points else raw_coords
+        """
+        Note:
+            On the contrary to other `Element` objects, `Region` has a particular initialization that requires some
+            computation. As via regions coords are often fuzzy, `Region.coords` are first reconstructed."""
+        return self.get_readjusted_coords(self._word_inclusion_threshold)
 
     @lazy_property
     def image(self):
@@ -419,7 +368,33 @@ class Region:
     def text(self):
         return '\n'.join([l.text for l in self.lines])
 
-    # todo implement this centrally
+    def get_readjusted_coords(self, word_inclusion_threshold: float = 0.7) -> 'Shape':
+        """Automatically readjusts the region coordinates, so that exactly fit the words contained in the region.
+
+        This is done by :
+
+                1. Finding the words in the region's page which are contained in the region's initial via_coords.
+                This is done using `is_rectangle_partly_within_rectangle` with `word_inclusion_threshold`.
+                2. Actualizing the coords to fit the exact bounding rectangle of contained words.
+
+            Hence, `Region.coords` are instanciated immediately and is no `@lazy_property`."""
+
+        # Find the words included
+        initial_coords = Shape.from_xywh(x=self.markup['shape_attributes']['x'],
+                                         y=self.markup['shape_attributes']['y'],
+                                         w=self.markup['shape_attributes']['width'],
+                                         h=self.markup['shape_attributes']['height'])
+
+        words = [w for w in self.page.words
+                 if is_rectangle_within_rectangle_with_threshold(w.coords.bounding_rectangle,
+                                                                 initial_coords.bounding_rectangle,
+                                                                 word_inclusion_threshold)]
+
+        # resize region
+        words_points = [xy for w in words for xy in w.coords.bounding_rectangle]
+        return Shape(get_bounding_rectangle_from_points(words_points)) \
+            if words_points else initial_coords
+
     def get_readjusted_lines(self) -> List['Line']:
         """Readjusts region lines to fit only the words of a line that are actually contained within the region.
 
@@ -451,8 +426,10 @@ class Region:
         return region_lines
 
 
-class Line:
-    """Class for lines."""
+class TextElement:
+    """Class for lines and words."""
+
+    # This could be separated in two classes (`Lines` and `Words`) if needed
 
     def __init__(self, markup: 'bs4.element.Tag', page: Page, ocr_format: str):
         self.markup = markup
@@ -460,38 +437,24 @@ class Line:
         self.ocr_format = ocr_format
 
     @lazy_property
-    def coords(self):  # Are readjusted to word bounding boxes, themselves readjusted to contours
-        return get_element_coords(self.markup, self.ocr_format)
+    def id(self):
+        return self.markup['id']
 
     @lazy_property
-    def image(self):
-        return self.page.image.crop(self.coords.bounding_rectangle)
-
-    @lazy_property
-    def words(self):
-        return [Word(el, self.page, self.ocr_format)
-                for el in find_all_elements(self.markup, 'words', self.ocr_format)]
-
-    @lazy_property
-    def text(self):
-        return ' '.join([w.text for w in self.words])
-
-
-class Word:
-    """Class for Words."""
-
-    def __init__(self, markup: 'bs4.element.Tag', page: Page, ocr_format: str):
-        self.markup = markup
-        self.page = page
-        self.ocr_format = ocr_format
-
-    @classmethod  # todo : implement
-    def from_canonical(cls, canonical: dict):
+    def element_type(self):
         raise NotImplementedError
 
     @lazy_property
-    def coords(self) -> Shape:
+    def raw_coords(self):
         return get_element_coords(self.markup, self.ocr_format)
+
+    @lazy_property
+    def coords(self) -> Shape:
+        if self.words:
+            return Shape.from_points([xy for w in self.words for xy in w.coords.bounding_rectangle])
+        else:
+            raw_shape = get_element_coords(self.markup, self.ocr_format)
+            return adjust_to_included_contours(raw_shape.bounding_rectangle, self.page.image.contours)
 
     @lazy_property
     def image(self):
@@ -499,4 +462,16 @@ class Word:
 
     @lazy_property
     def text(self):
-        return get_element_text(self.markup, self.ocr_format)
+        # The conditional structure is there to avoid weird text reconstructions ('\n\nWord\n\n...') by bs4.
+        if self.words:  # Element is a line
+            return ' '.join([w.text for w in self.words])
+        else:  # Element is a word
+            return get_element_text(self.markup, self.ocr_format)
+
+    @lazy_property
+    def words(self):
+        words = [TextElement(el, self.page, self.ocr_format) for el in
+                 find_all_elements(self.markup, 'words', self.ocr_format)]
+
+        # trim space words and empty words
+        return [w for w in words if re.sub(r'\s+', '', w.text) != '']

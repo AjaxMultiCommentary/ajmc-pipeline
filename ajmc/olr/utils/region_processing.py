@@ -17,7 +17,7 @@ def select_page_regions_by_types(page: 'Page',
     return [r for r in page.regions if r.region_type in region_types]
 
 
-def order_olr_regions(regions: List['Region']):
+def sort_to_reading_order(regions: List['Region']):
     """Orders elements according to reading order.
 
     This is a very simple algorithm to sort OLR or OCR elements according to reading order. This is particularly

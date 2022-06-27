@@ -1,10 +1,12 @@
 """Contains all the necessary utils for the management of spreadsheets."""
+import json
 import logging
+import os
 from typing import List, Tuple, Set
 from ajmc.commons.variables import SPREADSHEETS_IDS
 from ajmc.text_importation.classes import Commentary
 from ajmc.commons.miscellaneous import get_custom_logger, read_google_sheet
-from ajmc.commons import docstrings
+from ajmc.commons import docstrings, variables
 
 logger = get_custom_logger(__name__)
 
@@ -72,8 +74,10 @@ def check_entire_via_spreadsheets_conformity(sheet_id:str = SPREADSHEETS_IDS['ol
 
     for comm_id, comm_df in df.groupby(df['commentary_id']):
         logger.info(f"""Checking commentary {comm_id}""")
-        commentary = Commentary.from_folder_structure(commentary_id=comm_id)
-        differences[comm_id] = check_via_spreadsheet_conformity(via_project=commentary.via_project,
+        with open(os.path.join(variables.PATHS['base_dir'], comm_id, variables.PATHS['via_path']), 'r') as file:
+            via_project = json.load(file)
+
+        differences[comm_id] = check_via_spreadsheet_conformity(via_project=via_project,
                                                                 sheet_page_ids=comm_df['page_id'].tolist())
 
     if not any([s for t in differences.values() for s in t]):

@@ -398,7 +398,7 @@ def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=N
                 else:
                     test_ocr_raw(output_name, tessdata_dir, img_filename, lang=model_str, save=True, viz=False, verbose=False, lstm_config="")
 
-            commentary = Commentary.from_folder_structure(ocr_dir)
+            commentary = Commentary.from_ajmc_structure(ocr_dir)
             
             # page_filenames = [os.path.join(EVALUATION_DIR, commentary_id, "ocr", "groundtruth", "images", item+".png") for item in commentary._get_page_ids()]
             # page_filenames = [p.path['image_path'] for p in commentary.pages]

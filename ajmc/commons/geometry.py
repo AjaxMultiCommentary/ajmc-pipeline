@@ -158,7 +158,7 @@ def are_rectangles_overlapping_with_threshold(r1: RectangleType, r2: RectangleTy
     return inter_area >= threshold * union_area
 
 
-def shrink_to_included_contours(rectangle: RectangleType,
+def adjust_to_included_contours(rectangle: RectangleType,
                                 contours: List[Shape]) -> Shape:
     """Finds the contours included in `rectangle` and returns a shape objects that minimally contains them.
 
