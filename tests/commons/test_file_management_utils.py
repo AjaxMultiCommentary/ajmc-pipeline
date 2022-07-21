@@ -1,6 +1,7 @@
 from ajmc.commons import variables
 from ajmc.commons.file_management import utils
 import os
+from tests import sample_objects as so
 
 def test_get_62_based_datecode():
     assert len(utils.get_62_based_datecode()) == 6
@@ -29,6 +30,6 @@ def test_verify_path_integrity():
             raise """`utils.verify_path_integrity` should raise an error with `wrong_paths`."""
 
 
-def test_get_path_from_id(sample_page_id, sample_image_dir):
-    assert utils.get_path_from_id(sample_page_id, sample_image_dir) == os.path.join(sample_image_dir, sample_page_id + '.png')
-    assert not utils.get_path_from_id(sample_page_id.split('_')[0] + '_9999', sample_image_dir)
+def test_get_path_from_id():
+    assert utils.get_path_from_id(so.sample_page_id, so.sample_image_dir) == os.path.join(so.sample_image_dir, so.sample_page_id + '.png')
+    assert not utils.get_path_from_id(so.sample_page_id.split('_')[0] + '_9999', so.sample_image_dir)

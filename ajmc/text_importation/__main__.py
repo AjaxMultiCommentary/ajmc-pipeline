@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 import sys
-from ajmc.text_importation.classes import Commentary
+from ajmc.text_importation.classes import OcrCommentary
 from ajmc.text_importation.rebuild import basic_rebuild, rebuilt_to_xmi
 from ajmc.commons.variables import PATHS
 from ajmc.commons.miscellaneous import get_custom_logger
@@ -80,7 +80,7 @@ def main():
 
     for commentary_id, commentary_format in zip(args.commentary_ids, args.commentary_formats):
 
-        commentary = Commentary(commentary_id)
+        commentary = OcrCommentary(commentary_id)
 
         args.json_dir = os.path.join(PATHS['base_dir'], commentary_id, 'canonical', commentary_format)
         os.makedirs(args.json_dir, exist_ok=True)

@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 from typing import List, Dict, Tuple
 
 def draw_page_labels(img: 'PIL.Image',
-                     words: List['Word'],
+                     words: List['OcrWord'],
                      labels: List[str],
                      labels_to_colors
                       ):

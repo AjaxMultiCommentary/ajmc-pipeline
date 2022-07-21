@@ -1,10 +1,9 @@
 """Miscellaneous helpers and utilities."""
-
+from functools import wraps
 import json
 import logging
 import timeit
 from typing import List, Tuple, Iterable, Generator
-import numpy as np
 import pandas as pd
 from jsonschema import Draft6Validator
 
@@ -14,13 +13,21 @@ RectangleType = List[Tuple[int, int]]
 def lazy_property(func):
     """Decorator. Makes property computation lazy."""
 
-    def inner(self, *args, **kwargs):
-        private_attr = "_" + func.__name__
+    private_attr = '_' + func.__name__
+
+    @wraps(func)
+    def fget(self):
         if not hasattr(self, private_attr):
-            setattr(self, private_attr, func(self, *args, **kwargs))
+            setattr(self, private_attr, func(self))
         return getattr(self, private_attr)
 
-    return property(inner)
+    def fset(self, value):
+        setattr(self, private_attr, value)
+
+    def fdel(self):
+        delattr(self, private_attr)
+
+    return property(fget, fset, fdel, func.__doc__)
 
 
 def timer(iterations: int = 3, number: int = 1_000):
@@ -41,11 +48,6 @@ def timer(iterations: int = 3, number: int = 1_000):
         return inner
 
     return timer_decorator
-
-
-def safe_divide(dividend, divisor):
-    """Simple division which return `np.nan` if `divisor` equals zero."""
-    return dividend / divisor if divisor != 0 else np.nan
 
 
 def recursive_iterator(iterable: Iterable, iterable_types: Tuple[Iterable] = (list, tuple)) -> Generator:

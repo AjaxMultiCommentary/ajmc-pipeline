@@ -1,5 +1,5 @@
 from ajmc.commons.variables import pd_commentaries
-from ajmc.text_importation.classes import Commentary
+from ajmc.text_importation.classes import OcrCommentary
 
 import pandas as pd
 
@@ -7,7 +7,7 @@ sheet = {c: {'page': [], 'region': [], 'word_count': []} for c in pd_commentarie
 
 for commentary_id in ['sophoclesplaysa05campgoog']:
     print("Process commentary  " + commentary_id)
-    commentary = Commentary(commentary_id, )
+    commentary = OcrCommentary(commentary_id, )
 
     for page in commentary.pages:
         if int(page.id.split('_')[-1]) % 20 == 0:
@@ -30,11 +30,11 @@ with pd.ExcelWriter('/Users/sven/Desktop/temp.xlsx') as writer:
 
 
 #%%
-from ajmc.text_importation.classes import Commentary
+from ajmc.text_importation.classes import OcrCommentary
 
 sheet = {'commentary': [], 'page': [], 'regions': [], 'word_count': []}
 
-commentary = Commentary("sophoclesplaysa05campgoog", 'krakenhocr')
+commentary = OcrCommentary("sophoclesplaysa05campgoog", 'krakenhocr')
 
 
 for page in commentary.pages:

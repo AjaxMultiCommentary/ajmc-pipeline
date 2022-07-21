@@ -1,5 +1,5 @@
 from ajmc.commons import variables
-from ajmc.text_importation.classes import Commentary, Page
+from ajmc.text_importation.classes import OcrCommentary, OcrPage
 import os
 import re
 
@@ -54,8 +54,8 @@ with open(via_path, 'w', encoding='utf-8') as f:
     f.write(text_mod)
 
 # %% test it
-comm = Commentary.from_ajmc_structure(ocr_dir=ocr_dir)
-comm_ = Commentary(
+comm = OcrCommentary.from_ajmc_structure(ocr_dir=ocr_dir)
+comm_ = OcrCommentary(
     via_path=archived_via_path,
     ocr_dir=ocr_dir)
 
@@ -83,9 +83,9 @@ for fname in fnames:
 
 # %% Testing if modified HOCR files still work
 
-orig_page = Page(
+orig_page = OcrPage(
     ocr_path='/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/Kamerbeek1953/ocr/runs/17u09o_kraken/outputs_/Kamerbeek1953_0101.hocr')
-new_page = Page(
+new_page = OcrPage(
     ocr_path='/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/Kamerbeek1953/ocr/runs/17u09o_kraken/outputs/Kamerbeek1953_00101.hocr')
 
 new_page.text == orig_page.text

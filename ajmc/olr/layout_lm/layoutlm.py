@@ -10,7 +10,7 @@ from ajmc.commons.variables import COLORS
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset
 from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.nlp.token_classification.pipeline import create_dirs
-from ajmc.text_importation.classes import Commentary
+from ajmc.text_importation.classes import OcrCommentary
 from PIL import Image
 from ajmc.commons.miscellaneous import read_google_sheet
 from ajmc.commons import variables
@@ -26,8 +26,9 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
     ]
 
 
-def get_olr_split_pages(commentary: Commentary,
-                        splits: List[str]) -> List['Page']:
+# todo 👁️ now in kraken
+def get_olr_split_pages(commentary: OcrCommentary,
+                        splits: List[str]) -> List['OcrPage']:
     """Gets the data from splits on the olr_gt sheet."""
 
     olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
@@ -40,7 +41,7 @@ def get_olr_split_pages(commentary: Commentary,
 
 
 def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
-                        sampling: Optional[Dict[str, float]] = None) -> Dict[str, List['Page']]:
+                        sampling: Optional[Dict[str, float]] = None) -> Dict[str, List['OcrPage']]:
     """
     Args:
         data_dict: A dict of format `{'set': {'ocr_dir':['split','split']}, }
@@ -51,7 +52,7 @@ def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
     for set_ in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
         set_pages[set_] = []
         for ocr_dir in data_dict[set_].keys():  # Iterate over ocr_dirs
-            commentary = Commentary.from_ajmc_structure(ocr_dir=ocr_dir)
+            commentary = OcrCommentary.from_ajmc_structure(ocr_dir=ocr_dir)
             set_pages[set_] += get_olr_split_pages(commentary, data_dict[set_][ocr_dir])
 
     if sampling:
@@ -102,7 +103,7 @@ def page_to_layoutlmv2_encodings(page,
 
 
 @docstring_formatter(**docstrings)
-def prepare_data(page_sets: Dict[str, List['Page']],
+def prepare_data(page_sets: Dict[str, List['OcrPage']],
                  labels_to_ids: Dict[str, int],
                  regions_to_coarse_labels: Dict[str, str],
                  rois: List[str],
@@ -113,7 +114,7 @@ def prepare_data(page_sets: Dict[str, List['Page']],
     """Prepares data for LayoutLMV2.
 
     Args:
-        page_sets: A dict containing a list of `Page`s per split.
+        page_sets: A dict containing a list of `OcrPage`s per split.
         model_inputs_names: List of inputs the model wants (inputs_ids, attention_mask,...)
         labels_to_ids: {labels_to_ids}
         regions_to_coarse_labels:
@@ -159,7 +160,7 @@ def prepare_data(page_sets: Dict[str, List['Page']],
 
 
 # Todo : this must be a general function for token classification.
-def align_predicted_page(page: 'Page',
+def align_predicted_page(page: 'OcrPage',
                          rois,
                          labels_to_ids,
                          ids_to_labels,
@@ -167,7 +168,7 @@ def align_predicted_page(page: 'Page',
                          tokenizer,
                          model,
                          unknownify_tokens: bool = False
-                         ) -> Tuple[List['Word'], List[str]]:
+                         ) -> Tuple[List['OcrWord'], List[str]]:
 
     encodings = page_to_layoutlmv2_encodings(page, rois=rois, labels_to_ids=labels_to_ids,
                                              regions_to_coarse_labels=regions_to_coarse_labels, tokenizer=tokenizer,

@@ -3,7 +3,7 @@ import pandas as pd
 import json
 from typing import Union, List
 from ajmc.olr.layout_lm.layoutlm import get_olr_split_pages, page_to_layoutlmv2_encodings
-from ajmc.text_importation.classes import Commentary
+from ajmc.text_importation.classes import OcrCommentary
 
 from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification
 from ajmc.olr.layout_lm.config import rois, regions_to_coarse_labels, labels_to_ids, ids_to_labels
@@ -31,7 +31,7 @@ for fname in next(os.walk(base_path))[1]:  # Walk in dirs only
 
             ocr_dir = os.path.join(new_prefix, ocr_dir[len(old_prefix):])
             output_dir = os.path.join(new_prefix, config['predictions_dir'][len(old_prefix):])
-            commentary = Commentary.from_ajmc_structure(ocr_dir=ocr_dir)
+            commentary = OcrCommentary.from_ajmc_structure(ocr_dir=ocr_dir)
             pages+= get_olr_split_pages(commentary, splits)
 
         tokenizer = LayoutLMv2TokenizerFast.from_pretrained(model_name_or_path)

@@ -18,7 +18,7 @@ def get_hocr_element_coords(element: bs4.element.Tag) -> Shape:
     """Extract coords from `title='...; bbox X1 Y1 X2 Y2; ...'`"""
     coords = [int(num) for el in element['title'].split(';') if el.strip().startswith('bbox')
               for num in el.strip().split()[1:]]
-    return Shape.from_points([(coords[0], coords[1]), (coords[2], coords[3])])
+    return Shape([(coords[0], coords[1]), (coords[2], coords[3])])
 
 
 def get_pagexml_element_coords(element: bs4.element.Tag) -> Shape:

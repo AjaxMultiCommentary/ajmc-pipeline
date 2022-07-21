@@ -1,33 +1,56 @@
 """This module contains sample objects which are sent to `sample_objects.json` and used as fixtures elsewhere."""
 
 from ajmc.nlp.token_classification.evaluation import seqeval_evaluation
-from ajmc.commons import variables
+from ajmc.commons import variables, geometry, image
 import os
-from ajmc.text_importation.classes import Commentary
+from ajmc.text_importation.classes import OcrCommentary
+
+# Arithmetic
+sample_intervals = {'base': (1, 10),
+                    'included': (2, 8),
+                    'overlapping': (8, 15),
+                    'non_overlapping': (11, 20)}
+
+sample_interval_lists = {'base': [(1, 10), (15, 15), (16, 20)],
+                         'included': [(1, 10), (19, 20)],
+                         'overlapping': [(2, 12)],
+                         'non_overlapping': [(0, 0), (30, 40)]}
+
+# Geometry
+sample_points = {'base': [(0, 0), (2, 0), (1, 1), (2, 2), (0, 2)],
+                 'included': [(0, 0), (1, 0), (1, 1), (0, 1)],
+                 'overlapping': [[1, 1], [3, 1], [2, 2], [3, 3], [1, 3]],
+                 'non_overlapping': [(5, 5), (7, 5), (6, 6), (7, 7), (5, 7)],
+                 'line': [(0, 0), (1, 1), (2, 2)],
+                 'horizontally_overlapping': [(1, 0), (3, 0), (3, 2), (1, 2)],
+                 }
+
+sample_rectangles = {k: geometry.get_bounding_rectangle_from_points(v) for k, v in sample_points.items()}
 
 # Commentaries, OCR, path and via
-sample_base_dir = variables.PATHS['base_dir']
+sample_base_dir = "/Users/sven/packages/ajmc/data/sample_commentaries"
 
 sample_commentary_id = 'cu31924087948174'
 sample_page_id = sample_commentary_id + '_0083'
 
 sample_via_path = os.path.join(sample_base_dir, sample_commentary_id, variables.PATHS['via_path'])
 
-sample_ocr_run = '2480ei_greek-english_porson_sophoclesplaysa05campgoog'
-
+sample_ocr_run = 'tess_eng_grc'
 sample_ocr_dir = os.path.join(sample_base_dir, sample_commentary_id, variables.PATHS['ocr'], sample_ocr_run, 'outputs')
 sample_ocr_page_path = os.path.join(sample_ocr_dir, sample_page_id + '.hocr')
 
 sample_groundtruth_dir = os.path.join(sample_base_dir, sample_commentary_id, variables.PATHS['groundtruth'])
 sample_groundtruth_page_path = os.path.join(sample_groundtruth_dir, sample_page_id + '.hmtl')
 
+sample_ocrcommentary = OcrCommentary.from_ajmc_structure(sample_ocr_dir)
+sample_cancommentary = sample_ocrcommentary.to_canonical()
+
+sample_page = [p for p in sample_ocrcommentary.pages if p.id == sample_page_id][0]
+
+# Image
 sample_image_dir = os.path.join(sample_base_dir, sample_commentary_id, variables.PATHS['png'])
 sample_image_path = os.path.join(sample_image_dir, sample_page_id + '.png')
-
-sample_commentary = Commentary.from_ajmc_structure(sample_ocr_dir)
-sample_page = [p for p in sample_commentary.pages if p.id == sample_page_id][0]
-
-
+sample_image = image.Image(id=sample_page_id, path=sample_image_path)
 
 # NLP, NER...
 from transformers import DistilBertTokenizerFast
@@ -46,5 +69,9 @@ sample_encodings = sample_tokenizer(text=[w.text for w in sample_page.words],
                                     padding=True,
                                     return_overflowing_tokens=True,
                                     is_split_into_words=True)
+
+
+
+
 
 

@@ -1,8 +1,31 @@
 import logging
 
 import pytest
-
+from typing import List
 from ajmc.commons import miscellaneous as misc
+
+
+def test_lazy_property():
+    class Foo:
+        def __init__(self):
+            pass
+
+        @misc.lazy_property
+        def bar(self) -> List[int]:
+            """A list of ints."""
+            return [1, 2, 3]
+
+    a = Foo()
+
+    assert a.bar == a._bar == [1, 2, 3]
+
+    a.bar = [4, 5, 6]
+    assert a.bar == [4, 5, 6]
+    assert a._bar == [4, 5, 6]
+
+    del a.bar
+    assert a.bar == a._bar == [1, 2, 3]
+    assert Foo.bar.__doc__.startswith('A list of ints.')
 
 
 def test_recursive_iterator():

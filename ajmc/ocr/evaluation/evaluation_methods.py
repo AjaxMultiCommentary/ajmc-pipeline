@@ -3,11 +3,11 @@ import os
 from typing import List, Dict, Tuple, Union, Optional
 import Levenshtein
 from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES
-from ajmc.commons.miscellaneous import safe_divide
+from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import is_rectangle_within_rectangle, are_rectangles_overlapping_with_threshold
 from ajmc.ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts
-from ajmc.text_importation.classes import Page, Commentary
+from ajmc.text_importation.classes import OcrPage, OcrCommentary
 from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
@@ -67,8 +67,8 @@ def bag_of_word_evaluation(gt_bag: List[str],
     return error_counts
 
 
-def simple_coordinates_based_evaluation(gt_words: List['Word'],
-                                        pred_words: List['Word'],
+def simple_coordinates_based_evaluation(gt_words: List['OcrWord'],
+                                        pred_words: List['OcrWord'],
                                         overlap_threshold: float = 0.8) -> float:
     """Computes edit distance between spacially overlapping words and returns the CER.
 
@@ -77,8 +77,8 @@ def simple_coordinates_based_evaluation(gt_words: List['Word'],
      (e.g. with crummy groundtruth- or preds-boxes), the word is left out and not counted in the final result.
 
      Args:
-         gt_words: The list of gt words (e.g. `Page.words` or `Region.words`)
-         pred_words: The list of ocr words (e.g. `Page.words` or `Region.words`)
+         gt_words: The list of gt words (e.g. `OcrPage.words` or `OlrRegion.words`)
+         pred_words: The list of ocr words (e.g. `OcrPage.words` or `OlrRegion.words`)
          overlap_threshold: The minimal overlap-proportion.
 
      Returns:
@@ -107,8 +107,8 @@ def simple_coordinates_based_evaluation(gt_words: List['Word'],
     return total_edit_distance / total_characters
 
 
-def coord_based_page_evaluation(gt_page: 'Page',
-                                pred_page: 'Page',
+def coord_based_page_evaluation(gt_page: 'OcrPage',
+                                pred_page: 'OcrPage',
                                 word_overlap_threshold: Optional[float] = 0.8,
                                 error_counts: Optional[Dict[str, Dict[str, Dict[str, int]]]] = None,
                                 editops_record: Optional[Dict[Tuple[str, str, str], int]] = None
@@ -212,14 +212,14 @@ def coord_based_page_evaluation(gt_page: 'Page',
     return editops_record, error_counts, soup
 
 
-def commentary_evaluation(commentary: 'Commentary',
+def commentary_evaluation(commentary: 'OcrCommentary',
                           write_files: bool = True,
                           output_dir: Optional[str] = None,
                           word_overlap_threshold: float = 0.8):
-    """Evaluates all the pages of a `Commentary` that have groundtruth.
+    """Evaluates all the pages of a `OcrCommentary` that have groundtruth.
 
     Args:
-        commentary: The `Commentary` object to evaluate.
+        commentary: The `OcrCommentary` object to evaluate.
         write_files: Whether to write the files or not
         output_dir: Leave to none if you want to write files to the default dir
         word_overlap_threshold: See `coord_based_page_evaluation`.
@@ -273,7 +273,7 @@ def evaluate_all():
 
     raise NotImplementedError
 #
-# commentary = Commentary('cu31924087948174',
+# commentary = OcrCommentary('cu31924087948174',
 #                         '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/tess_eng_grc/outputs')
 # commentary_evaluation(commentary=commentary, )
 #

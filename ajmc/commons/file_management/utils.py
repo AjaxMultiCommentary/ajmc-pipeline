@@ -6,6 +6,8 @@ from typing import Tuple
 from ajmc.commons import variables
 from ajmc.commons.miscellaneous import get_custom_logger
 
+logger = get_custom_logger(__name__)
+
 NUMBERS_LETTERS = '0123456789' + ascii_letters
 
 
@@ -68,9 +70,6 @@ def parse_ocr_path(path:str) -> Tuple[str,str,str]:
     ocr_run = rest[dirs_pattern.index('[ocr_run]')]
 
     return base, commentary_id, ocr_run
-
-
-logger = get_custom_logger(__name__)
 
 
 def get_path_from_id(page_id: str, dir_: str = None) -> str:

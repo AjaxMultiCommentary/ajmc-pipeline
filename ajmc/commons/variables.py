@@ -139,3 +139,6 @@ COLORS = {
     # https://coolors.co/b7094c-a01a58-892b64-723c70-5c4d7d-455e89-2e6f95-1780a1-0091ad
     # https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167
 }
+
+
+TEXTCONTAINER_TYPES = ['commentary', 'page', 'region', 'line', 'word']

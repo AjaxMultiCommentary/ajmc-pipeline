@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import re
+from ajmc.commons.arithmetic import safe_divide
 
 # Todo See how to sort these
 
@@ -26,11 +27,8 @@ def weighted_average_series(series: list, weights: list):
         temp = values * weights
         sumprod += temp
 
-    def safe_div(x, y):
-        return x / y if y != 0 else np.nan
-
     for i in range(len(sumprod)):
-        sumprod.iloc[i] = safe_div(sumprod.iloc[i], weights_sum)
+        sumprod.iloc[i] = safe_divide(sumprod.iloc[i], weights_sum)
 
 
 def weight_average(values, weights):

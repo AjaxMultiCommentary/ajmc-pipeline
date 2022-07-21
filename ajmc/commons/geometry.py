@@ -1,36 +1,31 @@
-from typing import List, Union, Iterable, Optional
+from typing import List, Union, Iterable
 import numpy as np
+
+from ajmc.commons.arithmetic import compute_interval_overlap
 from ajmc.commons.miscellaneous import lazy_property, RectangleType
+from ajmc.commons.docstrings import docstring_formatter, docstrings
 
 
 class Shape:
-    """The basic class for contours, rectangles and coordinates.
+    """The basic class for contours, bounding rectangles and coordinates.
 
     `Shape` objects can be instanciated directly or via `Shape.from_points()`, `Shape.from_numpy_array()`
     or `Shape.from_xywh()`. Notice that default constructor expects a list of 4 lists of x-y points, like
     `[[x:int,y:int], ...]`.
 
     Attributes:
-        bounding_rectangle : a list of 4 list of x-y points `[[x:int,y:int], ...]`, representing the four points
-        of the rectangle from the upper left corner clockwise.
+
         points (List[List[int]]): a list of list of x,y-points `[[x:int,y:int], ...]`
 
     """
 
-    def __init__(self, bounding_rectangle: RectangleType, points: Optional[List[List[int]]] = None):
+    def __init__(self, points: Iterable[Iterable[int]] = None):
         """Default constructor.
         
         Args:
-            bounding_rectangle : a list of 4 list of x-y points `[[x:int,y:int], ...]`, representing the four points
-            of the rectangle from the upper left corner clockwise.
-            points: a list of list of points `[[x:int,y:int], ...]`
+            points: an iterable of iterable of points such as `[[x:int,y:int], ...]` or `[(x,y), ...]`.
         """
-        self.bounding_rectangle: RectangleType = bounding_rectangle
-        self.points = points if points else bounding_rectangle
-
-    @classmethod
-    def from_points(cls, points: Iterable[Iterable[int]]):
-        return cls(get_bounding_rectangle_from_points(points), points)
+        self.points = points
 
     @classmethod
     def from_numpy_array(cls, points: np.ndarray):
@@ -43,8 +38,7 @@ class Shape:
         points = points.squeeze()
         assert points.shape[-1] == 2 and points.shape[
             0] > 1, """The array's shape must be (N,2) or squeezable to (N,2)"""
-        points = points.tolist()
-        return cls(get_bounding_rectangle_from_points(points), points)
+        return cls(points.tolist())
 
     @classmethod
     def from_xywh(cls, x: int, y: int, w: int, h: int):
@@ -53,12 +47,17 @@ class Shape:
         return cls([(x, y), (x + w, y), (x + w, y + h), (x, y + h)])
 
     @lazy_property
-    def width(self):
-        return self.bounding_rectangle[2][0] - self.bounding_rectangle[0][0]
+    @docstring_formatter(**docstrings)
+    def bounding_rectangle(self):
+        """{rectangle} This format is used internally (preferably to `bounding_rectangle_2` in order to
+        perform operations such as `any([is_point_within_rectangle(p,r) for p in points])`. """
+        return get_bounding_rectangle_from_points(self.points)
 
     @lazy_property
-    def height(self):
-        return self.bounding_rectangle[2][1] - self.bounding_rectangle[0][1]
+    def bounding_rectangle_2(self):
+        """Bounding rectangle represented by `[[Up-left xy], [bottom-right xy]]`,
+        mainly used for memory efficient storage."""
+        return get_bounding_rectangle_from_points(self.points)[::2]
 
     @lazy_property
     def xywh(self) -> List[int]:
@@ -67,15 +66,28 @@ class Shape:
         return [self.bounding_rectangle[0][0], self.bounding_rectangle[0][1], self.width, self.height]
 
     @lazy_property
+    def width(self) -> int:
+        return self.bounding_rectangle[2][0] - self.bounding_rectangle[0][0] + 1
+
+    @lazy_property
+    def height(self) -> int:
+        return self.bounding_rectangle[2][1] - self.bounding_rectangle[0][1] + 1
+
+    @lazy_property
+    def center(self) -> List[int]:
+        return [int(self.xywh[0] + self.width / 2), int(self.xywh[1] + self.height / 2)]
+
+    @lazy_property
     def area(self) -> int:
         return max(self.width * self.height, 0)
 
 
+@docstring_formatter(**docstrings)
 def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> RectangleType:
-    """Gets the bounding rectangle (i.e. the minimal rectangle containing all points) from a sequence of x-y points.
+    """Gets the bounding box (i.e. the minimal rectangle containing all points) from a sequence of x-y points.
 
     Args:
-        points: A sequence of (x, y) points, e.g. `[(1,2), (1,5), (3,5)]`
+        points: {points}
     
     Returns:
         A list of four lists of x-y-points representing the four points of the rectangle from the upper
@@ -100,19 +112,39 @@ def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterab
 
 
 def compute_rectangle_area(rectangle: RectangleType) -> int:
-    return (rectangle[2][0] - rectangle[0][0]) * (rectangle[2][1] - rectangle[0][1])
+    # Todo Shouldn't this work directly with a shape object.
+    return (rectangle[2][0] - rectangle[0][0] + 1) * (rectangle[2][1] - rectangle[0][1] + 1)
 
 
+@docstring_formatter(**docstrings)
 def is_point_within_rectangle(point: Union[Iterable[int], np.ndarray], rectangle: RectangleType) -> bool:
-    """Checks wheter a `point` is contained within a `rectangle`."""
+    """Checks wheter a `point` is contained within a `rectangle`.
+
+    Note:
+        Included means included or equal, not strictly included.
+
+    Args:
+         point: {point}
+         rectangle: {rectangle}
+    """
     return all([point[0] >= rectangle[0][0],
                 point[1] >= rectangle[0][1],
                 point[0] <= rectangle[2][0],
                 point[1] <= rectangle[2][1]])
 
 
+@docstring_formatter(**docstrings)
 def is_rectangle_within_rectangle(contained: RectangleType, container: RectangleType) -> bool:
-    """Checks whether a rectangle is entirely contained within another."""
+    """Checks whether the `contained` rectangle is entirely contained within the `container` rectangle.
+
+    Note:
+        Included means included or equal, not strictly included. For any rectangle `r`, we have
+        `is_rectangle_within_rectangle(r, r) == True`.
+
+    Args:
+        contained: {rectangle}
+        container: {rectangle}
+    """
 
     return all([contained[0][0] >= container[0][0],
                 contained[0][1] >= container[0][1],
@@ -120,59 +152,83 @@ def is_rectangle_within_rectangle(contained: RectangleType, container: Rectangle
                 contained[2][1] <= container[2][1]])
 
 
-def are_rectangles_overlapping(r1: RectangleType, r2: RectangleType) -> bool:
-    """Checks whether rectangles are overlapping with each other."""
-
-    return any([is_point_within_rectangle(p, r2) for p in r1])
-
-
+@docstring_formatter(**docstrings)
 def compute_overlap_area(r1: RectangleType, r2: RectangleType) -> int:
     """Measures the area of intersection between two rectangles.
 
     Args:
-        r1: A list of four lists of x,y points.
-        r2: A list of four lists of x,y points.
+        r1: {rectangle}
+        r2: {rectangle}
 
     Returns:
         int: The area of intersection
     """
-
-    inter_width = max(min(r1[2][0], r2[2][0]) - max(r1[0][0], r2[0][0]), 0)
-    inter_height = max(min(r1[2][1], r2[2][1]) - max(r1[0][1], r2[0][1]), 0)
+    inter_width = compute_interval_overlap((r1[0][0], r1[2][0]), (r2[0][0], r2[2][0]))
+    inter_height = compute_interval_overlap((r1[0][1], r1[2][1]), (r2[0][1], r2[2][1]))
 
     return inter_width * inter_height
 
 
+@docstring_formatter(**docstrings)
+def are_rectangles_overlapping(r1: RectangleType, r2: RectangleType) -> bool:
+    """Checks whether rectangles are overlapping with each other.
+
+    Args:
+        r1: {rectangle}
+        r2: {rectangle}
+    """
+    return bool(compute_overlap_area(r1, r2))
+
+
+@docstring_formatter(**docstrings)
 def is_rectangle_within_rectangle_with_threshold(contained: RectangleType, container: RectangleType,
                                                  threshold: float) -> bool:
     """Asserts more than `threshold` of `contained`'s area is within `container`. Is not merged with
-    `are_rectangles_overlapping` for effisciency purposes. """
+    `are_rectangles_overlapping` for effisciency purposes.
+
+    Args:
+        contained: {rectangle}
+        container: {rectangle}
+        threshold: The minimal proportional of `contained` which should be included in `container`.
+    """
     contained_area = compute_rectangle_area(contained)
     return compute_overlap_area(contained, container) > threshold * contained_area
 
 
+@docstring_formatter(**docstrings)
 def are_rectangles_overlapping_with_threshold(r1: RectangleType, r2: RectangleType, threshold: float) -> bool:
-    """Checks whether the overlapping (intersection) area of two rectangles is higher than `threshold`* union area """
+    """Checks whether the overlapping (intersection) area of two rectangles is higher than `threshold`* union area
+
+    Args:
+        r1: {rectangle}
+        r2: {rectangle}
+        threshold: The minimal proportion of the union area to be included in the intersection area.
+    """
     inter_area = compute_overlap_area(r1, r2)
     union_area = compute_rectangle_area(r1) + compute_rectangle_area(r2) - inter_area
     return inter_area >= threshold * union_area
 
 
-def adjust_to_included_contours(rectangle: RectangleType,
+@docstring_formatter(**docstrings)
+def adjust_to_included_contours(r: RectangleType,
                                 contours: List[Shape]) -> Shape:
     """Finds the contours included in `rectangle` and returns a shape objects that minimally contains them.
 
     Note:
-        This function is mainly used to resize word-boxes. It thereforediscards the contours that would make
+        This function is mainly used to resize word-boxes. It therefore discards the contours that would make
         `rectangle` taller (i.e. longer on the Y-axis). This is helpful to avoid line-overlapping word-boxes.
+
+    Args:
+        r: {rectangle}
+        contours: A list of included contours
     """
 
     included_contours = [c for c in contours
-                         if are_rectangles_overlapping(c.bounding_rectangle, rectangle)
-                         and not (c.bounding_rectangle[0][1] < rectangle[0][1]
-                                  or c.bounding_rectangle[2][1] > rectangle[2][1])]
+                         if are_rectangles_overlapping(c.bounding_rectangle, r)
+                         and not (c.bounding_rectangle[0][1] < r[0][1]
+                                  or c.bounding_rectangle[2][1] > r[2][1])]
 
-    if included_contours:
-        return Shape.from_points([xy for c in included_contours for xy in c.bounding_rectangle])
+    if included_contours:  # If we find included contours, readjust the bounding box
+        return Shape([xy for c in included_contours for xy in c.bounding_rectangle])
     else:
-        return Shape.from_points(rectangle)
+        return Shape(r)  # Leave the box untouched # Todo why ?

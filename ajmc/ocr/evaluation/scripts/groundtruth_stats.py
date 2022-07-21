@@ -1,4 +1,4 @@
-from ajmc.text_importation.classes import Commentary
+from ajmc.text_importation.classes import OcrCommentary
 from ajmc.commons.variables import COMMENTARY_IDS
 
 
@@ -10,7 +10,7 @@ df_dict = {k: [] for k in ['commentary_id', 'pages', 'lines', 'words', 'paratext
 
 for commentary_id in commentary_ids:
 
-    commentary = Commentary(commentary_id)
+    commentary = OcrCommentary(commentary_id)
     comm_dict = {k: 0 for k in ['commentary_id', 'pages', 'lines', 'words', 'paratext', 'primary_text', 'commentary']}
     comm_dict['commentary_id'] = commentary_id
 
