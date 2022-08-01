@@ -1,4 +1,4 @@
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 from ajmc.commons.variables import COMMENTARY_IDS
 
 
@@ -17,11 +17,11 @@ for commentary_id in commentary_ids:
 
     for page in commentary.ocr_groundtruth_pages:
         comm_dict['pages'] += 1
-        comm_dict['lines'] += len(page.lines)
-        comm_dict['words'] += len(page.words)
-        comm_dict['paratext'] += sum([len(r.words) for r in page.regions if r.region_type in ['introduction', 'preface', 'bibliography', 'footnote']])
-        comm_dict['primary_text'] += sum([len(r.words) for r in page.regions if r.region_type == 'primary_text'])
-        comm_dict['commentary'] += sum([len(r.words) for r in page.regions if r.region_type == 'commentary'])
+        comm_dict['lines'] += len(page.children['line'])
+        comm_dict['words'] += len(page.children['word'])
+        comm_dict['paratext'] += sum([len(r.children['word']) for r in page.children['region'] if r.region_type in ['introduction', 'preface', 'bibliography', 'footnote']])
+        comm_dict['primary_text'] += sum([len(r.children['word']) for r in page.children['region'] if r.region_type == 'primary_text'])
+        comm_dict['commentary'] += sum([len(r.children['word']) for r in page.children['region'] if r.region_type == 'commentary'])
 
     for k in df_dict.keys():
         df_dict[k].append(comm_dict[k])

@@ -1,6 +1,6 @@
 import os
 from tests import sample_objects as so
-from ajmc.text_importation.classes import OcrPage, OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
 from ajmc.ocr.evaluation.evaluation_methods import bag_of_word_evaluation, coord_based_page_evaluation
 
 

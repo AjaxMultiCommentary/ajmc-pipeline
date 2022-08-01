@@ -3,7 +3,7 @@ import pandas as pd
 import json
 from typing import Union, List
 from ajmc.olr.layout_lm.layoutlm import get_olr_split_pages, page_to_layoutlmv2_encodings
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 
 from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification
 from ajmc.olr.layout_lm.config import rois, regions_to_coarse_labels, labels_to_ids, ids_to_labels

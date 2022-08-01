@@ -1,7 +1,7 @@
 import pandas as pd
 from ajmc.commons.miscellaneous import read_google_sheet
 from ajmc.commons import variables
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 
 df = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
 xl_path = '/Users/sven/Desktop/coucou.tsv'

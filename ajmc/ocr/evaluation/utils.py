@@ -55,14 +55,14 @@ def insert_text_in_soup(soup: "BeautifulSoup", word: 'OcrWord', is_gt: bool, is_
     divisor = float(soup.html.head.meta['divisor'])
 
     # Write groundtruth to the right
-    x_coord = int(word.coords.bounding_rectangle[3][0] / divisor) + \
+    x_coord = int(word.bbox.bbox[3][0] / divisor) + \
               (int(soup.html.head.meta["half_width"]) if is_gt else 0)
-    y_coord = int(word.coords.bounding_rectangle[3][1] / divisor)
+    y_coord = int(word.bbox.bbox[3][1] / divisor)
 
     new_div = soup.new_tag(name="div",
                            attrs={"style": f"""position:absolute; 
-                                             width:{word.coords.width / divisor}px; 
-                                             height:{word.coords.height / divisor}px; 
+                                             width:{word.bbox.width / divisor}px; 
+                                             height:{word.bbox.height / divisor}px; 
                                              left:{x_coord}px; 
                                              top:{y_coord}px;
                                              font-size: 80%;
@@ -87,15 +87,15 @@ def actualize_overlap_matrix(args: "ArgumentParser", image: "Image", zonemask: "
 
     for zone in zonemask.zones:  # For each zone, fill matrix and add error dictionary
 
-        image.overlap_matrix[0, zone.coords[0][1]:zone.coords[2][1],
-        zone.coords[0][0]:zone.coords[2][0]] += zone.zone_type + " "  # adds zone.type to matrix, eg. "primary_text"
+        image.overlap_matrix[0, zone.bbox[0][1]:zone.bbox[2][1],
+        zone.bbox[0][0]:zone.bbox[2][0]] += zone.zone_type + " "  # adds zone.type to matrix, eg. "primary_text"
 
-    for gt_word in groundtruth.words:  # For each gt_word in gt, fill matrix, then find overlapping gt- and ocr-words
-        image.overlap_matrix[1, gt_word.coords[0][1]:gt_word.coords[2][1],
-        gt_word.coords[0][0]:gt_word.coords[2][0]] = gt_word.id
+    for gt_word in groundtruth.children['word']:  # For each gt_word in gt, fill matrix, then find overlapping gt- and ocr-words
+        image.overlap_matrix[1, gt_word.bbox[0][1]:gt_word.bbox[2][1],
+        gt_word.bbox[0][0]:gt_word.bbox[2][0]] = gt_word.id
 
-    for word in ocr.words:  # For each word in ocr, fill matrix
-        image.overlap_matrix[2, word.coords[0][1]:word.coords[2][1], word.coords[0][0]:word.coords[2][0]] = word.id
+    for word in ocr.children['word']:  # For each word in ocr, fill matrix
+        image.overlap_matrix[2, word.bbox[0][1]:word.bbox[2][1], word.bbox[0][0]:word.bbox[2][0]] = word.id
 
     return image.overlap_matrix
 

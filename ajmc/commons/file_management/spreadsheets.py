@@ -4,7 +4,7 @@ import logging
 import os
 from typing import List, Tuple, Set
 from ajmc.commons.variables import SPREADSHEETS_IDS
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 from ajmc.commons.miscellaneous import get_custom_logger, read_google_sheet
 from ajmc.commons import docstrings, variables
 

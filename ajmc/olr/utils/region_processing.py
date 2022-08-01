@@ -16,11 +16,10 @@ def get_page_region_dicts_from_via(page_id: str, via_project: dict) -> List[dict
 
 def select_page_regions_by_types(page: 'OcrPage',
                                  region_types: List[str]) -> List['OlrRegion']:
-    return [r for r in page.regions if r.region_type in region_types]
+    return [r for r in page.children['region'] if r.region_type in region_types]
 
 
 def sort_to_reading_order(elements: list,
-                          # Todo : this can only be a list of elements with coords. Do a mother class for text elements ?
                           overlap_thresh: float = 0.6):
     """Orders elements according to reading order.
 
@@ -42,28 +41,28 @@ def sort_to_reading_order(elements: list,
     ordered = []
 
     # Sort regions from highest to lowest (done only once, to speed up computation)
-    elements.sort(key=lambda x: x.coords.xywh[1])
+    elements.sort(key=lambda x: x.bbox.xywh[1])
 
     # Select the top region
     while len(ordered) < len(elements):
         rest = [e for e in elements if e not in ordered]
 
-        # y_overlaps = [r for r in rest if r.coords.bounding_rectangle[0][1] < rest[0].coords.bounding_rectangle[2][1]]
+        # y_overlaps = [r for r in rest if r.bbox.bbox[0][1] < rest[0].bbox.bbox[2][1]]
         # see if there are other regions overlapping on the y-axis (this will include rest[0] itself).
 
         overlapping_candidates = []
 
         for r in rest:  # for each remainding
             # Compute the y-overlap it this element has with highest element (rest[0])
-            y_overlap = compute_interval_overlap(i1=(rest[0].coords.bounding_rectangle[0][1],
-                                                     rest[0].coords.bounding_rectangle[2][1]),
-                                                 i2=(r.coords.bounding_rectangle[0][1],
-                                                     r.coords.bounding_rectangle[2][1]))
+            y_overlap = compute_interval_overlap(i1=(rest[0].bbox.bbox[0][1],
+                                                     rest[0].bbox.bbox[2][1]),
+                                                 i2=(r.bbox.bbox[0][1],
+                                                     r.bbox.bbox[2][1]))
             # If the y-overlap are above `overlap_threshold`, append the element to the `overlapping_candidates`
-            if y_overlap > overlap_thresh * rest[0].coords.height \
-                    or y_overlap > overlap_thresh * r.coords.height:
+            if y_overlap > overlap_thresh * rest[0].bbox.height \
+                    or y_overlap > overlap_thresh * r.bbox.height:
                 overlapping_candidates.append(r)
 
-        ordered.append(sorted(overlapping_candidates, key=lambda x: x.coords.xywh[0])[0])  # select the leftest element
+        ordered.append(sorted(overlapping_candidates, key=lambda x: x.bbox.xywh[0])[0])  # select the leftest element
 
     return ordered

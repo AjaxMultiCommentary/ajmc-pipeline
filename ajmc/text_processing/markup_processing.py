@@ -14,24 +14,24 @@ def parse_markup_file(path: str) -> bs4.BeautifulSoup:
 
 
 # ===========================  COORDS EXTRACTERS  ============================
-def get_hocr_element_coords(element: bs4.element.Tag) -> Shape:
-    """Extract coords from `title='...; bbox X1 Y1 X2 Y2; ...'`"""
+def get_hocr_element_bbox(element: bs4.element.Tag) -> Shape:
+    """Extract bbox from `title='...; bbox X1 Y1 X2 Y2; ...'`"""
     coords = [int(num) for el in element['title'].split(';') if el.strip().startswith('bbox')
               for num in el.strip().split()[1:]]
     return Shape([(coords[0], coords[1]), (coords[2], coords[3])])
 
 
-def get_pagexml_element_coords(element: bs4.element.Tag) -> Shape:
+def get_pagexml_element_bbox(element: bs4.element.Tag) -> Shape:
     points = element.find('pc:Coords')['points'].split()  # A List[str]
     return Shape([tuple(int(coord) for coord in point.split(',')) for point in points])
 
 
-def get_element_coords(element: bs4.element.Tag, ocr_format: str = 'tesshocr') -> Shape:
-    """Generic extractor. Extracts the coords of a markup element."""
+def get_element_bbox(element: bs4.element.Tag, ocr_format: str = 'tesshocr') -> Shape:
+    """Generic extractor. Extracts the bbox of a markup element."""
     if 'hocr' in ocr_format:
-        return get_hocr_element_coords(element)
+        return get_hocr_element_bbox(element)
     elif ocr_format == "pagexml":
-        return get_pagexml_element_coords(element)
+        return get_pagexml_element_bbox(element)
     else:
         raise NotImplementedError("""Accepted formats are 'tesshocr', 'krakenhocr' and 'pagexml'.""")
 

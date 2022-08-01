@@ -1,5 +1,5 @@
 from ajmc.commons.variables import pd_commentaries
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 
 import pandas as pd
 
@@ -12,11 +12,11 @@ for commentary_id in ['sophoclesplaysa05campgoog']:
     for page in commentary.pages:
         if int(page.id.split('_')[-1]) % 20 == 0:
             print("processing page  " + page.id)
-        regions = [r for r in page.regions if r.region_type in ['introduction', 'preface', 'footnotes', 'commentary']]
+        regions = [r for r in page.children['region'] if r.region_type in ['introduction', 'preface', 'footnotes', 'commentary']]
         region_counts = {r.region_type: 0 for r in regions}
 
         for region in regions:
-            region_counts[region.region_type] += len(region.words)
+            region_counts[region.region_type] += len(region.children['word'])
 
         for region, count in region_counts.items():
             sheet[commentary_id]['page'].append(page.id.split('_')[1])
@@ -30,7 +30,7 @@ with pd.ExcelWriter('/Users/sven/Desktop/temp.xlsx') as writer:
 
 
 #%%
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 
 sheet = {'commentary': [], 'page': [], 'regions': [], 'word_count': []}
 
@@ -42,14 +42,14 @@ for page in commentary.pages:
     if int(page.id.split('_')[-1]) % 20 == 0:
         print("processing page  " + page.id)
 
-    regions = [r for r in page.regions if r.region_type in ['introduction', 'preface', 'footnotes', 'commentary']]
+    regions = [r for r in page.children['region'] if r.region_type in ['introduction', 'preface', 'footnotes', 'commentary']]
     if not regions:
         continue
     else:
         sheet['commentary'].append(commentary.id)
         sheet['page'].append(page.id.split('_')[1])
         sheet['regions'].append(','.join([r.region_type for r in regions]))
-        sheet['word_count'].append(sum([len(r.words) for r in regions]))
+        sheet['word_count'].append(sum([len(r.children['word']) for r in regions]))
 
 
 

@@ -74,11 +74,11 @@ def detect_regions(img_path: str,
 
     for dc in dilated_contours:
         contained_contours = [c for c in contours if
-                              is_rectangle_within_rectangle(c.bounding_rectangle, dc.bounding_rectangle)]
+                              is_rectangle_within_rectangle(c.bbox, dc.bbox)]
 
         if contained_contours:
             contained_stacked = Shape.from_numpy_array(
-                np.concatenate([c.bounding_rectangle for c in contained_contours], axis=0))
+                np.concatenate([c.bbox for c in contained_contours], axis=0))
             dilated_contours_shrinked.append(contained_stacked)
 
     for i, c in enumerate(dilated_contours_shrinked):
@@ -102,8 +102,8 @@ def detect_regions(img_path: str,
 
         for c in dilated_contours_shrinked:
             shrinked_rectangle = cv2.rectangle(copy,
-                                               (c.bounding_rectangle[0][0], c.bounding_rectangle[0][1]),
-                                               (c.bounding_rectangle[2][0], c.bounding_rectangle[2][1]),
+                                               (c.bbox[0][0], c.bbox[0][1]),
+                                               (c.bbox[2][0], c.bbox[2][1]),
                                                (0, 0, 255), 4)
 
         cv2.imwrite(os.path.join(output_dir, img_name), copy)

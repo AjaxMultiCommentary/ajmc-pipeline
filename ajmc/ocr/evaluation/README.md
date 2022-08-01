@@ -9,7 +9,7 @@
 To run the evaluation of a commentary, please do :
 
 ```python
-from ajmc.text_importation import Commentary
+from ajmc.text_processing import Commentary
 from ajmc.ocr.evaluation.evaluation_methods import commentary_evaluation
 
 commentary = Commentary('sophoclesplaysa05campgoog')

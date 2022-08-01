@@ -48,30 +48,30 @@ class Shape:
 
     @lazy_property
     @docstring_formatter(**docstrings)
-    def bounding_rectangle(self):
-        """{rectangle} This format is used internally (preferably to `bounding_rectangle_2` in order to
+    def bbox(self) -> RectangleType:
+        """{rectangle} This format is used internally (preferably to `bbox_2` in order to
         perform operations such as `any([is_point_within_rectangle(p,r) for p in points])`. """
-        return get_bounding_rectangle_from_points(self.points)
+        return get_bbox_from_points(self.points)
 
     @lazy_property
-    def bounding_rectangle_2(self):
+    def bbox_2(self) -> RectangleType:
         """Bounding rectangle represented by `[[Up-left xy], [bottom-right xy]]`,
         mainly used for memory efficient storage."""
-        return get_bounding_rectangle_from_points(self.points)[::2]
+        return self.bbox[::2]
 
     @lazy_property
     def xywh(self) -> List[int]:
         """Gets the bounding rectangle in `[x,y,w,h]` format, where `x` and `y` are the coordinates of the upper-left
         corner."""
-        return [self.bounding_rectangle[0][0], self.bounding_rectangle[0][1], self.width, self.height]
+        return [self.bbox[0][0], self.bbox[0][1], self.width, self.height]
 
     @lazy_property
     def width(self) -> int:
-        return self.bounding_rectangle[2][0] - self.bounding_rectangle[0][0] + 1
+        return self.bbox[2][0] - self.bbox[0][0] + 1
 
     @lazy_property
     def height(self) -> int:
-        return self.bounding_rectangle[2][1] - self.bounding_rectangle[0][1] + 1
+        return self.bbox[2][1] - self.bbox[0][1] + 1
 
     @lazy_property
     def center(self) -> List[int]:
@@ -83,7 +83,7 @@ class Shape:
 
 
 @docstring_formatter(**docstrings)
-def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> RectangleType:
+def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> RectangleType:
     """Gets the bounding box (i.e. the minimal rectangle containing all points) from a sequence of x-y points.
 
     Args:
@@ -112,7 +112,7 @@ def get_bounding_rectangle_from_points(points: Union[np.ndarray, Iterable[Iterab
 
 
 def compute_rectangle_area(rectangle: RectangleType) -> int:
-    # Todo Shouldn't this work directly with a shape object.
+    # Todo 👁️ Shouldn't this work directly with a shape object.
     return (rectangle[2][0] - rectangle[0][0] + 1) * (rectangle[2][1] - rectangle[0][1] + 1)
 
 
@@ -224,11 +224,11 @@ def adjust_to_included_contours(r: RectangleType,
     """
 
     included_contours = [c for c in contours
-                         if are_rectangles_overlapping(c.bounding_rectangle, r)
-                         and not (c.bounding_rectangle[0][1] < r[0][1]
-                                  or c.bounding_rectangle[2][1] > r[2][1])]
+                         if are_rectangles_overlapping(c.bbox, r)
+                         and not (c.bbox[0][1] < r[0][1]
+                                  or c.bbox[2][1] > r[2][1])]
 
     if included_contours:  # If we find included contours, readjust the bounding box
-        return Shape([xy for c in included_contours for xy in c.bounding_rectangle])
+        return Shape([xy for c in included_contours for xy in c.bbox])
     else:
         return Shape(r)  # Leave the box untouched # Todo why ?

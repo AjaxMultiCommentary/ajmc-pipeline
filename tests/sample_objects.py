@@ -3,7 +3,7 @@
 from ajmc.nlp.token_classification.evaluation import seqeval_evaluation
 from ajmc.commons import variables, geometry, image
 import os
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 
 # Arithmetic
 sample_intervals = {'base': (1, 10),
@@ -25,7 +25,7 @@ sample_points = {'base': [(0, 0), (2, 0), (1, 1), (2, 2), (0, 2)],
                  'horizontally_overlapping': [(1, 0), (3, 0), (3, 2), (1, 2)],
                  }
 
-sample_rectangles = {k: geometry.get_bounding_rectangle_from_points(v) for k, v in sample_points.items()}
+sample_rectangles = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.items()}
 
 # Commentaries, OCR, path and via
 sample_base_dir = "/Users/sven/packages/ajmc/data/sample_commentaries"
@@ -64,7 +64,7 @@ sample_seqeval_output = seqeval_evaluation([sample_ner_labels_pred],
 sample_model_name_or_path = 'distilbert-base-uncased'
 sample_tokenizer = DistilBertTokenizerFast.from_pretrained(sample_model_name_or_path)
 
-sample_encodings = sample_tokenizer(text=[w.text for w in sample_page.words],
+sample_encodings = sample_tokenizer(text=[w.text for w in sample_page.children['word']],
                                     truncation=True,
                                     padding=True,
                                     return_overflowing_tokens=True,

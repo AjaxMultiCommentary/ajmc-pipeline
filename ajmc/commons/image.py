@@ -2,7 +2,7 @@ import cv2
 from typing import List, Tuple, Optional
 import numpy as np
 from ajmc.commons.geometry import Shape
-from ajmc.commons.miscellaneous import lazy_property, RectangleType, get_custom_logger
+from ajmc.commons.miscellaneous import lazy_property, RectangleType, get_custom_logger, lazy_init
 
 logger = get_custom_logger(__name__)
 
@@ -14,17 +14,13 @@ class Image:
           The center of `Image`-coordinates is the upper left corner, consistantly with cv2 and numpy. This implies
           that Y-coordinates are ascending towards the bottom of the image.
     """
-
+    @lazy_init
     def __init__(self,
                  id: Optional[str] = None,
                  path: Optional[str] = None,
                  matrix: Optional[np.ndarray] = None,
-                 word_range: Optional[List[Tuple[int, int]]] = None):
-        if matrix is not None:
-            self.matrix = matrix
-        self.path = path
-        self.id = id
-        self.word_range = word_range
+                 word_range: Optional[Tuple[int, int]] = None):
+        pass
 
     @lazy_property
     def matrix(self) -> np.ndarray:
@@ -113,18 +109,18 @@ def draw_page_regions_lines_words(matrix: np.ndarray,
                                   page: 'OcrPage',
                                   output_path: Optional[str] = None,
                                   region_elements: bool = False):
-    matrix = draw_rectangles(rectangles=[r.coords.bounding_rectangle for r in page.regions],
+    matrix = draw_rectangles(rectangles=[r.bbox.bbox for r in page.children['region']],
                              matrix=matrix,
                              color=(255, 0, 0),
                              thickness=3)
     if region_elements:
-        matrix = draw_rectangles([r.coords.bounding_rectangle for region in page.regions for r in region.lines], matrix,
+        matrix = draw_rectangles([r.bbox.bbox for region in page.children['region'] for r in region.children['line']], matrix,
                                  (0, 255, 0), thickness=2)
-        matrix = draw_rectangles([r.coords.bounding_rectangle for region in page.regions for r in region.words], matrix,
+        matrix = draw_rectangles([r.bbox.bbox for region in page.children['region'] for r in region.children['word']], matrix,
                                  thickness=1)
     else:
-        matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.lines], matrix, (0, 255, 0), thickness=2)
-        matrix = draw_rectangles([r.coords.bounding_rectangle for r in page.words], matrix, thickness=1)
+        matrix = draw_rectangles([r.bbox.bbox for r in page.children['line']], matrix, (0, 255, 0), thickness=2)
+        matrix = draw_rectangles([r.bbox.bbox for r in page.children['word']], matrix, thickness=1)
 
     if output_path:
         cv2.imwrite(output_path, matrix)
@@ -136,7 +132,7 @@ def draw_reading_order(matrix: np.ndarray,
                        page: 'OcrPage',
                        output_path: Optional[str] = None):
     # Compute word centers
-    w_centers = [w.coords.center for w in page.words]
+    w_centers = [w.bbox.center for w in page.children['word']]
     matrix = cv2.polylines(img=matrix,
                            pts=[np.array(w_centers, np.int32).reshape((-1, 1, 2))],
                            isClosed=False,

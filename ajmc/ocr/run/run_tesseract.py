@@ -19,7 +19,7 @@ PARENT_DIR = os.path.dirname(os.path.dirname(PROJECT_DIR))
 sys.path.append(os.path.dirname(PROJECT_DIR))
 
 from ajmc.ocr.evaluation.evaluation_methods import commentary_evaluation
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 from ajmc.ocr.preprocess import toolbox
 
 # Data dir with whole images

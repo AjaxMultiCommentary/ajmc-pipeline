@@ -3,7 +3,7 @@ import re
 PATHS = {
     # 'base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/',
     'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
-    'schema': 'data/page.schema.json',
+    'schema': 'data/templates/page.schema.json',
     'groundtruth': 'ocr/groundtruth/evaluation',
     'png': 'images/png',
     'via_path': 'olr/via_project.json',

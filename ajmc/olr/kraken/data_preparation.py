@@ -4,11 +4,11 @@ from bs4 import BeautifulSoup
 
 from ajmc.commons import variables
 from ajmc.commons.miscellaneous import read_google_sheet
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 
 
-def get_olr_split_pages(commentary: 'TextContainer',
-                        splits: List[str]) -> List['TextContainer']:
+def get_olr_split_pages(commentary: 'CanonicalTextContainer',
+                        splits: List[str]) -> List['CanonicalTextContainer']:
     """Gets the data from splits on the olr_gt sheet."""
 
     olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
@@ -20,7 +20,7 @@ def get_olr_split_pages(commentary: 'TextContainer',
 
 
 def create_kraken_alto(img_path: str,
-                       regions: List['TextContainer'],
+                       regions: List['CanonicalTextContainer'],
                        output_path: Optional[str] = None):
     base = """<?xml version="1.0" encoding="UTF-8">
     <alto xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -46,10 +46,10 @@ def create_kraken_alto(img_path: str,
         reg = soup.new_tag('ComposedBlockType',
                            ID=r.id,
 
-                           HPOS=r.coords[0].xywh[0],
-                           VPOS=r.coords[0].xywh[1],
-                           WIDTH=r.coords[0].xywh[2],
-                           HEIGHT=r.coords[0].xywh[3],
+                           HPOS=r.bbox[0].xywh[0],
+                           VPOS=r.bbox[0].xywh[1],
+                           WIDTH=r.bbox[0].xywh[2],
+                           HEIGHT=r.bbox[0].xywh[3],
                            TYPE=r.info['region_type'])
 
         soup.alto.Layout.Page.PrintSpace.append(reg)

@@ -13,13 +13,13 @@ def test_shape():
     assert shape.xywh[2] * shape.xywh[3] == shape.area == 9
 
 
-def test_get_bounding_rectangle_from_points():
+def test_get_bbox_from_points():
     # Assert the rectangle is actually what we want it to be
     assert rectangles['base'] == [points['base'][0], points['base'][1], points['base'][3], points['base'][4]]
     # Test with numpy array of points
-    assert rectangles['base'] == geo.get_bounding_rectangle_from_points(np.array(points['base']))
+    assert rectangles['base'] == geo.get_bbox_from_points(np.array(points['base']))
     # Test a non-rectangular sequence of points
-    assert geo.get_bounding_rectangle_from_points(points['line']) == rectangles['base']
+    assert geo.get_bbox_from_points(points['line']) == rectangles['base']
 
 
 def test_is_point_within_rectangle():
@@ -66,5 +66,5 @@ def test_shrink_to_included_contours():
     # Make sure it takes only horizontally overlappping shapes
     contours_1 = [geo.Shape(points[k]) for k in ['base', 'overlapping', 'horizontally_overlapping']]
     contours_2 = [geo.Shape(points[k]) for k in ['base', 'horizontally_overlapping']]
-    assert geo.adjust_to_included_contours(rectangles['base'], contours_1).bounding_rectangle == \
-           geo.adjust_to_included_contours(rectangles['base'], contours_2).bounding_rectangle
+    assert geo.adjust_to_included_contours(rectangles['base'], contours_1).bbox == \
+           geo.adjust_to_included_contours(rectangles['base'], contours_2).bbox

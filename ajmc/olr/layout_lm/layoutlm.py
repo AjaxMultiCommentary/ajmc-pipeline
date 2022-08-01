@@ -10,7 +10,7 @@ from ajmc.commons.variables import COLORS
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset
 from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.nlp.token_classification.pipeline import create_dirs
-from ajmc.text_importation.classes import OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 from PIL import Image
 from ajmc.commons.miscellaneous import read_google_sheet
 from ajmc.commons import variables
@@ -75,16 +75,16 @@ def page_to_layoutlmv2_encodings(page,
         LayoutLMv2FeatureExtractor.from_pretrained('microsoft/layoutlmv2-base-uncased', apply_ocr=False)
 
     # Get the lists of words, boxes and labels for a single page
-    words = [w.text for r in page.regions if r.region_type in rois for w in r.words]
+    words = [w.text for r in page.children['region'] if r.region_type in rois for w in r.children['word']]
 
     if unknownify_tokens:
         words = [tokenizer.unk_token for _ in words]
 
-    word_boxes = [normalize_bounding_rectangles(w.coords.bounding_rectangle, page.image.width, page.image.height)
-                  for r in page.regions if r.region_type in rois for w in r.words]
+    word_boxes = [normalize_bounding_rectangles(w.bbox.bbox, page.image.width, page.image.height)
+                  for r in page.children['region'] if r.region_type in rois for w in r.children['word']]
 
     word_labels = [labels_to_ids[regions_to_coarse_labels[r.region_type]]
-                   for r in page.regions if r.region_type in rois for w in r.words] if get_labels else None
+                   for r in page.children['region'] if r.region_type in rois for w in r.children['word']] if get_labels else None
 
     # Tokenize, truncate and pad
     encodings = tokenizer(text=words,
@@ -174,8 +174,8 @@ def align_predicted_page(page: 'OcrPage',
                                              regions_to_coarse_labels=regions_to_coarse_labels, tokenizer=tokenizer,
                                              get_labels=False, unknownify_tokens=unknownify_tokens)
 
-    words = [w for r in page.regions if r.region_type in rois for w in
-             r.words]  # this is the way words are selected in `page_to_layoutlmv2_encodings`
+    words = [w for r in page.children['region'] if r.region_type in rois for w in
+             r.children['word']]  # this is the way words are selected in `page_to_layoutlmv2_encodings`
 
     dataset = CustomDataset(encodings=encodings,
                             model_inputs_names=['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image'])

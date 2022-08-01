@@ -1,4 +1,5 @@
 """Miscellaneous helpers and utilities."""
+import inspect
 from functools import wraps
 import json
 import logging
@@ -8,26 +9,6 @@ import pandas as pd
 from jsonschema import Draft6Validator
 
 RectangleType = List[Tuple[int, int]]
-
-
-def lazy_property(func):
-    """Decorator. Makes property computation lazy."""
-
-    private_attr = '_' + func.__name__
-
-    @wraps(func)
-    def fget(self):
-        if not hasattr(self, private_attr):
-            setattr(self, private_attr, func(self))
-        return getattr(self, private_attr)
-
-    def fset(self, value):
-        setattr(self, private_attr, value)
-
-    def fdel(self):
-        delattr(self, private_attr)
-
-    return property(fget, fset, fdel, func.__doc__)
 
 
 def timer(iterations: int = 3, number: int = 1_000):
@@ -132,3 +113,101 @@ def aligned_print(*args, **kwargs):
     print(to_print)
 
 
+def lazy_property(func):
+    """Decorator. Makes property computation lazy."""
+
+    private_attr = '_' + func.__name__
+
+    @wraps(func)
+    def fget(self):
+        if not hasattr(self, private_attr):
+            setattr(self, private_attr, func(self))
+        return getattr(self, private_attr)
+
+    def fset(self, value):
+        setattr(self, private_attr, value)
+
+    def fdel(self):
+        if hasattr(self, private_attr):
+            delattr(self, private_attr)
+
+    return property(fget, fset, fdel, func.__doc__)
+
+
+# todo 👁️ make this handle *args and **kwargs.
+def lazy_init(func):
+    """Set attributes for required arguments and defaulted keyword argument which are not None at instantiation.
+
+    Example:
+        ```python
+        @lazy_init
+        def __init__(self, hello, world = None):
+            pass
+        ```
+
+        is actually equivalent to :
+
+        ```python
+        def __init__(self, hello, world = None):
+            self.hello = hello
+
+            if world is not None:
+                self.world = world
+        ```
+
+    Note:
+        Warning, this does not handle `*args` and `**kwargs`.
+
+    """
+    specs = inspect.getfullargspec(func)
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        len_defaults = len(specs.defaults) if specs.defaults else 0
+        n_req_args = len(specs.args) - len_defaults
+
+        # Start with required args
+        req_from_args = [(n, v) for n, v in zip(specs.args[1:n_req_args], args)]
+        req_from_kwargs = [(n, v) for n, v in kwargs.items() if n in specs.args[1:n_req_args]]
+        for n, v in req_from_args + req_from_kwargs:
+            setattr(self, n, v)
+
+        # For defaulted args, only append
+        def_from_args = [(n, v) for n, v in zip(specs.args[n_req_args:], args[n_req_args:]) if v is not None]
+        def_from_kwargs = [(n, v) for n, v in kwargs.items() if n in specs.args[n_req_args:] and v is not None]
+        for n, v in def_from_args + def_from_kwargs:
+            setattr(self, n, v)
+
+        func(self, *args, **kwargs)
+
+    return wrapper
+
+
+def lazy_attributer(attr_name, func, attr_decorator=lambda x: x):
+    """Parametrized decorator returning a decorator which adds the attribute of
+    name `attr_name` and of value `func` to the `class_` it decorizes.
+
+    Example:
+        ```python
+        @lazy_attributer('greeting', lambda self: f'Bonjour {self.name}', property)
+        class Student:
+            ...
+        ```
+        is actually equivalent to :
+
+        ```python
+        class Student:
+            ...
+
+            @property
+            def greeting(self):
+                return f'Bonjour {self.name}'
+        ```
+
+    """
+
+    def set_attribute(class_):
+        setattr(class_, attr_name, attr_decorator(func))
+        return class_
+
+    return set_attribute

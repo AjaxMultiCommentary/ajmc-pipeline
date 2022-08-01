@@ -1,5 +1,5 @@
 from ajmc.commons import variables
-from ajmc.text_importation.classes import OcrCommentary, OcrPage
+from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
 import os
 import re
 

@@ -7,7 +7,7 @@ from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import is_rectangle_within_rectangle, are_rectangles_overlapping_with_threshold
 from ajmc.ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts
-from ajmc.text_importation.classes import OcrPage, OcrCommentary
+from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
 from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
@@ -77,8 +77,8 @@ def simple_coordinates_based_evaluation(gt_words: List['OcrWord'],
      (e.g. with crummy groundtruth- or preds-boxes), the word is left out and not counted in the final result.
 
      Args:
-         gt_words: The list of gt words (e.g. `OcrPage.words` or `OlrRegion.words`)
-         pred_words: The list of ocr words (e.g. `OcrPage.words` or `OlrRegion.words`)
+         gt_words: The list of gt words (e.g. `OcrPage.children['word']` or `OlrRegion.children['word']`)
+         pred_words: The list of ocr words (e.g. `OcrPage.children['word']` or `OlrRegion.children['word']`)
          overlap_threshold: The minimal overlap-proportion.
 
      Returns:
@@ -93,8 +93,8 @@ def simple_coordinates_based_evaluation(gt_words: List['OcrWord'],
     for gt_word in gt_words:
 
         for i, pred_word in enumerate(pred_words_):
-            if are_rectangles_overlapping_with_threshold(pred_word.coords.bounding_rectangle,
-                                                         gt_word.coords.bounding_rectangle,
+            if are_rectangles_overlapping_with_threshold(pred_word.bbox.bbox,
+                                                         gt_word.bbox.bbox,
                                                          overlap_threshold):
                 total_characters += len(gt_word.text)
                 total_edit_distance += Levenshtein.distance(pred_word.text, gt_word.text)
@@ -143,7 +143,7 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
 
     soup = initialize_soup(img_width=gt_page.image.width, img_height=gt_page.image.height)  # Initialize html output
     charsets = ['latin', 'greek', 'punctuation', 'numbers']
-    pred_words_ = pred_page.words.copy()
+    pred_words_ = pred_page.children['word'].copy()
 
     if not error_counts:
         error_counts = {region:
@@ -155,12 +155,12 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
     if not editops_record:
         editops_record = {}
 
-    for gt_word in gt_page.words:
+    for gt_word in gt_page.children['word']:
 
         # Find `gt_word`'s regions
-        gt_word_regions = ['global'] + [r.region_type for r in gt_page.regions if
-                                        is_rectangle_within_rectangle(gt_word.coords.bounding_rectangle,
-                                                                      r.coords.bounding_rectangle)]
+        gt_word_regions = ['global'] + [r.region_type for r in gt_page.children['region'] if
+                                        is_rectangle_within_rectangle(gt_word.bbox.bbox,
+                                                                      r.bbox.bbox)]
 
         for region in gt_word_regions:
             error_counts[region]['words']['total'] += 1
@@ -170,8 +170,8 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
 
         # Find the corresponding ocr_word
         for i, pred_word in enumerate(pred_words_):
-            if are_rectangles_overlapping_with_threshold(pred_word.coords.bounding_rectangle,
-                                                         gt_word.coords.bounding_rectangle, word_overlap_threshold):
+            if are_rectangles_overlapping_with_threshold(pred_word.bbox.bbox,
+                                                         gt_word.bbox.bbox, word_overlap_threshold):
                 distance = Levenshtein.distance(pred_word.text, gt_word.text)
 
                 for region in gt_word_regions:
@@ -231,8 +231,8 @@ def commentary_evaluation(commentary: 'OcrCommentary',
     for gt_page in commentary.ocr_groundtruth_pages:
         pred_page = [p for p in commentary.pages if p.id == gt_page.id][0]
 
-        bow_error_counts = bag_of_word_evaluation(gt_bag=[w.text for w in gt_page.words],
-                                                  pred_bag=[w.text for w in pred_page.words],
+        bow_error_counts = bag_of_word_evaluation(gt_bag=[w.text for w in gt_page.children['word']],
+                                                  pred_bag=[w.text for w in pred_page.children['word']],
                                                   error_counts=bow_error_counts)
 
         editops, coord_error_counts, soup = coord_based_page_evaluation(gt_page=gt_page,
@@ -244,7 +244,7 @@ def commentary_evaluation(commentary: 'OcrCommentary',
 
     if write_files:
         if not output_dir:
-            output_dir = os.path.join(commentary.paths['ocr_dir'], os.pardir, 'evaluation')
+            output_dir = os.path.join(commentary.ocr_dir, os.pardir, 'evaluation')
 
         os.makedirs(output_dir, exist_ok=True)
 
