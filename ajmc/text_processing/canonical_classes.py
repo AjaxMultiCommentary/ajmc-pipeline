@@ -131,8 +131,10 @@ class CanonicalTextContainer:
 
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
         """Generic method to generate a `CanonicalTextContainer`'s canonical representation."""
-        return {'id': self.id, 'word_range': self.word_range}
-
+        data = {'id': self.id, 'word_range': self.word_range}
+        if hasattr(self, 'info'):
+            data['info'] = self.info
+        return data
 
 class CanonicalCommentary(CanonicalTextContainer):
 
