@@ -226,7 +226,7 @@ class CanonicalPage(CanonicalTextContainer):
         template = env.get_template('alto.xml.jinja2')
 
         with open(output_path, 'w') as f:
-            f.write(template.render(page=self, elements=children_types))
+            f.write(template.render(page=self, elements=children_types, region_types=variables.OLR_REGION_TYPES))
 
 
 class CanonicalSinglePageTextContainer(CanonicalTextContainer):

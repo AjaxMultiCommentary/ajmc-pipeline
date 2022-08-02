@@ -26,17 +26,16 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
     ]
 
 
-# todo 👁️ now in kraken
-def get_olr_split_pages(commentary: OcrCommentary,
-                        splits: List[str]) -> List['OcrPage']:
+def get_olr_split_pages(commentary_id: OcrCommentary,
+                        splits: List[str]) -> List[str]:
     """Gets the data from splits on the olr_gt sheet."""
 
     olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
 
-    filter_ = [(olr_gt['commentary_id'][i] == commentary.id and olr_gt['split'][i] in splits) for i in
+    filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
                range(len(olr_gt['page_id']))]
 
-    return [p for p in commentary.pages if p.id in list(olr_gt['page_id'][filter_])]
+    return list(olr_gt['page_id'][filter_])
 
 
 
@@ -54,6 +53,8 @@ def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
         for ocr_dir in data_dict[set_].keys():  # Iterate over ocr_dirs
             commentary = OcrCommentary.from_ajmc_structure(ocr_dir=ocr_dir)
             set_pages[set_] += get_olr_split_pages(commentary, data_dict[set_][ocr_dir])
+            set_pages[set_] += [p for p in commentary.pages
+                                if p.id in get_olr_split_pages(commentary.id, data_dict[set_][ocr_dir])]
 
     if sampling:
         random.seed(42)

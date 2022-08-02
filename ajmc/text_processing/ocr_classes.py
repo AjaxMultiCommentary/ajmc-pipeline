@@ -5,7 +5,7 @@ from time import strftime
 from typing import Dict, Optional, List, Union, Any
 import bs4.element
 
-from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_attributer, lazy_init
+from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons import variables
 from ajmc.commons.geometry import (
@@ -14,7 +14,7 @@ from ajmc.commons.geometry import (
     is_rectangle_within_rectangle, adjust_to_included_contours, get_bbox_from_points
 )
 from ajmc.commons.image import Image, draw_page_regions_lines_words
-from ajmc.olr.utils.region_processing import sort_to_reading_order, get_page_region_dicts_from_via
+from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via
 import jsonschema
 
 from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalWord, \

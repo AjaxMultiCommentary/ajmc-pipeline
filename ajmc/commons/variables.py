@@ -11,7 +11,8 @@ PATHS = {
     'xmi': 'ner/annotation',
     'typesystem': 'data/TypeSystem.xml',
     'olr_initiation': 'olr/annotation/project_initiation',
-    'ocr': 'ocr/runs'
+    'ocr': 'ocr/runs',
+    'canonical': 'canonical/v2'
 }
 
 FOLDER_STRUCTURE_PATHS = {
