@@ -59,6 +59,7 @@ class OcrCommentary:
     def __init__(self,
                  id: Optional[str] = None,
                  ocr_dir: Optional[str] = None,
+                 base_dir: Optional[str] = None,
                  via_path: Optional[str] = None,
                  image_dir: Optional[str] = None,
                  groundtruth_dir: Optional[str] = None,
@@ -95,6 +96,7 @@ class OcrCommentary:
 
         return cls(id=id,
                    ocr_dir=ocr_dir,
+                   base_dir=base_dir,
                    via_path=os.path.join(base_dir, id, variables.PATHS['via_path']),
                    image_dir=os.path.join(base_dir, id, variables.PATHS['png']),
                    groundtruth_dir=os.path.join(base_dir, id, variables.PATHS['groundtruth']),
@@ -132,14 +134,19 @@ class OcrCommentary:
     def to_canonical(self):
         can = CanonicalCommentary(id=self.id,
                                   images=[],
-                                  children={k: [] for k in ['page', 'region', 'line', 'word']})
+                                  children={k: [] for k in ['page', 'region', 'line', 'word']},
+                                  info={'image_dir': self.image_dir,
+                                        'base_dir': self.base_dir})
 
         if hasattr(self, 'ocr_run'):
-            can.info = {'ocr_run': self.ocr_run}
+            can.info['ocr_run'] = self.ocr_run
 
         w_count, p_count, r_count, l_count = 0, 0, 0, 0
 
-        for p in self.pages:
+        for i, p in enumerate(self.pages):
+            if i % 20 == 0:
+                print(f'Processing page {i} of {len(self.pages)}')
+
             p.optimise()
             p_start = w_count
             for r in p.children['region']:
@@ -470,5 +477,3 @@ class OcrWord(OcrTextContainer):
 
     def adjust_bbox(self):
         self.bbox = adjust_to_included_contours(self.bbox.bbox, self.page.image.contours)
-
-

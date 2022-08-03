@@ -4,7 +4,13 @@ from ajmc.text_processing import canonical_classes as cc
 import pytest
 
 
+
 @pytest.mark.parametrize('container', [so.sample_cancommentary,
+                                       so.sample_cancommentary.children['page'][0],
+                                       so.sample_cancommentary.children['region'][0],
+                                       so.sample_cancommentary.children['line'][0],
+                                       so.sample_cancommentary.children['word'][0],
+                                       so.sample_cancommentary_from_json,
                                        so.sample_cancommentary.children['page'][0],
                                        so.sample_cancommentary.children['region'][0],
                                        so.sample_cancommentary.children['line'][0],

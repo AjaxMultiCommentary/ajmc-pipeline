@@ -1,6 +1,8 @@
 from typing import List
 
+from ajmc.commons import variables
 from ajmc.commons.arithmetic import compute_interval_overlap
+from ajmc.commons.miscellaneous import read_google_sheet
 
 
 def get_page_region_dicts_from_via(page_id: str, via_project: dict) -> List[dict]:
@@ -66,3 +68,15 @@ def sort_to_reading_order(elements: list,
         ordered.append(sorted(overlapping_candidates, key=lambda x: x.bbox.xywh[0])[0])  # select the leftest element
 
     return ordered
+
+
+def get_olr_split_pages(commentary_id: 'OcrCommentary',
+                        splits: List[str]) -> List[str]:
+    """Gets the data from splits on the olr_gt sheet."""
+
+    olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
+
+    filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
+               range(len(olr_gt['page_id']))]
+
+    return list(olr_gt['page_id'][filter_])

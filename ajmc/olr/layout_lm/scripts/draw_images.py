@@ -2,7 +2,8 @@ import os
 import pandas as pd
 import json
 from typing import Union, List
-from ajmc.olr.layout_lm.layoutlm import get_olr_split_pages, page_to_layoutlmv2_encodings
+from ajmc.olr.layout_lm.layoutlm import page_to_layoutlmv2_encodings
+from ajmc.olr.utils import get_olr_split_pages
 from ajmc.text_processing.ocr_classes import OcrCommentary
 
 from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification

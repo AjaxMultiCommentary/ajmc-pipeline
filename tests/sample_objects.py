@@ -4,6 +4,7 @@ from ajmc.nlp.token_classification.evaluation import seqeval_evaluation
 from ajmc.commons import variables, geometry, image
 import os
 from ajmc.text_processing.ocr_classes import OcrCommentary
+from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
 # Arithmetic
 sample_intervals = {'base': (1, 10),
@@ -44,6 +45,11 @@ sample_groundtruth_page_path = os.path.join(sample_groundtruth_dir, sample_page_
 
 sample_ocrcommentary = OcrCommentary.from_ajmc_structure(sample_ocr_dir)
 sample_cancommentary = sample_ocrcommentary.to_canonical()
+
+sample_cancommentary.to_json()
+sample_canonical_path = os.path.join(sample_ocrcommentary.base_dir, 'canonical/v2', sample_ocrcommentary.ocr_run+'.json')
+
+sample_cancommentary_from_json = CanonicalCommentary.from_json(sample_canonical_path)
 
 sample_page = [p for p in sample_ocrcommentary.pages if p.id == sample_page_id][0]
 

@@ -7,7 +7,8 @@ from ajmc.commons.variables import COLORS
 from ajmc.nlp.token_classification.evaluation import evaluate_dataset
 from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.olr.layout_lm.config import labels_to_ids, rois, regions_to_coarse_labels, ids_to_labels
-from ajmc.olr.layout_lm.layoutlm import get_olr_split_pages, draw_pages, prepare_data, get_data_dict_pages
+from ajmc.olr.layout_lm.layoutlm import draw_pages, prepare_data, get_data_dict_pages
+from ajmc.olr.utils import get_olr_split_pages
 from ajmc.text_processing.ocr_classes import OcrCommentary
 
 base_path = '/Users/sven/drive/layout_lm_tests'

@@ -131,10 +131,11 @@ class CanonicalTextContainer:
 
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
         """Generic method to generate a `CanonicalTextContainer`'s canonical representation."""
-        data = {'id': self.id, 'word_range': self.word_range}
-        if hasattr(self, 'info'):
+        data = {'word_range': self.word_range}
+        if hasattr(self, 'info'):  # mainly for `region_type`s
             data['info'] = self.info
         return data
+
 
 class CanonicalCommentary(CanonicalTextContainer):
 
@@ -151,11 +152,15 @@ class CanonicalCommentary(CanonicalTextContainer):
             can_json = json.loads(file.read())
 
         comm = cls(id=can_json['metadata']['id'],
-                   images=[Image(id=img['id'], path=img['path'], word_range=img['word_range']) for img in
-                           can_json['images']],
-                   children={})
+                   images=[Image(id=img['id'],
+                                 path=os.path.join(can_json['metadata']['image_dir'], img['id'] + '.png'),
+                                 word_range=img['word_range'])
+                           for img in can_json['images']],
+                   children={},
+                   info={**can_json['metadata']})
 
-        comm.children = {type_: [types_to_classes[type_](type=type_, commentary=comm, **tc) for tc in tcs]
+        comm.children = {type_: [types_to_classes[type_](type=type_, commentary=comm, index=i, **tc)
+                                 for i, tc in enumerate(tcs)]
                          for type_, tcs in can_json['textcontainers'].items()}
 
         return comm
@@ -178,16 +183,18 @@ class CanonicalCommentary(CanonicalTextContainer):
 
     # Todo ⚠️ create json schema
     def to_json(self, output_path: Optional[str] = None) -> dict:
-        data = {'metadata': {'id': self.id, 'ocr_run': self.info['ocr_run']},
-                'images': [{'id': img.id, 'path': img.path, 'word_range': img.word_range} for img in self.images],
+        data = {'metadata': {'id': self.id, 'ocr_run': self.info['ocr_run'], 'image_dir': self.info['image_dir'],
+                             'base_dir': self.info['base_dir']},
+                'images': [{'id': img.id, 'word_range': img.word_range} for img in self.images],
                 'textcontainers': {type_: [tc.to_json() for tc in tcs] for type_, tcs in self.children.items()}}
 
         if output_path is None:
-            output_path = os.path.join(variables.PATHS['base_dir'], self.id, 'canonical/v2/',
-                                       self.info['ocr_run'] + '.json')
+            output_dir = os.path.join(self.info['base_dir'], 'canonical/v2/')
+            os.makedirs(output_dir, exist_ok=True)
+            output_path = os.path.join(output_dir, self.info['ocr_run'] + '.json')
 
         with open(output_path, 'w') as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
+            json.dump(data, f, indent=2, ensure_ascii=False)
 
         return data
 
@@ -228,6 +235,9 @@ class CanonicalPage(CanonicalTextContainer):
         with open(output_path, 'w') as f:
             f.write(template.render(page=self, elements=children_types, region_types=variables.OLR_REGION_TYPES))
 
+    def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
+        return {'id': self.id, 'word_range': self.word_range}
+
 
 class CanonicalSinglePageTextContainer(CanonicalTextContainer):
 
@@ -255,7 +265,7 @@ class CanonicalWord(CanonicalTextContainer):
         return self.index, self.index
 
     def to_json(self):
-        return {'id': self.id, 'bbox': self.bbox.bbox_2, 'text': self.text}
+        return {'bbox': self.bbox.bbox_2, 'text': self.text}
 
 
 types_to_classes = {'commentary': CanonicalCommentary,

@@ -10,10 +10,9 @@ from ajmc.commons.variables import COLORS
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset
 from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.nlp.token_classification.pipeline import create_dirs
+from ajmc.olr.utils import get_olr_split_pages
 from ajmc.text_processing.ocr_classes import OcrCommentary
 from PIL import Image
-from ajmc.commons.miscellaneous import read_google_sheet
-from ajmc.commons import variables
 
 
 # Functions
@@ -24,19 +23,6 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
         int(1000 * (rectangle[2][0] / img_width)),
         int(1000 * (rectangle[2][1] / img_height))
     ]
-
-
-def get_olr_split_pages(commentary_id: OcrCommentary,
-                        splits: List[str]) -> List[str]:
-    """Gets the data from splits on the olr_gt sheet."""
-
-    olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
-
-    filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
-               range(len(olr_gt['page_id']))]
-
-    return list(olr_gt['page_id'][filter_])
-
 
 
 def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
