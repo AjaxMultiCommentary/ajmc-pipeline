@@ -272,11 +272,6 @@ def main(config):
 if __name__ == '__main__':
     from ajmc.olr.layout_lm.config import create_olr_config
     config = create_olr_config(
-        json_path='/data/configs/layoutlm/simple_config_local.json'
+        json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json'
     )
     main(config)
-
-
-#%%
-coucou = {'a':12}
-coucou.twelwe = 12

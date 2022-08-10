@@ -64,6 +64,8 @@ ids_to_labels = {v: k for k, v in labels_to_ids.items()}
 ids_to_ner_labels = {v: 'B-' + k for k, v in labels_to_ids.items()}
 
 
+# todo 👁️ there is no reason to make the config a namespace anymore
+# todo 👁 change config data_dirs_and sets to list of dict {path: sets:}
 def create_olr_config(json_path: Optional[str] = None):
 
     config = initialize_config(json_path=json_path)
@@ -71,7 +73,7 @@ def create_olr_config(json_path: Optional[str] = None):
     new_data_dirs = {}
     for set_ in config.data_dirs_and_sets:
         new_data_dirs[set_] = {}
-        for path, it in config.data_dirs_and_sets[set_]:
+        for path, it in config.data_dirs_and_sets[set_].items():
             new_data_dirs[set_][os.path.join(prefix, path)] = it
     config.data_dirs_and_sets = new_data_dirs
     config.regions_to_coarse_labels = regions_to_coarse_labels
