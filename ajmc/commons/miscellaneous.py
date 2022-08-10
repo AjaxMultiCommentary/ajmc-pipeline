@@ -55,19 +55,19 @@ def validate_json_schema(schema_path: str = 'data/page.schema.json'):
     Draft6Validator.check_schema(schema)
 
 
+formatter = logging.Formatter("%(levelname)s - %(name)s -   %(message)s")
+
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.ERROR)
+stream_handler.setFormatter(formatter)
+
+
 def get_custom_logger(name: str,
-                      level: int = logging.INFO,
-                      fmt: str = "%(levelname)s - %(name)s -   %(message)s"):
+                      level: int = logging.INFO):
     """Custom logging wraper, called each time a logger is declared in the package."""
 
     logger = logging.getLogger(name)
     logger.setLevel(level)
-
-    formatter = logging.Formatter(fmt)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(level)
-    stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)
 
     return logger

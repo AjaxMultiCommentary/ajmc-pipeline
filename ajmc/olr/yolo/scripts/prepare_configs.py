@@ -3,7 +3,7 @@ import os
 from ajmc.text_processing import ocr_classes
 from ajmc.commons import variables
 
-configs_dir = '/Users/sven/packages/ajmc/data/configs/olr/layoutlm'
+configs_dir = '/data/configs/layoutlm/configs'
 
 for fname in os.listdir(configs_dir):
     if fname.endswith('.json'):
@@ -32,8 +32,8 @@ import os
 from ajmc.text_processing import ocr_classes
 from ajmc.commons import variables
 
-configs_dir = '/Users/sven/packages/ajmc/data/configs/olr/layoutlm'
-yolo_configs_dir = '/data/yolo/yolo'
+configs_dir = '/data/configs/layoutlm/configs'
+yolo_configs_dir = '/data/configs_/configs_'
 
 for fname in os.listdir(configs_dir):
     if fname.endswith('.json'):
@@ -60,30 +60,28 @@ for fname in os.listdir(configs_dir):
 
 # %%
 from ajmc.text_processing import ocr_classes
-import logging
+import os
 
-logging.basicConfig(level=logging.ERROR)
 
 paths = [
-    'sophoclesplaysa05campgoog/ocr/runs/15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27/outputs',
-    "Kamerbeek1953/ocr/runs/17u09o_kraken/outputs",
-    "sophoclesplaysa05campgoog/ocr/runs/15o0dN_lace_retrained_sophoclesplaysa05campgoog-2021-05-24-08-15-12-porson-with-sophoclesplaysa05campgoog-2021-05-23-22-17-38/outputs",
-    "sophoclesplaysa05campgoog/ocr/runs/15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27/outputs",
-    "sophoclesplaysa05campgoog/ocr/runs/15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27/outputs",
+    # 'sophoclesplaysa05campgoog/ocr/runs/15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27/outputs',
+    # "Kamerbeek1953/ocr/runs/17u09o_kraken/outputs",
+    # "sophoclesplaysa05campgoog/ocr/runs/15o0dN_lace_retrained_sophoclesplaysa05campgoog-2021-05-24-08-15-12-porson-with-sophoclesplaysa05campgoog-2021-05-23-22-17-38/outputs",
+    "cu31924087948174/ocr/runs/15o0a0_lace_base_cu31924087948174-2021-05-23-21-05-58-porson-2021-05-23-14-27-27/outputs",
+    "Garvie1998/ocr/runs/17g0ao_kraken/outputs",
     "Paduano1982/ocr/runs/17v0fZ_kraken/outputs",
     "Wecklein1894/ocr/runs/13p0am_lace_base/outputs"
 ]
 
 base_dir =  '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data'
-for path in path:
+for path in paths:
     print(f'PROCESSING {path}')
     comm_id = path.split('/')[0]
     ocr_run = path.split('/')[-2]
-    path = os.path.join(variables.PATHS['base_dir'], path)
-    can_path = os.path.join(comm_id, 'canonical/v2', ocr_run + '.json')
+    path = os.path.join(base_dir, path)
 
     comm = ocr_classes.OcrCommentary.from_ajmc_structure(path).to_canonical()
 
-    comm.to_json(can_path)
+    comm.to_json()
 
 

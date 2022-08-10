@@ -151,9 +151,11 @@ class CanonicalCommentary(CanonicalTextContainer):
         with open(json_path, "r") as file:
             can_json = json.loads(file.read())
 
+        base_dir = '/'+'/'.join([p for p in json_path.split('/')[:-3]])
+        image_dir = os.path.join(base_dir, variables.PATHS['png'])
         comm = cls(id=can_json['metadata']['id'],
                    images=[Image(id=img['id'],
-                                 path=os.path.join(can_json['metadata']['image_dir'], img['id'] + '.png'),
+                                 path=os.path.join(image_dir, img['id'] + '.png'),
                                  word_range=img['word_range'])
                            for img in can_json['images']],
                    children={},

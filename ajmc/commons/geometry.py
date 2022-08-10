@@ -46,6 +46,13 @@ class Shape:
         while `w` and `h` represent width and height respectively."""
         return cls([(x, y), (x + w, y), (x + w, y + h), (x, y + h)])
 
+    @classmethod
+    def from_center_w_h(cls, center_x: int, center_y: int, w: int, h:int ):
+        x = center_x - int(w/2)
+        y = center_y - int(h/2)
+        return cls.from_xywh(x, y, w, h)
+
+
     @lazy_property
     @docstring_formatter(**docstrings)
     def bbox(self) -> RectangleType:

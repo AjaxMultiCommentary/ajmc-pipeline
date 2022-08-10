@@ -96,7 +96,7 @@ class OcrCommentary:
 
         return cls(id=id,
                    ocr_dir=ocr_dir,
-                   base_dir=base_dir,
+                   base_dir=os.path.join(base_dir,id),
                    via_path=os.path.join(base_dir, id, variables.PATHS['via_path']),
                    image_dir=os.path.join(base_dir, id, variables.PATHS['png']),
                    groundtruth_dir=os.path.join(base_dir, id, variables.PATHS['groundtruth']),

@@ -70,8 +70,8 @@ def sort_to_reading_order(elements: list,
     return ordered
 
 
-def get_olr_split_pages(commentary_id: 'OcrCommentary',
-                        splits: List[str]) -> List[str]:
+def get_olr_split_page_ids(commentary_id: 'OcrCommentary',
+                           splits: List[str]) -> List[str]:
     """Gets the data from splits on the olr_gt sheet."""
 
     olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')

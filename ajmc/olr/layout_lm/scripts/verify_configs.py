@@ -1,7 +1,7 @@
 import json
 import os
 
-configs_dir = '/Users/sven/packages/ajmc/data/configs/olr'
+configs_dir = '/data/configs/layoutlm/configs'
 
 prefix = '/content/drive/MyDrive/'
 output_dir = os.path.join(prefix, 'layout_lm_tests')

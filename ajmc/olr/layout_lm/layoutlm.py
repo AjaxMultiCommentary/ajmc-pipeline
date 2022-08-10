@@ -10,8 +10,8 @@ from ajmc.commons.variables import COLORS
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset
 from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.nlp.token_classification.pipeline import create_dirs
-from ajmc.olr.utils import get_olr_split_pages
-from ajmc.text_processing.ocr_classes import OcrCommentary
+from ajmc.olr.utils import get_olr_split_page_ids
+from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from PIL import Image
 
 
@@ -26,21 +26,20 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
 
 
 def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
-                        sampling: Optional[Dict[str, float]] = None) -> Dict[str, List['OcrPage']]:
+                        sampling: Optional[Dict[str, float]] = None) -> Dict[str, List['CanonicalPage']]:
     """
     Args:
-        data_dict: A dict of format `{'set': {'ocr_dir':['split','split']}, }
+        data_dict: A dict of format `{'set': {'can_dir':['split','split']}, }
         sampling: A dict of format `{'set': sample_size}` with 0>sample_size>1.
     """
 
     set_pages = {}
     for set_ in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
         set_pages[set_] = []
-        for ocr_dir in data_dict[set_].keys():  # Iterate over ocr_dirs
-            commentary = OcrCommentary.from_ajmc_structure(ocr_dir=ocr_dir)
-            set_pages[set_] += get_olr_split_pages(commentary, data_dict[set_][ocr_dir])
-            set_pages[set_] += [p for p in commentary.pages
-                                if p.id in get_olr_split_pages(commentary.id, data_dict[set_][ocr_dir])]
+        for json_path in data_dict[set_].keys():  # Iterate over ocr_dirs
+            commentary = CanonicalCommentary.from_json(json_path=json_path)
+            set_pages[set_] += [p for p in commentary.children['page']
+                                if p.id in get_olr_split_page_ids(commentary.id, data_dict[set_][json_path])]
 
     if sampling:
         random.seed(42)
@@ -70,8 +69,23 @@ def page_to_layoutlmv2_encodings(page,
     word_boxes = [normalize_bounding_rectangles(w.bbox.bbox, page.image.width, page.image.height)
                   for r in page.children['region'] if r.region_type in rois for w in r.children['word']]
 
+    # Legacy code
     word_labels = [labels_to_ids[regions_to_coarse_labels[r.region_type]]
                    for r in page.children['region'] if r.region_type in rois for w in r.children['word']] if get_labels else None
+
+    if not get_labels:
+        word_labels = None
+    else:
+        word_labels = []
+        for r in page.children['region']:
+            if r.region_type in rois:
+                for i, w in enumerate(r.children['word']):
+                    if i != 0:
+                        word_labels.append('I-'+labels_to_ids[regions_to_coarse_labels[r.region_type]][2:])
+                    else:
+                        word_labels.append('B-'+labels_to_ids[regions_to_coarse_labels[r.region_type]][2:])
+
+
 
     # Tokenize, truncate and pad
     encodings = tokenizer(text=words,
@@ -255,3 +269,14 @@ def main(config):
                    output_dir=config.predictions_dir,
                    unknownify_tokens=config.unknownify_tokens)
 
+if __name__ == '__main__':
+    from ajmc.olr.layout_lm.config import create_olr_config
+    config = create_olr_config(
+        json_path='/data/configs/layoutlm/simple_config_local.json'
+    )
+    main(config)
+
+
+#%%
+coucou = {'a':12}
+coucou.twelwe = 12

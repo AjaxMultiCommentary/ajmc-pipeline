@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 from ajmc.nlp.token_classification.config import initialize_config
 
@@ -64,7 +65,15 @@ ids_to_ner_labels = {v: 'B-' + k for k, v in labels_to_ids.items()}
 
 
 def create_olr_config(json_path: Optional[str] = None):
+
     config = initialize_config(json_path=json_path)
+    prefix = '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/'
+    new_data_dirs = {}
+    for set_ in config.data_dirs_and_sets:
+        new_data_dirs[set_] = {}
+        for path, it in config.data_dirs_and_sets[set_]:
+            new_data_dirs[set_][os.path.join(prefix, path)] = it
+    config.data_dirs_and_sets = new_data_dirs
     config.regions_to_coarse_labels = regions_to_coarse_labels
     config.labels_to_ids = labels_to_ids
     config.ids_to_labels = ids_to_ner_labels  # TODO : ⚠️ Check this weird thing out you lazy bum !
