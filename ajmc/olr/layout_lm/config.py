@@ -63,11 +63,26 @@ labels_to_ids = {
 ids_to_labels = {v: k for k, v in labels_to_ids.items()}
 ids_to_ner_labels = {v: 'B-' + k for k, v in labels_to_ids.items()}
 
+labels_to_ids = {
+    'B-commentary': 0,
+    'I-commentary': 1,
+    'B-primary_text': 2,
+    'I-primary_text': 3,
+    'B-paratext': 4,
+    'I-paratext': 5,
+    'B-numbers': 6,
+    'I-numbers': 7,
+    'B-app_crit': 8,
+    'I-app_crit': 9,
+    'B-others': 10,
+    'I-others': 11,
+}
+ids_to_labels = {v: k for k, v in labels_to_ids.items()}
+
 
 # todo 👁️ there is no reason to make the config a namespace anymore
 # todo 👁 change config data_dirs_and sets to list of dict {path: sets:}
 def create_olr_config(json_path: Optional[str] = None):
-
     config = initialize_config(json_path=json_path)
     prefix = '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/'
     new_data_dirs = {}
@@ -78,13 +93,11 @@ def create_olr_config(json_path: Optional[str] = None):
     config.data_dirs_and_sets = new_data_dirs
     config.regions_to_coarse_labels = regions_to_coarse_labels
     config.labels_to_ids = labels_to_ids
-    config.ids_to_labels = ids_to_ner_labels  # TODO : ⚠️ Check this weird thing out you lazy bum !
-    config.ids_to_raw_labels = ids_to_labels
+    config.ids_to_labels = ids_to_labels
     config.model_inputs = ['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image', 'labels']
     config.splits = ['train', 'dev']
     config.rois = rois
     config.num_labels = len(list(labels_to_ids.keys()))
+    config.do_draw = True
 
     return config
-
-

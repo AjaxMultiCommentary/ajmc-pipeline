@@ -61,29 +61,29 @@ def page_to_layoutlmv2_encodings(page,
         LayoutLMv2FeatureExtractor.from_pretrained('microsoft/layoutlmv2-base-uncased', apply_ocr=False)
 
     # Get the lists of words, boxes and labels for a single page
-    words = [w.text for r in page.children['region'] if r.region_type in rois for w in r.children['word']]
+    words = [w.text for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
 
     if unknownify_tokens:
         words = [tokenizer.unk_token for _ in words]
 
     word_boxes = [normalize_bounding_rectangles(w.bbox.bbox, page.image.width, page.image.height)
-                  for r in page.children['region'] if r.region_type in rois for w in r.children['word']]
+                  for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
 
     # Legacy code
-    word_labels = [labels_to_ids[regions_to_coarse_labels[r.region_type]]
-                   for r in page.children['region'] if r.region_type in rois for w in r.children['word']] if get_labels else None
+    # word_labels = [labels_to_ids[regions_to_coarse_labels[r.info['region_type']]]
+    #                for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']] if get_labels else None
 
     if not get_labels:
         word_labels = None
     else:
         word_labels = []
         for r in page.children['region']:
-            if r.region_type in rois:
+            if r.info['region_type'] in rois:
                 for i, w in enumerate(r.children['word']):
                     if i != 0:
-                        word_labels.append('I-'+labels_to_ids[regions_to_coarse_labels[r.region_type]][2:])
+                        word_labels.append(labels_to_ids['I-'+ regions_to_coarse_labels[r.info['region_type']]])
                     else:
-                        word_labels.append('B-'+labels_to_ids[regions_to_coarse_labels[r.region_type]][2:])
+                        word_labels.append(labels_to_ids['B-'+regions_to_coarse_labels[r.info['region_type']]])
 
 
 
@@ -175,7 +175,7 @@ def align_predicted_page(page: 'OcrPage',
                                              regions_to_coarse_labels=regions_to_coarse_labels, tokenizer=tokenizer,
                                              get_labels=False, unknownify_tokens=unknownify_tokens)
 
-    words = [w for r in page.children['region'] if r.region_type in rois for w in
+    words = [w for r in page.children['region'] if r.info['region_type'] in rois for w in
              r.children['word']]  # this is the way words are selected in `page_to_layoutlmv2_encodings`
 
     dataset = CustomDataset(encodings=encodings,
@@ -262,7 +262,7 @@ def main(config):
         draw_pages(pages=pages['eval'],
                    rois=config.rois,
                    labels_to_ids=config.labels_to_ids,
-                   ids_to_labels=config.ids_to_raw_labels,
+                   ids_to_labels=config.ids_to_labels,
                    regions_to_coarse_labels=config.regions_to_coarse_labels,
                    tokenizer=tokenizer,
                    model=model,
