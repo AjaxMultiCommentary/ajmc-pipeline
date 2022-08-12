@@ -97,7 +97,7 @@ CHARSETS = {
 }
 
 COLORS = {
-    # https://coolors.co/b2001e-f02282-461e44-3b9ff1-125b4f-98e587-ffc802-af7159
+    # https://coolors.co/b2001e-f02282-461e44-3b9ff1-37507d-125b4f-98e587-ffc802-af7159-b5a267
     'distinct': {
         'red': (178, 0, 30),
         'pink': (240, 34, 130),
@@ -106,7 +106,9 @@ COLORS = {
         'yellow': (255, 200, 2),
         'brown': (175, 113, 89),
         'dark_green': (18, 91, 79),
-        'purple': (70, 30, 68)
+        'purple': (70, 30, 68),
+        'dark_blue': (55, 80, 125),
+        'ecru': (181, 162, 103),
     },
     # https://coolors.co/f72585-b5179e-7209b7-560bad-480ca8-3a0ca3-3f37c9-4361ee-4895ef-4cc9f0
     'hues': {

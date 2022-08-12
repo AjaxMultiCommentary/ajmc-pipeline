@@ -81,9 +81,10 @@ def page_to_layoutlmv2_encodings(page,
             if r.info['region_type'] in rois:
                 for i, w in enumerate(r.children['word']):
                     if i != 0:
-                        word_labels.append(labels_to_ids['I-'+ regions_to_coarse_labels[r.info['region_type']]])
+                        word_labels.append(labels_to_ids['O'])
+                        # word_labels.append(labels_to_ids['I-'+ regions_to_coarse_labels[r.info['region_type']]])
                     else:
-                        word_labels.append(labels_to_ids['B-'+regions_to_coarse_labels[r.info['region_type']]])
+                        word_labels.append(labels_to_ids[regions_to_coarse_labels[r.info['region_type']]])
 
 
 
@@ -209,7 +210,7 @@ def draw_pages(pages,
                ):
     from ajmc.olr.layout_lm.draw import draw_page_labels, draw_caption
 
-    labels_to_colors = {l: c + tuple([125]) for l, c in zip(labels_to_ids.keys(), COLORS['distinct'].values())}
+    labels_to_colors = {l: c + tuple([127]) for l, c in zip(labels_to_ids.keys(), list(COLORS['distinct'].values())+list(COLORS['hues'].values()))}
 
     for page in pages:
         page_words, page_labels = align_predicted_page(page,
