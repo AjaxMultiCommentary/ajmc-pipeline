@@ -235,7 +235,7 @@ class CanonicalPage(CanonicalTextContainer):
         template = env.get_template('alto.xml.jinja2')
 
         with open(output_path, 'w') as f:
-            f.write(template.render(page=self, elements=children_types, region_types=variables.OLR_REGION_TYPES))
+            f.write(template.render(page=self, elements=children_types, region_types=variables.ORDERED_OLR_REGION_TYPES))
 
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
         return {'id': self.id, 'word_range': self.word_range}

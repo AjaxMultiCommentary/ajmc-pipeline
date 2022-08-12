@@ -1,28 +1,14 @@
 import os
 from typing import Optional
 from ajmc.nlp.token_classification.config import initialize_config
+from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES
 
-rois = ['app_crit',
-        'appendix',
-        'bibliography',
-        'commentary',
-        'footnote',
-        'index_siglorum',
-        'introduction',
-        'line_number_text',
-        # 'line_number_commentary',
-        'printed_marginalia',
-        # 'handwritten_marginalia',
-        'page_number',
-        'preface',
-        'primary_text',
-        'running_header',
-        'table_of_contents',
-        'title',
-        'translation',
-        'other',
-        # 'undefined'
-        ]
+
+excluded_region_types = ['line_number_commentary', 'handwritten_marginalia', 'undefined', 'line_region']
+
+rois = [rt for rt in ORDERED_OLR_REGION_TYPES if rt not in excluded_region_types]
+
+
 regions_to_coarse_labels = {
     # Commentary
     'commentary': 'commentary',
@@ -49,8 +35,10 @@ regions_to_coarse_labels = {
     'printed_marginalia': 'others',
     'handwritten_marginalia': 'others',
     'other': 'others',
-    'undefined': 'others'
+    'undefined': 'others',
+    'line_region': 'others'
 }
+
 labels_to_ids = {
     # Commentary
     'commentary': 1,

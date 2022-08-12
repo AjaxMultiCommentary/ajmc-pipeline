@@ -47,28 +47,6 @@ COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Finglass2011',
 
 PD_COMMENTARY_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
 
-OLR_REGION_TYPES = ['app_crit',
-                    'appendix',
-                    'bibliography',
-                    'commentary',
-                    'footnote',
-                    'index_siglorum',
-                    'introduction',
-                    'line_number_text',
-                    'line_number_commentary',
-                    'printed_marginalia',
-                    'handwritten_marginalia',
-                    'page_number',
-                    'preface',
-                    'primary_text',
-                    'running_header',
-                    'table_of_contents',
-                    'title',
-                    'translation',
-                    'other',
-                    'undefined'
-                    ]
-
 ORDERED_OLR_REGION_TYPES = ['commentary',
                             'primary_text',
                             'preface',
@@ -88,8 +66,10 @@ ORDERED_OLR_REGION_TYPES = ['commentary',
                             'printed_marginalia',
                             'handwritten_marginalia',
                             'other',
-                            'undefined'
+                            'undefined',
+                            'line_region',  # added only to make sure every word has a region
                             ]
+
 
 MINIREF_PAGES = [
     'cu31924087948174_0035',
