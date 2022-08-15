@@ -34,10 +34,15 @@ def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
     """
 
     set_pages = {}
+    commentaries = {}
     for set_ in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
         set_pages[set_] = []
         for json_path in data_dict[set_].keys():  # Iterate over ocr_dirs
-            commentary = CanonicalCommentary.from_json(json_path=json_path)
+            try:
+                commentary = commentaries[json_path]
+            except KeyError:
+                commentaries[json_path] = CanonicalCommentary.from_json(json_path=json_path)
+                commentary = commentaries[json_path]
             page_ids = get_olr_split_page_ids(commentary.id, data_dict[set_][json_path])
             set_pages[set_] += [p for p in commentary.children['page'] if p.id in page_ids]
 
