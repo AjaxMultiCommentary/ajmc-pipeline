@@ -1,7 +1,7 @@
 import os
 import random
 
-from ajmc.olr.layout_lm.config import rois, regions_to_coarse_labels, labels_to_ids, ids_to_labels
+from ajmc.olr.layout_lm.config import rois, regions_to_coarse_labels, coarse_labels_to_ids, ids_to_coarse_labels
 import yaml
 from ajmc.olr.utils import get_olr_split_page_ids
 from ajmc.text_processing import canonical_classes
@@ -35,8 +35,8 @@ for config_name in os.listdir(configs_dir):
             'path': f'../datasets/{config_name[:-5]}',
             'train': 'images/train',
             'val': 'images/eval',
-            'nc': len(labels_to_ids.keys()),
-            'names': [it[0] for it in sorted([it_ for it_ in labels_to_ids.items()], key=lambda x: x[1])]
+            'nc': len(coarse_labels_to_ids.keys()),
+            'names': [it[0] for it in sorted([it_ for it_ in coarse_labels_to_ids.items()], key=lambda x: x[1])]
         }
 
         with open(os.path.join(config_dir, 'config.yaml'), 'w') as file:
@@ -70,7 +70,7 @@ for config_name in os.listdir(configs_dir):
                     for r in p.children['region']:
                         if r.info['region_type'] in rois:
                             r_coarse_label = regions_to_coarse_labels[r.info['region_type']]
-                            r_label_id = labels_to_ids[r_coarse_label]
+                            r_label_id = coarse_labels_to_ids[r_coarse_label]
                             r_width = r.bbox.width / p.image.width
                             r_height = r.bbox.height/ p.image.height
                             r_center_x = r.bbox.center[0]/p.image.width

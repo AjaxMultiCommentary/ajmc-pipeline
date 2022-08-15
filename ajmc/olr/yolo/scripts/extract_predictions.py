@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from ajmc.commons.geometry import Shape, is_rectangle_within_rectangle_with_threshold
 from ajmc.nlp.token_classification.evaluation import seqeval_evaluation, seqeval_to_df
-from ajmc.olr.layout_lm.config import rois, regions_to_coarse_labels, labels_to_ids, ids_to_labels, ids_to_ner_labels
+from ajmc.olr.layout_lm.config import rois, regions_to_coarse_labels, coarse_labels_to_ids, ids_to_coarse_labels, ids_to_ner_labels
 
 from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalSinglePageTextContainer
 
@@ -74,7 +74,7 @@ for xp_name in os.listdir(runs_path):
                         # find the word's gt label
                         gt_rtype = r.info['region_type']
                         gt_rtype = gt_rtype if gt_rtype != 'line_region' else 'other'
-                        gt_ner_label = ids_to_ner_labels[labels_to_ids[regions_to_coarse_labels[gt_rtype]]]
+                        gt_ner_label = ids_to_ner_labels[coarse_labels_to_ids[regions_to_coarse_labels[gt_rtype]]]
                         gt_words_labels.append(gt_ner_label)
 
                         # find the word's pred label

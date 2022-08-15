@@ -102,8 +102,11 @@ def train(config: 'argparse.Namespace',
 
         # ============================ Evaluate and append during training ============================
         if config.evaluate_during_training:
-            epoch_results = evaluate_dataset(eval_dataset, model, config.batch_size, config.device,
-                                             config.ids_to_labels, config.do_debug)
+            epoch_results = evaluate_dataset(dataset=eval_dataset,
+                                             model=model,
+                                             batch_size=config.batch_size,
+                                             ids_to_labels=config.ids_to_labels,
+                                             do_debug=config.do_debug)
             epoch_results = seqeval_to_df(epoch_results)
 
             epoch_data = pd.DataFrame({("TRAINING", "EP"): [epoch_num + 1],

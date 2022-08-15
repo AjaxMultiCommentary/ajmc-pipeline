@@ -22,12 +22,13 @@ def seqeval_evaluation(predictions: List[List[str]], groundtruth: List[List[str]
     return metric.compute(predictions=predictions, references=groundtruth, zero_division=0)
 
 
+# todo 👁️ actualize docstring
 @docstring_formatter(**docstrings)
 def evaluate_dataset(dataset: torch.utils.data.Dataset,
                      model: transformers.PreTrainedModel,
                      batch_size: int,
-                     device: torch.device,
                      ids_to_labels: Dict[int, str],
+                     rebuild_ner_labels: bool = True,
                      do_debug: bool = False):
     """Evaluate an entire dataset using seqeval. Is used during the main train loop.
 
@@ -38,6 +39,10 @@ def evaluate_dataset(dataset: torch.utils.data.Dataset,
     :param ids_to_labels: {ids_to_labels}
     :param do_debug: {do_debug}
     """
+
+    if rebuild_ner_labels:
+        if not all([l.startswith('B-') or l.startswith('I-') or l == 'O' for l in ids_to_labels.values()]):
+            ids_to_labels = {i: 'B-' + l for i, l in ids_to_labels.items()}
 
     dataloader = DataLoader(dataset, sampler=SequentialSampler(dataset), batch_size=batch_size)
 

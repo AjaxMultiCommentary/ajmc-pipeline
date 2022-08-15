@@ -80,11 +80,12 @@ def page_to_layoutlmv2_encodings(page,
         for r in page.children['region']:
             if r.info['region_type'] in rois:
                 for i, w in enumerate(r.children['word']):
-                    if i != 0:
-                        word_labels.append(labels_to_ids['O'])
-                        # word_labels.append(labels_to_ids['I-'+ regions_to_coarse_labels[r.info['region_type']]])
-                    else:
-                        word_labels.append(labels_to_ids[regions_to_coarse_labels[r.info['region_type']]])
+                    word_labels.append(labels_to_ids[regions_to_coarse_labels[r.info['region_type']]])
+                    # if i != 0:
+                    #     word_labels.append(labels_to_ids['O'])
+                    #     # word_labels.append(labels_to_ids['I-'+ regions_to_coarse_labels[r.info['region_type']]])
+                    # else:
+                    #     word_labels.append(labels_to_ids[regions_to_coarse_labels[r.info['region_type']]])
 
 
 
