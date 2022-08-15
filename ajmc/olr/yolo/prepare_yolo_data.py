@@ -1,6 +1,9 @@
 import os
 import random
 
+import numpy as np
+
+from ajmc.commons.image import Image
 from ajmc.olr.layout_lm.config import rois, regions_to_coarse_labels, coarse_labels_to_ids, ids_to_coarse_labels
 import yaml
 from ajmc.olr.utils import get_olr_split_page_ids
@@ -12,15 +15,15 @@ base_data_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/c
 base_xp_dir = '/Users/sven/packages/ajmc/data/yolo'
 configs_dir = os.path.join(base_xp_dir, 'configs')
 
-excluded_configs = ['1C_jebb_blank_tokens.json', '4A _omnibus_base.json']
+excluded_configs = ['1C_jebb_blank_tokens.json']
 
 for config_name in os.listdir(configs_dir):
     if config_name.endswith('.json') and config_name not in excluded_configs:
-    # if config_name == '3A_paduano_base.json':
+        print(f'******** Processing {config_name} *********')
         with open(os.path.join(configs_dir, config_name), "r") as file:
             config = json.loads(file.read())
 
-        config_dir = os.path.join(base_xp_dir, 'datasets', config_name[:-5])
+        config_dir = os.path.join(base_xp_dir, 'datasets/binary_class', config_name[:-5])
         # Create folders
         abs_paths = {'images': {'train': os.path.join(config_dir, 'images/train'),
                                 'eval': os.path.join(config_dir, 'images/eval')},
@@ -71,6 +74,7 @@ for config_name in os.listdir(configs_dir):
                         if r.info['region_type'] in rois:
                             r_coarse_label = regions_to_coarse_labels[r.info['region_type']]
                             r_label_id = coarse_labels_to_ids[r_coarse_label]
+                            r_label_id = 0
                             r_width = r.bbox.width / p.image.width
                             r_height = r.bbox.height/ p.image.height
                             r_center_x = r.bbox.center[0]/p.image.width
@@ -80,3 +84,17 @@ for config_name in os.listdir(configs_dir):
                     # write page labesl
                     with open(os.path.join(abs_paths['labels'][set_], p.image.id + '.txt'), 'w') as f:
                         f.write('\n'.join(yolo_labels))
+
+
+        # todo 👁️ add noisy pages ?
+        # write blank images
+        num_blank_pages = 2
+        for i in range(num_blank_pages):
+            blank_img = Image(matrix=np.ones(p.image.matrix.shape))
+            blank_img.write(os.path.join(abs_paths['images']['train'], f'blank_{i}.png'))
+            # write page labels
+            with open(os.path.join(abs_paths['labels']['train'], f'blank_{i}.txt'), 'w') as f:
+                f.write('')
+
+
+

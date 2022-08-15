@@ -4,12 +4,16 @@ from ajmc.text_processing.ocr_classes import OcrCommentary
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
 
-can = OcrCommentary.from_ajmc_structure('/Users/sven/packages/ajmc/data/sample_commentaries/cu31924087948174/ocr/runs/tess_eng_grc/outputs').to_canonical()
-can.to_json('/Users/sven/packages/ajmc/data/sample_commentaries/cu31924087948174/canonical/v2/tess_eng_grc.json')
-can_from_json = CanonicalCommentary.from_json('/Users/sven/packages/ajmc/data/sample_commentaries/cu31924087948174/canonical/v2/tess_eng_grc.json')
+can = OcrCommentary.from_ajmc_structure('/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/sophokle1v3soph/ocr/runs/13p0bP_lace_retrained/outputs').to_canonical()
+can.to_json()
+#%%
+import os
 
-for p in can_from_json.children['page']:
-    p.to_alto(['region', 'line'], os.path.join('/Users/sven/drive/ketos', p.id+'.xml'))
-
-
-
+base = '/Users/sven/packages/ajmc/data/yolo/datasets/multiclass'
+for conf_dir in next(os.walk(base))[1]:
+    config_path = os.path.join(base, conf_dir, 'config.yaml')
+    with open(config_path, 'r') as f:
+        conf = f.read()
+    conf = conf.replace('path: ../datasets/', 'path: ../datasets/multiclass/')
+    with open(config_path, 'w') as f:
+        f.write(conf)
