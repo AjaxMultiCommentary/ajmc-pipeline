@@ -71,12 +71,12 @@ def sort_to_reading_order(elements: list,
 
 
 def get_olr_split_page_ids(commentary_id: 'OcrCommentary',
-                           splits: List[str]) -> List[str]:
+                           split: str) -> List[str]:
     """Gets the data from splits on the olr_gt sheet."""
 
     olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
 
-    filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
+    filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] == split) for i in
                range(len(olr_gt['page_id']))]
 
     return list(olr_gt['page_id'][filter_])

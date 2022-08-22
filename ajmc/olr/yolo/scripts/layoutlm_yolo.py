@@ -6,8 +6,7 @@ from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassificati
 
 from ajmc.commons.geometry import is_rectangle_within_rectangle_with_threshold
 from ajmc.commons.image import draw_rectangles
-from ajmc.olr.layout_lm.config import rois, region_types_to_labels, \
-    create_olr_config
+from ajmc.olr.layout_lm.config import create_olr_config
 from ajmc.olr.layout_lm.layoutlm import get_data_dict_pages, align_predicted_page
 from ajmc.olr.yolo.utils import read_yolo_txt
 
@@ -30,7 +29,7 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
 
     # Get the config
     config_path = os.path.join(CONFIGS_DIR, config_name + '.json')
-    config = create_olr_config(config_path)
+    config = create_olr_config(config_path, BASE_DATA_DIR)
 
     # Create the LayoutLM model and its tokenizer
     model_path = os.path.join(LAYOUTLM_XP_DIR, config_name, 'model')
@@ -38,8 +37,7 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
     model = LayoutLMv2ForTokenClassification.from_pretrained(model_path)
 
     # Get the pages
-    pages = get_data_dict_pages(data_dict=config['data_dirs_and_sets'],
-                                base_dir=BASE_DATA_DIR)['eval']
+    pages = get_data_dict_pages(data_dict=config['data'])['eval']
 
     # Get the predictions
     for page in pages:
@@ -47,7 +45,7 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
                                              labels_to_ids=config['labels_to_ids'],
                                              ids_to_labels=config['ids_to_labels'],
                                              rois=config['rois'],
-                                             regions_to_coarse_labels=region_types_to_labels,
+                                             regions_to_coarse_labels=config['region_types_to_labels'],
                                              tokenizer=tokenizer,
                                              model=model)
 
@@ -94,7 +92,7 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
         # Write ground-truth
         lines = []
         for r in page.children['region']:
-            if r.info['region_type'] in rois:
+            if r.info['region_type'] in config['rois']:
                 line = [region_types_to_labels[r.info['region_type']]]
                 line += [str(el) for el in r.bbox.xyxy]
                 lines.append(' '.join(line))

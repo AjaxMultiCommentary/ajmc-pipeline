@@ -1,14 +1,12 @@
 import os
 import random
-
 import numpy as np
-
 from ajmc.commons.image import Image
 from ajmc.olr.layout_lm.config import create_olr_config
 import yaml
 from ajmc.olr.utils import get_olr_split_page_ids
 from ajmc.text_processing import canonical_classes
-import json
+
 
 
 base_data_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data'
@@ -20,7 +18,8 @@ excluded_configs = ['1C_jebb_blank_tokens.json']
 for config_name in os.listdir(configs_dir):
     if config_name.endswith('.json') and config_name not in excluded_configs:
         print(f'******** Processing {config_name} *********')
-        config = create_olr_config(os.path.join(configs_dir, config_name))
+        config = create_olr_config(os.path.join(configs_dir, config_name),
+                                   prefix=base_data_dir)
 
         config_dir = os.path.join(base_xp_dir, 'datasets/multiclass', config_name[:-5]) # todo chnage
         # Create folders
@@ -45,16 +44,13 @@ for config_name in os.listdir(configs_dir):
             documents = yaml.dump(yolo_yaml, file)
 
 
-        for set_ in config['data_dirs_and_sets'].keys():
-            for path, splits in config['data_dirs_and_sets'][set_].items():
+        for set_, dicts in config['data'].items():
+            for dict_ in dicts:  # todo 👁️ why isn't this directly a get_data_dict_pages ?
 
                 # You get the commentary to canonical
-                print(f'import {path}')
-                comm = canonical_classes.CanonicalCommentary.from_json(
-                    os.path.join(base_data_dir, path)
-                )
+                comm = canonical_classes.CanonicalCommentary.from_json(dict_['path'])
 
-                p_ids = get_olr_split_page_ids(comm.id, splits)
+                p_ids = get_olr_split_page_ids(dict_['id'], dict_['split'])
                 pages = [p for p in comm.children['page'] if p.id in p_ids]
 
                 try:

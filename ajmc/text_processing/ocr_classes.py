@@ -308,8 +308,9 @@ class OcrPage(OcrTextContainer):
 
         # Process regions
         self.children['region'] = [r for r in self.children['region']
-                                   if r.region_type not in ['undefined', 'line_number_commentary']
-                                   and r.children['word']]
+                                   if r.region_type not in ['undefined', 'line_number_commentary']]
+                                   # and r.children['word']]
+
         for r in self.children['region']:
             r.adjust_bbox()
 
@@ -430,7 +431,7 @@ class OlrRegion(OcrTextContainer):
 
     def adjust_bbox(self):
         words_points = [xy for w in self.children['word'] for xy in w.bbox.bbox]
-        self.bbox = Shape(get_bbox_from_points(words_points))
+        self.bbox = Shape(get_bbox_from_points(words_points)) if words_points else self.bbox
 
 
 class OcrLine(OcrTextContainer):

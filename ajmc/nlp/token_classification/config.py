@@ -4,7 +4,9 @@ import json
 import torch
 from transformers import TrainingArguments
 from typing import Dict, Any
+from ajmc.commons.miscellaneous import get_custom_logger
 
+logger = get_custom_logger(__name__)
 
 def create_default_config() -> Dict[str, Any]:
     """Creates a default token-classification config."""
@@ -72,10 +74,13 @@ def parse_config_from_json(json_path: str) -> Dict[str, Any]:
     config = create_default_config()
     config.update(**{arg: json_args[arg] for arg in json_args.keys()})
 
-    if config['device_name'].startswith("cuda"):
-        assert torch.cuda.is_available(), "You set `device_name` to {} but cuda is not available.".format(
-            config['device_name'])
-    config['device'] = torch.device(config['device_name'])
+    if config['device_name'].startswith("cuda") and not torch.cuda.is_available():
+        logger.error("You set `device_name` to {} but cuda is not available, setting device to cpu.".format(config['device_name']))
+        config['device'] = torch.device('cpu')
+
+    else:
+        config['device'] = torch.device(config['device_name'])
+
 
     return config
 

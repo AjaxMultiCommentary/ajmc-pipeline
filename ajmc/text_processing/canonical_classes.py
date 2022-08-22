@@ -8,7 +8,9 @@ from ajmc.commons.image import Image
 from ajmc.commons.miscellaneous import lazy_property, lazy_init, lazy_attributer
 from jinja2 import Environment, FileSystemLoader
 from ajmc.commons import variables
+from ajmc.commons.miscellaneous import get_custom_logger
 
+logger = get_custom_logger(__name__)
 
 class CanonicalTextContainer:
 
@@ -148,6 +150,8 @@ class CanonicalCommentary(CanonicalTextContainer):
 
     @classmethod
     def from_json(cls, json_path: str):
+        logger.info(f'Importing canonical commentary from {json_path}')
+
         with open(json_path, "r") as file:
             can_json = json.loads(file.read())
 

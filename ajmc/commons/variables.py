@@ -75,6 +75,40 @@ ORDERED_OLR_REGION_TYPES = ['commentary',
 EXCLUDED_REGION_TYPES = ['line_number_commentary', 'handwritten_marginalia', 'undefined', 'line_region']
 ROIS = [rt for rt in ORDERED_OLR_REGION_TYPES if rt not in EXCLUDED_REGION_TYPES]
 
+REGION_TYPES_TO_COARSE_LABELS = {
+    # Commentary
+    'commentary': 'commentary',
+    # Primary text
+    'primary_text': 'primary_text',
+    # Footnotes
+    'footnote': 'footnote',
+    # Running header
+    'running_header': 'running_header',
+    # Paratext
+    'preface': 'paratext',
+    'introduction': 'paratext',
+    'appendix': 'paratext',
+    # Numbers
+    'line_number_text': 'numbers',
+    'line_number_commentary': 'numbers',
+    'page_number': 'numbers',
+    # App Crit
+    'app_crit': 'app_crit',
+    # Others
+    'translation': 'others',
+    'bibliography': 'others',
+    'index_siglorum': 'others',
+    'table_of_contents': 'others',
+    'title': 'others',
+    'printed_marginalia': 'others',
+    'handwritten_marginalia': 'others',
+    'other': 'others',
+    'undefined': 'others',
+    'line_region': 'others'
+}
+
+REGION_TYPES_TO_FINE_LABELS = {k:k for k in REGION_TYPES_TO_COARSE_LABELS.keys()}
+
 MINIREF_PAGES = [
     'cu31924087948174_0035',
     'cu31924087948174_0063',

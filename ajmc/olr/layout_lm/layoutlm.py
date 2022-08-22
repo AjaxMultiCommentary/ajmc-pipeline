@@ -6,7 +6,7 @@ from ajmc.commons.docstrings import docstrings, docstring_formatter
 from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
 from typing import List, Optional, Dict, Union, Tuple
 from ajmc.nlp.token_classification.pipeline import train
-from ajmc.commons.variables import COLORS
+from ajmc.commons.variables import COLORS, PATHS
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset
 from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.nlp.token_classification.pipeline import create_dirs
@@ -25,27 +25,27 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
     ]
 
 
-def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
-                        sampling: Optional[Dict[str, float]] = None,
-                        base_dir : str = '') -> Dict[str, List['CanonicalPage']]:
+def get_data_dict_pages(data_dict: Dict[str, List[Dict[str, str]]],
+                        sampling: Optional[Dict[str, float]] = None) -> Dict[str, List['CanonicalPage']]:
     """
     Args:
-        data_dict: A dict of format `{'set': {'can_dir':['split','split']}, }
+        data_dict: A dict of format `{'set': [{'id': 'comm_id_1', 'run':..., 'path': ...}, ...] }
         sampling: A dict of format `{'set': sample_size}` with 0>sample_size>1.
     """
 
     set_pages = {}
     commentaries = {}
-    for set_ in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
+
+    for set_, dicts in data_dict.items():  # Iterate over set names, eg 'train', 'eval'
         set_pages[set_] = []
-        for json_path in data_dict[set_].keys():  # Iterate over ocr_dirs
-            json_abs_path = os.path.join(base_dir, json_path)
+        for dict_ in dicts:
             try:
-                commentary = commentaries[json_abs_path]
+                commentary = commentaries[dict_['id']]
             except KeyError:
-                commentaries[json_abs_path] = CanonicalCommentary.from_json(json_path=json_abs_path)
-                commentary = commentaries[json_abs_path]
-            page_ids = get_olr_split_page_ids(commentary.id, data_dict[set_][json_path])
+                commentary = CanonicalCommentary.from_json(json_path=dict_['path'])
+                commentaries[dict_['id']] = commentary
+
+            page_ids = get_olr_split_page_ids(dict_['id'], dict_['split'])
             set_pages[set_] += [p for p in commentary.children['page'] if p.id in page_ids]
 
     if sampling:
@@ -252,7 +252,7 @@ def main(config):
     tokenizer = LayoutLMv2TokenizerFast.from_pretrained(config['model_name_or_path'])
     model = LayoutLMv2ForTokenClassification.from_pretrained(config['model_name_or_path'], num_labels=config['num_labels'])
 
-    pages = get_data_dict_pages(data_dict=config['data_dirs_and_sets'], sampling=config['sampling'])
+    pages = get_data_dict_pages(data_dict=config['data'], sampling=config['sampling'])
 
     datasets = prepare_data(page_sets=pages,
                             labels_to_ids=config['labels_to_ids'],
@@ -281,6 +281,7 @@ def main(config):
 if __name__ == '__main__':
     from ajmc.olr.layout_lm.config import create_olr_config
     config = create_olr_config(
-        json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json'
+        json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json',
+        prefix=PATHS['base_dir']
     )
     main(config)
