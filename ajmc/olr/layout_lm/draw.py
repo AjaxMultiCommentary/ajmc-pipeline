@@ -6,7 +6,7 @@ from typing import List, Dict, Tuple
 def draw_page_labels(img: 'PIL.Image',
                      words: List['OcrWord'],
                      labels: List[str],
-                     labels_to_colors
+                     labels_to_colors,
                       ):
     """Highlights words bounding boxes with the color corresponding to their label."""
 

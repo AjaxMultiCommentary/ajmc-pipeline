@@ -67,6 +67,10 @@ class Shape:
         return self.bbox[::2]
 
     @lazy_property
+    def xyxy(self):
+        return [i for tup in self.bbox_2 for i in tup]
+
+    @lazy_property
     def xywh(self) -> List[int]:
         """Gets the bounding rectangle in `[x,y,w,h]` format, where `x` and `y` are the coordinates of the upper-left
         corner."""

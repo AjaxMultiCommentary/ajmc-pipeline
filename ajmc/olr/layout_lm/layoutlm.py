@@ -26,7 +26,8 @@ def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, im
 
 
 def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
-                        sampling: Optional[Dict[str, float]] = None) -> Dict[str, List['CanonicalPage']]:
+                        sampling: Optional[Dict[str, float]] = None,
+                        base_dir : str = '') -> Dict[str, List['CanonicalPage']]:
     """
     Args:
         data_dict: A dict of format `{'set': {'can_dir':['split','split']}, }
@@ -38,11 +39,12 @@ def get_data_dict_pages(data_dict: Dict[str, Dict[str, List[str]]],
     for set_ in data_dict.keys():  # Iterate over set names, eg 'train', 'eval'
         set_pages[set_] = []
         for json_path in data_dict[set_].keys():  # Iterate over ocr_dirs
+            json_abs_path = os.path.join(base_dir, json_path)
             try:
-                commentary = commentaries[json_path]
+                commentary = commentaries[json_abs_path]
             except KeyError:
-                commentaries[json_path] = CanonicalCommentary.from_json(json_path=json_path)
-                commentary = commentaries[json_path]
+                commentaries[json_abs_path] = CanonicalCommentary.from_json(json_path=json_abs_path)
+                commentary = commentaries[json_abs_path]
             page_ids = get_olr_split_page_ids(commentary.id, data_dict[set_][json_path])
             set_pages[set_] += [p for p in commentary.children['page'] if p.id in page_ids]
 
@@ -243,38 +245,38 @@ def main(config):
     # config = create_olr_config('/Users/sven/packages/ajmc/data/configs/simple_config_local.json')
     create_dirs(config)
 
-    with open(os.path.join(config.output_dir, 'config.json'), 'w') as f:
-        json.dump(config.__dict__, f, skipkeys=True, indent=4, sort_keys=True,
+    with open(os.path.join(config['output_dir'], 'config.json'), 'w') as f:
+        json.dump(config, f, skipkeys=True, indent=4, sort_keys=True,
                   default=lambda o: '<not serializable>')
 
-    tokenizer = LayoutLMv2TokenizerFast.from_pretrained(config.model_name_or_path)
-    model = LayoutLMv2ForTokenClassification.from_pretrained(config.model_name_or_path, num_labels=config.num_labels)
+    tokenizer = LayoutLMv2TokenizerFast.from_pretrained(config['model_name_or_path'])
+    model = LayoutLMv2ForTokenClassification.from_pretrained(config['model_name_or_path'], num_labels=config['num_labels'])
 
-    pages = get_data_dict_pages(data_dict=config.data_dirs_and_sets, sampling=config.sampling)
+    pages = get_data_dict_pages(data_dict=config['data_dirs_and_sets'], sampling=config['sampling'])
 
     datasets = prepare_data(page_sets=pages,
-                            labels_to_ids=config.labels_to_ids,
-                            regions_to_coarse_labels=config.regions_to_coarse_labels,
-                            rois=config.rois,
+                            labels_to_ids=config['labels_to_ids'],
+                            regions_to_coarse_labels=config['regions_to_coarse_labels'],
+                            rois=config['rois'],
                             tokenizer=tokenizer,
-                            unknownify_tokens=config.unknownify_tokens,
-                            do_debug=config.do_debug)
+                            unknownify_tokens=config['unknownify_tokens'],
+                            do_debug=config['do_debug'])
 
-    if config.do_train:
+    if config['do_train']:
         train(config=config, model=model, train_dataset=datasets['train'], eval_dataset=datasets['eval'],
               tokenizer=tokenizer)
 
     # draw
-    if config.do_draw:
+    if config['do_draw']:
         draw_pages(pages=pages['eval'],
-                   rois=config.rois,
-                   labels_to_ids=config.labels_to_ids,
-                   ids_to_labels=config.ids_to_labels,
-                   regions_to_coarse_labels=config.regions_to_coarse_labels,
+                   rois=config['rois'],
+                   labels_to_ids=config['labels_to_ids'],
+                   ids_to_labels=config['ids_to_labels'],
+                   regions_to_coarse_labels=config['regions_to_coarse_labels'],
                    tokenizer=tokenizer,
                    model=model,
-                   output_dir=config.predictions_dir,
-                   unknownify_tokens=config.unknownify_tokens)
+                   output_dir=config['predictions_dir'],
+                   unknownify_tokens=config['unknownify_tokens'])
 
 if __name__ == '__main__':
     from ajmc.olr.layout_lm.config import create_olr_config

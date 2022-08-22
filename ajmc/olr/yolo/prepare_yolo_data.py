@@ -4,7 +4,7 @@ import random
 import numpy as np
 
 from ajmc.commons.image import Image
-from ajmc.olr.layout_lm.config import rois, regions_to_coarse_labels, coarse_labels_to_ids, ids_to_coarse_labels
+from ajmc.olr.layout_lm.config import regions_to_coarse_labels, coarse_labels_to_ids, ids_to_coarse_labels
 import yaml
 from ajmc.olr.utils import get_olr_split_page_ids
 from ajmc.text_processing import canonical_classes
@@ -18,12 +18,12 @@ configs_dir = os.path.join(base_xp_dir, 'configs')
 excluded_configs = ['1C_jebb_blank_tokens.json']
 
 for config_name in os.listdir(configs_dir):
-    if config_name.endswith('.json') and config_name not in excluded_configs:
+    if config_name.endswith('.json') and config_name not in excluded_configs and config_name.startswith('4A_'):
         print(f'******** Processing {config_name} *********')
         with open(os.path.join(configs_dir, config_name), "r") as file:
             config = json.loads(file.read())
 
-        config_dir = os.path.join(base_xp_dir, 'datasets/binary_class', config_name[:-5])
+        config_dir = os.path.join(base_xp_dir, 'datasets/multiclass', config_name[:-5])
         # Create folders
         abs_paths = {'images': {'train': os.path.join(config_dir, 'images/train'),
                                 'eval': os.path.join(config_dir, 'images/eval')},
@@ -71,10 +71,10 @@ for config_name in os.listdir(configs_dir):
                     # get page labels
                     yolo_labels = []
                     for r in p.children['region']:
-                        if r.info['region_type'] in rois:
+                        if r.info['region_type'] in config['rois']:
                             r_coarse_label = regions_to_coarse_labels[r.info['region_type']]
                             r_label_id = coarse_labels_to_ids[r_coarse_label]
-                            r_label_id = 0
+                            # r_label_id = 0
                             r_width = r.bbox.width / p.image.width
                             r_height = r.bbox.height/ p.image.height
                             r_center_x = r.bbox.center[0]/p.image.width

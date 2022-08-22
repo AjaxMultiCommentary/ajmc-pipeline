@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-runs_path = '/scratch/sven/yolo/runs/yolov5m_1280_ep300/'
+runs_path = '/scratch/sven/yolo/runs/binary_classification/'
 general_results = pd.DataFrame()
 
 for config_name in sorted(os.listdir(runs_path)):

@@ -1,23 +1,24 @@
 import os
 from typing import Optional
-from ajmc.nlp.token_classification.config import initialize_config
+from ajmc.nlp.token_classification.config import parse_config_from_json
 from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES
 
-
-excluded_region_types = ['line_number_commentary', 'handwritten_marginalia', 'undefined', 'line_region']
+excluded_region_types = ['line_number_commentary', 'handwritten_marginalia', 'undefined', 'line_region'] # todo in configs
 
 rois = [rt for rt in ORDERED_OLR_REGION_TYPES if rt not in excluded_region_types]
-
 
 regions_to_coarse_labels = {
     # Commentary
     'commentary': 'commentary',
     # Primary text
     'primary_text': 'primary_text',
+    # Footnotes
+    'footnote': 'footnote',
+    # Running header
+    'running_header': 'running_header',
     # Paratext
     'preface': 'paratext',
     'introduction': 'paratext',
-    'footnote': 'paratext',
     'appendix': 'paratext',
     # Numbers
     'line_number_text': 'numbers',
@@ -29,7 +30,6 @@ regions_to_coarse_labels = {
     'translation': 'others',
     'bibliography': 'others',
     'index_siglorum': 'others',
-    'running_header': 'others',
     'table_of_contents': 'others',
     'title': 'others',
     'printed_marginalia': 'others',
@@ -39,16 +39,9 @@ regions_to_coarse_labels = {
     'line_region': 'others'
 }
 
-coarse_labels_to_ids = {
-    'commentary': 1,
-    'primary_text': 2,
-    'paratext': 3,
-    'numbers': 4,
-    'app_crit': 5,
-    'others': 0,
-    'O': 6
-}
-ids_to_coarse_labels = {v: k for k, v in coarse_labels_to_ids.items()}
+coarse_labels_to_ids = {l: i for i, l in enumerate(sorted(list(regions_to_coarse_labels.values())))}
+
+ids_to_coarse_labels = {l: i for i, l in coarse_labels_to_ids.items()}
 
 ner_labels_to_ids = {
     'B-commentary': 0,
@@ -67,25 +60,24 @@ ner_labels_to_ids = {
 ids_to_ner_labels = {v: k for k, v in ner_labels_to_ids.items()}
 
 
-# todo 👁️ there is no reason to make the config a namespace anymore
-# todo 👁 change config data_dirs_and sets to list of dict {path: sets:}
 def create_olr_config(json_path: Optional[str] = None,
-                      prefix = None  # '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/'
+                      prefix=None
+                      # '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/'
                       ):
-    config = initialize_config(json_path=json_path)
+    config = parse_config_from_json(json_path=json_path)
     if prefix:
         new_data_dirs = {}
-        for set_ in config.data_dirs_and_sets:
+        for set_ in config['data_dirs_and_sets']:
             new_data_dirs[set_] = {}
-            for path, it in config.data_dirs_and_sets[set_].items():
+            for path, it in config['data_dirs_and_sets'][set_].items():
                 new_data_dirs[set_][os.path.join(prefix, path)] = it
-        config.data_dirs_and_sets = new_data_dirs
-    config.regions_to_coarse_labels = regions_to_coarse_labels
-    config.labels_to_ids = coarse_labels_to_ids
-    config.ids_to_labels = ids_to_coarse_labels
-    config.model_inputs = ['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image', 'labels']
-    config.splits = ['train', 'dev']
-    config.rois = rois
-    config.num_labels = len(list(coarse_labels_to_ids.keys()))
+        config['data_dirs_and_sets'] = new_data_dirs
+    config['regions_to_coarse_labels'] = regions_to_coarse_labels
+    config['labels_to_ids'] = coarse_labels_to_ids
+    config['ids_to_labels'] = ids_to_coarse_labels
+    config['model_inputs'] = ['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image', 'labels']
+    config['splits'] = ['train', 'dev']
+    config['rois'] = rois
+    config['num_labels'] = len(list(coarse_labels_to_ids.keys()))
 
     return config
