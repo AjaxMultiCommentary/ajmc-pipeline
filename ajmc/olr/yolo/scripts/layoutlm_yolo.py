@@ -6,7 +6,8 @@ from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassificati
 
 from ajmc.commons.geometry import is_rectangle_within_rectangle_with_threshold
 from ajmc.commons.image import draw_rectangles
-from ajmc.olr.layout_lm.config import coarse_labels_to_ids, ids_to_coarse_labels, rois, regions_to_coarse_labels
+from ajmc.olr.layout_lm.config import rois, region_types_to_labels, \
+    create_olr_config
 from ajmc.olr.layout_lm.layoutlm import get_data_dict_pages, align_predicted_page
 from ajmc.olr.yolo.utils import read_yolo_txt
 
@@ -29,8 +30,7 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
 
     # Get the config
     config_path = os.path.join(CONFIGS_DIR, config_name + '.json')
-    with open(config_path, 'r') as f:
-        config = json.loads(f.read())
+    config = create_olr_config(config_path)
 
     # Create the LayoutLM model and its tokenizer
     model_path = os.path.join(LAYOUTLM_XP_DIR, config_name, 'model')
@@ -44,10 +44,10 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
     # Get the predictions
     for page in pages:
         words, labels = align_predicted_page(page=page,
-                                             labels_to_ids=coarse_labels_to_ids,
-                                             ids_to_labels=ids_to_coarse_labels,
-                                             rois=rois,
-                                             regions_to_coarse_labels=regions_to_coarse_labels,
+                                             labels_to_ids=config['labels_to_ids'],
+                                             ids_to_labels=config['ids_to_labels'],
+                                             rois=config['rois'],
+                                             regions_to_coarse_labels=region_types_to_labels,
                                              tokenizer=tokenizer,
                                              model=model)
 
@@ -64,7 +64,7 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
                 lines = [l for l in f.readlines() if l]
             detected_regions = read_yolo_txt(lines=lines,
                                              # ids_to_label={0: 'region'},
-                                             ids_to_label=ids_to_coarse_labels,
+                                             ids_to_label=config['ids_to_labels'],
                                              image_width=page.image.width,
                                              image_height=page.image.height)
         except IndexError:
@@ -95,7 +95,7 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
         lines = []
         for r in page.children['region']:
             if r.info['region_type'] in rois:
-                line = [regions_to_coarse_labels[r.info['region_type']]]
+                line = [region_types_to_labels[r.info['region_type']]]
                 line += [str(el) for el in r.bbox.xyxy]
                 lines.append(' '.join(line))
 

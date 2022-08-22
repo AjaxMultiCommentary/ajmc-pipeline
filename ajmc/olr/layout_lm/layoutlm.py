@@ -77,7 +77,7 @@ def page_to_layoutlmv2_encodings(page,
                   for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
 
     # Legacy code
-    # word_labels = [labels_to_ids[regions_to_coarse_labels[r.info['region_type']]]
+    # word_labels = [labels_to_ids[region_types_to_labels[r.info['region_type']]]
     #                for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']] if get_labels else None
 
     if not get_labels:
@@ -90,9 +90,9 @@ def page_to_layoutlmv2_encodings(page,
                     word_labels.append(labels_to_ids[regions_to_coarse_labels[r.info['region_type']]])
                     # if i != 0:
                     #     word_labels.append(labels_to_ids['O'])
-                    #     # word_labels.append(labels_to_ids['I-'+ regions_to_coarse_labels[r.info['region_type']]])
+                    #     # word_labels.append(labels_to_ids['I-'+ region_types_to_labels[r.info['region_type']]])
                     # else:
-                    #     word_labels.append(labels_to_ids[regions_to_coarse_labels[r.info['region_type']]])
+                    #     word_labels.append(labels_to_ids[region_types_to_labels[r.info['region_type']]])
 
 
 
@@ -256,7 +256,7 @@ def main(config):
 
     datasets = prepare_data(page_sets=pages,
                             labels_to_ids=config['labels_to_ids'],
-                            regions_to_coarse_labels=config['regions_to_coarse_labels'],
+                            regions_to_coarse_labels=config['region_types_to_labels'],
                             rois=config['rois'],
                             tokenizer=tokenizer,
                             unknownify_tokens=config['unknownify_tokens'],
@@ -272,7 +272,7 @@ def main(config):
                    rois=config['rois'],
                    labels_to_ids=config['labels_to_ids'],
                    ids_to_labels=config['ids_to_labels'],
-                   regions_to_coarse_labels=config['regions_to_coarse_labels'],
+                   regions_to_coarse_labels=config['region_types_to_labels'],
                    tokenizer=tokenizer,
                    model=model,
                    output_dir=config['predictions_dir'],

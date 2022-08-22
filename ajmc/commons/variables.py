@@ -4,6 +4,8 @@ import logging
 PATHS = {
     # 'base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/',
     'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
+    'drive_base_dir': '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/',
+    'cluster_base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data',
     'schema': 'data/templates/page.schema.json',
     'groundtruth': 'ocr/groundtruth/evaluation',
     'png': 'images/png',
@@ -70,6 +72,8 @@ ORDERED_OLR_REGION_TYPES = ['commentary',
                             'line_region',  # added only to make sure every word has a region
                             ]
 
+EXCLUDED_REGION_TYPES = ['line_number_commentary', 'handwritten_marginalia', 'undefined', 'line_region']
+ROIS = [rt for rt in ORDERED_OLR_REGION_TYPES if rt not in EXCLUDED_REGION_TYPES]
 
 MINIREF_PAGES = [
     'cu31924087948174_0035',

@@ -4,9 +4,9 @@ import json
 from ajmc.olr.utils import get_olr_split_page_ids
 from ajmc.text_processing. canonical_classes import CanonicalCommentary
 from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification
-from ajmc.olr.layout_lm.config import rois, regions_to_coarse_labels, labels_to_ids, ids_to_labels
+from ajmc.olr.layout_lm.config import region_types_to_labels, labels_to_ids, ids_to_labels
 from ajmc.olr.layout_lm.layoutlm import draw_pages
-from ajmc.commons.variables import COLORS
+from ajmc.commons.variables import COLORS, ROIS
 
 
 
@@ -36,7 +36,7 @@ for fname in next(os.walk(base_path))[1]:  # Walk in dirs only
         tokenizer = LayoutLMv2TokenizerFast.from_pretrained(model_name_or_path)
         model = LayoutLMv2ForTokenClassification.from_pretrained(model_name_or_path)
 
-        draw_pages(pages,rois=rois, labels_to_ids=labels_to_ids, ids_to_labels=ids_to_labels,
-                   regions_to_coarse_labels=regions_to_coarse_labels, tokenizer=tokenizer,
+        draw_pages(pages, rois=ROIS, labels_to_ids=labels_to_ids, ids_to_labels=ids_to_labels,
+                   regions_to_coarse_labels=region_types_to_labels, tokenizer=tokenizer,
                    model=model, output_dir=output_dir)
 

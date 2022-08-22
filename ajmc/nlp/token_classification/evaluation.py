@@ -16,10 +16,17 @@ from ajmc.commons.miscellaneous import get_custom_logger
 logger = get_custom_logger(__name__)
 
 
-def seqeval_evaluation(predictions: List[List[str]], groundtruth: List[List[str]]):
+def seqeval_evaluation(predictions: List[List[str]],
+                       groundtruth: List[List[str]],
+                       nerify_labels: bool = False):
     """Simple wrapper around seqeval."""
     metric = datasets.load_metric('seqeval')
-    return metric.compute(predictions=predictions, references=groundtruth, zero_division=0)
+    if not nerify_labels:
+        return metric.compute(predictions=predictions, references=groundtruth, zero_division=0)
+    else:
+        return metric.compute(predictions=['B-' + l if l != 'O' else l for l in predictions],
+                              references=['B-' + l if l != 'O' else l for l in groundtruth],
+                              zero_division=0)
 
 
 # todo 👁️ actualize docstring

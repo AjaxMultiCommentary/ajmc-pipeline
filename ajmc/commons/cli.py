@@ -3,7 +3,7 @@ import sys
 
 parser = argparse.ArgumentParser()
 
-
+# Todo : remove the cli
 def general_args(parser: "ArgumentParser") -> "ArgumentParser":
     """Adds general cli arguments to the parser.
 

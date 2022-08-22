@@ -7,18 +7,24 @@ from ajmc.commons.miscellaneous import get_custom_logger, split_list
 
 logger = get_custom_logger(__name__)
 
+def get_ner_labels(labels: List[str],
+                   b_only: bool = False,
+                   add_o: bool = True) -> List[str]:
+    """A simple function to nerify labels"""
+    ner_labels = ['B-'+l for l in labels if l != 'O']
+    if not b_only:
+        ner_labels += ['I-'+l for l in labels if l != 'O']
+    if 'O' in labels or add_o:
+        ner_labels.append('O')
+
+    return sort_ner_labels(ner_labels)
+
 
 def sort_ner_labels(labels: Iterable[str]):
     """Sorts a list of CoLLN-compliant labels alphabetically, starting 'O'."""
 
-    assert 'O' in labels, """Label 'O' not found in labels."""
-    labels = [l for l in labels if l != 'O']
-    uniques = set([l[2:] for l in labels])
-
-    sorted_labels = ['O']
-    for l in sorted(uniques):
-        sorted_labels.append('B-' + l)
-        sorted_labels.append('I-' + l)
+    sorted_labels = ['O'] if 'O' in labels else []
+    sorted_labels += sorted([l for l in labels if l != 'O'], key=lambda x: x[2:]+x[0])
 
     return sorted_labels
 

@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from ajmc.commons.geometry import is_rectangle_within_rectangle_with_threshold
 from ajmc.nlp.token_classification.evaluation import seqeval_evaluation, seqeval_to_df
-from ajmc.olr.layout_lm.config import regions_to_coarse_labels, coarse_labels_to_ids, ids_to_ner_labels
+from ajmc.olr.layout_lm.config import create_olr_config
 from ajmc.olr.yolo.utils import read_yolo_txt_line
 
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
@@ -25,15 +25,14 @@ for xp_name in next(os.walk(runs_path))[1]:
 
     # Open config file to get commentary
     config_path = os.path.join(yolo_path, 'configs', xp_name + '.json')
+    config = create_olr_config(config_path, prefix=base_data_dir)
     with open(config_path, 'r') as file:
         config = json.loads(file.read())
 
     # Create the commentaries
-    for can_path in config['data_dirs_and_sets']['eval'].keys():
-        comm_id_ = can_path.split('/')[-4]
-        if not comm_id_ in commentaries.keys():
-            can_path = os.path.join(base_data_dir, can_path)
-            commentaries[comm_id_] = CanonicalCommentary.from_json(can_path)
+    for dict_ in config['data']['eval']:
+        if not dict_['id'] in commentaries.keys():
+            commentaries[dict_['id']] = CanonicalCommentary.from_json(dict_['path'])
 
     # Find the prediction
     preds_dir = os.path.join(yolo_path, 'runs/yolov5m_1280_ep300/detect', xp_name, 'labels')
@@ -54,7 +53,7 @@ for xp_name in next(os.walk(runs_path))[1]:
             print('   Line loop')
             for line in lines:
                 regions.append(read_yolo_txt_line(line=line,
-                                                  ids_to_label=ids_to_ner_labels,
+                                                  ids_to_label=config['ids_to_labels'],
                                                   image_width=page.image.width,
                                                   image_height=page.image.height))
 
@@ -64,8 +63,8 @@ for xp_name in next(os.walk(runs_path))[1]:
                     # find the word's gt label
                     gt_rtype = r.info['region_type']
                     gt_rtype = gt_rtype if gt_rtype != 'line_region' else 'other'
-                    gt_ner_label = ids_to_ner_labels[coarse_labels_to_ids[regions_to_coarse_labels[gt_rtype]]]
-                    gt_words_labels.append(gt_ner_label)
+                    gt_label = config['region_types_to_labels'][gt_rtype]
+                    gt_words_labels.append(gt_label)
 
                     # find the word's pred label
                     pred_regions = [r for r in regions
@@ -79,7 +78,8 @@ for xp_name in next(os.walk(runs_path))[1]:
                     pred_words_labels.append(pred_rtype)
 
     result = seqeval_evaluation(predictions=[pred_words_labels],
-                                groundtruth=[gt_words_labels])
+                                groundtruth=[gt_words_labels],
+                                nerify_labels=True)
 
     result = seqeval_to_df(result)
     result.insert(0, ('config', 'exp'), [xp_name])
