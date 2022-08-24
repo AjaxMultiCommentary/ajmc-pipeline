@@ -14,6 +14,7 @@ class Image:
           The center of `Image`-coordinates is the upper left corner, consistantly with cv2 and numpy. This implies
           that Y-coordinates are ascending towards the bottom of the image.
     """
+
     @lazy_init
     def __init__(self,
                  id: Optional[str] = None,
@@ -57,21 +58,30 @@ class Image:
         cv2.imwrite(output_path, self.matrix)
 
 
-def binarize(img_matrix: np.ndarray):
+def binarize(img_matrix: np.ndarray,
+             inverted: bool = False):
     """Binarizes a cv2 `image`"""
+    binarization_type = (cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV) if inverted else (cv2.THRESH_OTSU | cv2.THRESH_BINARY)
     gray = cv2.cvtColor(img_matrix, cv2.COLOR_BGR2GRAY)
-    return cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)[1]
+    return cv2.threshold(gray, 0, 255, type=binarization_type)[1]
 
 
-def find_contours(img_matrix: np.ndarray, do_binarize: bool = True, remove_artifacts=True) -> List[Shape]:
+def find_contours(img_matrix: np.ndarray,
+                  binarize: bool = True) -> List[Shape]:
     """Binarizes `img_matrix` and finds contours using `cv2.findContours`."""
 
-    temp = binarize(img_matrix) if do_binarize else img_matrix
-    contours, _ = cv2.findContours(temp, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)  # alternative: CHAIN_APPROX_NONE
-    contours = [Shape.from_numpy_array(c) for c in contours if len(c) > 1]
+    # This has to be done in cv2. Using cv2.THRESH_BINARY_INV to avoid looking for the white background as a contour
+    if binarize:
+        gray = cv2.cvtColor(img_matrix, cv2.COLOR_BGR2GRAY)
+        thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)[1]
+    else:
+        thresh = img_matrix
 
-    if remove_artifacts:
-        contours = remove_artifacts_from_contours(contours, 0.002 * img_matrix.shape[0])
+    # alternative: CHAIN_APPROX_NONE
+    contours, _ = cv2.findContours(thresh, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
+
+    # Discard single-point contours
+    contours = [Shape.from_numpy_array(c) for c in contours if len(c) > 1]
 
     return contours
 
@@ -114,9 +124,11 @@ def draw_page_regions_lines_words(matrix: np.ndarray,
                              color=(255, 0, 0),
                              thickness=3)
     if region_elements:
-        matrix = draw_rectangles([r.bbox.bbox for region in page.children['region'] for r in region.children['line']], matrix,
+        matrix = draw_rectangles([r.bbox.bbox for region in page.children['region'] for r in region.children['line']],
+                                 matrix,
                                  (0, 255, 0), thickness=2)
-        matrix = draw_rectangles([r.bbox.bbox for region in page.children['region'] for r in region.children['word']], matrix,
+        matrix = draw_rectangles([r.bbox.bbox for region in page.children['region'] for r in region.children['word']],
+                                 matrix,
                                  thickness=1)
     else:
         matrix = draw_rectangles([r.bbox.bbox for r in page.children['line']], matrix, (0, 255, 0), thickness=2)

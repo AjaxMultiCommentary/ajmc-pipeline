@@ -18,7 +18,7 @@ img_path = os.path.join(PATHS["base_dir"], commentary_id, PATHS["png"], page["fi
 
 image = cv2.imread(img_path)
 
-contours: List[Shape] = image_processing.find_contours(image, do_binarize=True)
+contours: List[Shape] = image_processing.find_contours(image)
 
 #%%
 

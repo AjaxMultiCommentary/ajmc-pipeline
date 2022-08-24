@@ -45,6 +45,9 @@ def docstring_formatter(**kwargs):
 
 docstrings = dict()  # Creating docstrings on the fly in order to refer to previously declared elements.
 
+docstrings['artifact_size_threshold'] = f"""Size-threshold under which contours are to be considered as artifacts 
+and removed, expressed as a percentage of image height. Default is 0.003"""
+
 docstrings['BatchEncoding'] = """The default ouput of HuggingFace's `TokenizerFast`. As [docs](https://huggingface.co/docs/transformers/v4.19.2/en/main_classes/tokenizer#transformers.BatchEncoding)
         have it, "This class is derived from a python dictionary and can be used as a dictionary. In addition, this class exposes utility methods to map from word/character space to token space". 
         The object contains `data` and `encodings`. Data is directly callable and has the form of a `Dict[str, List[List[int]]]` where keys are model inputs. Encodings is a 
@@ -56,6 +59,12 @@ docstrings['coords_single'] = 'A `Shape` object representing the coordinates of 
 docstrings['custom_dataset'] = """A dataset inheriting from `torch.utils.data.Dataset`, implementing at least `__len__` and 
         `__getitem__()`, where each item is a dict alike `{{"model_input": tensor(), ...}}` corresponding
         to a single example.""",
+
+docstrings['dilation_kernel_size'] = """Dilation kernel size, preferably an odd number. Tweak
+                        this parameter and `dilation_iterations` to improve
+                        automatic boxing."""
+
+docstrings['dilation_iterations'] = 'Number of iterations in dilation, default 1'
 
 docstrings['do_debug'] = """Whether break loops after the first iteration.""",
 

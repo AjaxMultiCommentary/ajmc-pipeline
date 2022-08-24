@@ -11,7 +11,7 @@ def general_args(parser: "ArgumentParser") -> "ArgumentParser":
     :return: augmented argparse parser.
     """
 
-    parser.add_argument("--img_dir",
+    parser.add_argument("--image_dir",
                         default=None,
                         type=str,
                         required=False,
@@ -101,7 +101,7 @@ def annotation_helper_args(parser: "ArgumentParser") -> "ArgumentParser":
                              "Below this threshold contours are discarded."
                              "Recommended is around 0.01*image_width")
 
-    parser.add_argument("--draw_rectangles",
+    parser.add_argument("--draw_images",
                         action="store_true",
                         help="Whether to output images with both shrinked and dilated "
                              "rectangles. This is usefull if you want to have a look at "
@@ -131,7 +131,7 @@ else:
 
     args = parser.parse_args(["--output_dir",
                               "/Users/sven/Desktop/",
-                              "--img_dir",
+                              "--image_dir",
                               "/Users/sven/ajmc/data/images",
                               # "--GROUNDTRUTH_DIR", "/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary_data/lobeck/ocr/evaluation/groundtruth/html/",
                               # "--OCR_DIR", "/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary_data/lobeck/ocr/evaluation/groundtruth/html/",
@@ -139,6 +139,6 @@ else:
                               "--dilation_kernel_size", "29",
                               "--dilation_iterations", "2",
                               "--artifact_perimeter_threshold", "10",
-                              "--draw_rectangles",
+                              "--draw_images",
                               # "--merge_zones"
                               ])
