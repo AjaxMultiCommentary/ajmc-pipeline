@@ -178,13 +178,3 @@ def main(image_dir: str,
 
     write_csv_manually("detected_annotations.csv", via_csv_dict, output_dir)
     logger.info("{} zones were automatically detected".format(len(via_csv_dict["filename"])))
-
-
-
-main(
-    image_dir='/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/annalsoftacitusp00taci/images/png',
-    output_dir='/Users/sven/Desktop/tests',
-    dilation_kernel_size=27,
-    dilation_iterations=1,
-    draw_images=True
-    )
