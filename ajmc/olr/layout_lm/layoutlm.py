@@ -4,6 +4,7 @@ import random
 
 from ajmc.commons.docstrings import docstrings, docstring_formatter
 from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
+from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor
 from typing import List, Optional, Dict, Union, Tuple
 from ajmc.nlp.token_classification.pipeline import train
 from ajmc.commons.variables import COLORS, PATHS
@@ -13,6 +14,22 @@ from ajmc.nlp.token_classification.pipeline import create_dirs
 from ajmc.olr.utils import get_olr_split_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from PIL import Image
+
+V3 = True
+
+if V3:
+    MODEL_INPUTS = ['input_ids',
+                    'bbox',
+                    'attention_mask',
+                    'pixel_values']
+
+else:
+    MODEL_INPUTS = ['input_ids',
+                    'bbox',
+                    'token_type_ids',
+                    'attention_mask',
+                    'image']
+
 
 
 # Functions
@@ -51,7 +68,7 @@ def get_data_dict_pages(data_dict: Dict[str, List[Dict[str, str]]],
     if sampling:
         random.seed(42)
         for set_, sample_size in sampling.items():
-            set_pages[set_] = random.sample(set_pages[set_], k=int(sample_size*len(set_pages[set_])))
+            set_pages[set_] = random.sample(set_pages[set_], k=int(sample_size * len(set_pages[set_])))
 
     return set_pages
 
@@ -61,12 +78,9 @@ def page_to_layoutlmv2_encodings(page,
                                  labels_to_ids,
                                  regions_to_coarse_labels,
                                  tokenizer,
-                                 feature_extractor: Optional['FeatureExtractor'] = None,
+                                 feature_extractor: 'FeatureExtractor',
                                  get_labels: bool = True,
                                  unknownify_tokens: bool = False):
-    feature_extractor = feature_extractor if feature_extractor else \
-        LayoutLMv2FeatureExtractor.from_pretrained('microsoft/layoutlmv2-base-uncased', apply_ocr=False)
-
     # Get the lists of words, boxes and labels for a single page
     words = [w.text for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
 
@@ -94,8 +108,6 @@ def page_to_layoutlmv2_encodings(page,
                     # else:
                     #     word_labels.append(labels_to_ids[region_types_to_labels[r.info['region_type']]])
 
-
-
     # Tokenize, truncate and pad
     encodings = tokenizer(text=words,
                           boxes=word_boxes,
@@ -107,7 +119,11 @@ def page_to_layoutlmv2_encodings(page,
     # Add the image for each input
     image = Image.open(page.image.path).convert('RGB')
     image = feature_extractor(image)['pixel_values']
-    encodings['image'] = [image[0].copy() for _ in range(len(encodings['input_ids']))]
+
+    if V3:
+        encodings['pixel_values'] = [image[0].copy() for _ in range(len(encodings['input_ids']))]
+    else:
+        encodings['image'] = [image[0].copy() for _ in range(len(encodings['input_ids']))]
 
     return encodings
 
@@ -118,7 +134,8 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
                  regions_to_coarse_labels: Dict[str, str],
                  rois: List[str],
                  tokenizer,
-                 unknownify_tokens:bool = False,
+                 feature_extractor,
+                 unknownify_tokens: bool = False,
                  do_debug: bool = False
                  ) -> Dict[str, CustomDataset]:
     """Prepares data for LayoutLMV2.
@@ -145,6 +162,7 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
                                                                labels_to_ids=labels_to_ids,
                                                                regions_to_coarse_labels=regions_to_coarse_labels,
                                                                tokenizer=tokenizer,
+                                                               feature_extractor=feature_extractor,
                                                                unknownify_tokens=unknownify_tokens)
             else:
                 page_encodings = page_to_layoutlmv2_encodings(page=page,
@@ -152,6 +170,7 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
                                                               labels_to_ids=labels_to_ids,
                                                               regions_to_coarse_labels=regions_to_coarse_labels,
                                                               tokenizer=tokenizer,
+                                                              feature_extractor=feature_extractor,
                                                               unknownify_tokens=unknownify_tokens)
                 for k in split_encodings.keys():
                     split_encodings[k] += page_encodings[k]
@@ -164,7 +183,8 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
         encodings[s] = split_encodings
 
     # todo 👁️ change this
-    return {s: CustomDataset(encodings[s], ['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image']) for s in page_sets.keys()}
+    return {s: CustomDataset(encodings[s], MODEL_INPUTS) for s in
+            page_sets.keys()}
 
 
 # todo 👁️ this must be a general function for token classification.
@@ -174,19 +194,21 @@ def align_predicted_page(page: 'OcrPage',
                          ids_to_labels,
                          regions_to_coarse_labels,
                          tokenizer,
+                         feature_extractor,
                          model,
                          unknownify_tokens: bool = False
                          ) -> Tuple[List['OcrWord'], List[str]]:
-
     encodings = page_to_layoutlmv2_encodings(page, rois=rois, labels_to_ids=labels_to_ids,
-                                             regions_to_coarse_labels=regions_to_coarse_labels, tokenizer=tokenizer,
+                                             regions_to_coarse_labels=regions_to_coarse_labels,
+                                             tokenizer=tokenizer,
+                                             feature_extractor=feature_extractor,
                                              get_labels=False, unknownify_tokens=unknownify_tokens)
 
     words = [w for r in page.children['region'] if r.info['region_type'] in rois for w in
              r.children['word']]  # this is the way words are selected in `page_to_layoutlmv2_encodings`
 
     dataset = CustomDataset(encodings=encodings,
-                            model_inputs_names=['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image'])
+                            model_inputs_names=MODEL_INPUTS)
 
     # Merge tokens offsets together
     word_ids_list: List[Union[int, None]] = [el for encoding in dataset.encodings.encodings for el in encoding.word_ids]
@@ -210,13 +232,15 @@ def draw_pages(pages,
                ids_to_labels,
                regions_to_coarse_labels,
                tokenizer,
+               feature_extractor,
                model,
                output_dir: str,
                unknownify_tokens: bool = False,
                ):
     from ajmc.olr.layout_lm.draw import draw_page_labels, draw_caption
 
-    labels_to_colors = {l: c + tuple([127]) for l, c in zip(labels_to_ids.keys(), list(COLORS['distinct'].values())+list(COLORS['hues'].values()))}
+    labels_to_colors = {l: c + tuple([127]) for l, c in
+                        zip(labels_to_ids.keys(), list(COLORS['distinct'].values()) + list(COLORS['hues'].values()))}
 
     for page in pages:
         page_words, page_labels = align_predicted_page(page,
@@ -225,18 +249,19 @@ def draw_pages(pages,
                                                        ids_to_labels,
                                                        regions_to_coarse_labels,
                                                        tokenizer,
+                                                       feature_extractor,
                                                        model,
                                                        unknownify_tokens=unknownify_tokens
                                                        )
 
         img = Image.open(page.image.path)
         img = draw_page_labels(img=img,
-                         words=page_words,
-                         labels=page_labels,
-                         labels_to_colors=labels_to_colors)
+                               words=page_words,
+                               labels=page_labels,
+                               labels_to_colors=labels_to_colors)
         img = draw_caption(img, labels_to_colors=labels_to_colors)
 
-        img.save(os.path.join(output_dir, page.id+'.png'))
+        img.save(os.path.join(output_dir, page.id + '.png'))
 
 
 def main(config):
@@ -247,8 +272,17 @@ def main(config):
         json.dump(config, f, skipkeys=True, indent=4, sort_keys=True,
                   default=lambda o: '<not serializable>')
 
-    tokenizer = LayoutLMv2TokenizerFast.from_pretrained(config['model_name_or_path'])
-    model = LayoutLMv2ForTokenClassification.from_pretrained(config['model_name_or_path'], num_labels=config['num_labels'])
+    if config['model_name_or_path'] == 'microsoft/layoutlmv2-base-uncased':
+        tokenizer = LayoutLMv2TokenizerFast.from_pretrained(config['model_name_or_path'])
+        model = LayoutLMv2ForTokenClassification.from_pretrained(config['model_name_or_path'],
+                                                                 num_labels=config['num_labels'])
+        feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained(config['model_name_or_path'], apply_ocr=False)
+    else:
+        tokenizer = LayoutLMv3TokenizerFast.from_pretrained(config['model_name_or_path'])
+        model = LayoutLMv3ForTokenClassification.from_pretrained(config['model_name_or_path'],
+                                                                 num_labels=config['num_labels'])
+        feature_extractor = LayoutLMv3FeatureExtractor.from_pretrained(config['model_name_or_path'], apply_ocr=False)
+
 
     pages = get_data_dict_pages(data_dict=config['data'], sampling=config['sampling'])
 
@@ -257,6 +291,7 @@ def main(config):
                             regions_to_coarse_labels=config['region_types_to_labels'],
                             rois=config['rois'],
                             tokenizer=tokenizer,
+                            feature_extractor=feature_extractor,
                             unknownify_tokens=config['unknownify_tokens'],
                             do_debug=config['do_debug'])
 
@@ -272,12 +307,15 @@ def main(config):
                    ids_to_labels=config['ids_to_labels'],
                    regions_to_coarse_labels=config['region_types_to_labels'],
                    tokenizer=tokenizer,
+                   feature_extractor=feature_extractor,
                    model=model,
                    output_dir=config['predictions_dir'],
                    unknownify_tokens=config['unknownify_tokens'])
 
+
 if __name__ == '__main__':
     from ajmc.olr.layout_lm.config import create_olr_config
+
     config = create_olr_config(
         json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json',
         prefix=PATHS['base_dir']

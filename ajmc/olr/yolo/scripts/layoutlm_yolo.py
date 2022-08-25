@@ -2,7 +2,7 @@ import json
 import os
 from collections import Counter
 
-from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification
+from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
 
 from ajmc.commons.geometry import is_rectangle_within_rectangle_with_threshold
 from ajmc.commons.image import draw_rectangles
@@ -35,6 +35,7 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
     model_path = os.path.join(LAYOUTLM_XP_DIR, config_name, 'model')
     tokenizer = LayoutLMv2TokenizerFast.from_pretrained('microsoft/layoutlmv2-base-uncased')
     model = LayoutLMv2ForTokenClassification.from_pretrained(model_path)
+    feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained('microsoft/layoutlmv2-base-uncased')
 
     # Get the pages
     pages = get_data_dict_pages(data_dict=config['data'])['eval']
@@ -47,6 +48,7 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
                                              rois=config['rois'],
                                              regions_to_coarse_labels=config['region_types_to_labels'],
                                              tokenizer=tokenizer,
+                                             feature_extractor=feature_extractor,
                                              model=model)
 
         for w, l in zip(words, labels):

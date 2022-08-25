@@ -2,10 +2,12 @@ import os
 import pandas as pd
 from ajmc.olr.utils import get_olr_split_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
-from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification
+from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
 from ajmc.olr.layout_lm.config import create_olr_config
 from ajmc.olr.layout_lm.layoutlm import draw_pages
 from ajmc.commons.variables import PATHS
+
+
 
 base_path = '/Users/sven/drive/layout_lm_tests/first_region_token_only'
 
@@ -30,6 +32,7 @@ for fname in next(os.walk(base_path))[1]:  # Walk in dirs only
 
         tokenizer = LayoutLMv2TokenizerFast.from_pretrained(model_name_or_path)
         model = LayoutLMv2ForTokenClassification.from_pretrained(model_name_or_path)
+        feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained(model_name_or_path)
 
         draw_pages(pages,
                    rois=config['rois'],
@@ -37,6 +40,7 @@ for fname in next(os.walk(base_path))[1]:  # Walk in dirs only
                    ids_to_labels=config['ids_to_labels'],
                    regions_to_coarse_labels=config['region_types_to_labels'],
                    tokenizer=tokenizer,
+                   feature_extractor=feature_extractor,
                    model=model,
                    output_dir=output_dir)
 
