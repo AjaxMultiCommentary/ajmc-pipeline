@@ -108,7 +108,7 @@ def compute_image_links(page: dict,
     return image_links
 
 
-def rebuilt_to_xmi(page: dict,  # todo : should this accept CommentaryPage objects ?
+def rebuilt_to_xmi(page: dict,  # todo 👁️ should this accept CommentaryPage objects ?
                    output_dir: str,
                    typesystem_path: str = PATHS['typesystem'],
                    iiif_mappings=None,

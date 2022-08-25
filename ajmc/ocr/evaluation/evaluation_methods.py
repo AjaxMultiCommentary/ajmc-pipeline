@@ -11,8 +11,8 @@ from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
 from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
-# todo add fuzzy eval
 
+# todo 👁️ add fuzzy eval
 def bag_of_word_evaluation(gt_bag: List[str],
                            pred_bag: List[str],
                            error_counts: Optional[Dict[str, Union[int, float]]] = None,

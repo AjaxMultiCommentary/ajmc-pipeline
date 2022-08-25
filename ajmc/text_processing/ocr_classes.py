@@ -114,7 +114,7 @@ class OcrCommentary:
 
         return sorted(pages, key=lambda x: x.id)
 
-    @lazy_property  # Todo : This should not be maintained anymore
+    @lazy_property  # Todo 👁️ This should not be maintained anymore
     def ocr_groundtruth_pages(self) -> Union[List['OcrPage'], list]:
         """The commentary's pages which have a groundtruth file in `self.paths['groundtruth']`."""
         pages = []

@@ -187,7 +187,7 @@ class CanonicalCommentary(CanonicalTextContainer):
     def parents(self):
         return {}
 
-    # Todo ⚠️ create json schema
+    # Todo 👁️ create json schema
     def to_json(self, output_path: Optional[str] = None) -> dict:
         data = {'metadata': {'id': self.id, 'ocr_run': self.info['ocr_run'], 'image_dir': self.info['image_dir'],
                              'base_dir': self.info['base_dir']},

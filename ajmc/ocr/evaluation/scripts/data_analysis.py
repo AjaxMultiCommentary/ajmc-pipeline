@@ -4,7 +4,7 @@ import numpy as np
 import re
 from ajmc.commons.arithmetic import safe_divide
 
-# Todo See how to sort these
+# Todo 👁️ See how to sort these
 
 
 def weighted_average_series(series: list, weights: list):

@@ -83,8 +83,8 @@ for config_name in sorted(next(os.walk(os.path.join(YOLO_XP_DIR, 'detect')))[1])
             else:
                 r['label'] = 'no_words'
 
-        # todo : filter empty regions
-        # todo resize regions
+        # todo 👁️ filter empty regions
+        # todo 👁️ resize regions
 
         # Write image
         page.image.write(os.path.join(MAP_PACKAGE_DIR, 'input/images-optional', page.id + '.png'))

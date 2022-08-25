@@ -20,7 +20,7 @@ def draw_page_labels(img: 'PIL.Image',
 
     return draw_img
 
-# Todo : Why the heck should this be a function ? This IS a funking script
+# Todo 👁️ Why the heck should this be a function ? This IS a funking script
 def draw_caption(img: 'PIL.Image',
                  labels_to_colors: Dict[str, Tuple[int,int,int]]):
 

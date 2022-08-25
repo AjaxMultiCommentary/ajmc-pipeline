@@ -2,7 +2,7 @@ from ajmc.text_processing.ocr_classes import OcrCommentary
 from ajmc.commons.variables import COMMENTARY_IDS
 
 
-# Todo : sort this
+# Todo 👁️ pick this up
 
 
 commentary_ids = [i for i in COMMENTARY_IDS if not i in ['Garvie1998', 'Kamerbeek1953']]

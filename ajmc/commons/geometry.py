@@ -242,4 +242,4 @@ def adjust_to_included_contours(r: RectangleType,
     if included_contours:  # If we find included contours, readjust the bounding box
         return Shape([xy for c in included_contours for xy in c.bbox])
     else:
-        return Shape(r)  # Leave the box untouched # Todo why ?
+        return Shape(r)  # Leave the box untouched

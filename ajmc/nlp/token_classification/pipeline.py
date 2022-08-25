@@ -185,7 +185,7 @@ def main(config: Union[str, Dict[str, Any]]):
         json.dump(config, f, skipkeys=True, indent=4, sort_keys=True,
                   default=lambda o: '<not serializable>')
 
-    # todo change model_name_or_path to model_config ; make a double path on data
+    # todo 👁️ change model_name_or_path to model_config ; make a double path on data
     # tokenizer = transformers.AutoTokenizer.from_pretrained(config['model_name_or_path'], add_prefix_space=True)  # for roberta exclusively
     tokenizer = transformers.AutoTokenizer.from_pretrained(config['model_name_or_path'])
 
@@ -226,4 +226,4 @@ def main(config: Union[str, Dict[str, Any]]):
                                   tokenizer=tokenizer, ids_to_labels=config['ids_to_labels'],
                                   labels_column=config['labels_column'], url=path)
 
-# todo reimplement freeze, additionnal data and
+# todo 👁️ reimplement freeze, additionnal data and

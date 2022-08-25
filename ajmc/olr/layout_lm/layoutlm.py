@@ -125,11 +125,9 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
 
     Args:
         page_sets: A dict containing a list of `OcrPage`s per split.
-        model_inputs_names: List of inputs the model wants (inputs_ids, attention_mask,...)
         labels_to_ids: {labels_to_ids}
         regions_to_coarse_labels:
         rois: The regions to focus on
-        special_tokens: {special_tokens}
         tokenizer:
         unknownify_tokens:
         do_debug:
@@ -165,11 +163,11 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
 
         encodings[s] = split_encodings
 
-    # Todo : change this
+    # todo 👁️ change this
     return {s: CustomDataset(encodings[s], ['input_ids', 'bbox', 'token_type_ids', 'attention_mask', 'image']) for s in page_sets.keys()}
 
 
-# Todo : this must be a general function for token classification.
+# todo 👁️ this must be a general function for token classification.
 def align_predicted_page(page: 'OcrPage',
                          rois,
                          labels_to_ids,

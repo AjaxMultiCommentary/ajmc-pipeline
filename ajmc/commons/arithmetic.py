@@ -33,7 +33,8 @@ def is_interval_within_interval(contained: Tuple[int, int], container: Tuple[int
 def are_intervals_within_intervals(contained: List[Tuple[int, int]], container: List[Tuple[int, int]]) -> bool:
     """Applies `is_interval_within_interval` on a list of intervals, making sure that all the contained intervals
     are contained in one of the container intervals."""
-    # todo ‼️ : deal with overlapping TCs (e.g. chapter spanning over several pages but not entirely included in them.
+
+    # todo 👁️ deal with overlapping TCs (e.g. chapter spanning over several pages but not entirely included in them.
     return all(
         [
             any([is_interval_within_interval(contained_i, container_i) for container_i in container])
