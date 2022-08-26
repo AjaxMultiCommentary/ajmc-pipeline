@@ -1,7 +1,7 @@
 import os
 from string import ascii_letters
 from datetime import datetime
-from typing import Tuple
+from typing import Tuple, Optional
 
 from ajmc.commons import variables
 from ajmc.commons.miscellaneous import get_custom_logger
@@ -12,8 +12,9 @@ NUMBERS_LETTERS = '0123456789' + ascii_letters
 
 
 def int_to_62_based_code(number: int) -> str:
+    assert number < 62**3, 'This function is implemented for numbers up to `62**3`.'
     code = ''
-    for i in [238328, 3844, 62]:  # 62**3, 62**2, 62
+    for i in [3844, 62, 1]:  # 62**2, 62**1, 62**0
         num = number // i
         assert num <= 62
         code += NUMBERS_LETTERS[num]
@@ -21,7 +22,11 @@ def int_to_62_based_code(number: int) -> str:
     return code
 
 
-def get_62_based_datecode(date: datetime = datetime.now()):
+def get_62_based_datecode(date: Optional[datetime] = None):
+
+    if date is None:
+        date = datetime.now()
+
     datecode = ''
 
     datecode += str(date.year)[-1]
@@ -60,7 +65,7 @@ def verify_path_integrity(path: str, path_pattern: str) -> None:
             folder structure. Please make sure you are observing the following pattern: \n {path_pattern} """
 
 
-def parse_ocr_path(path:str) -> Tuple[str,str,str]:
+def parse_ocr_path(path: str) -> Tuple[str, str, str]:
     """Extracts the base_path, commentary_id and ocr_run from an AJMC compliant OCR-outputs path."""
     dirs = path.rstrip('/').split('/')  # Stripping trailing '/' before splitting
     dirs_pattern = variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'].strip('/').split('/')
