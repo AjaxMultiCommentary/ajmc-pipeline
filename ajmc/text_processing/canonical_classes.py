@@ -225,6 +225,10 @@ class CanonicalPage(CanonicalTextContainer):
     def bbox(self):
         return Shape.from_xywh(0, 0, self.image.width, self.image.height)
 
+    @lazy_property
+    def image(self) -> Image:
+        return [img for img in self.commentary.images if img.id == self.id][0]
+
     def to_alto(self,
                 children_types: List[str],
                 output_path: str):
