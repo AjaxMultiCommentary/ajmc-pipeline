@@ -477,3 +477,5 @@ class OcrWord(OcrTextContainer):
 
     def adjust_bbox(self):
         self.bbox = adjust_to_included_contours(self.bbox.bbox, self.page.image.contours)
+
+
