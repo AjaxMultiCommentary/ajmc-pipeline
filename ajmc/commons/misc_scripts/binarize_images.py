@@ -1,3 +1,5 @@
+"""Use this script to binarize images of multiple commentaries"""
+
 import cv2
 from ajmc.commons.variables import PATHS
 import os
