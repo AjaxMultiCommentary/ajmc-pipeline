@@ -8,7 +8,8 @@ from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassificati
 from typing import List, Optional, Dict, Union, Tuple
 from ajmc.nlp.token_classification.pipeline import train
 from ajmc.commons.variables import COLORS, PATHS
-from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset
+from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset, \
+    align_to_tokenized, align_labels
 from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.nlp.token_classification.pipeline import create_dirs
 from ajmc.olr.utils import get_olr_split_page_ids
@@ -30,6 +31,7 @@ else:
                     'attention_mask',
                     'image']
 
+ROBERTA_MODEL_INPUTS = ['input_ids', 'attention_mask']
 
 
 # Functions
@@ -80,6 +82,7 @@ def page_to_layoutlmv2_encodings(page,
                                  tokenizer,
                                  feature_extractor: 'FeatureExtractor',
                                  get_labels: bool = True,
+                                 text_only: bool = False,
                                  unknownify_tokens: bool = False):
     # Get the lists of words, boxes and labels for a single page
     words = [w.text for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
@@ -90,10 +93,6 @@ def page_to_layoutlmv2_encodings(page,
     word_boxes = [normalize_bounding_rectangles(w.bbox.bbox, page.image.width, page.image.height)
                   for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
 
-    # Legacy code
-    # word_labels = [labels_to_ids[region_types_to_labels[r.info['region_type']]]
-    #                for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']] if get_labels else None
-
     if not get_labels:
         word_labels = None
     else:
@@ -101,17 +100,32 @@ def page_to_layoutlmv2_encodings(page,
         for r in page.children['region']:
             if r.info['region_type'] in rois:
                 for i, w in enumerate(r.children['word']):
-                    word_labels.append(labels_to_ids[regions_to_coarse_labels[r.info['region_type']]])
+                    word_labels.append(regions_to_coarse_labels[r.info['region_type']])
                     # if i != 0:
                     #     word_labels.append(labels_to_ids['O'])
                     #     # word_labels.append(labels_to_ids['I-'+ region_types_to_labels[r.info['region_type']]])
                     # else:
                     #     word_labels.append(labels_to_ids[region_types_to_labels[r.info['region_type']]])
 
+    if text_only:
+        encodings = tokenizer(text=words,
+                              is_split_into_words=True,
+                              truncation=True,
+                              padding='max_length',
+                              return_overflowing_tokens=True)
+
+        if get_labels:
+            aligned_labels = [align_labels(e.word_ids, word_labels, labels_to_ids) for e in
+                              encodings.encodings]
+
+            encodings.data['labels'] = aligned_labels
+
+        return encodings
+
     # Tokenize, truncate and pad
     encodings = tokenizer(text=words,
                           boxes=word_boxes,
-                          word_labels=word_labels,
+                          word_labels=[labels_to_ids[l] for l in word_labels],
                           truncation=True,
                           padding='max_length',
                           return_overflowing_tokens=True)
@@ -136,6 +150,7 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
                  tokenizer,
                  feature_extractor,
                  unknownify_tokens: bool = False,
+                 text_only: bool = False,
                  do_debug: bool = False
                  ) -> Dict[str, CustomDataset]:
     """Prepares data for LayoutLMV2.
@@ -151,7 +166,7 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
 
     """
 
-    encodings = {}
+    encodings_split_dict = {}
 
     for s in page_sets.keys():
         split_encodings = None
@@ -163,7 +178,8 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
                                                                regions_to_coarse_labels=regions_to_coarse_labels,
                                                                tokenizer=tokenizer,
                                                                feature_extractor=feature_extractor,
-                                                               unknownify_tokens=unknownify_tokens)
+                                                               unknownify_tokens=unknownify_tokens,
+                                                               text_only=text_only)
             else:
                 page_encodings = page_to_layoutlmv2_encodings(page=page,
                                                               rois=rois,
@@ -171,7 +187,8 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
                                                               regions_to_coarse_labels=regions_to_coarse_labels,
                                                               tokenizer=tokenizer,
                                                               feature_extractor=feature_extractor,
-                                                              unknownify_tokens=unknownify_tokens)
+                                                              unknownify_tokens=unknownify_tokens,
+                                                              text_only=text_only)
                 for k in split_encodings.keys():
                     split_encodings[k] += page_encodings[k]
 
@@ -180,11 +197,15 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
             if i == 2 and do_debug:
                 break
 
-        encodings[s] = split_encodings
+        encodings_split_dict[s] = split_encodings
 
-    # todo 👁️ change this
-    return {s: CustomDataset(encodings[s], MODEL_INPUTS) for s in
-            page_sets.keys()}
+    if text_only:
+        return {s: CustomDataset(encodings=encodings_split_dict[s],
+                                 model_inputs_names=ROBERTA_MODEL_INPUTS)
+                for s in page_sets.keys()}
+    else:
+        return {s: CustomDataset(encodings_split_dict[s], MODEL_INPUTS) for s in
+                page_sets.keys()}
 
 
 # todo 👁️ this must be a general function for token classification.
@@ -196,19 +217,25 @@ def align_predicted_page(page: 'OcrPage',
                          tokenizer,
                          feature_extractor,
                          model,
-                         unknownify_tokens: bool = False
+                         unknownify_tokens: bool = False,
+                         text_only: bool = False,
                          ) -> Tuple[List['OcrWord'], List[str]]:
     encodings = page_to_layoutlmv2_encodings(page, rois=rois, labels_to_ids=labels_to_ids,
                                              regions_to_coarse_labels=regions_to_coarse_labels,
                                              tokenizer=tokenizer,
                                              feature_extractor=feature_extractor,
-                                             get_labels=False, unknownify_tokens=unknownify_tokens)
+                                             get_labels=False,
+                                             unknownify_tokens=unknownify_tokens,
+                                             text_only=text_only)
 
     words = [w for r in page.children['region'] if r.info['region_type'] in rois for w in
              r.children['word']]  # this is the way words are selected in `page_to_layoutlmv2_encodings`
 
-    dataset = CustomDataset(encodings=encodings,
-                            model_inputs_names=MODEL_INPUTS)
+    if text_only:
+        dataset = CustomDataset(encodings=encodings, model_inputs_names=ROBERTA_MODEL_INPUTS)
+    else:
+        dataset = CustomDataset(encodings=encodings,
+                                model_inputs_names=MODEL_INPUTS)
 
     # Merge tokens offsets together
     word_ids_list: List[Union[int, None]] = [el for encoding in dataset.encodings.encodings for el in encoding.word_ids]
@@ -236,6 +263,7 @@ def draw_pages(pages,
                model,
                output_dir: str,
                unknownify_tokens: bool = False,
+               text_only: bool = False,
                ):
     from ajmc.olr.layout_lm.draw import draw_page_labels, draw_caption
 
@@ -251,7 +279,8 @@ def draw_pages(pages,
                                                        tokenizer,
                                                        feature_extractor,
                                                        model,
-                                                       unknownify_tokens=unknownify_tokens
+                                                       unknownify_tokens=unknownify_tokens,
+                                                       text_only=text_only
                                                        )
 
         img = Image.open(page.image.path)
@@ -272,17 +301,25 @@ def main(config):
         json.dump(config, f, skipkeys=True, indent=4, sort_keys=True,
                   default=lambda o: '<not serializable>')
 
-    if config['model_name_or_path'] == 'microsoft/layoutlmv2-base-uncased':
-        tokenizer = LayoutLMv2TokenizerFast.from_pretrained(config['model_name_or_path'])
-        model = LayoutLMv2ForTokenClassification.from_pretrained(config['model_name_or_path'],
-                                                                 num_labels=config['num_labels'])
-        feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained(config['model_name_or_path'], apply_ocr=False)
+    if config['text_only']:
+        from transformers import RobertaTokenizerFast, RobertaForTokenClassification
+        tokenizer = RobertaTokenizerFast.from_pretrained(config['model_name_or_path'], add_prefix_space=True)
+        model = RobertaForTokenClassification.from_pretrained(config['model_name_or_path'],
+                                                              num_labels=config['num_labels'])
+        feature_extractor = None
     else:
-        tokenizer = LayoutLMv3TokenizerFast.from_pretrained(config['model_name_or_path'])
-        model = LayoutLMv3ForTokenClassification.from_pretrained(config['model_name_or_path'],
-                                                                 num_labels=config['num_labels'])
-        feature_extractor = LayoutLMv3FeatureExtractor.from_pretrained(config['model_name_or_path'], apply_ocr=False)
-
+        if V3:
+            tokenizer = LayoutLMv3TokenizerFast.from_pretrained(config['model_name_or_path'])
+            model = LayoutLMv3ForTokenClassification.from_pretrained(config['model_name_or_path'],
+                                                                     num_labels=config['num_labels'])
+            feature_extractor = LayoutLMv3FeatureExtractor.from_pretrained(config['model_name_or_path'],
+                                                                           apply_ocr=False)
+        else:
+            tokenizer = LayoutLMv2TokenizerFast.from_pretrained(config['model_name_or_path'])
+            model = LayoutLMv2ForTokenClassification.from_pretrained(config['model_name_or_path'],
+                                                                     num_labels=config['num_labels'])
+            feature_extractor = LayoutLMv2FeatureExtractor.from_pretrained(config['model_name_or_path'],
+                                                                           apply_ocr=False)
 
     pages = get_data_dict_pages(data_dict=config['data'], sampling=config['sampling'])
 
@@ -293,6 +330,7 @@ def main(config):
                             tokenizer=tokenizer,
                             feature_extractor=feature_extractor,
                             unknownify_tokens=config['unknownify_tokens'],
+                            text_only=config['text_only'],
                             do_debug=config['do_debug'])
 
     if config['do_train']:
@@ -310,14 +348,16 @@ def main(config):
                    feature_extractor=feature_extractor,
                    model=model,
                    output_dir=config['predictions_dir'],
-                   unknownify_tokens=config['unknownify_tokens'])
+                   unknownify_tokens=config['unknownify_tokens'],
+                   text_only=config['text_only'])
 
 
 if __name__ == '__main__':
     from ajmc.olr.layout_lm.config import create_olr_config
 
     config = create_olr_config(
-        json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json',
+        # json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json',
+        json_path='/Users/sven/packages/ajmc/data/layoutlm/configs/1E_jebb_text_only.json',
         prefix=PATHS['base_dir']
     )
     main(config)
