@@ -1,0 +1,60 @@
+{
+    "batch_size": 1,
+    "data": {
+        "eval": [
+            {
+                "id": "sophoclesplaysa05campgoog",
+                "run": "15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27",
+                "split": "test"
+            }
+        ],
+        "train": [
+            {
+                "id": "sophoclesplaysa05campgoog",
+                "run": "15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27",
+                "split": "train"
+            }
+        ]
+    },
+    "device_name": "cpu",
+    "do_debug": true,
+    "do_draw": true,
+    "do_save": true,
+    "do_train": true,
+    "epochs": 2,
+    "evaluate_during_training": true,
+    "excluded_region_types": [
+        "line_number_commentary",
+        "handwritten_marginalia",
+        "undefined",
+        "line_region"
+    ],
+    "gradient_accumulation_steps": 2,
+    "model_name_or_path": "microsoft/layoutlmv3-base",
+    "output_dir": "/Users/sven/drive/layout_lm_test_local",
+    "overwrite_output_dir": true,
+    "region_types_to_labels": {
+        "app_crit": "app_crit",
+        "appendix": "paratext",
+        "bibliography": "others",
+        "commentary": "commentary",
+        "footnote": "footnote",
+        "handwritten_marginalia": "others",
+        "index_siglorum": "others",
+        "introduction": "paratext",
+        "line_number_commentary": "numbers",
+        "line_number_text": "numbers",
+        "line_region": "others",
+        "other": "others",
+        "page_number": "numbers",
+        "preface": "paratext",
+        "primary_text": "primary_text",
+        "printed_marginalia": "others",
+        "running_header": "running_header",
+        "table_of_contents": "others",
+        "title": "others",
+        "translation": "others",
+        "undefined": "others"
+    },
+    "text_only": false
+}

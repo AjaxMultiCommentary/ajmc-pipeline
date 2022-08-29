@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "https://impresso.github.io/impresso-schemas/json/commentary/page.schema.json",
+  "title": "Commmentary Page",
+  "description": "Physical representation of a commentary page as recognized by a given OCR engine.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Canonical ID of the commentary page."
+    },
+    "iiif": {
+      "type": "string",
+      "description": "URI of the IIIF Manifest of the commentary page image."
+    },
+    "cdate": {
+      "type": "string",
+      "description": "Creation date timestamp (of the JSON file)."
+    },
+    "regions": {
+      "type": "array",
+      "description": "Page regions.",
+      "items": {
+        "type": "object",
+        "description": "Page region.",
+        "properties": {
+          "region_type": {
+            "type":"string",
+            "description": "The type of olr region, (e.g. commentary, primary_text,...)"
+          },
+          "bbox": {
+            "type": "array",
+            "description": "Coordinates of image-region, following IIIF regions schema (x, y, width, height).",
+            "minItems": 4,
+            "items": {
+              "type": "integer"
+            }
+          },
+          "lines": {
+            "type": "array",
+            "description": "Lines of text (belonging to a given paragraph)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "bbox": {
+                  "type": "array",
+                  "description": "Coordinates of image-region.",
+                  "minItems": 4,
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                "words": {
+                  "type": "array",
+                  "description": "Tokens (as detected by the OCR engine).",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "bbox": {
+                        "type": "array",
+                        "description": "Coordinates of image-region.",
+                        "minItems": 4,
+                        "items": {
+                          "type": "integer"
+                        }
+                      },
+                      "text": {
+                        "type": "string",
+                        "description": "Token surface form."
+                      }
+                    },
+                    "required": [
+                      "bbox",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "bbox",
+                "words"
+              ]
+            }
+          }
+        },
+        "required": [
+          "bbox",
+          "lines"
+        ]
+      }
+    }
+  },
+  "required": [
+    "id",
+    "cdate",
+    "regions"
+  ]
+}

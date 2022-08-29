@@ -1,0 +1,52 @@
+{
+    "batch_size": 16,
+    "data": {
+        "eval": [
+            {
+                "id": "sophoclesplaysa05campgoog",
+                "run": "15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27",
+                "split": "test"
+            }
+        ],
+        "train": [
+            {
+                "id": "cu31924087948174",
+                "run": "28qmab_tess_base",
+                "split": "train"
+            }
+        ]
+    },
+    "device_name": "cuda",
+    "epochs": 300,
+    "excluded_region_types": [
+        "line_number_commentary",
+        "handwritten_marginalia",
+        "undefined",
+        "line_region"
+    ],
+    "image_size": 1280,
+    "model_name_or_path": "yolov5m",
+    "region_types_to_labels": {
+        "app_crit": "app_crit",
+        "appendix": "paratext",
+        "bibliography": "others",
+        "commentary": "commentary",
+        "footnote": "footnote",
+        "handwritten_marginalia": "others",
+        "index_siglorum": "others",
+        "introduction": "paratext",
+        "line_number_commentary": "numbers",
+        "line_number_text": "numbers",
+        "line_region": "others",
+        "other": "others",
+        "page_number": "numbers",
+        "preface": "paratext",
+        "primary_text": "primary_text",
+        "printed_marginalia": "others",
+        "running_header": "running_header",
+        "table_of_contents": "others",
+        "title": "others",
+        "translation": "others",
+        "undefined": "others"
+    }
+}

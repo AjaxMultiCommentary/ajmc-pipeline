@@ -1,0 +1,170 @@
+{
+    "batch_size": 4,
+    "data": {
+        "eval": [
+            {
+                "id": "Colonna1975",
+                "run": "28qlZa_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "DeRomilly1976",
+                "run": "28q0aU_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "Ferrari1974",
+                "run": "28r0zj_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "Garvie1998",
+                "run": "28r0KM_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "Kamerbeek1953",
+                "run": "28qloZ_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "Paduano1982",
+                "run": "28qlSF_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "Untersteiner1934",
+                "run": "28r0XU_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "Wecklein1894",
+                "run": "28r1pY_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "bsb10234118",
+                "run": "28qloR_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "cu31924087948174",
+                "run": "28qmab_tess_base",
+                "split": "test"
+            },
+            {
+                "id": "sophoclesplaysa05campgoog",
+                "run": "15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27",
+                "split": "test"
+            },
+            {
+                "id": "sophokle1v3soph",
+                "run": "28r0iY_tess_base",
+                "split": "test"
+            }
+        ],
+        "train": [
+            {
+                "id": "Colonna1975",
+                "run": "28qlZa_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "DeRomilly1976",
+                "run": "28q0aU_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "Ferrari1974",
+                "run": "28r0zj_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "Garvie1998",
+                "run": "28r0KM_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "Kamerbeek1953",
+                "run": "28qloZ_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "Paduano1982",
+                "run": "28qlSF_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "Untersteiner1934",
+                "run": "28r0XU_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "Wecklein1894",
+                "run": "28r1pY_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "bsb10234118",
+                "run": "28qloR_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "cu31924087948174",
+                "run": "28qmab_tess_base",
+                "split": "train"
+            },
+            {
+                "id": "sophoclesplaysa05campgoog",
+                "run": "15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27",
+                "split": "train"
+            },
+            {
+                "id": "sophokle1v3soph",
+                "run": "28r0iY_tess_base",
+                "split": "train"
+            }
+        ]
+    },
+    "device_name": "cuda",
+    "do_debug": false,
+    "do_draw": false,
+    "do_save": true,
+    "do_train": true,
+    "epochs": 40,
+    "evaluate_during_training": true,
+    "excluded_region_types": [
+        "line_number_commentary",
+        "handwritten_marginalia",
+        "undefined",
+        "line_region"
+    ],
+    "gradient_accumulation_steps": 4,
+    "model_name_or_path": "microsoft/layoutlmv3-base",
+    "output_dir": "/content/drive/MyDrive/layout_lm_tests/4A_omnibus_base",
+    "overwrite_output_dir": true,
+    "region_types_to_labels": {
+        "app_crit": "app_crit",
+        "appendix": "paratext",
+        "bibliography": "others",
+        "commentary": "commentary",
+        "footnote": "footnote",
+        "handwritten_marginalia": "others",
+        "index_siglorum": "others",
+        "introduction": "paratext",
+        "line_number_commentary": "numbers",
+        "line_number_text": "numbers",
+        "line_region": "others",
+        "other": "others",
+        "page_number": "numbers",
+        "preface": "paratext",
+        "primary_text": "primary_text",
+        "printed_marginalia": "others",
+        "running_header": "running_header",
+        "table_of_contents": "others",
+        "title": "others",
+        "translation": "others",
+        "undefined": "others"
+    },
+    "text_only": false
+}
