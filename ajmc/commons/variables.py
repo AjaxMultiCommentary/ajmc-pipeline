@@ -17,6 +17,7 @@ PATHS = {
     'canonical': 'canonical/v2'
 }
 
+
 # todo 👁️
 def get_path():
     pass
@@ -44,7 +45,9 @@ VIA_CSV_DICT_TEMPLATE = {'filename': [],
 
 COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Finglass2011', 'Garvie1998', 'Kamerbeek1953',
                   'Paduano1982', 'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174',
-                  'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph']
+                  'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'thukydides02thuc',
+                  'pvergiliusmaroa00virggoog',
+                  'annalsoftacitusp00taci']
 
 PD_COMMENTARY_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
 
@@ -106,7 +109,7 @@ REGION_TYPES_TO_COARSE_LABELS = {
     'line_region': 'others'
 }
 
-REGION_TYPES_TO_FINE_LABELS = {k:k for k in REGION_TYPES_TO_COARSE_LABELS.keys()}
+REGION_TYPES_TO_FINE_LABELS = {k: k for k in REGION_TYPES_TO_COARSE_LABELS.keys()}
 
 MINIREF_PAGES = [
     'cu31924087948174_0035',
@@ -165,7 +168,6 @@ COLORS = {
     # https://coolors.co/b7094c-a01a58-892b64-723c70-5c4d7d-455e89-2e6f95-1780a1-0091ad
     # https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167
 }
-
 
 TEXTCONTAINER_TYPES = ['commentary', 'page', 'region', 'line', 'word']
 

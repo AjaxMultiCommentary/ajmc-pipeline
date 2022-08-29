@@ -4,8 +4,7 @@
 
 # Others
 draw_ner_results.py
-data/
-workbench.py
+workbench*.py
 
 # Ziqi
 *.pyc
