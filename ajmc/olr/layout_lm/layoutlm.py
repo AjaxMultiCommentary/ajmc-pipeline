@@ -3,7 +3,7 @@ import os
 import random
 
 from ajmc.commons.docstrings import docstrings, docstring_formatter
-from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
+# from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
 from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor
 from typing import List, Optional, Dict, Union, Tuple
 from ajmc.nlp.token_classification.pipeline import train
@@ -125,7 +125,7 @@ def page_to_layoutlmv2_encodings(page,
     # Tokenize, truncate and pad
     encodings = tokenizer(text=words,
                           boxes=word_boxes,
-                          word_labels=[labels_to_ids[l] for l in word_labels],
+                          word_labels=[labels_to_ids[l] for l in word_labels] if get_labels else None,
                           truncation=True,
                           padding='max_length',
                           return_overflowing_tokens=True)
@@ -209,7 +209,7 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
 
 
 # todo 👁️ this must be a general function for token classification.
-def align_predicted_page(page: 'OcrPage',
+def align_predicted_page(page: 'Page',
                          rois,
                          labels_to_ids,
                          ids_to_labels,
@@ -219,7 +219,7 @@ def align_predicted_page(page: 'OcrPage',
                          model,
                          unknownify_tokens: bool = False,
                          text_only: bool = False,
-                         ) -> Tuple[List['OcrWord'], List[str]]:
+                         ) -> Tuple[List['Word'], List[str]]:
     encodings = page_to_layoutlmv2_encodings(page, rois=rois, labels_to_ids=labels_to_ids,
                                              regions_to_coarse_labels=regions_to_coarse_labels,
                                              tokenizer=tokenizer,

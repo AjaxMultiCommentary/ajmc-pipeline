@@ -59,10 +59,10 @@ def evaluate_dataset(dataset: torch.utils.data.Dataset,
     for batch in dataloader:
         if predictions is None:
             predictions = predict(batch, model)
-            groundtruth = batch["labels"].numpy()
+            groundtruth = batch['labels'].numpy()
         else:
             predictions = np.append(predictions, predict(batch, model), axis=0)
-            groundtruth = np.append(groundtruth, batch["labels"].numpy(), axis=0)
+            groundtruth = np.append(groundtruth, batch['labels'].numpy(), axis=0)
         if do_debug:
             break
 
@@ -82,10 +82,10 @@ def evaluate_dataset(dataset: torch.utils.data.Dataset,
 def evaluate_iob_files(output_dir: str, groundtruth_path: str, preds_path: str, method: str,
                        hipe_script_path: str = None, output_suffix: str = None, task: str = 'nerc_coarse'):
     """Evaluates CLEF-HIPE compliant files.
-     If `method` is set to `"hipe"`, runs run CLEF-HIPE-evaluation within `os.system`. Else if `method` is set to
-     `"seqeval`, imports the files as dfs."""
+     If `method` is set to `'hipe'`, runs run CLEF-HIPE-evaluation within `os.system`. Else if `method` is set to
+     `'seqeval`, imports the files as dfs."""
 
-    if method == "hipe":
+    if method == 'hipe':
         os.system(
             f"""
             python {hipe_script_path} \
@@ -97,13 +97,13 @@ def evaluate_iob_files(output_dir: str, groundtruth_path: str, preds_path: str, 
             """
         )
 
-    elif method == "seqeval":
+    elif method == 'seqeval':
 
-        with open(preds_path, "r") as f:
-            preds = pd.read_csv(f, delimiter="\t", skiprows=1, comment="#", usecols=[0, 1],
-                                names=["TOKEN", "NE-COARSE-LIT"])
+        with open(preds_path, 'r') as f:
+            preds = pd.read_csv(f, delimiter='\t', skiprows=1, comment='#', usecols=[0, 1],
+                                names=['TOKEN', 'NE-COARSE-LIT'])
 
-        with open(groundtruth_path, "r") as f:
+        with open(groundtruth_path, 'r') as f:
             gt = pd.read_csv(f, delimiter="\t", skiprows=1, comment="#", usecols=[0, 1],
                              names=["TOKEN", "NE-COARSE-LIT"])
 
@@ -145,7 +145,7 @@ def seqeval_to_df(seqeval_output: Dict[str, Union[Dict[str, float], float]],
             for subkey in seqeval_output[key].keys():
                 to_df[(key, abbreviations[subkey])] = [seqeval_output[key][subkey]]
 
-    ordered_keys = [("ALL", key) for key in ["F1", "A", "P", "R"]] + [k for k in to_df.keys() if k[0] != 'ALL']
+    ordered_keys = [("ALL", key) for key in ["F1", "A", "P", "R"]] + [(k[0], metric) for k in to_df.keys() if k[0] != 'ALL' for metric in ["F1", "P", "R", 'N']]
 
     if do_debug:
         to_df_debug = {}

@@ -4,7 +4,7 @@ import pandas as pd
 from ajmc.commons.geometry import is_rectangle_within_rectangle_with_threshold
 from ajmc.nlp.token_classification.evaluation import seqeval_evaluation, seqeval_to_df
 from ajmc.olr.layout_lm.config import create_olr_config
-from ajmc.olr.yolo.utils import read_yolo_txt_line
+from ajmc.olr.yolo.utils import parse_yolo_txt_line
 
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
@@ -52,10 +52,11 @@ for xp_name in next(os.walk(runs_path))[1]:
 
             print('   Line loop')
             for line in lines:
-                regions.append(read_yolo_txt_line(line=line,
-                                                  ids_to_label=config['ids_to_labels'],
-                                                  image_width=page.image.width,
-                                                  image_height=page.image.height))
+                regions.append(parse_yolo_txt_line(line=line,
+                                                   ids_to_label=config['ids_to_labels'],
+                                                   image_width=page.image.width,
+                                                   image_height=page.image.height,
+                                                   is_groundtruth=False))
 
             print('   Word loop')
             for r in page.children['region']:

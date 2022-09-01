@@ -1,5 +1,6 @@
 """Miscellaneous helpers and utilities."""
 import inspect
+import os
 from functools import wraps
 import json
 import logging
@@ -211,3 +212,8 @@ def lazy_attributer(attr_name, func, attr_decorator=lambda x: x):
         return class_
 
     return set_attribute
+
+
+def walk_dirs(path:str):
+    """Walks over the dirs in path."""
+    return sorted(next(os.walk(path))[1])

@@ -1,7 +1,9 @@
 """Draw utilities, notably to draw word labels."""
+import os
 
 from PIL import Image, ImageDraw, ImageFont
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
+
 
 def draw_page_labels(img: 'PIL.Image',
                      words: List['OcrWord'],
@@ -22,7 +24,8 @@ def draw_page_labels(img: 'PIL.Image',
 
 # Todo 👁️ Why the heck should this be a function ? This IS a funking script
 def draw_caption(img: 'PIL.Image',
-                 labels_to_colors: Dict[str, Tuple[int,int,int]]):
+                 labels_to_colors: Dict[str, Tuple[int,int,int]],
+                 font_dir: Optional[str] = None):
 
     draw_img = img.convert('RGB')
 
@@ -32,8 +35,17 @@ def draw_caption(img: 'PIL.Image',
     margin_top = int(base_img_height / 10)
     margin_left = int(base_img_width / 10)
 
-    font = ImageFont.truetype("CourierNewTTF.ttf", size=int(base_img_width / 35))
-    title_font = ImageFont.truetype("ORATOR10.ttf", size=int(base_img_width / 25))
+    courrier_path = os.path.join(font_dir,"CourierNewTTF.ttf") if font_dir else "CourierNewTTF.ttf"
+    orator_path = os.path.join(font_dir,"ORATOR10.ttf") if font_dir else "ORATOR10.ttf"
+
+    # try:
+    font = ImageFont.truetype(courrier_path, size=int(base_img_width / 35))
+    title_font = ImageFont.truetype(orator_path, size=int(base_img_width / 25))
+    # except:
+    #     assert False
+    #     font = ImageFont.load_default()
+    #     title_font = ImageFont.load_default()
+
 
     _, font_height = font.getsize('a')
     pad = int(font_height / 6)

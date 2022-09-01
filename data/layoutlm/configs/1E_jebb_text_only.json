@@ -1,23 +1,23 @@
 {
-    "batch_size": 2,
+    "batch_size": 8,
     "data": {
         "eval": [
             {
                 "id": "sophoclesplaysa05campgoog",
-                "run": "15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27",
+                "run": "28qm8n_tess_base",
                 "split": "test"
             }
         ],
         "train": [
             {
                 "id": "sophoclesplaysa05campgoog",
-                "run": "15o09Y_lace_base_sophoclesplaysa05campgoog-2021-05-23-21-38-49-porson-2021-05-23-14-27-27",
+                "run": "28qm8n_tess_base",
                 "split": "train"
             }
         ]
     },
     "device_name": "cuda",
-    "do_debug": true,
+    "do_debug": false,
     "do_draw": false,
     "do_save": true,
     "do_train": true,

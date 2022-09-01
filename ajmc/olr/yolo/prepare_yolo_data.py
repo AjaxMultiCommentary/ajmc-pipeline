@@ -15,14 +15,11 @@ base_data_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/c
 base_xp_dir = '/Users/sven/packages/ajmc/data/yolo'
 configs_dir = os.path.join(base_xp_dir, 'configs')
 
-excluded_configs = ['1C_jebb_blank_tokens.json',
-                    '1B_jebb_better_ocr.json',
-                    '4B_omnibus_external.json'
-                    ]
+excluded_configs = ['4B_omnibus_external.json']
 DATASET_NAME = 'multiclass'
 # for config_name in os.listdir(configs_dir):
 for config_name in os.listdir(configs_dir):
-    if config_name.endswith('.json') and config_name not in excluded_configs:
+    if config_name.endswith('.json') and config_name in excluded_configs:
         print(f'******** Processing {config_name} *********')
         config = create_olr_config(os.path.join(configs_dir, config_name),
                                    prefix=base_data_dir)
