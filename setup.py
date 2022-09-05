@@ -166,8 +166,12 @@ setup(
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
 
     data_files=[
-        ("data/templates", ["data/templates/alto.xml.jinjia2"]),
-        ("data/templates", ["data/templates/page.schema.json"]),
+        (
+            "data/templates", [
+                "data/templates/alto.xml.jinja2",
+                "data/templates/page.schema.json"
+            ]
+        ),
     ],  # Optional
 
     # To provide executable scripts, use entry points in preference to the
