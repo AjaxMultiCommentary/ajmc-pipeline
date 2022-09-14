@@ -1,3 +1,10 @@
+"""
+`ocr/evaluation` performs a double evaluation of ocr outputs against given groundtruth data.
+
+1. **Bag-of-word evaluation**: computes errors by matching words which have the minimal edit distance in a bag of groundtruth and in a a bag of predicted word.
+2. **Coordinate based evaluation**: computes errors by matching words with overlapping coordinates.
+"""
+
 import csv
 import os
 from typing import List, Dict, Tuple, Union, Optional
@@ -11,6 +18,7 @@ from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
 from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
+
 
 # todo 👁️ add fuzzy eval
 def bag_of_word_evaluation(gt_bag: List[str],
@@ -249,7 +257,8 @@ def commentary_evaluation(commentary: 'OcrCommentary',
         os.makedirs(output_dir, exist_ok=True)
 
         for i, soup in enumerate(soups):
-            with open(os.path.join(output_dir, commentary.ocr_groundtruth_pages[i].id + ".html"), "w", encoding="utf-8") as html_file:
+            with open(os.path.join(output_dir, commentary.ocr_groundtruth_pages[i].id + ".html"), "w",
+                      encoding="utf-8") as html_file:
                 html_file.write(str(soup))
 
         # Sort and write editops record

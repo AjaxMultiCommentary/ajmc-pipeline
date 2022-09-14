@@ -1,3 +1,4 @@
+"""Basically to put all the images from different sub-folders into one"""
 import os
 import sys
 import shutil

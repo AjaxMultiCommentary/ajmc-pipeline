@@ -1,3 +1,4 @@
+"""Main module for finetuning and evaluation of Tess. """
 import os
 import cv2
 import sys
