@@ -10,8 +10,8 @@ from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons import variables
 from ajmc.commons.geometry import (
     Shape,
-    is_rectangle_within_rectangle_with_threshold,
-    is_rectangle_within_rectangle, adjust_to_included_contours, get_bbox_from_points
+    is_bbox_within_bbox_with_threshold,
+    is_bbox_within_bbox, adjust_bbox_to_included_contours, get_bbox_from_points
 )
 from ajmc.commons.image import Image, draw_page_regions_lines_words
 from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via
@@ -156,7 +156,7 @@ class OcrCommentary:
                     for w in l.children['word']:
                         can.children['word'].append(CanonicalWord(type='word',
                                                                   index=w_count,
-                                                                  bbox=w.bbox.bbox_2,
+                                                                  bbox=w.bbox.bbox,
                                                                   text=w.text,
                                                                   commentary=can))
                         w_count += 1
@@ -319,20 +319,20 @@ class OcrPage(OcrTextContainer):
 
             for l in self.children['line']:
                 # If the line is entirely in the region, append it
-                if is_rectangle_within_rectangle(contained=l.bbox.bbox,
-                                                 container=r.bbox.bbox):
+                if is_bbox_within_bbox(contained=l.bbox.bbox,
+                                       container=r.bbox.bbox):
                     l.region = r  # Link the line to its region
                     r.children['line'].append(l)
 
                 # If the line is only partially in the region, handle the line splitting problem.
-                elif any([is_rectangle_within_rectangle(w.bbox.bbox, r.bbox.bbox)
+                elif any([is_bbox_within_bbox(w.bbox.bbox, r.bbox.bbox)
                           for w in l.children['word']]):
 
                     # Create the new line and append it both to region and page lines
                     new_line = OcrLine(markup=None,
                                        page=self,
                                        word_ids=[w.id for w in l.children['word']
-                                                 if is_rectangle_within_rectangle(w.bbox.bbox, r.bbox.bbox)])
+                                                 if is_bbox_within_bbox(w.bbox.bbox, r.bbox.bbox)])
                     new_line.adjust_bbox()
                     new_line.region = r
                     r.children['line'].append(new_line)
@@ -423,9 +423,9 @@ class OlrRegion(OcrTextContainer):
     @lazy_property
     def children(self):
         return {k: [el for el in self.page.children[k]
-                    if is_rectangle_within_rectangle_with_threshold(contained=el.bbox.bbox,
-                                                                    container=self.bbox.bbox,
-                                                                    threshold=self._inclusion_threshold)]
+                    if is_bbox_within_bbox_with_threshold(contained=el.bbox.bbox,
+                                                          container=self.bbox.bbox,
+                                                          threshold=self._inclusion_threshold)]
                 for k in ['line', 'word']}
 
     def adjust_bbox(self):
@@ -476,6 +476,6 @@ class OcrWord(OcrTextContainer):
         return get_element_text(element=self.markup, ocr_format=self.ocr_format)
 
     def adjust_bbox(self):
-        self.bbox = adjust_to_included_contours(self.bbox.bbox, self.page.image.contours)
+        self.bbox = adjust_bbox_to_included_contours(self.bbox.bbox, self.page.image.contours)
 
 

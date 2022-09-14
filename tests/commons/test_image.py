@@ -21,10 +21,10 @@ def test_remove_artifacts_from_contours(art_size):
 
 def test_image():
     assert isinstance(so.sample_image.matrix, np.ndarray)
-    assert isinstance(so.sample_image.crop(so.sample_rectangles['base']), img.Image)
+    assert isinstance(so.sample_image.crop(so.sample_bboxes['base']), img.Image)
 
 
-def test_draw_rectangles():
+def test_draw_bboxes():
     matrix = so.sample_image.matrix.copy()
-    assert so.sample_image.matrix.shape == img.draw_rectangles([r for _, r in so.sample_rectangles.items()],
+    assert so.sample_image.matrix.shape == img.draw_bboxes([r for _, r in so.sample_bboxes.items()],
                                                         matrix).shape

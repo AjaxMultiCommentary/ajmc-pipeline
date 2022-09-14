@@ -1,7 +1,7 @@
 import json
 import os
 import pandas as pd
-from ajmc.commons.geometry import is_rectangle_within_rectangle_with_threshold
+from ajmc.commons.geometry import is_bbox_within_bbox_with_threshold
 from ajmc.nlp.token_classification.evaluation import seqeval_evaluation, seqeval_to_df
 from ajmc.olr.layout_lm.config import create_olr_config
 from ajmc.olr.yolo.utils import parse_yolo_txt_line
@@ -69,9 +69,9 @@ for xp_name in next(os.walk(runs_path))[1]:
 
                     # find the word's pred label
                     pred_regions = [r for r in regions
-                                    if is_rectangle_within_rectangle_with_threshold(w.bbox.bbox,
-                                                                                    r['bbox'].bbox,
-                                                                                    WORD_INCLUSION_THRESH)]
+                                    if is_bbox_within_bbox_with_threshold(w.bbox.bbox,
+                                                                          r['bbox'].bbox,
+                                                                          WORD_INCLUSION_THRESH)]
                     if pred_regions:
                         pred_rtype = pred_regions[0]['label']
                     else:

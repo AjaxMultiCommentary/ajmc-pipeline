@@ -275,7 +275,7 @@ class CanonicalWord(CanonicalTextContainer):
         return self.index, self.index
 
     def to_json(self):
-        return {'bbox': self.bbox.bbox_2, 'text': self.text}
+        return {'bbox': self.bbox.bbox, 'text': self.text}
 
 
 types_to_classes = {'commentary': CanonicalCommentary,

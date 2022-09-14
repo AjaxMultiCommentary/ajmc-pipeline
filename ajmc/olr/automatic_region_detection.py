@@ -3,8 +3,8 @@
 a csv that can be directly imported to VIA.
 
 **Detecting boxes in image-files** is done using `cv2.dilation`. This dilates recognized letters-contours to recognize
-wider structures. The retrieved rectangles are then shrinked back to their original size. This can be seen
-when drawing rectangles on images.
+wider structures. The retrieved bboxes are then shrinked back to their original size. This can be seen
+when drawing bboxes on images.
 
 **Synergy with VIA**. Then, to **transfer the project to VIA2**, please :
 
@@ -15,12 +15,13 @@ the annotation_helper/data directory.
 - In the `annotation`-menu, chose import annotations from csv, and import the annotations you want from the
 annotation_helper output.
 """
+
 import csv
 import os
 from typing import List
 import cv2
 import numpy as np
-from ajmc.commons.geometry import Shape, is_rectangle_within_rectangle
+from ajmc.commons.geometry import Shape, is_bbox_within_bbox
 from ajmc.commons.image import binarize, find_contours, remove_artifacts_from_contours
 from ajmc.commons.variables import VIA_CSV_DICT_TEMPLATE
 from ajmc.commons.docstrings import docstring_formatter, docstrings
@@ -37,7 +38,7 @@ def detect_regions(img_path: str,
                    via_csv_dict: dict,
                    artifact_size_threshold: int = 0.003) -> dict:
     """Automatically detects regions of interest in an image, using a simple dilation process.
-    Returns a `'key':[values]`-like dictionnary containing all the generated rectangles for all the images.
+    Returns a `'key':[values]`-like dictionnary containing all the generated bboxes for all the images.
 
     Args:
         img_path: Absolute page to the image.
@@ -76,7 +77,7 @@ def detect_regions(img_path: str,
 
     for dc in dilated_contours:
         contained_contours = [c for c in contours if
-                              is_rectangle_within_rectangle(c.bbox, dc.bbox)]
+                              is_bbox_within_bbox(c.bbox, dc.bbox)]
 
         if contained_contours:
             contained_stacked = Shape.from_numpy_array(
@@ -96,16 +97,16 @@ def detect_regions(img_path: str,
                                                         "height": c.xywh[3]})
         via_csv_dict["region_attributes"].append({"text": "undefined"})
 
-    # Draws output rectangles
+    # Draws output bboxes
     if draw_images:
-        # for rectangle in dilation_contours_rectangles:
+        # for rectangle in dilation_contours_bboxes:
         #     dilation_rectangle = cv2.rectangle(copy, (rectangle[0, 0], rectangle[0, 1]),
         #                          (rectangle[2, 0], rectangle[2, 1]), (0, 0, 255), 4)
 
         for c in dilated_contours_shrinked:
-            shrinked_rectangle = cv2.rectangle(copy,
+            shrinked_bbox = cv2.rectangle(copy,
                                                (c.bbox[0][0], c.bbox[0][1]),
-                                               (c.bbox[2][0], c.bbox[2][1]),
+                                               (c.bbox[1][0], c.bbox[1][1]),
                                                (0, 0, 255), 4)
 
         cv2.imwrite(os.path.join(output_dir, img_name), copy)

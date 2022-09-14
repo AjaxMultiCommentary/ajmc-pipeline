@@ -1,5 +1,4 @@
 from typing import Tuple, List
-
 import numpy as np
 
 from ajmc.commons.docstrings import docstrings, docstring_formatter
@@ -41,8 +40,6 @@ def are_intervals_within_intervals(contained: List[Tuple[int, int]], container: 
             for contained_i in contained
         ]
     )
-
-
 
 
 def safe_divide(dividend, divisor):

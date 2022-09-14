@@ -56,5 +56,5 @@ python evaluator --IMG_DIR "data/test_png" \
 --OUTPUT_DIR "output" \
 --OCR_DIR "test/"
 --GROUNDTRUTH_DIR "test_gt/"
---draw_rectangles
+--draw_bboxes
 ```

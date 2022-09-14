@@ -21,6 +21,7 @@ def do_map_for_yolo(images_dir: str,
                     ):
     # Create the Metric builder
     metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=False, num_classes=len(ids_to_labels.keys()))
+    counts = {l: 0 for l in ids_to_labels.values()}
 
     # Walk over each prediction txt in `preds_dir`
     for pred_path in glob.glob(os.path.join(preds_dir, '*.txt')):
@@ -49,7 +50,13 @@ def do_map_for_yolo(images_dir: str,
 
         metric_fn.add(preds_array, gt_array)
 
+        # Do the counts:
+        for l in gt:
+            counts[ids_to_labels[l['label_id']]] += 1
+
     metrics = metric_fn.value(iou_thresholds=(0.5))
+    for k, dict_ in metrics[0.5].items():
+        dict_['count'] = counts[ids_to_labels[k]]
 
     return metrics
 
@@ -73,20 +80,18 @@ for xp_serie in xp_series:
         ids_to_labels = {i: l for i, l in enumerate(config['names'])}
 
         # Create the general_results.
-
-        if i==0:
+        if i == 0:
             general_results = initialize_general_results(ids_to_labels=ids_to_labels)
 
         metrics = do_map_for_yolo(images_dir=images_dir,
-                                 gt_dir = gt_dir,
-                                 preds_dir=preds_dir,
-                                 ids_to_labels=ids_to_labels,
-                                 )
+                                  gt_dir=gt_dir,
+                                  preds_dir=preds_dir,
+                                  ids_to_labels=ids_to_labels,
+                                  )
 
         general_results = update_general_results(general_results=general_results, metrics=metrics,
-                                                 xp_name=xp_name,  ids_to_labels=ids_to_labels)
+                                                 xp_name=xp_name, ids_to_labels=ids_to_labels)
 
     df = pd.DataFrame.from_dict(general_results)
     tsv_path = os.path.join(RUNS_DIR, xp_serie, 'general_results.tsv')
     df.to_csv(tsv_path, sep='\t', index=False)
-

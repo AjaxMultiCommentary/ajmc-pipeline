@@ -89,7 +89,7 @@ selected_regions = {
     "commentary-like": ["commentary", "footnote"],
     "low_greek": ["introduction", "preface", "translation"],
     "app_crit": ["app_crit"],
-    "structured_texts": ["appendix", "bibliography", "index_siglorum", "running_header", "table_of_contents", "title"],
+    "structured_texts": ["appendix", "bibliography", "index", "running_header", "table_of_contents", "title"],
     "numbers": ["line_number_commentary", "line_number_text", "page_number"],
 }
 selected_metrics = ["cer", "wer"]

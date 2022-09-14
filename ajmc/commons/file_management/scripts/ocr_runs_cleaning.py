@@ -1,3 +1,5 @@
+"""Use this script to clean ocr/runs/xxxxxxx/outputs dirs from lace outputs and other weird files."""
+
 import os
 
 base_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data'

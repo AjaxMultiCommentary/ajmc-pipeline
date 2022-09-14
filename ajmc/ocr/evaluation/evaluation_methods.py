@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple, Union, Optional
 import Levenshtein
 from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES
 from ajmc.commons.arithmetic import safe_divide
-from ajmc.commons.geometry import is_rectangle_within_rectangle, are_rectangles_overlapping_with_threshold
+from ajmc.commons.geometry import is_bbox_within_bbox, are_bboxes_overlapping_with_threshold
 from ajmc.ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts
 from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
@@ -93,9 +93,9 @@ def simple_coordinates_based_evaluation(gt_words: List['OcrWord'],
     for gt_word in gt_words:
 
         for i, pred_word in enumerate(pred_words_):
-            if are_rectangles_overlapping_with_threshold(pred_word.bbox.bbox,
-                                                         gt_word.bbox.bbox,
-                                                         overlap_threshold):
+            if are_bboxes_overlapping_with_threshold(pred_word.bbox.bbox,
+                                                     gt_word.bbox.bbox,
+                                                     overlap_threshold):
                 total_characters += len(gt_word.text)
                 total_edit_distance += Levenshtein.distance(pred_word.text, gt_word.text)
                 matched_words += 1
@@ -159,8 +159,8 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
 
         # Find `gt_word`'s regions
         gt_word_regions = ['global'] + [r.region_type for r in gt_page.children['region'] if
-                                        is_rectangle_within_rectangle(gt_word.bbox.bbox,
-                                                                      r.bbox.bbox)]
+                                        is_bbox_within_bbox(gt_word.bbox.bbox,
+                                                            r.bbox.bbox)]
 
         for region in gt_word_regions:
             error_counts[region]['words']['total'] += 1
@@ -170,8 +170,8 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
 
         # Find the corresponding ocr_word
         for i, pred_word in enumerate(pred_words_):
-            if are_rectangles_overlapping_with_threshold(pred_word.bbox.bbox,
-                                                         gt_word.bbox.bbox, word_overlap_threshold):
+            if are_bboxes_overlapping_with_threshold(pred_word.bbox.bbox,
+                                                     gt_word.bbox.bbox, word_overlap_threshold):
                 distance = Levenshtein.distance(pred_word.text, gt_word.text)
 
                 for region in gt_word_regions:

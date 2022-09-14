@@ -104,7 +104,7 @@ def annotation_helper_args(parser: "ArgumentParser") -> "ArgumentParser":
     parser.add_argument("--draw_images",
                         action="store_true",
                         help="Whether to output images with both shrinked and dilated "
-                             "rectangles. This is usefull if you want to have a look at "
+                             "bboxes. This is usefull if you want to have a look at "
                              "images, e.g. to test dilation parameters. ")
 
     return parser

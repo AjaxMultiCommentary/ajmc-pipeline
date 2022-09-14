@@ -1,13 +1,13 @@
-from typing import List, Union, Iterable
+from typing import List, Union, Iterable, Tuple
 import numpy as np
 
 from ajmc.commons.arithmetic import compute_interval_overlap
-from ajmc.commons.miscellaneous import lazy_property, RectangleType
 from ajmc.commons.docstrings import docstring_formatter, docstrings
+from ajmc.commons.miscellaneous import lazy_property
 
 
 class Shape:
-    """The basic class for contours, bounding rectangles and coordinates.
+    """The basic class for contours, bounding boxs and coordinates.
 
     `Shape` objects can be instanciated directly or via `Shape.from_points()`, `Shape.from_numpy_array()`
     or `Shape.from_xywh()`. Notice that default constructor expects a list of 4 lists of x-y points, like
@@ -44,7 +44,7 @@ class Shape:
     def from_xywh(cls, x: int, y: int, w: int, h: int):
         """Creates a Shape from `x`, `y`, `w`, `h`, where `x` and `y` are the coordinates of the upper left corner,
         while `w` and `h` represent width and height respectively."""
-        return cls([(x, y), (x + w, y), (x + w, y + h), (x, y + h)])
+        return cls([(x, y), (x + w, y + h)])
 
     @classmethod
     def from_center_w_h(cls, center_x: int, center_y: int, w: int, h:int ):
@@ -55,38 +55,31 @@ class Shape:
 
     @lazy_property
     @docstring_formatter(**docstrings)
-    def bbox(self) -> RectangleType:
-        """{rectangle} This format is used internally (preferably to `bbox_2` in order to
-        perform operations such as `any([is_point_within_rectangle(p,r) for p in points])`. """
+    def bbox(self) -> Tuple[Tuple[int,int], Tuple[int,int]]:
+        """{bbox}"""
         return get_bbox_from_points(self.points)
 
     @lazy_property
-    def bbox_2(self) -> RectangleType:
-        """Bounding rectangle represented by `[[Up-left xy], [bottom-right xy]]`,
-        mainly used for memory efficient storage."""
-        return self.bbox[::2]
+    def xyxy(self) -> Tuple[int, int, int, int]:
+        return self.bbox[0][0], self.bbox[0][1], self.bbox[1][0], self.bbox[1][1]
 
     @lazy_property
-    def xyxy(self):
-        return [i for tup in self.bbox_2 for i in tup]
-
-    @lazy_property
-    def xywh(self) -> List[int]:
-        """Gets the bounding rectangle in `[x,y,w,h]` format, where `x` and `y` are the coordinates of the upper-left
+    def xywh(self) -> Tuple[int, int, int, int]:
+        """Gets the bounding box in `[x,y,w,h]` format, where `x` and `y` are the coordinates of the upper-left
         corner."""
-        return [self.bbox[0][0], self.bbox[0][1], self.width, self.height]
+        return self.bbox[0][0], self.bbox[0][1], self.width, self.height
 
     @lazy_property
     def width(self) -> int:
-        return self.bbox[2][0] - self.bbox[0][0] + 1
+        return self.bbox[1][0] - self.bbox[0][0] + 1
 
     @lazy_property
     def height(self) -> int:
-        return self.bbox[2][1] - self.bbox[0][1] + 1
+        return self.bbox[1][1] - self.bbox[0][1] + 1
 
     @lazy_property
-    def center(self) -> List[int]:
-        return [int(self.xywh[0] + self.width / 2), int(self.xywh[1] + self.height / 2)]
+    def center(self) -> Tuple[int, int]:
+        return int(self.bbox[0][0] + self.width / 2), int(self.bbox[0][1] + self.height / 2)
 
     @lazy_property
     def area(self) -> int:
@@ -94,15 +87,14 @@ class Shape:
 
 
 @docstring_formatter(**docstrings)
-def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> RectangleType:
+def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> Tuple[Tuple[int,int], Tuple[int,int]]:
     """Gets the bounding box (i.e. the minimal rectangle containing all points) from a sequence of x-y points.
 
     Args:
         points: {points}
     
     Returns:
-        A list of four lists of x-y-points representing the four points of the rectangle from the upper
-        left corner clockwise."""
+        {bbox}"""
 
     if type(points) == np.ndarray:
         points = points.squeeze()
@@ -111,7 +103,7 @@ def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> 
         x_min, x_max = points[:, 0].min(), points[:, 0].max()
         y_min, y_max = points[:, 1].min(), points[:, 1].max()
 
-        return [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
+        return (x_min, y_min), (x_max, y_max)
 
     else:
         x_coords = [point[0] for point in points]
@@ -119,127 +111,133 @@ def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> 
         x_min, x_max = min(x_coords), max(x_coords)
         y_min, y_max = min(y_coords), max(y_coords)
 
-        return [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
+        return (x_min, y_min), (x_max, y_max)
 
 
-def compute_rectangle_area(rectangle: RectangleType) -> int:
-    # Todo 👁️ Shouldn't this work directly with a shape object.
-    return (rectangle[2][0] - rectangle[0][0] + 1) * (rectangle[2][1] - rectangle[0][1] + 1)
+def compute_bbox_area(bbox: Tuple[Tuple[int, int], Tuple[int, int]]) -> int:
+    return (bbox[1][0] - bbox[0][0] + 1) * (bbox[1][1] - bbox[0][1] + 1)
 
 
 @docstring_formatter(**docstrings)
-def is_point_within_rectangle(point: Union[Iterable[int], np.ndarray], rectangle: RectangleType) -> bool:
-    """Checks wheter a `point` is contained within a `rectangle`.
+def is_point_within_bbox(point: Union[Iterable[int], np.ndarray],
+                         bbox: Tuple[Tuple[int, int], Tuple[int, int]]) -> bool:
+    """Checks wheter a `point` is contained within a `bbox`.
 
     Note:
         Included means included or equal, not strictly included.
 
     Args:
          point: {point}
-         rectangle: {rectangle}
+         bbox: {bbox}
     """
-    return all([point[0] >= rectangle[0][0],
-                point[1] >= rectangle[0][1],
-                point[0] <= rectangle[2][0],
-                point[1] <= rectangle[2][1]])
+    return all([point[0] >= bbox[0][0],
+                point[1] >= bbox[0][1],
+                point[0] <= bbox[1][0],
+                point[1] <= bbox[1][1]])
 
 
 @docstring_formatter(**docstrings)
-def is_rectangle_within_rectangle(contained: RectangleType, container: RectangleType) -> bool:
-    """Checks whether the `contained` rectangle is entirely contained within the `container` rectangle.
+def is_bbox_within_bbox(contained: Tuple[Tuple[int, int], Tuple[int, int]],
+                        container: Tuple[Tuple[int, int], Tuple[int, int]]) -> bool:
+    """Checks whether the `contained` bbox is entirely contained within the `container` bbox.
 
     Note:
-        Included means included or equal, not strictly included. For any rectangle `r`, we have
-        `is_rectangle_within_rectangle(r, r) == True`.
+        Included means included or equal, not strictly included. For any bbox `r`, we have
+        `is_bbox_within_bbox(r, r) == True`.
 
     Args:
-        contained: {rectangle}
-        container: {rectangle}
+        contained: {bbox}
+        container: {bbox}
     """
 
     return all([contained[0][0] >= container[0][0],
                 contained[0][1] >= container[0][1],
-                contained[2][0] <= container[2][0],
-                contained[2][1] <= container[2][1]])
+                contained[1][0] <= container[1][0],
+                contained[1][1] <= container[1][1]])
 
 
 @docstring_formatter(**docstrings)
-def compute_overlap_area(r1: RectangleType, r2: RectangleType) -> int:
-    """Measures the area of intersection between two rectangles.
+def compute_bbox_overlap_area(bbox1: Tuple[Tuple[int, int], Tuple[int, int]],
+                              bbox2: Tuple[Tuple[int, int], Tuple[int, int]]) -> int:
+    """Measures the area of intersection between two bboxes.
 
     Args:
-        r1: {rectangle}
-        r2: {rectangle}
+        bbox1: {bbox}
+        bbox2: {bbox}
 
     Returns:
         int: The area of intersection
     """
-    inter_width = compute_interval_overlap((r1[0][0], r1[2][0]), (r2[0][0], r2[2][0]))
-    inter_height = compute_interval_overlap((r1[0][1], r1[2][1]), (r2[0][1], r2[2][1]))
+    inter_width = compute_interval_overlap((bbox1[0][0], bbox1[1][0]), (bbox2[0][0], bbox2[1][0]))
+    inter_height = compute_interval_overlap((bbox1[0][1], bbox1[1][1]), (bbox2[0][1], bbox2[1][1]))
 
     return inter_width * inter_height
 
 
 @docstring_formatter(**docstrings)
-def are_rectangles_overlapping(r1: RectangleType, r2: RectangleType) -> bool:
-    """Checks whether rectangles are overlapping with each other.
+def are_bboxes_overlapping(bbox1: Tuple[Tuple[int, int], Tuple[int, int]],
+                           bbox2: Tuple[Tuple[int, int], Tuple[int, int]]) -> bool:
+    """Checks whether bboxes are overlapping with each other.
 
     Args:
-        r1: {rectangle}
-        r2: {rectangle}
+        bbox1: {bbox}
+        bbox2: {bbox}
     """
-    return bool(compute_overlap_area(r1, r2))
+    return bool(compute_bbox_overlap_area(bbox1, bbox2))
 
 
 @docstring_formatter(**docstrings)
-def is_rectangle_within_rectangle_with_threshold(contained: RectangleType, container: RectangleType,
-                                                 threshold: float) -> bool:
+def is_bbox_within_bbox_with_threshold(contained: Tuple[Tuple[int, int], Tuple[int, int]],
+                                       container: Tuple[Tuple[int, int], Tuple[int, int]],
+                                       threshold: float) -> bool:
     """Asserts more than `threshold` of `contained`'s area is within `container`. Is not merged with
-    `are_rectangles_overlapping` for effisciency purposes.
+    `are_bboxes_overlapping` for effisciency purposes.
 
     Args:
-        contained: {rectangle}
-        container: {rectangle}
+        contained: {bbox}
+        container: {bbox}
         threshold: The minimal proportional of `contained` which should be included in `container`.
     """
-    contained_area = compute_rectangle_area(contained)
-    return compute_overlap_area(contained, container) > threshold * contained_area
+    contained_area = compute_bbox_area(contained)
+    return compute_bbox_overlap_area(contained, container) > threshold * contained_area
 
 
 @docstring_formatter(**docstrings)
-def are_rectangles_overlapping_with_threshold(r1: RectangleType, r2: RectangleType, threshold: float) -> bool:
-    """Checks whether the overlapping (intersection) area of two rectangles is higher than `threshold`* union area
+def are_bboxes_overlapping_with_threshold(bbox1: Tuple[Tuple[int, int], Tuple[int, int]],
+                                          bbox2: Tuple[Tuple[int, int], Tuple[int, int]],
+                                          threshold: float) -> bool:
+    """Checks whether the overlapping (intersection) area of two bboxes is higher than `threshold`* union area
 
     Args:
-        r1: {rectangle}
-        r2: {rectangle}
+        bbox1: {bbox}
+        bbox2: {bbox}
         threshold: The minimal proportion of the union area to be included in the intersection area.
     """
-    inter_area = compute_overlap_area(r1, r2)
-    union_area = compute_rectangle_area(r1) + compute_rectangle_area(r2) - inter_area
+    inter_area = compute_bbox_overlap_area(bbox1, bbox2)
+    union_area = compute_bbox_area(bbox1) + compute_bbox_area(bbox2) - inter_area
     return inter_area >= threshold * union_area
 
 
 @docstring_formatter(**docstrings)
-def adjust_to_included_contours(r: RectangleType,
-                                contours: List[Shape]) -> Shape:
-    """Finds the contours included in `rectangle` and returns a shape objects that minimally contains them.
+def adjust_bbox_to_included_contours(bbox: Tuple[Tuple[int, int], Tuple[int, int]],
+                                     contours: List[Shape]) -> Shape:
+    """Finds the contours included in `bbox` and returns a shape objects that minimally contains them.
 
     Note:
         This function is mainly used to resize word-boxes. It therefore discards the contours that would make
-        `rectangle` taller (i.e. longer on the Y-axis). This is helpful to avoid line-overlapping word-boxes.
+        `bbox` taller (i.e. longer on the Y-axis). This is helpful to avoid line-overlapping word-boxes.
 
     Args:
-        r: {rectangle}
+        bbox: {bbox}
         contours: A list of included contours
     """
 
     included_contours = [c for c in contours
-                         if are_rectangles_overlapping(c.bbox, r)
-                         and not (c.bbox[0][1] < r[0][1]
-                                  or c.bbox[2][1] > r[2][1])]
+                         if are_bboxes_overlapping(c.bbox, bbox)
+                         and not (c.bbox[0][1] < bbox[0][1]
+                                  or c.bbox[1][1] > bbox[1][1])]
 
     if included_contours:  # If we find included contours, readjust the bounding box
         return Shape([xy for c in included_contours for xy in c.bbox])
     else:
-        return Shape(r)  # Leave the box untouched
+        return Shape(bbox)  # Leave the box untouched

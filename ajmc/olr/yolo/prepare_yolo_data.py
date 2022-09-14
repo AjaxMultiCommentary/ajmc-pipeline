@@ -4,18 +4,18 @@ import numpy as np
 from ajmc.commons.image import Image
 from ajmc.olr.layout_lm.config import create_olr_config
 import yaml
-from ajmc.olr.utils import get_olr_split_page_ids
+from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing import canonical_classes
 
 from ajmc.commons.miscellaneous import stream_handler
-
+from ajmc.commons import variables
 stream_handler.setLevel(0)
 
-base_data_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data'
-base_xp_dir = '/Users/sven/packages/ajmc/data/yolo'
-configs_dir = os.path.join(base_xp_dir, 'configs')
+base_data_dir = variables.PATHS['cluster_base_dir']
+base_xp_dir = '/scratch/sven/yolo'
+configs_dir = '/scratch/sven/tmp/ajmc/data/layoutlm/configs'
 
-excluded_configs = ['4B_omnibus_external.json']
+excluded_configs = ['1D_jebb_kamerbeek.json']
 DATASET_NAME = 'multiclass'
 # for config_name in os.listdir(configs_dir):
 for config_name in os.listdir(configs_dir):
@@ -54,7 +54,7 @@ for config_name in os.listdir(configs_dir):
                 # You get the commentary to canonical
                 comm = canonical_classes.CanonicalCommentary.from_json(dict_['path'])
 
-                p_ids = get_olr_split_page_ids(dict_['id'], dict_['split'])
+                p_ids = get_olr_splits_page_ids(dict_['id'], [dict_['split']])
                 pages += [p for p in comm.children['page'] if p.id in p_ids]
 
             if config['sampling']:

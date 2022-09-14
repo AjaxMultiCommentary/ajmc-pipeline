@@ -55,9 +55,8 @@ def insert_text_in_soup(soup: "BeautifulSoup", word: 'OcrWord', is_gt: bool, is_
     divisor = float(soup.html.head.meta['divisor'])
 
     # Write groundtruth to the right
-    x_coord = int(word.bbox.bbox[3][0] / divisor) + \
-              (int(soup.html.head.meta["half_width"]) if is_gt else 0)
-    y_coord = int(word.bbox.bbox[3][1] / divisor)
+    x_coord = int(word.bbox.bbox[0][0] / divisor) + (int(soup.html.head.meta["half_width"]) if is_gt else 0)
+    y_coord = int(word.bbox.bbox[0][1] / divisor)
 
     new_div = soup.new_tag(name="div",
                            attrs={"style": f"""position:absolute; 
@@ -87,15 +86,15 @@ def actualize_overlap_matrix(args: "ArgumentParser", image: "Image", zonemask: "
 
     for zone in zonemask.zones:  # For each zone, fill matrix and add error dictionary
 
-        image.overlap_matrix[0, zone.bbox[0][1]:zone.bbox[2][1],
-        zone.bbox[0][0]:zone.bbox[2][0]] += zone.zone_type + " "  # adds zone.type to matrix, eg. "primary_text"
+        image.overlap_matrix[0, zone.bbox[0][1]:zone.bbox[1][1],
+        zone.bbox[0][0]:zone.bbox[1][0]] += zone.zone_type + " "  # adds zone.type to matrix, eg. "primary_text"
 
     for gt_word in groundtruth.children['word']:  # For each gt_word in gt, fill matrix, then find overlapping gt- and ocr-words
-        image.overlap_matrix[1, gt_word.bbox[0][1]:gt_word.bbox[2][1],
-        gt_word.bbox[0][0]:gt_word.bbox[2][0]] = gt_word.id
+        image.overlap_matrix[1, gt_word.bbox[0][1]:gt_word.bbox[1][1],
+        gt_word.bbox[0][0]:gt_word.bbox[1][0]] = gt_word.id
 
     for word in ocr.children['word']:  # For each word in ocr, fill matrix
-        image.overlap_matrix[2, word.bbox[0][1]:word.bbox[2][1], word.bbox[0][0]:word.bbox[2][0]] = word.id
+        image.overlap_matrix[2, word.bbox[0][1]:word.bbox[1][1], word.bbox[0][0]:word.bbox[1][0]] = word.id
 
     return image.overlap_matrix
 
@@ -142,12 +141,12 @@ def actualize_error_counts(error_counts: Dict[str, Dict[str, int]], gt_word: "Se
     return error_counts
 
 
-def draw_surrounding_rectangle(image_matrix: "ndarray",
+def draw_surrounding_bbox(image_matrix: "ndarray",
                                segment: "Segment",
                                color: tuple,
                                thickness: int,
                                surrounding_box_type: str = "shrinked") -> "ndarray":
-    """Draws the surrounding rectangle of a segment.
+    """Draws the surrounding bbox of a segment.
 
     :param image_matrix: ndarray retrieved from cv2.imread()
     :param segment:
@@ -190,14 +189,14 @@ def compute_confusion_metrics(error_counts: Dict) -> Tuple[float, float, float]:
     return precision, recall, f1
 
 
-def harmonise_unicode(word):
-    word = re.sub(r"᾽", "’", word)
-    word = re.sub(r"ʼ", "’", word)
-    word = re.sub(r"'", "’", word)
-    word = re.sub(r"—", "-", word)
-    word = re.sub(r"„", '"', word)
+def harmonise_unicode(text:str):
+    text = re.sub(r"᾽", "’", text)
+    text = re.sub(r"ʼ", "’", text)
+    text = re.sub(r"'", "’", text)
+    text = re.sub(r"—", "-", text)
+    text = re.sub(r"„", '"', text)
 
-    return word
+    return text
 
 
 def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> int:

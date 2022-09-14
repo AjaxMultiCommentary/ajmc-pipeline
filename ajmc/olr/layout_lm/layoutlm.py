@@ -12,7 +12,7 @@ from ajmc.nlp.token_classification.data_preparation.utils import align_from_toke
     align_to_tokenized, align_labels
 from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.nlp.token_classification.pipeline import create_dirs
-from ajmc.olr.utils import get_olr_split_page_ids
+from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from PIL import Image
 
@@ -35,12 +35,12 @@ ROBERTA_MODEL_INPUTS = ['input_ids', 'attention_mask']
 
 
 # Functions
-def normalize_bounding_rectangles(rectangle: List[List[int]], img_width: int, img_height: int, ):
+def normalize_bounding_bboxes(bbox: List[List[int]], img_width: int, img_height: int, ):
     return [
-        int(1000 * (rectangle[0][0] / img_width)),
-        int(1000 * (rectangle[0][1] / img_height)),
-        int(1000 * (rectangle[2][0] / img_width)),
-        int(1000 * (rectangle[2][1] / img_height))
+        int(1000 * (bbox[0][0] / img_width)),
+        int(1000 * (bbox[0][1] / img_height)),
+        int(1000 * (bbox[2][0] / img_width)),
+        int(1000 * (bbox[2][1] / img_height))
     ]
 
 
@@ -64,7 +64,7 @@ def get_data_dict_pages(data_dict: Dict[str, List[Dict[str, str]]],
                 commentary = CanonicalCommentary.from_json(json_path=dict_['path'])
                 commentaries[dict_['id']] = commentary
 
-            page_ids = get_olr_split_page_ids(dict_['id'], dict_['split'])
+            page_ids = get_olr_splits_page_ids(dict_['id'], [dict_['split']])
             set_pages[set_] += [p for p in commentary.children['page'] if p.id in page_ids]
 
     if sampling:
@@ -90,7 +90,7 @@ def page_to_layoutlmv2_encodings(page,
     if unknownify_tokens:
         words = [tokenizer.unk_token for _ in words]
 
-    word_boxes = [normalize_bounding_rectangles(w.bbox.bbox, page.image.width, page.image.height)
+    word_boxes = [normalize_bounding_bboxes(w.bbox.bbox, page.image.width, page.image.height)
                   for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
 
     if not get_labels:

@@ -54,6 +54,8 @@ docstrings['BatchEncoding'] = """The default ouput of HuggingFace's `TokenizerFa
         list of example, containing notably the offsets. Please note that not using a `TokenizerFast` (i.e. using a `Tokenizer` instead) can lead to the cumbersome
         situation in which `self.encodings` is set to `None`.""",
 
+docstrings['bbox'] = """A tuple of two (x, y) tuples representing upper-left and lower right coordinates."""
+
 docstrings['coords_single'] = 'A `Shape` object representing the coordinates of the object.'
 
 docstrings['custom_dataset'] = """A dataset inheriting from `torch.utils.data.Dataset`, implementing at least `__len__` and 
@@ -87,9 +89,6 @@ docstrings['parent_page'] = """"The `OcrPage` containing the object"""
 
 docstrings['point'] = 'Iterable containing x and y coordinates (e.g. `(123, 87)`'
 docstrings['points'] = f"""Iterable of iterable containing x-y points (e.g. `[(12,8), ...]`. """
-
-docstrings['rectangle'] = """Iterable of 4 iterables containing x-y points (e.g. `[[x:int,y:int], ...]`) representing
- the four points of the rectangle from the upper left corner clockwise."""
 
 docstrings['transformers_model'] = """A `transformers.models`."""
 

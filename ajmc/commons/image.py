@@ -2,7 +2,7 @@ import cv2
 from typing import List, Tuple, Optional
 import numpy as np
 from ajmc.commons.geometry import Shape
-from ajmc.commons.miscellaneous import lazy_property, RectangleType, get_custom_logger, lazy_init
+from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init
 
 logger = get_custom_logger(__name__)
 
@@ -40,11 +40,11 @@ class Image:
     def contours(self):
         return find_contours(self.matrix)
 
-    def crop(self, rect: RectangleType, margin: int = 0) -> 'Image':
+    def crop(self, rect: List[Tuple[int,int]], margin: int = 0) -> 'Image':
         """Gets the slice of `self.matrix` corresponding to `rect`.
 
         Args:
-            rect: The rectangle delimiting the desired crop
+            rect: The bbox delimiting the desired crop
             margin: The extra margin desired around `rect`
 
         Returns:
@@ -86,12 +86,12 @@ def find_contours(img_matrix: np.ndarray,
     return contours
 
 
-def draw_rectangles(rectangles: List[RectangleType], matrix: np.ndarray, color: Tuple[int, int, int] = (0, 0, 255),
+def draw_bboxes(bboxes: List[List[Tuple[int,int]]], matrix: np.ndarray, color: Tuple[int, int, int] = (0, 0, 255),
                     thickness: int = 2, output_path: str = None, show: bool = False):
-    """Draws a list of rectangles on an image matrix.
+    """Draws a list of bboxes on an image matrix.
 
     Args:
-        rectangles: A list of rectangles.
+        bboxes: A list of bboxes.
         matrix: An image matrix to draw on.
         color: A tuple of BGR-color, e.g. (255,109, 118)
         thickness: An integer, see cv2, e.g. 2
@@ -103,8 +103,8 @@ def draw_rectangles(rectangles: List[RectangleType], matrix: np.ndarray, color: 
 
     """
 
-    for rectangle in rectangles:
-        matrix = cv2.rectangle(matrix, pt1=tuple(rectangle[0]), pt2=tuple(rectangle[2]), color=color,
+    for bbox in bboxes:
+        matrix = cv2.rectangle(matrix, pt1=tuple(bbox[0]), pt2=tuple(bbox[2]), color=color,
                                thickness=thickness)
     if output_path:
         cv2.imwrite(output_path, matrix)
@@ -119,20 +119,20 @@ def draw_page_regions_lines_words(matrix: np.ndarray,
                                   page: 'OcrPage',
                                   output_path: Optional[str] = None,
                                   region_elements: bool = False):
-    matrix = draw_rectangles(rectangles=[r.bbox.bbox for r in page.children['region']],
+    matrix = draw_bboxes(bboxes=[r.bbox.bbox for r in page.children['region']],
                              matrix=matrix,
                              color=(255, 0, 0),
                              thickness=3)
     if region_elements:
-        matrix = draw_rectangles([r.bbox.bbox for region in page.children['region'] for r in region.children['line']],
+        matrix = draw_bboxes([r.bbox.bbox for region in page.children['region'] for r in region.children['line']],
                                  matrix,
                                  (0, 255, 0), thickness=2)
-        matrix = draw_rectangles([r.bbox.bbox for region in page.children['region'] for r in region.children['word']],
+        matrix = draw_bboxes([r.bbox.bbox for region in page.children['region'] for r in region.children['word']],
                                  matrix,
                                  thickness=1)
     else:
-        matrix = draw_rectangles([r.bbox.bbox for r in page.children['line']], matrix, (0, 255, 0), thickness=2)
-        matrix = draw_rectangles([r.bbox.bbox for r in page.children['word']], matrix, thickness=1)
+        matrix = draw_bboxes([r.bbox.bbox for r in page.children['line']], matrix, (0, 255, 0), thickness=2)
+        matrix = draw_bboxes([r.bbox.bbox for r in page.children['word']], matrix, thickness=1)
 
     if output_path:
         cv2.imwrite(output_path, matrix)
@@ -158,7 +158,7 @@ def draw_reading_order(matrix: np.ndarray,
 
 def remove_artifacts_from_contours(contours: List[Shape],
                                    artifact_perimeter_threshold: float) -> List[Shape]:
-    """Removes contours if the perimeter of their bounding rectangle is inferior to `artifact_perimeter_threshold`"""
+    """Removes contours if the perimeter of their bounding box is inferior to `artifact_perimeter_threshold`"""
 
     contours_ = [c for c in contours if (2 * (c.width + c.height)) > artifact_perimeter_threshold]
     logger.info(f"""Removed {len(contours) - len(contours_)} artifacts""")

@@ -1,10 +1,14 @@
+"""File management tools and utilities, such as moving/renaming/replacing files, get paths..."""
+
 import os
+import shutil
 from string import ascii_letters
 from datetime import datetime
 from typing import Tuple, Optional
 
 from ajmc.commons import variables
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_custom_logger, walk_dirs
+from ajmc.commons.variables import PATHS
 
 logger = get_custom_logger(__name__)
 
@@ -107,3 +111,28 @@ def guess_ocr_format(ocr_path: str) -> str:
     else:
         raise NotImplementedError("""The format could not be identified. It looks like the format is neither 
         `tesshocr`, nor `krakenhocr` nor `pagexml`, which are the only formats this module deals with.""")
+
+
+def move_files_in_each_commentary_dir(relative_src: str,
+                                      relative_dst: str,
+                                      base_dir: str = PATHS['base_dir']):
+    """Moves/rename files/folders in the folder structur
+
+    Args:
+        relative_src: relative path of the source file/folder, from commentary root (e.g. `'ocr/groundtruth'`)
+        relative_dst: relative path of the destination file/folder,  from commentary root (e.g. `'ocr/groundtruth'`)
+
+    Returns:
+        None
+    """
+
+    for dir_name in walk_dirs(base_dir):
+        if os.path.exists(os.path.join(base_dir, dir_name, relative_src)):
+            # Moves the file/folder
+            shutil.move(os.path.join(base_dir, dir_name, relative_src),
+                        os.path.join(base_dir, dir_name, relative_dst))
+
+
+def create_folder_in_each_commentary_dir(relative_dir_path:str):
+    for dir_name in next(os.walk(PATHS['base_dir']))[1]:
+        os.makedirs(os.path.join(PATHS['base_dir'], dir_name, relative_dir_path), exist_ok=True)

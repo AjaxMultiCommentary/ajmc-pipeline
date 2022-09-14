@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from ajmc.olr.utils import get_olr_split_page_ids
+from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
 from ajmc.olr.layout_lm.config import create_olr_config
@@ -28,7 +28,7 @@ for fname in next(os.walk(base_path))[1]:  # Walk in dirs only
             output_dir = os.path.join(new_prefix, config['predictions_dir'][len(old_prefix):])
             commentary = CanonicalCommentary.from_json(ocr_dir)
             pages += [p for p in commentary.children['page']
-                      if p.id in get_olr_split_page_ids(commentary.id, dict_['split'])]
+                      if p.id in get_olr_splits_page_ids(commentary.id, [dict_['split']])]
 
         tokenizer = LayoutLMv2TokenizerFast.from_pretrained(model_name_or_path)
         model = LayoutLMv2ForTokenClassification.from_pretrained(model_name_or_path)

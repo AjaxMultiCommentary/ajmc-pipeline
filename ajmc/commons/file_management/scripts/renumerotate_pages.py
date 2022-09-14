@@ -1,3 +1,5 @@
+"""WIP. This script can serve as a basis for renumerotating pages."""
+
 from ajmc.commons import variables
 from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
 import os

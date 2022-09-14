@@ -9,7 +9,7 @@ from typing import List, Tuple, Iterable, Generator
 import pandas as pd
 from jsonschema import Draft6Validator
 
-RectangleType = List[Tuple[int, int]]
+bboxType = List[Tuple[int, int]]
 
 
 def timer(iterations: int = 3, number: int = 1_000):

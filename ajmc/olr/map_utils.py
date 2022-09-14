@@ -1,4 +1,4 @@
-
+import numpy as np
 
 metrics_abbrev = {'ap': 'AP', 'precision': 'P', 'recall': 'R', 'number': 'N'}
 
@@ -15,8 +15,13 @@ def update_general_results(general_results, metrics, xp_name, ids_to_labels):
     general_results[('all', 'mAP')].append(float(metrics['mAP']))
 
     for l_id, dict_ in metrics[0.5].items():
-        general_results[(ids_to_labels[l_id], 'N')].append(dict_['precision'].shape[0])
         for m, score in dict_.items():
-            general_results[(ids_to_labels[l_id], metrics_abbrev[m])].append(float(score) if m == 'ap' else float(score.mean()))
+            if m == 'count':
+                general_results[(ids_to_labels[l_id], 'N')].append(dict_[m])
+            else:
+                if dict_['count']==0:
+                    general_results[(ids_to_labels[l_id], metrics_abbrev[m])].append(np.nan)
+                else:
+                    general_results[(ids_to_labels[l_id], metrics_abbrev[m])].append(float(score) if m == 'ap' else float(score.mean()))
 
     return general_results

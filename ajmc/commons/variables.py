@@ -63,7 +63,7 @@ ORDERED_OLR_REGION_TYPES = ['commentary',
                             'app_crit',
                             'bibliography',
                             'footnote',
-                            'index_siglorum',
+                            'index',
                             'running_header',
                             'table_of_contents',
                             'title',
@@ -99,7 +99,7 @@ REGION_TYPES_TO_COARSE_LABELS = {
     # Others
     'translation': 'others',
     'bibliography': 'others',
-    'index_siglorum': 'others',
+    'index': 'others',
     'table_of_contents': 'others',
     'title': 'others',
     'printed_marginalia': 'others',
@@ -172,3 +172,14 @@ COLORS = {
 TEXTCONTAINER_TYPES = ['commentary', 'page', 'region', 'line', 'word']
 
 LOGGING_LEVEL = logging.ERROR
+
+
+SAMPLE_PAGES = [
+    'bsb10234118_0096',
+    'sophokle1v3soph_0126',
+    'cu31924087948174_0063',
+    'cu31924087948174_0063',
+    'Wecklein1894_0087'
+
+
+]

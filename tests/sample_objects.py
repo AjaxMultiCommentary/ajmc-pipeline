@@ -26,7 +26,7 @@ sample_points = {'base': [(0, 0), (2, 0), (1, 1), (2, 2), (0, 2)],
                  'horizontally_overlapping': [(1, 0), (3, 0), (3, 2), (1, 2)],
                  }
 
-sample_rectangles = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.items()}
+sample_bboxes = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.items()}
 
 # Commentaries, OCR, path and via
 sample_base_dir = "/Users/sven/packages/ajmc/data/sample_commentaries"

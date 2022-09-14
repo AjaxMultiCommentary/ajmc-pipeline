@@ -7,12 +7,12 @@ from mean_average_precision import MetricBuilder
 from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor, \
     RobertaTokenizerFast, RobertaForTokenClassification
 
-from ajmc.commons.geometry import is_rectangle_within_rectangle_with_threshold
+from ajmc.commons.geometry import is_bbox_within_bbox_with_threshold
 from ajmc.commons.miscellaneous import walk_dirs
 from ajmc.olr.layout_lm.config import create_olr_config
 from ajmc.olr.layout_lm.layoutlm import get_data_dict_pages, align_predicted_page
 from ajmc.olr.map_utils import initialize_general_results, update_general_results
-from ajmc.olr.utils import get_olr_split_page_ids
+from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.olr.yolo.utils import parse_yolo_txt
 from ajmc.commons.variables import PATHS
 
@@ -22,7 +22,6 @@ from ajmc.text_processing.canonical_classes import CanonicalCommentary
 BASE_DATA_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data'
 LAYOUTLM_XP_DIR = '/scratch/sven/layoutlm/experiments'
 YOLO_XP_DIR = '/scratch/sven/yolo/runs/binary_class'
-CONFIGS_DIR = '/scratch/sven/yolo/configs'
 WORD_INCLUSION_THRESHOLD = 0.6
 
 LAYOUTLM_TO_YOLO_XP = {
@@ -38,21 +37,23 @@ LAYOUTLM_TO_YOLO_XP = {
     '3A_paduano_base': '3A_paduano_base',
     '3B_wecklein_base': '3B_wecklein_base',
     '4A_omnibus_base': '4A_omnibus_base',
-    '4B_omnibus_external': '4B_omnibus_external'
+    '4B_omnibus_external': '4B_omnibus_external',
+    '4C_omnibus_transfer':'4C_omnibus_transfer'
 }
 
 
 # Read the experiments config
 for i, xp_name in enumerate(walk_dirs(LAYOUTLM_XP_DIR)):
 
+    # Create the config
+    config = create_olr_config(os.path.join(LAYOUTLM_XP_DIR, xp_name, 'config.json'), prefix=PATHS['cluster_base_dir'])
+
     # Initialize mAP computation
     metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=False, num_classes=len(config['ids_to_labels']))
 
+    # Initialize general_results
     if i == 0:
         general_results = initialize_general_results(config['ids_to_labels'])
-
-    # Create the config
-    config = create_olr_config(os.path.join(LAYOUTLM_XP_DIR, xp_name, 'config.json'), prefix=PATHS['cluster_base_dir'])
 
     # Create the LayoutLM model and its tokenizer
     if not config['text_only']:
@@ -69,7 +70,7 @@ for i, xp_name in enumerate(walk_dirs(LAYOUTLM_XP_DIR)):
     for dict_ in config['data']['eval']:
         commentary = CanonicalCommentary.from_json(os.path.join(PATHS['cluster_base_dir'], dict_['id'],
                                                                 PATHS['canonical'], dict_['run'] + '.json'))
-        page_ids = get_olr_split_page_ids(commentary.id, dict_['split'])
+        page_ids = get_olr_splits_page_ids(commentary.id, [dict_['split']])
         pages += [p for p in commentary.children['page']
                   if p.id in page_ids]
 
@@ -82,7 +83,9 @@ for i, xp_name in enumerate(walk_dirs(LAYOUTLM_XP_DIR)):
                                              regions_to_coarse_labels=config['region_types_to_labels'],
                                              tokenizer=tokenizer,
                                              feature_extractor=feature_extractor,
-                                             model=model)
+                                             unknownify_tokens=config['unknownify_tokens'],
+                                             model=model,
+                                             text_only=config['text_only'])
 
         for w, l in zip(words, labels):
             w.layout_lm_label = l
@@ -103,10 +106,10 @@ for i, xp_name in enumerate(walk_dirs(LAYOUTLM_XP_DIR)):
 
         # find the words in each region
         for r in pred_regions:
-            r['words'] = [w.text for w in words
-                          if is_rectangle_within_rectangle_with_threshold(contained=w.bbox.bbox,
-                                                                          container=r['bbox'].bbox,
-                                                                          threshold=WORD_INCLUSION_THRESHOLD)]
+            r['words'] = [w for w in words
+                          if is_bbox_within_bbox_with_threshold(contained=w.bbox.bbox,
+                                                                container=r['bbox'].bbox,
+                                                                threshold=WORD_INCLUSION_THRESHOLD)]
         # Delete empty regions:
         pred_regions = [r for r in pred_regions if r['words']]
 
@@ -138,7 +141,15 @@ for i, xp_name in enumerate(walk_dirs(LAYOUTLM_XP_DIR)):
 
         metric_fn.add(preds_array, gt_array)
 
+
     metrics = metric_fn.value(iou_thresholds=(0.5))
+
+    # Do the counts
+    for k, dict_ in metrics[0.5].items():
+        dict_['count'] = len([r for p in pages
+                              for r in p.children['region']
+                              if config['labels_to_ids'][config['region_types_to_labels'][r.info['region_type']]] == k])
+
     general_results = update_general_results(general_results=general_results,
                                              metrics=metrics, xp_name=xp_name,
                                              ids_to_labels=config['ids_to_labels'])

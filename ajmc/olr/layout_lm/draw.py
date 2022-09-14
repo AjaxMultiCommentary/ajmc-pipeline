@@ -17,7 +17,7 @@ def draw_page_labels(img: 'PIL.Image',
     draw = ImageDraw.Draw(draw_img, 'RGBA')
 
     for word, label in zip(words, labels):
-        xy = tuple([word.bbox.bbox[0], word.bbox.bbox[2]])
+        xy = tuple([word.bbox.bbox[0], word.bbox.bbox[1]])
         draw.rounded_rectangle(xy=xy, fill=labels_to_colors[label], radius=4)
 
     return draw_img

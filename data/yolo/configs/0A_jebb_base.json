@@ -33,7 +33,7 @@
         "commentary": "commentary",
         "footnote": "footnote",
         "handwritten_marginalia": "others",
-        "index_siglorum": "others",
+        "index": "others",
         "introduction": "paratext",
         "line_number_commentary": "numbers",
         "line_number_text": "numbers",
