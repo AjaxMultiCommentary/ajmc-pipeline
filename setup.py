@@ -165,7 +165,14 @@ setup(
     #
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
 
-    # data_files=[("my_data", ["data/data_file"])],  # Optional
+    data_files=[
+        (
+            "data/templates", [
+                "data/templates/alto.xml.jinja2",
+                "data/templates/page.schema.json"
+            ]
+        ),
+    ],  # Optional
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
