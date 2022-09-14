@@ -248,13 +248,13 @@ class OcrPage(OcrTextContainer):
 
         for r in self.children['region']:
             r_dict = {'region_type': r.region_type,
-                      'bbox': r.bbox.xywh,
+                      'bbox': list(r.bbox.xywh),
                       'lines': [
                           {
-                              'bbox': l.bbox.xywh,
+                              'bbox': list(l.bbox.xywh),
                               'words': [
                                   {
-                                      'bbox': w.bbox.xywh,
+                                      'bbox': list(w.bbox.xywh),
                                       'text': w.text
                                   } for w in l.children['word']
                               ]

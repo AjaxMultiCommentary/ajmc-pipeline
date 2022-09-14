@@ -3,19 +3,19 @@ import numpy as np
 
 from ajmc.commons.arithmetic import compute_interval_overlap
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.miscellaneous import lazy_property
+from ajmc.commons.miscellaneous import lazy_property, BoxType
 
 
 class Shape:
-    """The basic class for contours, bounding boxs and coordinates.
+    """The basic class for contours, bounding boxes and coordinates.
 
-    `Shape` objects can be instanciated directly or via `Shape.from_points()`, `Shape.from_numpy_array()`
-    or `Shape.from_xywh()`. Notice that default constructor expects a list of 4 lists of x-y points, like
+    `Shape` objects can be instanciated directly from points. Other constructors are `Shape.from_numpy_array()`, `Shape.from_center_w_h()`
+    and `Shape.from_xywh()`. Notice that default constructor expects an iterable of x-y points, like
     `[[x:int,y:int], ...]`.
 
     Attributes:
 
-        points (List[List[int]]): a list of list of x,y-points `[[x:int,y:int], ...]`
+        points (Iterable[Iterable[int]]): a list of list of x,y-points `[[x:int,y:int], ...]`
 
     """
 
@@ -23,7 +23,7 @@ class Shape:
         """Default constructor.
         
         Args:
-            points: an iterable of iterable of points such as `[[x:int,y:int], ...]` or `[(x,y), ...]`.
+            points: an iterable of iterable of points such as `[[int,int], ...]` or `[(int,int), ...]`.
         """
         self.points = points
 
@@ -47,15 +47,14 @@ class Shape:
         return cls([(x, y), (x + w, y + h)])
 
     @classmethod
-    def from_center_w_h(cls, center_x: int, center_y: int, w: int, h:int ):
-        x = center_x - int(w/2)
-        y = center_y - int(h/2)
+    def from_center_w_h(cls, center_x: int, center_y: int, w: int, h: int):
+        x = center_x - int(w / 2)
+        y = center_y - int(h / 2)
         return cls.from_xywh(x, y, w, h)
-
 
     @lazy_property
     @docstring_formatter(**docstrings)
-    def bbox(self) -> Tuple[Tuple[int,int], Tuple[int,int]]:
+    def bbox(self) -> Tuple[Tuple[int, int], Tuple[int, int]]:
         """{bbox}"""
         return get_bbox_from_points(self.points)
 
@@ -87,7 +86,7 @@ class Shape:
 
 
 @docstring_formatter(**docstrings)
-def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> Tuple[Tuple[int,int], Tuple[int,int]]:
+def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> Tuple[Tuple[int, int], Tuple[int, int]]:
     """Gets the bounding box (i.e. the minimal rectangle containing all points) from a sequence of x-y points.
 
     Args:
@@ -114,13 +113,13 @@ def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> 
         return (x_min, y_min), (x_max, y_max)
 
 
-def compute_bbox_area(bbox: Tuple[Tuple[int, int], Tuple[int, int]]) -> int:
+def compute_bbox_area(bbox: BoxType) -> int:
     return (bbox[1][0] - bbox[0][0] + 1) * (bbox[1][1] - bbox[0][1] + 1)
 
 
 @docstring_formatter(**docstrings)
 def is_point_within_bbox(point: Union[Iterable[int], np.ndarray],
-                         bbox: Tuple[Tuple[int, int], Tuple[int, int]]) -> bool:
+                         bbox: BoxType) -> bool:
     """Checks wheter a `point` is contained within a `bbox`.
 
     Note:
@@ -137,8 +136,8 @@ def is_point_within_bbox(point: Union[Iterable[int], np.ndarray],
 
 
 @docstring_formatter(**docstrings)
-def is_bbox_within_bbox(contained: Tuple[Tuple[int, int], Tuple[int, int]],
-                        container: Tuple[Tuple[int, int], Tuple[int, int]]) -> bool:
+def is_bbox_within_bbox(contained: BoxType,
+                        container: BoxType) -> bool:
     """Checks whether the `contained` bbox is entirely contained within the `container` bbox.
 
     Note:
@@ -157,8 +156,8 @@ def is_bbox_within_bbox(contained: Tuple[Tuple[int, int], Tuple[int, int]],
 
 
 @docstring_formatter(**docstrings)
-def compute_bbox_overlap_area(bbox1: Tuple[Tuple[int, int], Tuple[int, int]],
-                              bbox2: Tuple[Tuple[int, int], Tuple[int, int]]) -> int:
+def compute_bbox_overlap_area(bbox1: BoxType,
+                              bbox2: BoxType) -> int:
     """Measures the area of intersection between two bboxes.
 
     Args:
@@ -175,8 +174,8 @@ def compute_bbox_overlap_area(bbox1: Tuple[Tuple[int, int], Tuple[int, int]],
 
 
 @docstring_formatter(**docstrings)
-def are_bboxes_overlapping(bbox1: Tuple[Tuple[int, int], Tuple[int, int]],
-                           bbox2: Tuple[Tuple[int, int], Tuple[int, int]]) -> bool:
+def are_bboxes_overlapping(bbox1: BoxType,
+                           bbox2: BoxType) -> bool:
     """Checks whether bboxes are overlapping with each other.
 
     Args:
@@ -187,8 +186,8 @@ def are_bboxes_overlapping(bbox1: Tuple[Tuple[int, int], Tuple[int, int]],
 
 
 @docstring_formatter(**docstrings)
-def is_bbox_within_bbox_with_threshold(contained: Tuple[Tuple[int, int], Tuple[int, int]],
-                                       container: Tuple[Tuple[int, int], Tuple[int, int]],
+def is_bbox_within_bbox_with_threshold(contained: BoxType,
+                                       container: BoxType,
                                        threshold: float) -> bool:
     """Asserts more than `threshold` of `contained`'s area is within `container`. Is not merged with
     `are_bboxes_overlapping` for effisciency purposes.
@@ -203,8 +202,8 @@ def is_bbox_within_bbox_with_threshold(contained: Tuple[Tuple[int, int], Tuple[i
 
 
 @docstring_formatter(**docstrings)
-def are_bboxes_overlapping_with_threshold(bbox1: Tuple[Tuple[int, int], Tuple[int, int]],
-                                          bbox2: Tuple[Tuple[int, int], Tuple[int, int]],
+def are_bboxes_overlapping_with_threshold(bbox1: BoxType,
+                                          bbox2: BoxType,
                                           threshold: float) -> bool:
     """Checks whether the overlapping (intersection) area of two bboxes is higher than `threshold`* union area
 
@@ -219,7 +218,7 @@ def are_bboxes_overlapping_with_threshold(bbox1: Tuple[Tuple[int, int], Tuple[in
 
 
 @docstring_formatter(**docstrings)
-def adjust_bbox_to_included_contours(bbox: Tuple[Tuple[int, int], Tuple[int, int]],
+def adjust_bbox_to_included_contours(bbox: BoxType,
                                      contours: List[Shape]) -> Shape:
     """Finds the contours included in `bbox` and returns a shape objects that minimally contains them.
 

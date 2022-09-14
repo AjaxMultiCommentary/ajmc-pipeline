@@ -6,6 +6,8 @@ from ajmc.commons.docstrings import docstrings, docstring_formatter
 # from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
 from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor
 from typing import List, Optional, Dict, Union, Tuple
+
+from ajmc.commons.miscellaneous import BoxType
 from ajmc.nlp.token_classification.pipeline import train
 from ajmc.commons.variables import COLORS, PATHS
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset, \
@@ -35,12 +37,12 @@ ROBERTA_MODEL_INPUTS = ['input_ids', 'attention_mask']
 
 
 # Functions
-def normalize_bounding_bboxes(bbox: List[List[int]], img_width: int, img_height: int, ):
+def normalize_bounding_box(bbox: BoxType, img_width: int, img_height: int, ):
     return [
         int(1000 * (bbox[0][0] / img_width)),
         int(1000 * (bbox[0][1] / img_height)),
-        int(1000 * (bbox[2][0] / img_width)),
-        int(1000 * (bbox[2][1] / img_height))
+        int(1000 * (bbox[1][0] / img_width)),
+        int(1000 * (bbox[1][1] / img_height))
     ]
 
 
@@ -90,7 +92,7 @@ def page_to_layoutlmv2_encodings(page,
     if unknownify_tokens:
         words = [tokenizer.unk_token for _ in words]
 
-    word_boxes = [normalize_bounding_bboxes(w.bbox.bbox, page.image.width, page.image.height)
+    word_boxes = [normalize_bounding_box(w.bbox.bbox, page.image.width, page.image.height)
                   for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
 
     if not get_labels:

@@ -15,7 +15,7 @@ def test_shape():
 
 def test_get_bbox_from_points():
     # Assert the bbox is actually what we want it to be
-    assert bboxes['base'] == [points['base'][0], points['base'][1], points['base'][3], points['base'][4]]
+    assert bboxes['base'] == (points['base'][0], points['base'][3])
     # Test with numpy array of points
     assert bboxes['base'] == geo.get_bbox_from_points(np.array(points['base']))
     # Test a non-rectangular sequence of points

@@ -1,11 +1,11 @@
 import json
 import os
 import re
-from typing import Optional, Dict, List, Tuple, Union, Any
+from typing import Optional, Dict, List, Tuple, Union, Any, Iterable
 from ajmc.commons.arithmetic import is_interval_within_interval
 from ajmc.commons.geometry import Shape, get_bbox_from_points
 from ajmc.commons.image import Image
-from ajmc.commons.miscellaneous import lazy_property, lazy_init, lazy_attributer
+from ajmc.commons.miscellaneous import lazy_property, lazy_init
 from jinja2 import Environment, FileSystemLoader
 from ajmc.commons import variables
 from ajmc.commons.miscellaneous import get_custom_logger
@@ -264,7 +264,7 @@ class CanonicalWord(CanonicalTextContainer):
 
     def __init__(self,
                  text: str,
-                 bbox: List[Tuple[int, int]],
+                 bbox: Iterable[Iterable[int]],
                  commentary: CanonicalTextContainer,
                  **kwargs):
         super().__init__(text=text, commentary=commentary, **kwargs)

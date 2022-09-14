@@ -47,7 +47,6 @@ def test_ocrcommentary_to_canonical():
         for ocr_r, can_r in zip(ocr_p.children['region'], can_p.children['region']):
 
             if ocr_r.bbox.xywh != can_r.bbox.xywh:
-
                 print('ocr_type: ', ocr_r.region_type)
                 print('ocr_text: ', ocr_r.text[:50])
                 print('can_type: ', can_r.info['region_type'])
@@ -63,7 +62,6 @@ def test_ocrcommentary_to_canonical():
                     assert ocr_w.text == can_w.text
 
         ocr_p.reset()
-
 
 
 def test_ocrpage():

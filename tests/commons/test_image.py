@@ -6,7 +6,7 @@ from ajmc.commons.geometry import Shape
 
 
 def test_find_contours():
-    contours = img.find_contours(so.sample_image.matrix, remove_artifacts=False)
+    contours = img.find_contours(so.sample_image.matrix)
     assert type(contours) == list
     assert all([isinstance(x, Shape) for x in contours])
 
@@ -14,7 +14,7 @@ def test_find_contours():
 @pytest.mark.parametrize('art_size', [0.1, 0.01, 0.001])
 def test_remove_artifacts_from_contours(art_size):
     artifact_size = art_size * so.sample_image.matrix.shape[0]
-    contours = img.find_contours(so.sample_image.matrix, remove_artifacts=False)
+    contours = img.find_contours(so.sample_image.matrix)
     contours_ = img.remove_artifacts_from_contours(contours, artifact_size)
     assert len(contours_) <= len(contours)
 
@@ -26,5 +26,5 @@ def test_image():
 
 def test_draw_bboxes():
     matrix = so.sample_image.matrix.copy()
-    assert so.sample_image.matrix.shape == img.draw_bboxes([r for _, r in so.sample_bboxes.items()],
-                                                        matrix).shape
+    assert so.sample_image.matrix.shape == img.draw_boxes([r for _, r in so.sample_bboxes.items()],
+                                                          matrix).shape

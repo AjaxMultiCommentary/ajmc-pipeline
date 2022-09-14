@@ -1,5 +1,4 @@
 import re
-import logging
 
 PATHS = {
     'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
@@ -16,12 +15,6 @@ PATHS = {
     'ocr': 'ocr/runs',
     'canonical': 'canonical/v2'
 }
-
-
-# todo 👁️
-def get_path():
-    pass
-
 
 FOLDER_STRUCTURE_PATHS = {
     # Only relative paths
@@ -170,8 +163,6 @@ COLORS = {
 }
 
 TEXTCONTAINER_TYPES = ['commentary', 'page', 'region', 'line', 'word']
-
-LOGGING_LEVEL = logging.ERROR
 
 
 SAMPLE_PAGES = [

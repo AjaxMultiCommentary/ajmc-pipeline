@@ -9,7 +9,7 @@ from typing import List, Tuple, Iterable, Generator
 import pandas as pd
 from jsonschema import Draft6Validator
 
-bboxType = List[Tuple[int, int]]
+BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 
 
 def timer(iterations: int = 3, number: int = 1_000):
@@ -217,3 +217,4 @@ def lazy_attributer(attr_name, func, attr_decorator=lambda x: x):
 def walk_dirs(path:str):
     """Walks over the dirs in path."""
     return sorted(next(os.walk(path))[1])
+
