@@ -8,11 +8,10 @@ from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassificati
     RobertaTokenizerFast, RobertaForTokenClassification
 
 from ajmc.commons.geometry import is_bbox_within_bbox_with_threshold
-from ajmc.commons.miscellaneous import walk_dirs
+from ajmc.commons.miscellaneous import walk_dirs, get_olr_splits_page_ids
 from ajmc.olr.layout_lm.config import create_olr_config
 from ajmc.olr.layout_lm.layoutlm import get_data_dict_pages, align_predicted_page
 from ajmc.olr.map_utils import initialize_general_results, update_general_results
-from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.olr.yolo.utils import parse_yolo_txt
 from ajmc.commons.variables import PATHS
 

@@ -8,9 +8,8 @@ import transformers
 from hipe_commons.helpers.tsv import get_tsv_data
 from torch.utils.data import DataLoader, SequentialSampler
 from ajmc.commons.docstrings import docstrings, docstring_formatter
-import ajmc.nlp.token_classification.data_preparation.hipe_iob
-from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
-from ajmc.nlp.token_classification.model import predict, predict_batches, predict_dataset
+from ajmc.nlp.token_classification.data_preparation import write_predictions_to_tsv
+from ajmc.nlp.token_classification.model import predict, predict_dataset
 from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
@@ -29,7 +28,6 @@ def seqeval_evaluation(predictions: List[List[str]],
                               zero_division=0)
 
 
-# todo 👁️ actualize docstring
 @docstring_formatter(**docstrings)
 def evaluate_dataset(dataset: torch.utils.data.Dataset,
                      model: transformers.PreTrainedModel,
@@ -39,12 +37,13 @@ def evaluate_dataset(dataset: torch.utils.data.Dataset,
                      do_debug: bool = False):
     """Evaluate an entire dataset using seqeval. Is used during the main train loop.
 
-    :param dataset: {custom_dataset}
-    :param model: Self explanatory
-    :param batch_size: Self explanatory
-    :param device: Self explanatory
-    :param ids_to_labels: {ids_to_labels}
-    :param do_debug: {do_debug}
+    Args:
+        dataset: {custom_dataset}
+        model: Self explanatory
+        batch_size: Self explanatory
+        ids_to_labels: {ids_to_labels}
+        rebuild_ner_labels: Whether to simulate NER Labels (for seqeval)
+        do_debug: {do_debug}
     """
 
     if rebuild_ner_labels:

@@ -4,10 +4,9 @@ import numpy as np
 from ajmc.commons.image import Image
 from ajmc.olr.layout_lm.config import create_olr_config
 import yaml
-from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing import canonical_classes
 
-from ajmc.commons.miscellaneous import stream_handler
+from ajmc.commons.miscellaneous import stream_handler, get_olr_splits_page_ids
 from ajmc.commons import variables
 stream_handler.setLevel(0)
 

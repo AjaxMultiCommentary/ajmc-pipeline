@@ -39,6 +39,7 @@ class CanonicalTextContainer:
         """Just here for clarity, but simply wraps the value given in `__init__`."""
         return self.commentary
 
+    # Todo : doesn't work
     @lazy_property
     def type(self) -> str:
         """Generic method to get a `CanonicalTextContainer`'s type."""

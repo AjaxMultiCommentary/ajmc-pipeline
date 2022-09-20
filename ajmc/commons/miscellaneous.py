@@ -5,9 +5,11 @@ from functools import wraps
 import json
 import logging
 import timeit
-from typing import List, Tuple, Iterable, Generator
+from typing import List, Tuple, Iterable, Generator, Optional
 import pandas as pd
 from jsonschema import Draft6Validator
+
+from ajmc.commons import variables
 
 BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 
@@ -218,3 +220,17 @@ def walk_dirs(path:str):
     """Walks over the dirs in path."""
     return sorted(next(os.walk(path))[1])
 
+
+def get_olr_splits_page_ids(commentary_id: 'OcrCommentary',
+                            splits: Optional[List[str]] = None) -> List[str]:
+    """Gets the data from splits on the olr_gt sheet."""
+
+    olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
+    if splits is not None:
+        filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
+               range(len(olr_gt['page_id']))]
+    else:
+        filter_ = [(olr_gt['commentary_id'][i] == commentary_id) for i in
+                   range(len(olr_gt['page_id']))]
+
+    return list(olr_gt['page_id'][filter_])

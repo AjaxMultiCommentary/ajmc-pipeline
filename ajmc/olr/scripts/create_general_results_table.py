@@ -5,7 +5,7 @@ import pandas as pd
 
 from ajmc.commons.variables import PATHS, ORDERED_OLR_REGION_TYPES
 from ajmc.olr.layout_lm.config import create_olr_config
-from ajmc.olr.utils import get_olr_splits_page_ids
+from ajmc.commons.miscellaneous import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
 

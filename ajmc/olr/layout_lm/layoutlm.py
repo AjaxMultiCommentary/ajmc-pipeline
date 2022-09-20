@@ -3,30 +3,28 @@ import os
 import random
 
 from ajmc.commons.docstrings import docstrings, docstring_formatter
-# from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
-from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor
 from typing import List, Optional, Dict, Union, Tuple
-
-from ajmc.commons.miscellaneous import BoxType
+from ajmc.commons.miscellaneous import BoxType, get_olr_splits_page_ids
 from ajmc.nlp.token_classification.pipeline import train
 from ajmc.commons.variables import COLORS, PATHS
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset, \
-    align_to_tokenized, align_labels
+    align_labels_to_tokenized
 from ajmc.nlp.token_classification.model import predict_dataset
 from ajmc.nlp.token_classification.pipeline import create_dirs
-from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from PIL import Image
 
 V3 = True
 
 if V3:
+    from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor
     MODEL_INPUTS = ['input_ids',
                     'bbox',
                     'attention_mask',
                     'pixel_values']
 
 else:
+    from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
     MODEL_INPUTS = ['input_ids',
                     'bbox',
                     'token_type_ids',
@@ -77,15 +75,15 @@ def get_data_dict_pages(data_dict: Dict[str, List[Dict[str, str]]],
     return set_pages
 
 
-def page_to_layoutlmv2_encodings(page,
-                                 rois,
-                                 labels_to_ids,
-                                 regions_to_coarse_labels,
-                                 tokenizer,
-                                 feature_extractor: 'FeatureExtractor',
-                                 get_labels: bool = True,
-                                 text_only: bool = False,
-                                 unknownify_tokens: bool = False):
+def page_to_layoutlm_encodings(page,
+                               rois,
+                               labels_to_ids,
+                               regions_to_coarse_labels,
+                               tokenizer,
+                               feature_extractor: 'FeatureExtractor',
+                               get_labels: bool = True,
+                               text_only: bool = False,
+                               unknownify_tokens: bool = False):
     # Get the lists of words, boxes and labels for a single page
     words = [w.text for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
 
@@ -117,7 +115,7 @@ def page_to_layoutlmv2_encodings(page,
                               return_overflowing_tokens=True)
 
         if get_labels:
-            aligned_labels = [align_labels(e.word_ids, word_labels, labels_to_ids) for e in
+            aligned_labels = [align_labels_to_tokenized(e.word_ids, word_labels, labels_to_ids) for e in
                               encodings.encodings]
 
             encodings.data['labels'] = aligned_labels
@@ -174,23 +172,23 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
         split_encodings = None
         for i, page in enumerate(page_sets[s]):
             if split_encodings is None:
-                split_encodings = page_to_layoutlmv2_encodings(page=page,
-                                                               rois=rois,
-                                                               labels_to_ids=labels_to_ids,
-                                                               regions_to_coarse_labels=regions_to_coarse_labels,
-                                                               tokenizer=tokenizer,
-                                                               feature_extractor=feature_extractor,
-                                                               unknownify_tokens=unknownify_tokens,
-                                                               text_only=text_only)
+                split_encodings = page_to_layoutlm_encodings(page=page,
+                                                             rois=rois,
+                                                             labels_to_ids=labels_to_ids,
+                                                             regions_to_coarse_labels=regions_to_coarse_labels,
+                                                             tokenizer=tokenizer,
+                                                             feature_extractor=feature_extractor,
+                                                             unknownify_tokens=unknownify_tokens,
+                                                             text_only=text_only)
             else:
-                page_encodings = page_to_layoutlmv2_encodings(page=page,
-                                                              rois=rois,
-                                                              labels_to_ids=labels_to_ids,
-                                                              regions_to_coarse_labels=regions_to_coarse_labels,
-                                                              tokenizer=tokenizer,
-                                                              feature_extractor=feature_extractor,
-                                                              unknownify_tokens=unknownify_tokens,
-                                                              text_only=text_only)
+                page_encodings = page_to_layoutlm_encodings(page=page,
+                                                            rois=rois,
+                                                            labels_to_ids=labels_to_ids,
+                                                            regions_to_coarse_labels=regions_to_coarse_labels,
+                                                            tokenizer=tokenizer,
+                                                            feature_extractor=feature_extractor,
+                                                            unknownify_tokens=unknownify_tokens,
+                                                            text_only=text_only)
                 for k in split_encodings.keys():
                     split_encodings[k] += page_encodings[k]
 
@@ -222,16 +220,16 @@ def align_predicted_page(page: 'Page',
                          unknownify_tokens: bool = False,
                          text_only: bool = False,
                          ) -> Tuple[List['Word'], List[str]]:
-    encodings = page_to_layoutlmv2_encodings(page, rois=rois, labels_to_ids=labels_to_ids,
-                                             regions_to_coarse_labels=regions_to_coarse_labels,
-                                             tokenizer=tokenizer,
-                                             feature_extractor=feature_extractor,
-                                             get_labels=False,
-                                             unknownify_tokens=unknownify_tokens,
-                                             text_only=text_only)
+    encodings = page_to_layoutlm_encodings(page, rois=rois, labels_to_ids=labels_to_ids,
+                                           regions_to_coarse_labels=regions_to_coarse_labels,
+                                           tokenizer=tokenizer,
+                                           feature_extractor=feature_extractor,
+                                           get_labels=False,
+                                           unknownify_tokens=unknownify_tokens,
+                                           text_only=text_only)
 
     words = [w for r in page.children['region'] if r.info['region_type'] in rois for w in
-             r.children['word']]  # this is the way words are selected in `page_to_layoutlmv2_encodings`
+             r.children['word']]  # this is the way words are selected in `page_to_layoutlm_encodings`
 
     if text_only:
         dataset = CustomDataset(encodings=encodings, model_inputs_names=ROBERTA_MODEL_INPUTS)

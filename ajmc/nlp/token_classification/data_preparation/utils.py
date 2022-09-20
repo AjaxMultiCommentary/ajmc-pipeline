@@ -1,4 +1,4 @@
-from typing import Iterable, List, Dict, Union, Any
+from typing import List, Dict, Union, Any, Iterable
 
 import torch
 from hipe_commons.helpers.tsv import get_tsv_data
@@ -7,13 +7,23 @@ from ajmc.commons.miscellaneous import get_custom_logger, split_list
 
 logger = get_custom_logger(__name__)
 
-def get_ner_labels(labels: List[str],
-                   b_only: bool = False,
-                   add_o: bool = True) -> List[str]:
-    """A simple function to nerify labels"""
-    ner_labels = ['B-'+l for l in labels if l != 'O']
-    if not b_only:
-        ner_labels += ['I-'+l for l in labels if l != 'O']
+
+def nerify_labels(labels: Iterable[str],
+                  add_i: bool = True,
+                  add_o: bool = True) -> List[str]:
+    """A simple function to NERify labels, adding `'B-'`s, `'I-'`s and `'O'` labels, making them CoLLN-compliant.
+
+    Args:
+        labels: The iterable of unique labels to NERify.
+        add_i: If false, does not add `'I-'` labels.
+        add_o: If false, does not add `'O'` label.
+
+    Returns:
+        The list of nerified labels
+    """
+    ner_labels = ['B-' + l for l in labels if l != 'O']
+    if not add_i:
+        ner_labels += ['I-' + l for l in labels if l != 'O']
     if 'O' in labels or add_o:
         ner_labels.append('O')
 
@@ -21,19 +31,38 @@ def get_ner_labels(labels: List[str],
 
 
 def sort_ner_labels(labels: Iterable[str]):
-    """Sorts a list of CoLLN-compliant labels alphabetically, starting 'O'."""
+    """Sorts a list of CoLLN-compliant labels alphabetically, ending with 'O'.
 
-    sorted_labels = ['O'] if 'O' in labels else []
-    sorted_labels += sorted([l for l in labels if l != 'O'], key=lambda x: x[2:]+x[0])
+    Args:
+        labels: The iterable of unique labels to sort. Each label should be in the form
+                `'B-classname'`, `'I-classname'` or `'O'`.
+
+    Returns:
+        The sorted list of labels
+    """
+
+    sorted_labels = sorted([l for l in labels if l != 'O'], key=lambda x: x[2:] + x[0])
+    if 'O' in labels:
+        sorted_labels.append('O')
 
     return sorted_labels
 
 
-def align_labels(tokens_to_words_offsets: 'transformers.tokenizers.Encoding',
-                 labels: List[str],
-                 labels_to_ids: Dict[str, int],
-                 label_all_tokens: bool = False,
-                 null_label: object = -100) -> List[List[int]]:
+def align_labels_to_tokenized(tokens_to_words_offsets: List[Union[None, int]],
+                              labels: List[str],
+                              labels_to_ids: Dict[str, int],
+                              label_all_tokens: bool = False,
+                              null_label: object = -100) -> List[int]:
+    """`align_labels_to_tokenized` is a special case of `align_to_tokenized`, dealing with labels specificities.
+
+    As such, it will:
+        - Change `labels` to their corresponding ids
+        - Label all the sub-tokens (with a single `'B-'` label) if `label_all_tokens` is True.
+        - Append `null_label` instead of `None` if the token offset is None.
+    """
+
+
+
     previous_token_index = None
     aligned_labels = []
 
@@ -56,8 +85,8 @@ def align_labels(tokens_to_words_offsets: 'transformers.tokenizers.Encoding',
     return aligned_labels
 
 
-def align_to_tokenized(tokens_to_words_offsets: 'transformers.tokenizers.Encoding',
-                       to_align: List[object]) -> List[object]:
+def align_to_tokenized(tokens_to_words_offsets: List[Union[None, int]],
+                       to_align: List[Any]) -> List[Any]:
     """Align `to_align` to a list of offsets, appending `None` if the offset is None.
 
     This is used to align a list of elements to their tokenized equivalent, for instance to align words
@@ -118,6 +147,7 @@ def align_from_tokenized(tokens_to_words_offsets: List[Union[None, int]],
     return aligned_elements
 
 
+# LEGACY. To use with HIPE.
 def write_predictions_to_tsv(words: List[List[Union[str, None]]],
                              labels: List[List[Union[str, None]]],
                              tsv_line_numbers: List[List[Union[int, None]]],
@@ -144,6 +174,7 @@ def write_predictions_to_tsv(words: List[List[Union[str, None]]],
         f.write('\n'.join(['\t'.join(l) for l in tsv_lines]))
 
 
+# LEGACY.
 @docstring_formatter(max_length=docstrings['max_length'], special_tokens=docstrings['special_tokens'])
 def manual_truncation(tokens, inputs: Dict[str, list], special_tokens: Dict[str, Dict[str, Any]], max_length):
     """Manually truncates and pads model inputs.

@@ -1,7 +1,7 @@
 from hipe_commons.helpers.tsv import tsv_to_dict
 from typing import List, Optional
 import torch
-from ajmc.nlp.token_classification.data_preparation.utils import sort_ner_labels, align_labels, align_to_tokenized
+from ajmc.nlp.token_classification.data_preparation import sort_ner_labels, align_labels_to_tokenized, align_to_tokenized
 from ajmc.commons.miscellaneous import get_unique_elements
 from ajmc.commons.docstrings import docstrings, docstring_formatter
 
@@ -55,8 +55,8 @@ def prepare_datasets(config: 'argparse.Namespace', tokenizer):
                                                  is_split_into_words=True,
                                                  return_overflowing_tokens=True)
 
-        data[split]['labels'] = [align_labels(e.word_ids, data[split][config['labels_column']],
-                                              config['labels_to_ids'])
+        data[split]['labels'] = [align_labels_to_tokenized(e.word_ids, data[split][config['labels_column']],
+                                                           config['labels_to_ids'])
                                  for e in data[split]['batchencoding'].encodings]
 
         data[split]['words'] = [align_to_tokenized(e.word_ids, data[split]['TOKEN']) for e in

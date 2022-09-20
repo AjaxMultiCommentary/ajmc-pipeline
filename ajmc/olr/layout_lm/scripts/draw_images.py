@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from ajmc.olr.utils import get_olr_splits_page_ids
+from ajmc.commons.miscellaneous import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
 from ajmc.olr.layout_lm.config import create_olr_config

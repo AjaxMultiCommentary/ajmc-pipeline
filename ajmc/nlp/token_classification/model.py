@@ -9,8 +9,7 @@ from torch.utils.data import DataLoader, SequentialSampler
 
 from ajmc.nlp.token_classification.data_preparation.hipe_iob import create_prediction_dataset
 from ajmc.commons.miscellaneous import get_custom_logger
-from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
-from ajmc.nlp.utils import get_device
+from ajmc.nlp.token_classification.data_preparation import write_predictions_to_tsv
 
 logger = get_custom_logger(__name__)
 
@@ -87,7 +86,7 @@ def predict_and_write_tsv(model, output_dir, tokenizer, ids_to_labels, labels_co
     predictions = predict_dataset(dataset_to_pred, model)
 
     predictions = [
-        [ids_to_labels[p] if l else None for (p, l) in zip(prediction, line_numbers)]
+        [ids_to_labels[p] if l else None for p, l in zip(prediction, line_numbers)]
         for prediction, line_numbers in zip(predictions, dataset_to_pred.tsv_line_numbers)
     ]
 
