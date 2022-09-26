@@ -73,14 +73,14 @@ for xp_name in df.index.get_level_values(level=0):
 
         commentary = commentaries[dict_['id']]
         page_ids = get_olr_splits_page_ids(commentary.id, [dict_['split']])
-        eval_pages += [p for p in commentary.children['page']
+        eval_pages += [p for p in commentary.children.pages
                        if p.id in page_ids]
 
     # Do the eval counts
     eval_stats = {l: 0 for l in config['region_types_to_labels'].values()}
 
     for p in eval_pages:
-        for r in p.children['region']:
+        for r in p.children.regions:
             if r.info['region_type'] in config['rois']:
                 eval_stats[
                     config['region_types_to_labels'][r.info['region_type']]] += 1
@@ -91,14 +91,14 @@ for xp_name in df.index.get_level_values(level=0):
         commentary = CanonicalCommentary.from_json(os.path.join(PATHS['cluster_base_dir'], dict_['id'],
                                                                 PATHS['canonical'], dict_['run'] + '.json'))
         page_ids = get_olr_splits_page_ids(commentary.id, [dict_['split']])
-        train_pages += [p for p in commentary.children['page']
+        train_pages += [p for p in commentary.children.pages
                         if p.id in page_ids]
 
     # Do the train counts
     train_stats = {l: 0 for l in config['region_types_to_labels'].values()}
 
     for p in train_pages:
-        for r in p.children['region']:
+        for r in p.children.regions:
             if r.info['region_type'] in config['rois']:
                 train_stats[
                     config['region_types_to_labels'][r.info['region_type']]] += 1

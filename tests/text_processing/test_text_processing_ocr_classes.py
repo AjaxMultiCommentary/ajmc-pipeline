@@ -1,7 +1,5 @@
 import json
 import os
-import re
-from ajmc.commons.image import Image
 from tests import sample_objects as so
 import jsonschema
 from ajmc.text_processing import ocr_classes
@@ -19,9 +17,16 @@ commentary_from_structure = ocr_classes.OcrCommentary.from_ajmc_structure(ocr_di
 
 def test_ocrcommentary():
     for comm in [commentary_from_paths, commentary_from_structure]:
-        # test OcrCommentary.pages
-        assert all([isinstance(p, ocr_classes.OcrPage) for p in comm.pages])
-        assert len(comm.pages) == len([f for f in os.listdir(so.sample_ocr_dir) if comm.id in f])
+        # test OcrCommentary.children
+        assert all([isinstance(p, ocr_classes.OcrPage) for p in comm.children.pages])
+        assert len(comm.children.pages) == len([f for f in os.listdir(so.sample_ocr_dir) if comm.id in f])
+        assert all([isinstance(r, ocr_classes.OlrRegion) for r in comm.children.regions])
+        assert all([isinstance(l, ocr_classes.OcrLine) for l in comm.children.lines])
+        assert all([isinstance(w, ocr_classes.OcrWord) for w in comm.children.words])
+
+        # test OcrCommentary.images
+        assert all([isinstance(i, image.Image) for i in comm.images])
+        
 
         # Test OcrCommentary.groundtruth_pages
         assert all([isinstance(p, ocr_classes.OcrPage) for p in comm.ocr_groundtruth_pages])
@@ -35,29 +40,29 @@ def test_ocrcommentary():
 
 
 def test_ocrcommentary_to_canonical():
-    assert len(so.sample_cancommentary.children['page']) == len(so.sample_ocrcommentary.pages)
-    for ocr_p, can_p in zip(so.sample_ocrcommentary.pages, so.sample_cancommentary.children['page']):
+    assert len(so.sample_cancommentary.children.pages) == len(so.sample_ocrcommentary.children.pages)
+    for ocr_p, can_p in zip(so.sample_ocrcommentary.children.pages, so.sample_cancommentary.children.pages):
         # Assert images stay the same
-        assert isinstance(can_p.image, Image)
+        assert isinstance(can_p.image, image.Image)
         assert ocr_p.image.id == can_p.image.id
 
         # Assert each canonical page has the same number of words, minus those which have been deleted on purpose
         ocr_p.optimise()
-        assert len(ocr_p.children['region']) == len(can_p.children['region'])
-        for ocr_r, can_r in zip(ocr_p.children['region'], can_p.children['region']):
+        assert len(ocr_p.children.regions) == len(can_p.children.regions)
+        for ocr_r, can_r in zip(ocr_p.children.regions, can_p.children.regions):
 
             if ocr_r.bbox.xywh != can_r.bbox.xywh:
                 print('ocr_type: ', ocr_r.region_type)
                 print('ocr_text: ', ocr_r.text[:50])
-                print('can_type: ', can_r.info['region_type'])
+                print('can_type: ', can_r.region_type)
                 print('can_text: ', can_r.text[:50])
 
-            assert len(ocr_r.children['line']) == len(can_r.children['line'])
-            for ocr_l, can_l in zip(ocr_p.children['line'], can_p.children['line']):
+            assert len(ocr_r.children.lines) == len(can_r.children.lines)
+            for ocr_l, can_l in zip(ocr_p.children.lines, can_p.children.lines):
                 assert ocr_l.bbox.xywh == can_l.bbox.xywh
 
-                assert len(ocr_l.children['word']) == len(can_l.children['word'])
-                for ocr_w, can_w in zip(ocr_p.children['word'], can_p.children['word']):
+                assert len(ocr_l.children.words) == len(can_l.children.words)
+                for ocr_w, can_w in zip(ocr_p.children.words, can_p.children.words):
                     assert ocr_w.bbox.xywh == can_w.bbox.xywh
                     assert ocr_w.text == can_w.text
 
@@ -74,12 +79,12 @@ def test_ocrpage():
 
     assert isinstance(page.image, image.Image)
 
-    assert all([isinstance(r, ocr_classes.OlrRegion) for r in page.children['region']])
-    assert all([isinstance(l, ocr_classes.OcrLine) for l in page.children['line']])
-    assert all([isinstance(w, ocr_classes.OcrWord) for w in page.children['word']])
+    assert all([isinstance(r, ocr_classes.OlrRegion) for r in page.children.regions])
+    assert all([isinstance(l, ocr_classes.OcrLine) for l in page.children.lines])
+    assert all([isinstance(w, ocr_classes.OcrWord) for w in page.children.words])
 
     # Validate page.json
-    with open(os.path.join('..', variables.PATHS['schema']), 'r') as file:
+    with open(os.path.join('../..', variables.PATHS['schema']), 'r') as file:
         schema = json.loads(file.read())
 
-    jsonschema.validate(instance=page.canonical_data, schema=schema)
+    jsonschema.validate(instance=page.to_canonical_v1(), schema=schema)

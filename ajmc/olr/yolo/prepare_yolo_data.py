@@ -54,7 +54,7 @@ for config_name in os.listdir(configs_dir):
                 comm = canonical_classes.CanonicalCommentary.from_json(dict_['path'])
 
                 p_ids = get_olr_splits_page_ids(dict_['id'], [dict_['split']])
-                pages += [p for p in comm.children['page'] if p.id in p_ids]
+                pages += [p for p in comm.children.pages if p.id in p_ids]
 
             if config['sampling']:
                 random.seed(42)
@@ -66,7 +66,7 @@ for config_name in os.listdir(configs_dir):
                 p.image.write(os.path.join(abs_paths['images'][set_], img_name))
                 # get page labels
                 yolo_labels = []
-                for r in p.children['region']:
+                for r in p.children.regions:
                     if r.info['region_type'] in config['rois']:
                         r_coarse_label = config['region_types_to_labels'][r.info['region_type']]
                         r_label_id = config['labels_to_ids'][r_coarse_label]

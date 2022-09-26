@@ -85,8 +85,8 @@ def simple_coordinates_based_evaluation(gt_words: List['OcrWord'],
      (e.g. with crummy groundtruth- or preds-boxes), the word is left out and not counted in the final result.
 
      Args:
-         gt_words: The list of gt words (e.g. `OcrPage.children['word']` or `OlrRegion.children['word']`)
-         pred_words: The list of ocr words (e.g. `OcrPage.children['word']` or `OlrRegion.children['word']`)
+         gt_words: The list of gt words (e.g. `OcrPage.children.words` or `OlrRegion.children.words`)
+         pred_words: The list of ocr words (e.g. `OcrPage.children.words` or `OlrRegion.children.words`)
          overlap_threshold: The minimal overlap-proportion.
 
      Returns:
@@ -151,7 +151,7 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
 
     soup = initialize_soup(img_width=gt_page.image.width, img_height=gt_page.image.height)  # Initialize html output
     charsets = ['latin', 'greek', 'punctuation', 'numbers']
-    pred_words_ = pred_page.children['word'].copy()
+    pred_words_ = pred_page.children.words.copy()
 
     if not error_counts:
         error_counts = {region:
@@ -163,10 +163,10 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
     if not editops_record:
         editops_record = {}
 
-    for gt_word in gt_page.children['word']:
+    for gt_word in gt_page.children.words:
 
         # Find `gt_word`'s regions
-        gt_word_regions = ['global'] + [r.region_type for r in gt_page.children['region'] if
+        gt_word_regions = ['global'] + [r.region_type for r in gt_page.children.regions if
                                         is_bbox_within_bbox(gt_word.bbox.bbox,
                                                             r.bbox.bbox)]
 
@@ -237,10 +237,10 @@ def commentary_evaluation(commentary: 'OcrCommentary',
     soups = []
 
     for gt_page in commentary.ocr_groundtruth_pages:
-        pred_page = [p for p in commentary.pages if p.id == gt_page.id][0]
+        pred_page = [p for p in commentary.children.pages if p.id == gt_page.id][0]
 
-        bow_error_counts = bag_of_word_evaluation(gt_bag=[w.text for w in gt_page.children['word']],
-                                                  pred_bag=[w.text for w in pred_page.children['word']],
+        bow_error_counts = bag_of_word_evaluation(gt_bag=[w.text for w in gt_page.children.words],
+                                                  pred_bag=[w.text for w in pred_page.children.words],
                                                   error_counts=bow_error_counts)
 
         editops, coord_error_counts, soup = coord_based_page_evaluation(gt_page=gt_page,

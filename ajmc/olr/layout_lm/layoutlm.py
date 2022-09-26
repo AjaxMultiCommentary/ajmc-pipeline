@@ -65,7 +65,7 @@ def get_data_dict_pages(data_dict: Dict[str, List[Dict[str, str]]],
                 commentaries[dict_['id']] = commentary
 
             page_ids = get_olr_splits_page_ids(dict_['id'], [dict_['split']])
-            set_pages[set_] += [p for p in commentary.children['page'] if p.id in page_ids]
+            set_pages[set_] += [p for p in commentary.children.pages if p.id in page_ids]
 
     if sampling:
         random.seed(42)
@@ -85,21 +85,21 @@ def page_to_layoutlm_encodings(page,
                                text_only: bool = False,
                                unknownify_tokens: bool = False):
     # Get the lists of words, boxes and labels for a single page
-    words = [w.text for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
+    words = [w.text for r in page.children.regions if r.info['region_type'] in rois for w in r.children.words]
 
     if unknownify_tokens:
         words = [tokenizer.unk_token for _ in words]
 
     word_boxes = [normalize_bounding_box(w.bbox.bbox, page.image.width, page.image.height)
-                  for r in page.children['region'] if r.info['region_type'] in rois for w in r.children['word']]
+                  for r in page.children.regions if r.info['region_type'] in rois for w in r.children.words]
 
     if not get_labels:
         word_labels = None
     else:
         word_labels = []
-        for r in page.children['region']:
+        for r in page.children.regions:
             if r.info['region_type'] in rois:
-                for i, w in enumerate(r.children['word']):
+                for i, w in enumerate(r.children.words):
                     word_labels.append(regions_to_coarse_labels[r.info['region_type']])
                     # if i != 0:
                     #     word_labels.append(labels_to_ids['O'])
@@ -228,8 +228,8 @@ def align_predicted_page(page: 'Page',
                                            unknownify_tokens=unknownify_tokens,
                                            text_only=text_only)
 
-    words = [w for r in page.children['region'] if r.info['region_type'] in rois for w in
-             r.children['word']]  # this is the way words are selected in `page_to_layoutlm_encodings`
+    words = [w for r in page.children.regions if r.info['region_type'] in rois for w in
+             r.children.words]  # this is the way words are selected in `page_to_layoutlm_encodings`
 
     if text_only:
         dataset = CustomDataset(encodings=encodings, model_inputs_names=ROBERTA_MODEL_INPUTS)

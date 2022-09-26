@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader, SequentialSampler
 
 from ajmc.nlp.token_classification.data_preparation.hipe_iob import create_prediction_dataset
 from ajmc.commons.miscellaneous import get_custom_logger
-from ajmc.nlp.token_classification.data_preparation import write_predictions_to_tsv
+from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
 
 logger = get_custom_logger(__name__)
 

@@ -8,7 +8,8 @@ import transformers
 from hipe_commons.helpers.tsv import get_tsv_data
 from torch.utils.data import DataLoader, SequentialSampler
 from ajmc.commons.docstrings import docstrings, docstring_formatter
-from ajmc.nlp.token_classification.data_preparation import write_predictions_to_tsv
+from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
+
 from ajmc.nlp.token_classification.model import predict, predict_dataset
 from ajmc.commons.miscellaneous import get_custom_logger
 

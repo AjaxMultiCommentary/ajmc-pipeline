@@ -70,7 +70,7 @@ for i, xp_name in enumerate(walk_dirs(LAYOUTLM_XP_DIR)):
         commentary = CanonicalCommentary.from_json(os.path.join(PATHS['cluster_base_dir'], dict_['id'],
                                                                 PATHS['canonical'], dict_['run'] + '.json'))
         page_ids = get_olr_splits_page_ids(commentary.id, [dict_['split']])
-        pages += [p for p in commentary.children['page']
+        pages += [p for p in commentary.children.pages
                   if p.id in page_ids]
 
     # Get the predictions
@@ -130,7 +130,7 @@ for i, xp_name in enumerate(walk_dirs(LAYOUTLM_XP_DIR)):
 
         # get the gt
         groundtruth = []
-        for r in page.children['region']:
+        for r in page.children.regions:
             # [xmin, ymin, xmax, ymax, class_id, confidence, difficult, crowd]
             r_gt = r.bbox.xyxy + \
                    [config['labels_to_ids'][config['region_types_to_labels'][r.info['region_type']]]] + \
@@ -146,7 +146,7 @@ for i, xp_name in enumerate(walk_dirs(LAYOUTLM_XP_DIR)):
     # Do the counts
     for k, dict_ in metrics[0.5].items():
         dict_['count'] = len([r for p in pages
-                              for r in p.children['region']
+                              for r in p.children.regions
                               if config['labels_to_ids'][config['region_types_to_labels'][r.info['region_type']]] == k])
 
     general_results = update_general_results(general_results=general_results,

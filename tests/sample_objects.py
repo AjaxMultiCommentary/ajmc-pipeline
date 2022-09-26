@@ -51,7 +51,7 @@ sample_canonical_path = os.path.join(sample_ocrcommentary.base_dir, 'canonical/v
 
 sample_cancommentary_from_json = CanonicalCommentary.from_json(sample_canonical_path)
 
-sample_page = [p for p in sample_ocrcommentary.pages if p.id == sample_page_id][0]
+sample_page = [p for p in sample_ocrcommentary.children.pages if p.id == sample_page_id][0]
 
 # Image
 sample_image_dir = os.path.join(sample_base_dir, sample_commentary_id, variables.PATHS['png'])
@@ -70,7 +70,7 @@ sample_seqeval_output = seqeval_evaluation([sample_ner_labels_pred],
 sample_model_name_or_path = 'distilbert-base-uncased'
 sample_tokenizer = DistilBertTokenizerFast.from_pretrained(sample_model_name_or_path)
 
-sample_encodings = sample_tokenizer(text=[w.text for w in sample_page.children['word']],
+sample_encodings = sample_tokenizer(text=[w.text for w in sample_page.children.words],
                                     truncation=True,
                                     padding=True,
                                     return_overflowing_tokens=True,

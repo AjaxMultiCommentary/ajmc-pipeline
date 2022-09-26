@@ -17,8 +17,8 @@ from ajmc.text_processing.ocr_classes import OcrPage
 
 page = OcrPage('sophoclesplaysa05campgoog_0146',
                ocr_path='/data/ocr/evaluation_test/gt_sophoclesplaysa05campgoog_0146.html')
-print('Wordcount:  ', len(page.children['word']))
-print('Charcount:  ', sum([len(w.text) for w in page.children['word']]))
+print('Wordcount:  ', len(page.children.words))
+print('Charcount:  ', sum([len(w.text) for w in page.children.words]))
 ```
 
 returns:

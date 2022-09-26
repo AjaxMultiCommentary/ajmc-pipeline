@@ -44,7 +44,7 @@ for xp_name in next(os.walk(runs_path))[1]:
             txt_path = os.path.join(preds_dir, txt)
             comm_id = txt.split('_')[0]
             page_id = txt.replace('.txt', '')
-            page = [p for p in commentaries[comm_id].children['page'] if p.id == page_id][0]
+            page = [p for p in commentaries[comm_id].children.pages if p.id == page_id][0]
 
             with open(txt_path, 'r') as f:
                 lines = f.read().split('\n')
@@ -59,8 +59,8 @@ for xp_name in next(os.walk(runs_path))[1]:
                                                    is_groundtruth=False))
 
             print('   Word loop')
-            for r in page.children['region']:
-                for w in r.children['word']:
+            for r in page.children.regions:
+                for w in r.children.words:
                     # find the word's gt label
                     gt_rtype = r.info['region_type']
                     gt_rtype = gt_rtype if gt_rtype != 'line_region' else 'other'

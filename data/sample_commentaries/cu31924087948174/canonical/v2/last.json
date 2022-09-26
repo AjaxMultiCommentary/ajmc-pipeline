@@ -1,7 +1,9 @@
 {
   "metadata": {
     "id": "cu31924087948174",
-    "ocr_run": "tess_eng_grc"
+    "ocr_run": "tess_eng_grc",
+    "image_dir": "/Users/sven/packages/ajmc/data/sample_commentaries/cu31924087948174/images/png",
+    "base_dir": "/Users/sven/packages/ajmc/data/sample_commentaries/cu31924087948174"
   },
   "images": [
     {

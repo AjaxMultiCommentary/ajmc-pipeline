@@ -1,11 +1,12 @@
 """Miscellaneous helpers and utilities."""
 import inspect
 import os
+from abc import abstractmethod
 from functools import wraps
 import json
 import logging
 import timeit
-from typing import List, Tuple, Iterable, Generator, Optional
+from typing import List, Tuple, Iterable, Generator, Optional, Callable
 import pandas as pd
 from jsonschema import Draft6Validator
 
@@ -166,20 +167,78 @@ def lazy_init(func):
 
     @wraps(func)
     def wrapper(self, *args, **kwargs):
-        len_defaults = len(specs.defaults) if specs.defaults else 0
-        n_req_args = len(specs.args) - len_defaults
+        defaults_args_len = len(specs.defaults) if specs.defaults else 0
+        required_args_len = len(specs.args) - defaults_args_len
 
         # Start with required args
-        req_from_args = [(n, v) for n, v in zip(specs.args[1:n_req_args], args)]
-        req_from_kwargs = [(n, v) for n, v in kwargs.items() if n in specs.args[1:n_req_args]]
-        for n, v in req_from_args + req_from_kwargs:
+        required_from_args = [(name, value) for name, value in zip(specs.args[1:required_args_len], args)]
+        required_from_kwargs = [(n, v) for n, v in kwargs.items() if n in specs.args[1:required_args_len]]
+        for n, v in required_from_args + required_from_kwargs:
             setattr(self, n, v)
 
         # For defaulted args, only append
-        def_from_args = [(n, v) for n, v in zip(specs.args[n_req_args:], args[n_req_args:]) if v is not None]
-        def_from_kwargs = [(n, v) for n, v in kwargs.items() if n in specs.args[n_req_args:] and v is not None]
+        def_from_args = [(n, v) for n, v in zip(specs.args[required_args_len:], args[required_args_len:]) if
+                         v is not None]
+        def_from_kwargs = [(n, v) for n, v in kwargs.items() if n in specs.args[required_args_len:] and v is not None]
         for n, v in def_from_args + def_from_kwargs:
             setattr(self, n, v)
+
+        func(self, *args, **kwargs)
+
+    return wrapper
+
+
+def lazy_init(func):
+    """Set attributes for required arguments and defaulted keyword argument which are not None at instantiation.
+
+    Example:
+        ```python
+        @lazy_init
+        def __init__(self, hello, world = None):
+            pass
+        ```
+
+        is actually equivalent to :
+
+        ```python
+        def __init__(self, hello, world = None):
+            self.hello = hello
+
+            if world is not None:
+                self.world = world
+        ```
+
+    Note:
+        Warning, this does not handle `*args` and `**kwargs`.
+
+    """
+    specs = inspect.getfullargspec(func)
+    assert specs.varargs is None, "`lazy_init` does not handle *args"
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        defaults_args_len = len(specs.defaults) if specs.defaults else 0
+        required_args_len = len(specs.args) - defaults_args_len
+        required_args_names = specs.args[1:required_args_len]
+        defaults_args_names = specs.args[required_args_len:]
+
+        # Start with required args
+        required_from_args = [(name, value) for name, value in zip(required_args_names, args)]
+        required_from_kwargs = [(name, value) for name, value in kwargs.items() if name in required_args_names]
+        for name, value in required_from_args + required_from_kwargs:
+            setattr(self, name, value)
+
+        # For defaulted args and potential **kwargs, only add if not None
+        def_from_args = [(n, v) for n, v in zip(defaults_args_names, args[required_args_len:])
+                         if v is not None]
+        def_from_kwargs = [(n, v) for n, v in kwargs.items() if n in defaults_args_names and v is not None]
+        for name, value in def_from_args + def_from_kwargs:
+            setattr(self, name, value)
+
+        # Add potential **kwargs
+        for name, value in kwargs.items():
+            if name not in required_args_names + defaults_args_names and value is not None:
+                setattr(self, name, value)
 
         func(self, *args, **kwargs)
 
@@ -216,9 +275,12 @@ def lazy_attributer(attr_name, func, attr_decorator=lambda x: x):
     return set_attribute
 
 
-def walk_dirs(path:str):
+def walk_dirs(path: str, prepend_base: bool = False) -> List[str]:
     """Walks over the dirs in path."""
-    return sorted(next(os.walk(path))[1])
+    if prepend_base:
+        return [os.path.join(path, dir_) for dir_ in sorted(next(os.walk(path))[1])]
+    else:
+        return sorted(next(os.walk(path))[1])
 
 
 def get_olr_splits_page_ids(commentary_id: 'OcrCommentary',
@@ -228,9 +290,28 @@ def get_olr_splits_page_ids(commentary_id: 'OcrCommentary',
     olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
     if splits is not None:
         filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
-               range(len(olr_gt['page_id']))]
+                   range(len(olr_gt['page_id']))]
     else:
         filter_ = [(olr_gt['commentary_id'][i] == commentary_id) for i in
                    range(len(olr_gt['page_id']))]
 
     return list(olr_gt['page_id'][filter_])
+
+
+class LazyObject:
+    """An object that computes its attributes lazily, using `compute_function`."""
+
+    @lazy_init
+    def __init__(self, compute_function: Callable, **kwargs):
+        """Initializes the object.
+
+        Args:
+            compute_function: The function to call to compute the attributes.
+            **kwargs: Pass kwargs to manually set attributes.
+        """
+        pass
+
+    def __getattr__(self, attribute):
+        if attribute not in self.__dict__:
+            self.__dict__[attribute] = self.compute_function(attribute)
+        return self.__dict__[attribute]

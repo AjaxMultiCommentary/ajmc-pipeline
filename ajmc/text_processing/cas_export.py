@@ -224,6 +224,7 @@ def main():
 
     for commentary_id, commentary_format in zip(args.commentary_ids, args.commentary_formats):
 
+        # Todo ⚠️ this is not a valid method anymore
         commentary = OcrCommentary(commentary_id)
 
         args.json_dir = os.path.join(PATHS['base_dir'], commentary_id, 'canonical', commentary_format)
@@ -233,15 +234,15 @@ def main():
         os.makedirs(args.xmi_dir, exist_ok=True)
 
         if args.make_jsons and args.make_xmis:
-            for page in commentary.pages:
+            for page in commentary.children.pages:
                 logger.info('Processing page  ' + page.id)
                 page.to_json(output_dir=args.json_dir)
-                rebuild = basic_rebuild(page.canonical_data, args.region_types)
+                rebuild = basic_rebuild(page.to_canonical_v1(), args.region_types)
                 if len(rebuild['fulltext']) > 0:  # h andles the empty-page case
                     rebuilt_to_xmi(rebuild, args.xmi_dir)
 
         elif args.make_jsons:
-            for page in commentary.pages:
+            for page in commentary.children.pages:
                 logger.info('Canonizing page  ' + page.id)
                 page.to_json(output_dir=args.json_dir)
 

@@ -125,20 +125,20 @@ def draw_page_regions_lines_words(matrix: np.ndarray,
                                   page: Union['OcrPage', 'CanonicalPage'],
                                   output_path: Optional[str] = None,
                                   region_elements: bool = False):
-    matrix = draw_boxes(boxes=[r.bbox.bbox for r in page.children['region']],
+    matrix = draw_boxes(boxes=[r.bbox.bbox for r in page.children.regions],
                         matrix=matrix,
                         color=(255, 0, 0),
                         thickness=3)
     if region_elements:
-        matrix = draw_boxes([r.bbox.bbox for region in page.children['region'] for r in region.children['line']],
+        matrix = draw_boxes([r.bbox.bbox for region in page.children.regions for r in region.children.lines],
                             matrix,
                             (0, 255, 0), thickness=2)
-        matrix = draw_boxes([r.bbox.bbox for region in page.children['region'] for r in region.children['word']],
+        matrix = draw_boxes([r.bbox.bbox for region in page.children.regions for r in region.children.words],
                             matrix,
                             thickness=1)
     else:
-        matrix = draw_boxes([r.bbox.bbox for r in page.children['line']], matrix, (0, 255, 0), thickness=2)
-        matrix = draw_boxes([r.bbox.bbox for r in page.children['word']], matrix, thickness=1)
+        matrix = draw_boxes([r.bbox.bbox for r in page.children.lines], matrix, (0, 255, 0), thickness=2)
+        matrix = draw_boxes([r.bbox.bbox for r in page.children.words], matrix, thickness=1)
 
     if output_path:
         cv2.imwrite(output_path, matrix)
@@ -150,7 +150,7 @@ def draw_reading_order(matrix: np.ndarray,
                        page: Union['OcrPage', 'CanonicalPage'],
                        output_path: Optional[str] = None):
     # Compute word centers
-    w_centers = [w.bbox.center for w in page.children['word']]
+    w_centers = [w.bbox.center for w in page.children.words]
     matrix = cv2.polylines(img=matrix,
                            pts=[np.array(w_centers, np.int32).reshape((-1, 1, 2))],
                            isClosed=False,

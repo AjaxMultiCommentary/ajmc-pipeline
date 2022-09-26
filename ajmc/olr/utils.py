@@ -18,7 +18,7 @@ def get_page_region_dicts_from_via(page_id: str, via_project: dict) -> List[dict
 
 def select_page_regions_by_types(page: 'OcrPage',
                                  region_types: List[str]) -> List['OlrRegion']:
-    return [r for r in page.children['region'] if r.region_type in region_types]
+    return [r for r in page.children.regions if r.region_type in region_types]
 
 
 def sort_to_reading_order(elements: list,
@@ -87,13 +87,13 @@ def get_olr_region_counts(commentaries: List['CanonicalCommentary'],
     for commentary in commentaries:
         # ⚠️ Get the list of groundtruth pages ONLY (remember that `commentary` zones are annotated on all pages !)
         gt_pages_ids = get_olr_splits_page_ids(commentary.id, splits)
-        gt_pages = [p for p in commentary.children['page'] if p.id in gt_pages_ids]
+        gt_pages = [p for p in commentary.children.pages if p.id in gt_pages_ids]
 
         # Do the counts
 
         for p in gt_pages:
             region_types_counts['pages'] += 1
-            for r in p.children['region']:
+            for r in p.children.regions:
                 if r.info['region_type'] != 'line_region':
                     region_types_counts['total'] += 1
                     region_types_counts[fine_to_coarse[r.info['region_type']] if fine_to_coarse else r.info['region_type']] += 1

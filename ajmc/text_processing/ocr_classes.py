@@ -1,11 +1,17 @@
+"""
+This module handles OCR outputs. Notice that it has to cope with the inconsistencies and vagaries of OCR outputs. Hence,
+eventhough the code is not very elegant, I would not recommend to change it without a very good reason and absolute
+confidence in your changes.
+"""
+
 import re
 import json
 import os
 from time import strftime
-from typing import Dict, Optional, List, Union, Any
+from typing import Dict, Optional, List, Union, Any, Type
 import bs4.element
-
-from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init
+from abc import abstractmethod
+from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init, LazyObject
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons import variables
 from ajmc.commons.geometry import (
@@ -17,8 +23,8 @@ from ajmc.commons.image import Image, draw_page_regions_lines_words
 from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via
 import jsonschema
 
-from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalWord, \
-    CanonicalSinglePageTextContainer, CanonicalPage
+from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalWord, CanonicalPage, CanonicalRegion, \
+    CanonicalLine, TextContainer
 from ajmc.text_processing.markup_processing import parse_markup_file, get_element_bbox, \
     get_element_text, find_all_elements
 from ajmc.commons.file_management.utils import verify_path_integrity, parse_ocr_path, get_path_from_id, guess_ocr_format
@@ -26,35 +32,9 @@ from ajmc.commons.file_management.utils import verify_path_integrity, parse_ocr_
 logger = get_custom_logger(__name__)
 
 
-# @lazy_attributer('ocr_format', lambda self: self.page.ocr_format, lazy_property)
-class OcrTextContainer:
-    pass
-
-    @lazy_property
-    def parents(self):
-        raise NotImplementedError('`parents` attribute is only available for `CanonicalTextContainer`s')
-
-    @lazy_property
-    def bbox(self):
-        return get_element_bbox(self.markup, self.ocr_format)
-
-    @lazy_property
-    def image(self) -> Image:
-        return self.page.Image
-
-    @lazy_property
-    def ocr_format(self) -> str:
-        return self.page.ocr_format
-
-    @lazy_property
-    def text(self) -> str:
-        return '\n'.join([l.text for l in self.children['line']])
-
-
-class OcrCommentary:
+class OcrCommentary(TextContainer):
     """`OcrCommentary` objects reprensent a single ocr-run of on a commentary, i.e. a collection of page OCRed pages."""
 
-    @lazy_init
     @docstring_formatter(**docstrings)
     def __init__(self,
                  id: Optional[str] = None,
@@ -63,14 +43,14 @@ class OcrCommentary:
                  via_path: Optional[str] = None,
                  image_dir: Optional[str] = None,
                  groundtruth_dir: Optional[str] = None,
-                 ocr_run: Optional[str] = None
-                 ):
+                 ocr_run: Optional[str] = None,
+                 **kwargs):
         """Default constructor, where custom paths can be provided.
 
         This is usefull when you want to instantiate a `OcrCommentary` without using `ajmc`'s folder structure. Note that
         only the requested paths must be provided. For instance, the object will be created if you do not provided the
         path to the images. But logically, you won't be able to access fonctionnalities that requires it (for instance
-        `OcrCommentary.pages[0].image`).
+        `OcrCommentary.children.pages[0].image`).
 
         Args:
             id: The id of the commentary (e.g. sophoclesplaysa05campgoog).
@@ -79,7 +59,8 @@ class OcrCommentary:
             image_dir: {image_dir}
             groundtruth_dir: {groundtruth_dir}
         """
-        pass
+        super().__init__(id=id, ocr_dir=ocr_dir, base_dir=base_dir, via_path=via_path, image_dir=image_dir,
+                         groundtruth_dir=groundtruth_dir, ocr_run=ocr_run, **kwargs)
 
     @classmethod
     @docstring_formatter(output_dir_format=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
@@ -96,23 +77,89 @@ class OcrCommentary:
 
         return cls(id=id,
                    ocr_dir=ocr_dir,
-                   base_dir=os.path.join(base_dir,id),
+                   base_dir=os.path.join(base_dir, id),
                    via_path=os.path.join(base_dir, id, variables.PATHS['via_path']),
                    image_dir=os.path.join(base_dir, id, variables.PATHS['png']),
                    groundtruth_dir=os.path.join(base_dir, id, variables.PATHS['groundtruth']),
                    ocr_run=ocr_run)
 
-    @lazy_property
-    def pages(self) -> List['OcrPage']:
-        """The pages contained in the commentaries"""
-        pages = []
-        for file in [f for f in os.listdir(self.ocr_dir) if f[-4:] in ['.xml', 'hocr', 'html']]:
-            pages.append(OcrPage(ocr_path=os.path.join(self.ocr_dir, file),
-                                 id=file.split('.')[0],
-                                 image_path=get_path_from_id(file.split('.')[0], self.image_dir),
-                                 commentary=self))
+    def to_canonical(self):
+        """Export the commentary to a `CanonicalCommentary` object.
 
-        return sorted(pages, key=lambda x: x.id)
+        Note:
+            This pipeline must cope with the fact that the OCR may not be perfect. For instance, it may happen that a word
+            is empty, or that coordinates are fuzzy. It hence rely on OcrPage.optimize() to fix these issues. Though this code
+            is far from elegant, I wouldn't recommend touching it unless you are 100% sure of what you are doing.
+        """
+
+        # We start by creating an empty `CanonicalCommentary`
+        can = CanonicalCommentary(id=self.id, children=None, images=[], info={})
+
+        # We fill the metadata
+        if hasattr(self, 'ocr_run'):
+            can.info['ocr_run'] = self.ocr_run
+        can.info['base_dir'] = self.base_dir
+
+        # We now populate the children and images
+        children = {k: [] for k in ['pages', 'regions', 'lines', 'words']}
+        w_count = 0
+        for i, p in enumerate(self.children.pages):
+            if i % 20 == 0:
+                logger.info(f'Processing page {i} of {len(self.children.pages)}')
+
+            p.optimise()
+            p_start = w_count
+            for r in p.children.regions:
+                r_start = w_count
+                for l in r.children.lines:
+                    l_start = w_count
+                    for w in l.children.words:
+                        children['words'].append(CanonicalWord(text=w.text, bbox=w.bbox.bbox, commentary=can))
+                        w_count += 1  # Hence w_count - 1 below
+
+                    children['lines'].append(CanonicalLine(word_range=(l_start, w_count - 1), commentary=can))
+
+                children['regions'].append(CanonicalRegion(word_range=(r_start, w_count - 1),
+                                                           commentary=can,
+                                                           region_type=r.region_type))
+
+            children['pages'].append(CanonicalPage(id=p.id, word_range=(p_start, w_count - 1), commentary=can))
+
+            can.images.append(Image(id=p.id, path=p.image_path, word_range=(p_start, w_count - 1)))
+            p.reset()  # We reset the page to free up memory
+
+        can.children = LazyObject(lambda x: x, **children)
+
+        return can
+
+    def _get_children(self, children_type):
+        """Get the children of the commentary.
+
+        Args:
+            children_type: The type of children to get. Must be one of `pages`, `regions`, `lines` or `words`.
+        """
+        if children_type not in ['words', 'lines', 'regions', 'pages']:
+            raise ValueError(f'`children_type` must be one of words, lines, regions, pages, not {children_type}')
+
+        if children_type == 'pages':
+            pages = []
+            for file in [f for f in os.listdir(self.ocr_dir) if f[-4:] in ['.xml', 'hocr', 'html']]:
+                pages.append(OcrPage(ocr_path=os.path.join(self.ocr_dir, file),
+                                     id=file.split('.')[0],
+                                     image_path=get_path_from_id(file.split('.')[0], self.image_dir),
+                                     commentary=self))
+
+            return sorted(pages, key=lambda x: x.id)
+
+        else:  # For regions, lines and words, retrieve them from each page
+            return [tc for p in self.children.pages for tc in getattr(p.children, children_type)]
+
+    def _get_parent(self) -> None:
+        return None  # A commentary has no parent
+
+    @lazy_property
+    def children(self):
+        return LazyObject(compute_function=self._get_children)
 
     @lazy_property  # Todo 👁️ This should not be maintained anymore
     def ocr_groundtruth_pages(self) -> Union[List['OcrPage'], list]:
@@ -131,103 +178,179 @@ class OcrCommentary:
         with open(self.via_path, 'r') as file:
             return json.load(file)
 
-    def to_canonical(self):
-        can = CanonicalCommentary(id=self.id,
-                                  images=[],
-                                  children={k: [] for k in ['page', 'region', 'line', 'word']},
-                                  info={'image_dir': self.image_dir,
-                                        'base_dir': self.base_dir})
-
-        if hasattr(self, 'ocr_run'):
-            can.info['ocr_run'] = self.ocr_run
-
-        w_count, p_count, r_count, l_count = 0, 0, 0, 0
-
-        for i, p in enumerate(self.pages):
-            if i % 20 == 0:
-                print(f'Processing page {i} of {len(self.pages)}')
-
-            p.optimise()
-            p_start = w_count
-            for r in p.children['region']:
-                r_start = w_count
-                for l in r.children['line']:
-                    l_start = w_count
-                    for w in l.children['word']:
-                        can.children['word'].append(CanonicalWord(type='word',
-                                                                  index=w_count,
-                                                                  bbox=w.bbox.bbox,
-                                                                  text=w.text,
-                                                                  commentary=can))
-                        w_count += 1
-
-                    can.children['line'].append(CanonicalSinglePageTextContainer(type='line',
-                                                                                 index=l_count,
-                                                                                 word_range=(l_start, w_count - 1),
-                                                                                 # ->w_count+=1 above
-                                                                                 commentary=can))
-                    l_count += 1
-
-                can.children['region'].append(CanonicalSinglePageTextContainer(type='region',
-                                                                               index=r_count,
-                                                                               word_range=(r_start, w_count - 1),
-                                                                               commentary=can,
-                                                                               info={'region_type': r.region_type}))
-                r_count += 1
-
-            can.children['page'].append(CanonicalPage(id=p.id,
-                                                      index=p_count,
-                                                      word_range=(p_start, w_count - 1),
-                                                      commentary=can))
-            can.images.append(Image(id=p.id,
-                                    path=p.image_path,
-                                    word_range=(p_start, w_count - 1)))
-            p_count += 1
-            p.reset()
-
-        return can
+    @lazy_property
+    def images(self) -> List[Image]:
+        return [p.image for p in self.children.pages]
 
 
-class OcrPage(OcrTextContainer):
+class OcrPage(TextContainer):
     """A class representing a commentary page."""
 
-    @lazy_init
     def __init__(self,
                  ocr_path: str,
                  id: Optional[str] = None,
                  image_path: Optional[str] = None,
-                 commentary: Optional[OcrCommentary] = None):
-        """Default constructor.
+                 commentary: Optional[OcrCommentary] = None,
+                 **kwargs):
+        super().__init__(ocr_path=ocr_path, id=id, image_path=image_path, commentary=commentary, **kwargs)
+
+    def _get_children(self, children_type):
+        if children_type == 'regions':
+            return [OlrRegion.from_via(via_dict=r, page=self)
+                    for r in get_page_region_dicts_from_via(self.id, self.parents.commentary.via_project)]
+
+        # Lines and words must be retrieved together
+        elif children_type in ['lines', 'words']:
+            w_count = 0
+            lines = []
+            words = []
+            for l_markup in find_all_elements(self.markup, 'line', self.ocr_format):
+                line = OcrLine(markup=l_markup, page=self)
+                line.word_ids = []
+                for w_markup in find_all_elements(l_markup, 'word', self.ocr_format):
+                    line.word_ids.append(w_count)
+                    words.append(OcrWord(id=w_count, markup=w_markup, page=self))
+                    w_count += 1
+                lines.append(line)
+
+            self.children.words = words
+            self.children.lines = lines
+
+            return getattr(self.children, children_type)
+
+    def _get_parent(self, parent_type):
+        raise NotImplementedError('OcrPage.parents must be set at __init__ or manually.')
+
+    def to_canonical_v1(self) -> Dict[str, Any]:
+        """Creates canonical data, as used for INCEpTION. """
+        logger.warning('You are creating a canonical data version 1. For version two, use `commentary.to_canonical`.')
+        data = {'id': self.id,
+                'iiif': 'None',
+                'cdate': strftime('%Y-%m-%d %H:%M:%S'),
+                'regions': []}
+
+        for r in self.children.regions:
+            r_dict = {'region_type': r.region_type,
+                      'bbox': list(r.bbox.xywh),
+                      'lines': [
+                          {
+                              'bbox': list(l.bbox.xywh),
+                              'words': [
+                                  {
+                                      'bbox': list(w.bbox.xywh),
+                                      'text': w.text
+                                  } for w in l.children.words
+                              ]
+
+                          } for l in r.children.lines
+                      ]
+                      }
+            data['regions'].append(r_dict)
+
+        return data
+
+    def to_json(self, output_dir: str, schema_path: str = variables.PATHS['schema']):
+        """Validate `self.to_canonical_v1` and serializes it to json."""
+
+        with open(schema_path, 'r') as file:
+            schema = json.loads(file.read())
+
+        jsonschema.validate(instance=self.to_canonical_v1(), schema=schema)
+
+        with open(os.path.join(output_dir, self.id + '.json'), 'w') as f:
+            json.dump(self.to_canonical_v1(), f, indent=4, ensure_ascii=False)
+
+    def reset(self):
+        """Resets the page to free up memory."""
+        delattr(self, 'children')
+        delattr(self, 'image')
+        delattr(self, 'text')
+
+    def optimise(self, debug_dir: Optional[str] = None):
+        """Optimises coordinates and reading order.
 
         Args:
-            ocr_path: Absolute path to an OCR output file
-            commentary: The commentary to which the page belongs.
+            debug_dir: If given, the page will be saved to this directory for debugging purposes.
+
+        Note:
+            - This function changes the page in place.
+            - Like `OcrCommentary.to_canonical`, this function must cope with the vagaries of the OCR output. Though its
+            code is far from slick, I wouldn't recommend trying to improve it unless you are 100% sure that you know what
+            you are doing.
         """
 
-        self.page = self
+        if debug_dir is not None:
+            _ = draw_page_regions_lines_words(self.image.matrix.copy(), self,
+                                              os.path.join(debug_dir, self.id + '_raw.png'))
 
-    @lazy_property
-    def ocr_format(self) -> str:
-        return guess_ocr_format(self.ocr_path)
+        logger.warning("You are optimising a page, bboxes and children are going to be changed")
+        self.reset()
 
-    @lazy_property
-    def children(self):
-        w_count = 0
-        lines = []
-        words = []
-        for l_markup in find_all_elements(self.markup, 'line', self.ocr_format):
-            line = OcrLine(markup=l_markup, page=self)
-            line.word_ids = []
-            for w_markup in find_all_elements(l_markup, 'word', self.ocr_format):
-                line.word_ids.append(w_count)
-                words.append(OcrWord(id=w_count, markup=w_markup, page=self))
-                w_count += 1
-            lines.append(line)
+        # Process words
+        self.children.words = [w for w in self.children.words if re.sub(r'\s+', '', w.text) != '']
+        for w in self.children.words:
+            w.adjust_bbox()
 
-        regions = [OlrRegion.from_via(via_dict=r, page=self) for r in
-                   get_page_region_dicts_from_via(self.id, self.commentary.via_project)]
+        # Process lines
+        self.children.lines = [l for l in self.children.lines if l.children.words]
+        for l in self.children.lines:
+            l.adjust_bbox()
 
-        return {'region': regions, 'line': lines, 'word': words}
+        # Process regions
+        self.children.regions = [r for r in self.children.regions
+                                 if r.region_type not in ['undefined', 'line_number_commentary']
+                                 and r.children.words]
+        for r in self.children.regions:
+            r.adjust_bbox()
+
+        # Cut lines according to regions
+        for r in self.children.regions:
+            r.children.lines = []
+
+            for l in self.children.lines:
+                # If the line is entirely in the region, append it
+                if is_bbox_within_bbox(contained=l.bbox.bbox,
+                                       container=r.bbox.bbox):
+                    l.region = r  # Link the line to its region
+                    r.children.lines.append(l)
+
+                # If the line is only partially in the region, handle the line splitting problem.
+                elif any([is_bbox_within_bbox(w.bbox.bbox, r.bbox.bbox)
+                          for w in l.children.words]):
+
+                    # Create the new line and append it both to region and page lines
+                    new_line = OcrLine(markup=None,
+                                       page=self,
+                                       word_ids=[w.id for w in l.children.words
+                                                 if is_bbox_within_bbox(w.bbox.bbox, r.bbox.bbox)])
+                    new_line.adjust_bbox()
+                    new_line.region = r
+                    r.children.lines.append(new_line)
+
+                    # Actualize the old line
+                    l.children.words = [w for w in l.children.words
+                                        if w.id not in new_line.word_ids]
+                    l.adjust_bbox()
+
+            r.children.lines.sort(key=lambda l: l.bbox.xywh[1])
+
+        # Actualize global page reading order
+        ## Create fake regions for lines with no regions
+        for l in self.children.lines:
+            if not hasattr(l, 'region'):
+                line_region = OlrRegion(region_type='line_region',
+                                        bbox=Shape(l.bbox.bbox),
+                                        page=self)
+                line_region.children.lines = [l]
+                self.children.regions.append(line_region)
+
+        self.children.regions = sort_to_reading_order(elements=self.children.regions)
+        self.children.lines = [l for r in self.children.regions for l in r.children.lines]
+        self.children.words = [w for l in self.children.lines for w in l.children.words]
+
+        if debug_dir:
+            _ = draw_page_regions_lines_words(self.image.matrix.copy(), self,
+                                              f"/Users/sven/Desktop/{self.id}_optimised.png")
 
     @lazy_property
     def image(self) -> Image:
@@ -238,152 +361,62 @@ class OcrPage(OcrTextContainer):
         return parse_markup_file(self.ocr_path)
 
     @lazy_property
-    def canonical_data(self) -> Dict[str, Any]:
-        """Creates canonical data, as used for INCEpTION. """
-        logger.warning('You are creating a canonical data version 1. For version two, use `commentary.to_canonical`.')
-        data = {'id': self.id,
-                'iiif': 'None',
-                'cdate': strftime('%Y-%m-%d %H:%M:%S'),
-                'regions': []}
+    def ocr_format(self) -> str:
+        return guess_ocr_format(self.ocr_path)
 
-        for r in self.children['region']:
-            r_dict = {'region_type': r.region_type,
-                      'bbox': list(r.bbox.xywh),
-                      'lines': [
-                          {
-                              'bbox': list(l.bbox.xywh),
-                              'words': [
-                                  {
-                                      'bbox': list(w.bbox.xywh),
-                                      'text': w.text
-                                  } for w in l.children['word']
-                              ]
+    @lazy_property
+    def bbox(self) -> Shape:
+        return Shape([0, 0, self.image.width, self.image.height])
 
-                          } for l in r.children['line']
-                      ]
-                      }
-            data['regions'].append(r_dict)
 
-        return data
+class OcrTextContainer(TextContainer):
 
-    def reset(self):
-        delattr(self, 'children')
-        delattr(self, 'image')
-        delattr(self, 'text')
-        delattr(self, 'canonical_data')
+    def __init__(self, **kwargs):
+        """Initialize a `OcrTextContainer` with provided kwargs
 
-    def purge_image(self):
-        delattr(self, 'image')
+        Args:
+            **kwargs: Use kwargs to pass any desired attribute or to manually set the values of properties.
+        """
+        super().__init__()
+        for k, v in kwargs.items():
+            if k == 'page':
+                self.parents.page = v
+                self.parents.commentary = self.parents.page.parents.commentary
+            else:
+                setattr(self, k, v)
 
-    def to_json(self, output_dir: str, schema_path: str = variables.PATHS['schema']):
-        """Validate `self.canonical_data` and serializes it to json."""
+    @abstractmethod
+    def _get_children(self, children_type):
+        pass
 
-        with open(schema_path, 'r') as file:
-            schema = json.loads(file.read())
+    def _get_parent(self, parent_type):
+        if parent_type not in ['commentary', 'page']:  # else: is provided in init
+            raise NotImplementedError(f'`OcrTextContainer.parents` only supports `commentary` and `page`, '
+                                      f'not {parent_type}. Build `CanonicalTextContainer.parents` instead.')
 
-        jsonschema.validate(instance=self.canonical_data, schema=schema)
+    def adjust_bbox(self):
+        words_points = [xy for w in self.children.words for xy in w.bbox.bbox]
+        self.bbox = Shape(get_bbox_from_points(words_points))
 
-        with open(os.path.join(output_dir, self.id + '.json'), 'w') as f:
-            json.dump(self.canonical_data, f, indent=4, ensure_ascii=False)
+    @lazy_property
+    def bbox(self):
+        return get_element_bbox(self.markup, self.ocr_format)
 
-    def optimise(self,
-                 do_debug: bool = False):
+    @lazy_property
+    def image(self) -> Image:
+        return self.parents.page.Image
 
-        if do_debug:
-            _ = draw_page_regions_lines_words(self.image.matrix.copy(), self,
-                                              f"/Users/sven/Desktop/{self.id}_raw.png")
+    @lazy_property
+    def ocr_format(self) -> str:
+        return self.parents.page.ocr_format
 
-        logger.warning("You are optimising a page, bboxes and children are going to be changed")
-        self.reset()
-
-        # Process words
-        self.children['word'] = [w for w in self.children['word'] if re.sub(r'\s+', '', w.text) != '']
-        for w in self.children['word']:
-            w.adjust_bbox()
-
-        # Process lines
-        self.children['line'] = [l for l in self.children['line'] if l.children['word']]
-        for l in self.children['line']:
-            l.adjust_bbox()
-
-        # Process regions
-        self.children['region'] = [r for r in self.children['region']
-                                   if r.region_type not in ['undefined', 'line_number_commentary']
-                                   and r.children['word']]
-        for r in self.children['region']:
-            r.adjust_bbox()
-
-        # Cut lines according to regions
-        for r in self.children['region']:
-            r.children['line'] = []
-
-            for l in self.children['line']:
-                # If the line is entirely in the region, append it
-                if is_bbox_within_bbox(contained=l.bbox.bbox,
-                                       container=r.bbox.bbox):
-                    l.region = r  # Link the line to its region
-                    r.children['line'].append(l)
-
-                # If the line is only partially in the region, handle the line splitting problem.
-                elif any([is_bbox_within_bbox(w.bbox.bbox, r.bbox.bbox)
-                          for w in l.children['word']]):
-
-                    # Create the new line and append it both to region and page lines
-                    new_line = OcrLine(markup=None,
-                                       page=self,
-                                       word_ids=[w.id for w in l.children['word']
-                                                 if is_bbox_within_bbox(w.bbox.bbox, r.bbox.bbox)])
-                    new_line.adjust_bbox()
-                    new_line.region = r
-                    r.children['line'].append(new_line)
-
-                    # Actualize the old line
-                    l.children['word'] = [w for w in l.children['word']
-                                          if w.id not in new_line.word_ids]
-                    l.adjust_bbox()
-
-            r.children['line'].sort(key=lambda l: l.bbox.xywh[1])
-
-        # Actualize global page reading order
-        ## Create fake regions for lines with no regions
-        for l in self.children['line']:
-            if not hasattr(l, 'region'):
-                line_region = OlrRegion(region_type='line_region',
-                                        bbox=Shape(l.bbox.bbox),
-                                        page=self)
-                line_region.children['line'] = [l]
-                self.children['region'].append(line_region)
-
-        self.children['region'] = sort_to_reading_order(elements=self.children['region'])
-        self.children['line'] = [l for r in self.children['region'] for l in r.children['line']]
-        self.children['word'] = [w for l in self.children['line'] for w in l.children['word']]
-
-        if do_debug:
-            _ = draw_page_regions_lines_words(self.image.matrix.copy(), self,
-                                              f"/Users/sven/Desktop/{self.id}_optimised.png")
+    @lazy_property
+    def text(self) -> str:
+        return ' '.join([w.text for w in self.children.words])
 
 
 class OlrRegion(OcrTextContainer):
-    """A class representing OLR regions.
 
-    `OlrRegion`s can be instantiated from a via-dictionary or manually.
-
-    Attributes:
-
-        region_type (str):
-            The type of the region, e.g. 'page_number', 'introduction'...
-
-        bbox (Shape):
-            A `Shape` object representing the coordinates of the region as extracted from via.
-
-        page (OcrPage):
-            The `OcrPage` object to which the region belongs
-
-        words:
-            The words included in the region.
-    """
-
-    @lazy_init
     @docstring_formatter(**docstrings)
     def __init__(self,
                  region_type: str,
@@ -396,7 +429,8 @@ class OlrRegion(OcrTextContainer):
             bbox: {coords_single}
             page: {parent_page}
         """
-        self._inclusion_threshold = 0.7
+        super().__init__(region_type=region_type, bbox=bbox, page=page)
+        self._inclusion_threshold = variables.PARAMETERS['ocr_region_inclusion_threshold']
 
     @classmethod
     @docstring_formatter(**docstrings)
@@ -414,68 +448,43 @@ class OlrRegion(OcrTextContainer):
                                         h=via_dict['shape_attributes']['height']),
                    page=page)
 
-    # =================== Parents and children ================
-    @lazy_property
-    def bbox(self):
-        """Just here for the clarity of inheritance, but just wraps value given in __init__"""
-        return self.bbox
-
-    @lazy_property
-    def children(self):
-        return {k: [el for el in self.page.children[k]
-                    if is_bbox_within_bbox_with_threshold(contained=el.bbox.bbox,
-                                                          container=self.bbox.bbox,
-                                                          threshold=self._inclusion_threshold)]
-                for k in ['line', 'word']}
-
-    def adjust_bbox(self):
-        words_points = [xy for w in self.children['word'] for xy in w.bbox.bbox]
-        self.bbox = Shape(get_bbox_from_points(words_points))
+    def _get_children(self, children_type):
+        return [el for el in getattr(self.parents.page.children, children_type)
+                if is_bbox_within_bbox_with_threshold(contained=el.bbox.bbox,
+                                                      container=self.bbox.bbox,
+                                                      threshold=self._inclusion_threshold)]
 
 
 class OcrLine(OcrTextContainer):
-    """Class for Ocrlines."""
 
-    @lazy_init
     def __init__(self,
                  markup: 'bs4.element.Tag',
                  page: OcrPage,
-                 word_ids: Optional[List[Union[str, int]]] = None):
-        pass
+                 word_ids: Optional[List[Union[str, int]]] = None,
+                 **kwargs):
+        super().__init__(markup=markup, page=page, word_ids=word_ids, **kwargs)
 
-    @lazy_property
-    def children(self):
-        return {'word': [w for w in self.page.children['word'] if w.id in self.word_ids]}
-
-    @lazy_property
-    def text(self) -> str:
-        return ' '.join([w.text for w in self.children['word']])
-
-    def adjust_bbox(self):
-        words_points = [xy for w in self.children['word'] for xy in w.bbox.bbox]
-        self.bbox = Shape(get_bbox_from_points(words_points))
+    def _get_children(self, children_type):
+        return [w for w in self.parents.page.children.words if
+                w.id in self.word_ids] if children_type == 'words' else []
 
 
 class OcrWord(OcrTextContainer):
     """Class for Words."""
 
-    @lazy_init
     def __init__(self,
                  id: Union[int, str],
                  markup: 'bs4.element.Tag',
-                 page: OcrPage
-                 ):
-        pass
+                 page: OcrPage,
+                 **kwargs):
+        super().__init__(id=id, markup=markup, page=page, **kwargs)
 
-    @lazy_property
-    def children(self):
-        return {}
+    def _get_children(self, children_type):
+        return []  # Words have no children
 
     @lazy_property
     def text(self):
         return get_element_text(element=self.markup, ocr_format=self.ocr_format)
 
     def adjust_bbox(self):
-        self.bbox = adjust_bbox_to_included_contours(self.bbox.bbox, self.page.image.contours)
-
-
+        self.bbox = adjust_bbox_to_included_contours(self.bbox.bbox, self.parents.page.image.contours)

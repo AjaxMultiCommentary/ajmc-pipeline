@@ -79,6 +79,7 @@ docstrings['image_dir'] = 'The path to the directory containing the images.'
 
 docstrings['interval'] = 'A `Tuple[int, int]` defining the included boundaries of an interval, with start <= stop.'
 
+docstrings['kwargs_for_properties'] = 'Use **kwargs to manually set or override properties.'
 docstrings['labels_to_ids'] = 'A dict mapping label-names to their respective ids, e.g. `{{"cat":0, "dog":1, ...}}`.',
 
 docstrings['ocr_dir'] = 'The path to the directory containing OCR outputs.'

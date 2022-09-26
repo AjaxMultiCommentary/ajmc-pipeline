@@ -16,10 +16,15 @@ PATHS = {
     'canonical': 'canonical/v2'
 }
 
+PARAMETERS = {
+    'ocr_region_inclusion_threshold': 0.7,
+}
+
 FOLDER_STRUCTURE_PATHS = {
     # Only relative paths
     # Placeholder pattern are between []
-    'ocr_outputs_dir': '[commentary_id]/ocr/runs/[ocr_run]/outputs'
+    'ocr_outputs_dir': '[commentary_id]/ocr/runs/[ocr_run]/outputs',
+    'canonical_json': '[commentary_id]/canonical/v2/[json]'
 }
 
 # Sheet names corresponds to the dictionary's keys

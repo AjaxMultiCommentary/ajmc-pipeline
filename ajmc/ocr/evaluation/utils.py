@@ -89,11 +89,11 @@ def actualize_overlap_matrix(args: "ArgumentParser", image: "Image", zonemask: "
         image.overlap_matrix[0, zone.bbox[0][1]:zone.bbox[1][1],
         zone.bbox[0][0]:zone.bbox[1][0]] += zone.zone_type + " "  # adds zone.type to matrix, eg. "primary_text"
 
-    for gt_word in groundtruth.children['word']:  # For each gt_word in gt, fill matrix, then find overlapping gt- and ocr-words
+    for gt_word in groundtruth.children.words:  # For each gt_word in gt, fill matrix, then find overlapping gt- and ocr-words
         image.overlap_matrix[1, gt_word.bbox[0][1]:gt_word.bbox[1][1],
         gt_word.bbox[0][0]:gt_word.bbox[1][0]] = gt_word.id
 
-    for word in ocr.children['word']:  # For each word in ocr, fill matrix
+    for word in ocr.children.words:  # For each word in ocr, fill matrix
         image.overlap_matrix[2, word.bbox[0][1]:word.bbox[1][1], word.bbox[0][0]:word.bbox[1][0]] = word.id
 
     return image.overlap_matrix

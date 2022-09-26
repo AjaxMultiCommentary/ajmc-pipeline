@@ -27,7 +27,7 @@ for fname in next(os.walk(base_path))[1]:  # Walk in dirs only
             ocr_dir = os.path.join(new_prefix, dict_['path'][len(old_prefix):])
             output_dir = os.path.join(new_prefix, config['predictions_dir'][len(old_prefix):])
             commentary = CanonicalCommentary.from_json(ocr_dir)
-            pages += [p for p in commentary.children['page']
+            pages += [p for p in commentary.children.pages
                       if p.id in get_olr_splits_page_ids(commentary.id, [dict_['split']])]
 
         tokenizer = LayoutLMv2TokenizerFast.from_pretrained(model_name_or_path)

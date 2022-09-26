@@ -22,17 +22,17 @@
               PHYSICAL_IMG_NR="{{ page.id.split('_')[-1] }}">
             <PrintSpace HPOS="0" VPOS="0" WIDTH="{{ page.bbox.width }}" HEIGHT="{{ page.bbox.height }}">
                 {% if 'region' in elements %}
-                    {% for r in page.children['region'] %}
+                    {% for r in page.children.regions %}
                         <TextBlock ID="{{ r.id }}"
                                    HPOS="{{ r.bbox.xywh[0] }}" VPOS="{{ r.bbox.xywh[1] }}"
                                    WIDTH="{{ r.bbox.width }}" HEIGHT="{{ r.bbox.height }}"
                                    TAGREFS="{{ r.info['region_type'] }}">
                             {% if 'line' in elements %}
-                                {% for l in r.children['line'] %}
+                                {% for l in r.children.lines %}
                                     <TextLine ID="{{ l.id }}" HPOS="{{ l.bbox.xywh[0] }}" VPOS="{{ l.bbox.xywh[1] }}"
                                               WIDTH="{{ l.bbox.width }}" HEIGHT="{{ l.bbox.height }}">
                                         {% if 'word' in elements %}
-                                            {% for w in l.children['word'] %}
+                                            {% for w in l.children.words %}
                                                 <String ID="{{ w.id }}" CONTENT="{{ w.text }}"
                                                         HPOS="{{ w.bbox.xywh[0] }}"
                                                         VPOS="{{ w.bbox.xywh[1] }}" WIDTH="{{ w.bbox.width }}"

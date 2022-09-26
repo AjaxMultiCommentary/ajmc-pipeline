@@ -1,35 +1,70 @@
+from ajmc.commons.miscellaneous import LazyObject
 from tests import sample_objects as so
 from ajmc.commons.geometry import Shape
 from ajmc.text_processing import canonical_classes as cc
 import pytest
 
 
+@pytest.mark.parametrize('tc', [so.sample_cancommentary,
+                                so.sample_cancommentary.children.pages[0],
+                                so.sample_cancommentary.children.regions[0],
+                                so.sample_cancommentary.children.lines[0],
+                                so.sample_cancommentary.children.words[0],
+                                so.sample_cancommentary_from_json,
+                                so.sample_cancommentary_from_json.children.pages[0],
+                                so.sample_cancommentary_from_json.children.regions[0],
+                                so.sample_cancommentary_from_json.children.lines[0],
+                                so.sample_cancommentary_from_json.children.words[0]])
+def test_textcontainer(tc):
+    # test CanonicalCommentary.children
+    assert isinstance(tc.children, LazyObject)
+    for tc_type in ['pages', 'regions', 'lines', 'words']:
+        assert isinstance(getattr(tc.children, tc_type), list)
+        assert all([isinstance(tc, cc.get_tc_type_class(tc_type)) for tc in getattr(tc.children, tc_type)])
 
-@pytest.mark.parametrize('container', [so.sample_cancommentary,
-                                       so.sample_cancommentary.children['page'][0],
-                                       so.sample_cancommentary.children['region'][0],
-                                       so.sample_cancommentary.children['line'][0],
-                                       so.sample_cancommentary.children['word'][0],
-                                       so.sample_cancommentary_from_json,
-                                       so.sample_cancommentary.children['page'][0],
-                                       so.sample_cancommentary.children['region'][0],
-                                       so.sample_cancommentary.children['line'][0],
-                                       so.sample_cancommentary.children['word'][0]])
-def test_canonicaltextcontainer(container):
-    assert isinstance(container.commentary, cc.CanonicalCommentary)
+    # Test CanonicalCommentary.parents
+    assert isinstance(tc.parents, LazyObject)
+    for tc_type in ['commentary', 'page', 'region', 'line']:
+        parent = getattr(tc.parents, tc_type)
+        assert isinstance(parent, cc.get_tc_type_class(tc_type)) or parent is None
 
-    assert isinstance(container.type, str)
+    assert isinstance(tc.type, str)
 
-    assert isinstance(container.id, str)
+    assert isinstance(tc.id, str)
 
-    assert isinstance(container.word_range, tuple)
-    assert len(container.word_range) == 2
+    assert isinstance(tc.text, str)
 
-    assert isinstance(container.children, dict)
 
-    assert isinstance(container.parents, dict)
 
-    assert isinstance(container.bbox, Shape)
-    assert len(container.bbox.xywh) == 4
+@pytest.mark.parametrize('commentary', [so.sample_cancommentary,
+                                so.sample_cancommentary_from_json])
+def test_canonical_commentary(commentary):
+    # test CanonicalCommentary.images
+    assert all([isinstance(i, cc.Image) for i in commentary.images])
+    assert len(commentary.images) == len(commentary.children.pages)
 
-    assert isinstance(container.text, str)
+@pytest.mark.parametrize('tc', [so.sample_cancommentary.children.pages[0],
+                                so.sample_cancommentary.children.regions[0],
+                                so.sample_cancommentary.children.lines[0],
+                                so.sample_cancommentary.children.words[0],
+                                so.sample_cancommentary_from_json.children.pages[0],
+                                so.sample_cancommentary_from_json.children.regions[0],
+                                so.sample_cancommentary_from_json.children.lines[0],
+                                so.sample_cancommentary_from_json.children.words[0]])
+def test_canonical_textcontainer(tc):
+    assert tc in getattr(tc.parents.commentary.children, tc.type+'s')
+
+    if tc.parents.page is not None:
+        assert tc in getattr(tc.parents.page.children, tc.type+'s')
+
+    if tc.parents.region is not None:
+        assert tc in getattr(tc.parents.region.children, tc.type+'s')
+
+    if tc.parents.line is not None:
+        assert tc in getattr(tc.parents.line.children, tc.type+'s')
+
+    assert isinstance(tc.bbox, Shape)
+
+
+
+

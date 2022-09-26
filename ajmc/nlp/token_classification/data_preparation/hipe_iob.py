@@ -1,9 +1,9 @@
 from hipe_commons.helpers.tsv import tsv_to_dict
 from typing import List, Optional
 import torch
-from ajmc.nlp.token_classification.data_preparation import sort_ner_labels, align_labels_to_tokenized, align_to_tokenized
 from ajmc.commons.miscellaneous import get_unique_elements
 from ajmc.commons.docstrings import docstrings, docstring_formatter
+from ajmc.nlp.token_classification.data_preparation.utils import sort_ner_labels, align_labels_to_tokenized, align_to_tokenized
 
 
 class HipeDataset(torch.utils.data.Dataset):

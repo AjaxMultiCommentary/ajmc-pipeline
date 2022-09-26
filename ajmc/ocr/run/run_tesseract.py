@@ -402,7 +402,7 @@ def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=N
             commentary = OcrCommentary.from_ajmc_structure(ocr_dir)
             
             # page_filenames = [os.path.join(EVALUATION_DIR, commentary_id, "ocr", "groundtruth", "images", item+".png") for item in commentary._get_page_ids()]
-            # page_filenames = [p.path['image_path'] for p in commentary.pages]
+            # page_filenames = [p.path['image_path'] for p in commentary.children.pages]
 
             commentary_evaluation(commentary=commentary,output_dir=evaluation_dir)
 
