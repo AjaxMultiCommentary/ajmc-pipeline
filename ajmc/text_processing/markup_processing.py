@@ -1,5 +1,7 @@
-"""This module contains all the functions to read OCR- and OLR-output, for all the
-formats (json, hocr, page-XML...)"""
+"""
+This module contains all the functions to read OCR- and OLR-output, for all the
+formats (json, hocr, page-XML...)
+"""
 
 import bs4
 from ajmc.commons.geometry import Shape
