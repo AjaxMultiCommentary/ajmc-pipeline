@@ -1,8 +1,10 @@
-import argparse
+"""
+This is a legacy but functionnal code.
+"""
+import glob
 import json
 import os
-import sys
-from typing import Union, List, Dict
+from typing import Union, List, Dict, Optional
 from cassis import load_typesystem, Cas
 from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.commons.variables import PATHS
@@ -85,8 +87,7 @@ def compute_image_links(page: dict,
                         padding: int = 20,
                         iiif_endpoint: str = None,
                         iiif_links: Dict[str, str] = None,
-                        pct: bool = False,):
-
+                        pct: bool = False, ):
     image_links = []
 
     for line_coords, line_offsets in zip(page["bbox"]["lines"], page["offsets"]["lines"]):
@@ -154,111 +155,59 @@ def rebuilt_to_xmi(page: dict,  # todo 👁️ should this accept CommentaryPage
     cas.to_xmi(outfile_path, pretty_print=True)
 
 
-def create_default_pipeline_parser() -> argparse.ArgumentParser:
-    """Adds relative arguments to the parser"""
+def main(commentaries: List[Dict[str, str]],
+         make_jsons: bool,
+         make_xmis: bool,
+         json_dir: Optional[str] = None,
+         xmi_dir: Optional[str] = None,
+         region_types: Union[List[str], str] = 'all'):
+    """
+    Main function for the pipeline.
+    
+    Args:
+        commentaries: A list of dicts `{'commentary_id': 'ocr_run'}` linking to the commentaries to be processed.
+        json_dir: Absolute path to the directory in which to write the json files or take them from.
+        xmi_dir: Absolute path to the directory in which to write the xmi files.
+        make_jsons: Whether to create canonical jsons. If false, jsons are grepped from json_dir.
+        make_xmis: Whether to create xmis.
+        region_types: The desired regions to convert to xmis, eg `introduction, preface, commentary, footnote`.   
+    """
 
-    parser = argparse.ArgumentParser()
+    for commentary_id, ocr_run in commentaries:
 
-    parser.add_argument('--commentary_ids',
-                        nargs='+',
-                        type=list,
-                        required=False,
-                        help='The ids of commentary to be processed.')
+        # Create paths
+        ocr_dir = os.path.join(PATHS['base_dir'], commentary_id, PATHS['ocr'], ocr_run, 'outputs')
+        json_dir = json_dir if json_dir else os.path.join(PATHS['base_dir'], commentary_id, 'canonical', ocr_run)
+        xmi_dir = xmi_dir if xmi_dir else os.path.join(PATHS['base_dir'], commentary_id, 'ner/annotation', ocr_run)
 
-    parser.add_argument('--commentary_formats',
-                        nargs='+',
-                        type=list,
-                        required=False,
-                        help='The respective ocr format to process commentary in')
+        # Get the commentary
+        commentary = OcrCommentary.from_ajmc_structure(ocr_dir=ocr_dir)
 
-    parser.add_argument('--json_dir',
-                        type=str,
-                        required=False,
-                        help='Absolute path to the directory in which to write the json files')
+        if make_jsons and make_xmis:
+            os.makedirs(json_dir, exist_ok=True)
+            os.makedirs(xmi_dir, exist_ok=True)
 
-    parser.add_argument('--make_jsons',
-                        action='store_true',
-                        help='Whether to create canonical jsons')
-
-    parser.add_argument('--xmi_dir',
-                        type=str,
-                        required=False,
-                        help='Absolute path to the directory in which to write the xmi files')
-
-    parser.add_argument('--make_xmis',
-                        action='store_true',
-                        help='Whether to create xmis')
-
-    parser.add_argument('--region_types',
-                        nargs='+',
-                        type=list,
-                        help="""The desired regions to convert to xmis, 
-                        eg `introduction, preface, commentary, footnote`""")
-    return parser
-
-
-def initialize_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
-    """Parses args from command-line if available, else locally."""
-
-    # If called from cli
-    if sys.argv[0].endswith('cas_export.py') and len(sys.argv) > 1:
-        return parser.parse_args()
-
-    else:  # For testing, without cli
-        args = parser.parse_args([])
-        # args.commentary_ids = ['sophokle1v3soph', 'cu31924087948174', 'Wecklein1894']
-        # args.commentary_formats = ['pagexml'] * 3
-        args.commentary_ids = ['lestragdiesdeso00tourgoog']
-        args.commentary_formats = ['tesshocr']
-        args.region_types = ['introduction', 'preface', 'commentary', 'footnote']
-        args.make_xmis = True
-        args.xmi_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/lestragdiesdeso00tourgoog/ner/annotation/tesshocr'
-        args.json_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/lestragdiesdeso00tourgoog/canonical/tesshocr'
-        args.make_jsons = True
-
-        return args
-
-
-def main():
-    args = initialize_args(create_default_pipeline_parser())
-
-    for commentary_id, commentary_format in zip(args.commentary_ids, args.commentary_formats):
-
-        # Todo ⚠️ this is not a valid method anymore
-        commentary = OcrCommentary(commentary_id)
-
-        args.json_dir = os.path.join(PATHS['base_dir'], commentary_id, 'canonical', commentary_format)
-        os.makedirs(args.json_dir, exist_ok=True)
-
-        args.xmi_dir = os.path.join(PATHS['base_dir'], commentary_id, 'ner/annotation', commentary_format)
-        os.makedirs(args.xmi_dir, exist_ok=True)
-
-        if args.make_jsons and args.make_xmis:
             for page in commentary.children.pages:
                 logger.info('Processing page  ' + page.id)
-                page.to_json(output_dir=args.json_dir)
-                rebuild = basic_rebuild(page.to_canonical_v1(), args.region_types)
-                if len(rebuild['fulltext']) > 0:  # h andles the empty-page case
-                    rebuilt_to_xmi(rebuild, args.xmi_dir)
+                page.to_json(output_dir=json_dir)
+                rebuild = basic_rebuild(page.to_canonical_v1(), region_types)
+                if len(rebuild['fulltext']) > 0:  # handles the empty-page case
+                    rebuilt_to_xmi(rebuild, xmi_dir)
 
-        elif args.make_jsons:
+        elif make_jsons:
+            os.makedirs(json_dir, exist_ok=True)
             for page in commentary.children.pages:
                 logger.info('Canonizing page  ' + page.id)
-                page.to_json(output_dir=args.json_dir)
+                page.to_json(output_dir=json_dir)
 
+        elif make_xmis:
+            os.makedirs(xmi_dir, exist_ok=True)
 
-        elif args.make_xmis:
+            for filename in glob.glob(os.path.join(json_dir, '*.json')):
+                with open(os.path.join(json_dir, filename), 'r') as f:
+                    logger.info('Xmi-ing page  ' + page['id'])
+                    page = json.loads(f.read())  # Why can't this be done directly from commentary ?
 
-            for filename in os.listdir(args.json_dir):
-                logger.info('Xmi-ing page  ' + page.id)
-                if filename.endswith('.json'):
-                    with open(os.path.join(args.json_dir, filename), 'r') as f:
-                        page = json.loads(f.read())  # Why can't this be done directly from commentary ?
-
-                    rebuild = basic_rebuild(page, args.region_types)
-                    if len(rebuild['fulltext']) > 0:  # handles the empty-page case
-                        rebuilt_to_xmi(rebuild, args.xmi_dir, typesystem_path=PATHS['typesystem'])
-
-
-if __name__ == '__main__':
-    main()
+                rebuild = basic_rebuild(page, region_types)
+                if len(rebuild['fulltext']) > 0:  # handles the empty-page case
+                    rebuilt_to_xmi(rebuild, xmi_dir, typesystem_path=PATHS['typesystem'])
