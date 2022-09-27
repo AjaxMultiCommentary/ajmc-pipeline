@@ -10,7 +10,7 @@ PATHS = {
     'via_path': 'olr/via_project.json',
     'json': 'canonical',
     'xmi': 'ner/annotation',
-    'typesystem': 'data/TypeSystem.xml',
+    'typesystem': 'data/templates/TypeSystem.xml',
     'olr_initiation': 'olr/annotation/project_initiation',
     'ocr': 'ocr/runs',
     'canonical': 'canonical/v2'
