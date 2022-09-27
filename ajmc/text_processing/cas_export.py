@@ -212,11 +212,3 @@ def main(commentaries: List[Dict[str, str]],
                 rebuild = basic_rebuild(page, region_types)
                 if len(rebuild['fulltext']) > 0:  # handles the empty-page case
                     rebuilt_to_xmi(rebuild, xmi_dir, typesystem_path=PATHS['typesystem'])
-
-
-
-
-main({'sophoclesplaysa05campgoog': '248095_greek-english_porson_sophoclesplaysa05campgoog'},
-     make_jsons=True,
-     make_xmis=True,
-     region_types='all')
