@@ -155,6 +155,7 @@ def rebuilt_to_xmi(page: dict,  # todo 👁️ should this accept CommentaryPage
     cas.to_xmi(outfile_path, pretty_print=True)
 
 
+# todo 👁️ This should rely on ocr outputs dirs
 def main(commentaries: List[Dict[str, str]],
          make_jsons: bool,
          make_xmis: bool,
@@ -173,7 +174,7 @@ def main(commentaries: List[Dict[str, str]],
         region_types: The desired regions to convert to xmis, eg `introduction, preface, commentary, footnote`.   
     """
 
-    for commentary_id, ocr_run in commentaries:
+    for commentary_id, ocr_run in commentaries.items():
 
         # Create paths
         ocr_dir = os.path.join(PATHS['base_dir'], commentary_id, PATHS['ocr'], ocr_run, 'outputs')
@@ -211,3 +212,11 @@ def main(commentaries: List[Dict[str, str]],
                 rebuild = basic_rebuild(page, region_types)
                 if len(rebuild['fulltext']) > 0:  # handles the empty-page case
                     rebuilt_to_xmi(rebuild, xmi_dir, typesystem_path=PATHS['typesystem'])
+
+
+
+
+main({'sophoclesplaysa05campgoog': '248095_greek-english_porson_sophoclesplaysa05campgoog'},
+     make_jsons=True,
+     make_xmis=True,
+     region_types='all')
