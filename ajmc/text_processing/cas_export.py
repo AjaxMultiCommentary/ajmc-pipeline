@@ -4,6 +4,7 @@ This is a legacy but functionnal code.
 import glob
 import json
 import os
+from tqdm import tqdm
 from typing import Union, List, Dict, Optional
 from cassis import load_typesystem, Cas
 from ajmc.commons.miscellaneous import get_custom_logger
@@ -188,7 +189,7 @@ def main(commentaries: List[Dict[str, str]],
             os.makedirs(json_dir, exist_ok=True)
             os.makedirs(xmi_dir, exist_ok=True)
 
-            for page in commentary.children.pages:
+            for page in tqdm(commentary.children.pages, desc=f'Building jsons and xmis for {commentary_id}'):
                 logger.info('Processing page  ' + page.id)
                 page.to_json(output_dir=json_dir)
                 rebuild = basic_rebuild(page.to_canonical_v1(), region_types)
@@ -197,14 +198,14 @@ def main(commentaries: List[Dict[str, str]],
 
         elif make_jsons:
             os.makedirs(json_dir, exist_ok=True)
-            for page in commentary.children.pages:
+            for page in tqdm(commentary.children.pages, desc=f'Creating jsons for {commentary_id}'):
                 logger.info('Canonizing page  ' + page.id)
                 page.to_json(output_dir=json_dir)
 
         elif make_xmis:
             os.makedirs(xmi_dir, exist_ok=True)
 
-            for filename in glob.glob(os.path.join(json_dir, '*.json')):
+            for filename in tqdm(glob.glob(os.path.join(json_dir, '*.json')), desc=f'Building xmis for {commentary_id}'):
                 with open(os.path.join(json_dir, filename), 'r') as f:
                     logger.info('Xmi-ing page  ' + page['id'])
                     page = json.loads(f.read())  # Why can't this be done directly from commentary ?
