@@ -29,6 +29,7 @@ from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
 
+
 @docstring_formatter(**docstrings)
 def detect_regions(img_path: str,
                    output_dir: str,
@@ -105,9 +106,9 @@ def detect_regions(img_path: str,
 
         for c in dilated_contours_shrinked:
             shrinked_bbox = cv2.rectangle(copy,
-                                               (c.bbox[0][0], c.bbox[0][1]),
-                                               (c.bbox[1][0], c.bbox[1][1]),
-                                               (0, 0, 255), 4)
+                                          (c.bbox[0][0], c.bbox[0][1]),
+                                          (c.bbox[1][0], c.bbox[1][1]),
+                                          (0, 0, 255), 4)
 
         cv2.imwrite(os.path.join(output_dir, img_name), copy)
 

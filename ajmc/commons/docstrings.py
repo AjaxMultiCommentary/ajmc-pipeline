@@ -64,7 +64,7 @@ docstrings['custom_dataset'] = """A dataset inheriting from `torch.utils.data.Da
 
 docstrings['dilation_kernel_size'] = """Dilation kernel size, preferably an odd number. Tweak
                         this parameter and `dilation_iterations` to improve
-                        automatic boxing."""
+                        automatic boxing. Starting with 25 is recommended."""
 
 docstrings['dilation_iterations'] = 'Number of iterations in dilation, default 1'
 
