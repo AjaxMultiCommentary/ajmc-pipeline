@@ -43,7 +43,7 @@ def test_get_path_from_id():
 def test_parse_ocr_path():
     path = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/2480ei_greek-english_porson_sophoclesplaysa05campgoog/outputs'
     base, commentary_id, ocr_run = utils.parse_ocr_path(path)
-    assert base == '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174'
+    assert base == '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data'
     assert commentary_id == 'cu31924087948174'
     assert ocr_run == '2480ei_greek-english_porson_sophoclesplaysa05campgoog'
 

@@ -63,7 +63,7 @@ from transformers import DistilBertTokenizerFast
 
 sample_ner_labels_pred = ['O', 'B-PERS', 'I-PERS', 'B-LOC', 'O']
 sample_ner_labels_gt = ['O', 'B-PERS', 'I-PERS', 'B-LOC', 'I-LOC']
-
+sample_labels_to_ids = {'O': 0, 'B-PERS': 1, 'I-PERS': 2, 'B-LOC': 3, 'I-LOC': 4}
 sample_seqeval_output = seqeval_evaluation([sample_ner_labels_pred],
                                            [sample_ner_labels_gt])
 

@@ -84,7 +84,7 @@ def test_ocrpage():
     assert all([isinstance(w, ocr_classes.OcrWord) for w in page.children.words])
 
     # Validate page.json
-    with open(os.path.join('../..', variables.PATHS['schema']), 'r') as file:
+    with open(os.path.join('..', variables.PATHS['schema']), 'r') as file:
         schema = json.loads(file.read())
 
     jsonschema.validate(instance=page.to_canonical_v1(), schema=schema)
