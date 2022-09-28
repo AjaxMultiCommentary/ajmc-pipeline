@@ -21,7 +21,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 
 from ajmc.ocr.evaluation.evaluation_methods import commentary_evaluation
 from ajmc.text_processing.ocr_classes import OcrCommentary
-from ajmc.ocr.preprocess import toolbox
+from ajmc.ocr.preprocessing import image_preprocessing
 
 # Data dir with whole images
 RAW_DATA_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/'

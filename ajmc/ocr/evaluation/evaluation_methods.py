@@ -30,10 +30,11 @@ def bag_of_word_evaluation(gt_bag: List[str],
     Args:
         gt_bag: The list of groundtruth words
         pred_bag: The list of ocr-predicted words
-        error_counts: A dict with results (pass it if you want to evaluate multiple pages
+        error_counts: A dict with results (pass it if you want to evaluate multiple pages)
 
     Returns:
-        float: The caracter-error rate"""
+        Error statistics (dict)
+    """
 
     if not error_counts:
         error_counts = {'gt_words': 0, 'pred_words': 0, 'true_words': 0,
@@ -80,7 +81,7 @@ def simple_coordinates_based_evaluation(gt_words: List['OcrWord'],
                                         overlap_threshold: float = 0.8) -> float:
     """Computes edit distance between spacially overlapping words and returns the CER.
 
-     Simple means that this method does NOT deal with word-boxes related issues. It only evaluates gt-words which
+     "Simple" means that this method does NOT deal with word-boxes related issues. It only evaluates gt-words which
      overlap to `overlap_threshold` with a predicted word and vice-versa. If no predicted word is found
      (e.g. with crummy groundtruth- or preds-boxes), the word is left out and not counted in the final result.
 
@@ -281,8 +282,3 @@ def evaluate_all():
     # weright average to get the general results
 
     raise NotImplementedError
-#
-# commentary = OcrCommentary('cu31924087948174',
-#                         '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/tess_eng_grc/outputs')
-# commentary_evaluation(commentary=commentary, )
-#

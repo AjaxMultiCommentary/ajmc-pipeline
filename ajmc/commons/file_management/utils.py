@@ -136,3 +136,13 @@ def move_files_in_each_commentary_dir(relative_src: str,
 def create_folder_in_each_commentary_dir(relative_dir_path:str):
     for dir_name in next(os.walk(PATHS['base_dir']))[1]:
         os.makedirs(os.path.join(PATHS['base_dir'], dir_name, relative_dir_path), exist_ok=True)
+
+
+def merge_subdirectories(parent_dir: str, destination_dir: str):
+    """Recursive function to merge the content of all sub-directories in `parent_dir` into one"""
+    os.makedirs(destination_dir, exist_ok=True)
+    for root, dirs, files in os.walk(parent_dir):
+        for file in files:
+            shutil.copy(os.path.join(root, file), destination_dir)
+        for dir_ in dirs:
+            merge_subdirectories(os.path.join(root, dir_), destination_dir)

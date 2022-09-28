@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 
 from ajmc.ocr.run.run_tesseract import PARENT_DIR, RAW_COMMENTARY_DIRS, TRAIN_COMMENTARY_DIRS, TESSDATA_DIR, TESSDATA_BEST_DIR, POGRETRA_COMMENTARY_DIRS, POGRETRA_DATA_DIR
 from ajmc.ocr.run.run_tesseract import get_fig_name, test_ocr, train, get_fig_idxs, show_fig, batch_ocr, train, clean_data_tesstrain, check_missing_gt, clean_gt_folder, test_ocr_raw, evaluate_model, check_dataset_size, get_commentary_dir
-from ajmc.ocr.preprocess import toolbox
+from ajmc.ocr.preprocessing import image_preprocessing
 
 mode="pogretra"
 

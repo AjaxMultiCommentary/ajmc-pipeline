@@ -24,29 +24,32 @@ def test_bag_of_word_evaluation():
 
 # Deactivated for now
 
-# def test_coord_based_page_evaluation():
-#     base_dir = '/Users/sven/packages/ajmc/'
-#
-#     comm = OcrCommentary.from_ajmc_structure(os.path.join(so.sample_base_dir, )
-#     gt_page = OcrPage(ocr_path=base_dir + 'data/ocr/evaluation_test/gt_sophoclesplaysa05campgoog_0146.html',
-#                       id='sophoclesplaysa05campgoog_0146',
-#                       image_path=base_dir+'data/ocr/evaluation_test/sophoclesplaysa05campgoog_0146.png',
-#                       via_path=base_dir+'data/ocr/evaluation_test/via_project.json')
-#     test_page = OcrPage(ocr_path=base_dir + 'data/ocr/evaluation_test/test_sophoclesplaysa05campgoog_0146.html',
-#                         id='sophoclesplaysa05campgoog_0146',
-#                         image_path=base_dir+'data/ocr/evaluation_test/sophoclesplaysa05campgoog_0146.png',
-#                         via_path=base_dir+'data/ocr/evaluation_test/via_project.json')
-#
-#     editops, error_counts, _ = coord_based_page_evaluation(gt_page=gt_page, pred_page=test_page)
-#
-#     assert error_counts['global']['words']['total'] == 548
-#     assert error_counts['global']['words']['false'] == 25
-#     assert error_counts['global']['words']['cr'] == 1 - 25 / 548
-#
-#     assert error_counts['global']['chars']['total'] == 2518
-#     assert error_counts['global']['chars']['false'] == 37
-#     assert error_counts['global']['chars']['cr'] == 1 - 37 / 2518
-#
-#     assert error_counts['global']['greek']['false'] == 18  # 21 - 3 insertion of greek chars in latin words ;-)
-#     assert error_counts['global']['latin']['false'] == 12
-#     assert error_counts['global']['numbers']['false'] == 6
+def test_coord_based_page_evaluation():
+    base_dir = '/Users/sven/packages/ajmc/'
+
+    # We first create a commentary because via is accessed via the commentary
+    comm = OcrCommentary(via_path=base_dir+'data/ocr/evaluation_test/via_project.json')
+
+    gt_page = OcrPage(ocr_path=base_dir + 'data/ocr/evaluation_test/gt_sophoclesplaysa05campgoog_0146.html',
+                      id='sophoclesplaysa05campgoog_0146',
+                      image_path=base_dir+'data/ocr/evaluation_test/sophoclesplaysa05campgoog_0146.png',
+                      commentary=comm)
+
+    test_page = OcrPage(ocr_path=base_dir + 'data/ocr/evaluation_test/test_sophoclesplaysa05campgoog_0146.html',
+                        id='sophoclesplaysa05campgoog_0146',
+                        image_path=base_dir+'data/ocr/evaluation_test/sophoclesplaysa05campgoog_0146.png',
+                        commentary=comm)
+
+    editops, error_counts, _ = coord_based_page_evaluation(gt_page=gt_page, pred_page=test_page)
+
+    assert error_counts['global']['words']['total'] == 548
+    assert error_counts['global']['words']['false'] == 25
+    assert error_counts['global']['words']['cr'] == 1 - 25 / 548
+
+    assert error_counts['global']['chars']['total'] == 2518
+    assert error_counts['global']['chars']['false'] == 37
+    assert error_counts['global']['chars']['cr'] == 1 - 37 / 2518
+
+    assert error_counts['global']['greek']['false'] == 18  # 21 - 3 insertion of greek chars in latin words ;-)
+    assert error_counts['global']['latin']['false'] == 12
+    assert error_counts['global']['numbers']['false'] == 6

@@ -170,3 +170,14 @@ def remove_artifacts_from_contours(contours: List[Shape],
     logger.info(f"""Removed {len(contours) - len(contours_)} artifacts""")
 
     return contours_
+
+
+def resize_image(img: np.ndarray,
+                 target_height) -> np.ndarray:
+    """Resize image to target height while maintaining aspect ratio."""
+
+    scale_percent = target_height / img.shape[0]  # percent of original size
+    target_width = int(img.shape[1] * scale_percent)
+    dim = target_width, target_height
+
+    return cv2.resize(src=img, dsize=dim, interpolation=cv2.INTER_AREA)
