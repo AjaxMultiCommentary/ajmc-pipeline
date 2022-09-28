@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from ajmc.commons.geometry import is_bbox_within_bbox_with_threshold
 from ajmc.nlp.token_classification.evaluation import seqeval_evaluation, seqeval_to_df
-from ajmc.olr.layout_lm.config import create_olr_config
+from ajmc.olr.layoutlm.layoutlm import create_olr_config
 from ajmc.olr.yolo.utils import parse_yolo_txt_line
 
 from ajmc.text_processing.canonical_classes import CanonicalCommentary

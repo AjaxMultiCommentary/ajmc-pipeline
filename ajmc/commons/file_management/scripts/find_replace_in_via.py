@@ -1,6 +1,6 @@
 """Use this script to replace a text in all via-files."""
 import os
-from ajmc.commons.miscellaneous import walk_dirs
+from ajmc.commons.file_management.utils import walk_dirs
 from ajmc.commons.variables import PATHS
 
 old_pattern = ''

@@ -6,13 +6,13 @@ import PIL
 from mean_average_precision import MetricBuilder
 
 from ajmc.commons.geometry import Shape, is_bbox_within_bbox
-from ajmc.commons.miscellaneous import walk_dirs, get_olr_splits_page_ids
-from ajmc.olr.layout_lm.draw import draw_page_labels, draw_caption
+from ajmc.commons.file_management.utils import walk_dirs
+from ajmc.olr.utils import get_olr_splits_page_ids
+from ajmc.olr.layoutlm.draw import draw_page_labels, draw_caption
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor, \
     RobertaTokenizerFast, RobertaForTokenClassification
-from ajmc.olr.layout_lm.config import create_olr_config
-from ajmc.olr.layout_lm.layoutlm import align_predicted_page
+from ajmc.olr.layoutlm.layoutlm import align_predicted_page, create_olr_config
 from ajmc.commons.variables import PATHS, COLORS
 from ajmc.olr.map_utils import metrics_abbrev, initialize_general_results, update_general_results
 

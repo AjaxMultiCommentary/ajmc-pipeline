@@ -1,12 +1,13 @@
 import json
 import os
 import random
-
 from ajmc.commons.docstrings import docstrings, docstring_formatter
 from typing import List, Optional, Dict, Union, Tuple
-from ajmc.commons.miscellaneous import BoxType, get_olr_splits_page_ids
+from ajmc.commons.miscellaneous import BoxType
+from ajmc.olr.utils import get_olr_splits_page_ids
+from ajmc.nlp.token_classification.config import parse_config_from_json
 from ajmc.nlp.token_classification.pipeline import train
-from ajmc.commons.variables import COLORS, PATHS
+from ajmc.commons.variables import COLORS, PATHS, ORDERED_OLR_REGION_TYPES
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset, \
     align_labels_to_tokenized
 from ajmc.nlp.token_classification.model import predict_dataset
@@ -33,6 +34,24 @@ else:
 
 ROBERTA_MODEL_INPUTS = ['input_ids', 'attention_mask']
 
+
+def create_olr_config(json_path: str,
+                      prefix: str):
+
+    config = parse_config_from_json(json_path=json_path)
+
+    for set_, data_list in config['data'].items():
+        for dict_ in data_list:
+            dict_['path'] = os.path.join(prefix, dict_['id'], PATHS['canonical'], dict_['run']+'.json')
+
+    config['rois'] = [rt for rt in ORDERED_OLR_REGION_TYPES if rt not in config['excluded_region_types']]
+    config['labels_to_ids'] = {l: i for i, l in enumerate(sorted(set(config['region_types_to_labels'].values())))}
+    config['ids_to_labels'] = {l: i for i, l in config['labels_to_ids'].items()}
+    config['num_labels'] = len(list(config['labels_to_ids'].keys()))
+    if 'sampling' not in config.keys():
+        config['sampling'] = None
+
+    return config
 
 # Functions
 def normalize_bounding_box(bbox: BoxType, img_width: int, img_height: int, ):
@@ -265,7 +284,7 @@ def draw_pages(pages,
                unknownify_tokens: bool = False,
                text_only: bool = False,
                ):
-    from ajmc.olr.layout_lm.draw import draw_page_labels, draw_caption
+    from ajmc.olr.layoutlm.draw import draw_page_labels, draw_caption
 
     labels_to_colors = {l: c + tuple([127]) for l, c in
                         zip(labels_to_ids.keys(), list(COLORS['distinct'].values()) + list(COLORS['hues'].values()))}
@@ -352,9 +371,8 @@ def main(config):
                    text_only=config['text_only'])
 
 
-if __name__ == '__main__':
-    from ajmc.olr.layout_lm.config import create_olr_config
 
+if __name__ == '__main__':
     config = create_olr_config(
         # json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json',
         json_path='/Users/sven/packages/ajmc/data/layoutlm/configs/1E_jebb_text_only.json',

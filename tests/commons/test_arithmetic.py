@@ -22,3 +22,8 @@ def test_are_intervals_within_intervals():
                                                  so.sample_interval_lists['base'])
     assert not ar.are_intervals_within_intervals(so.sample_interval_lists['non_overlapping'],
                                                  so.sample_interval_lists['base'])
+
+
+def test_safe_divide():
+    assert ar.safe_divide(1, 1) == 1
+    assert ar.safe_divide(1, 0) == float('nan')

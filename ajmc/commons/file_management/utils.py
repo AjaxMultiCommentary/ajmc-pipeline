@@ -4,10 +4,10 @@ import os
 import shutil
 from string import ascii_letters
 from datetime import datetime
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 from ajmc.commons import variables
-from ajmc.commons.miscellaneous import get_custom_logger, walk_dirs
+from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.commons.variables import PATHS
 
 logger = get_custom_logger(__name__)
@@ -146,3 +146,11 @@ def merge_subdirectories(parent_dir: str, destination_dir: str):
             shutil.copy(os.path.join(root, file), destination_dir)
         for dir_ in dirs:
             merge_subdirectories(os.path.join(root, dir_), destination_dir)
+
+
+def walk_dirs(path: str, prepend_base: bool = False) -> List[str]:
+    """Walks over the dirs in path."""
+    if prepend_base:
+        return [os.path.join(path, dir_) for dir_ in sorted(next(os.walk(path))[1])]
+    else:
+        return sorted(next(os.walk(path))[1])

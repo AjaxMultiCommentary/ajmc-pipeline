@@ -8,7 +8,7 @@ import yaml
 import numpy as np
 from mean_average_precision import MetricBuilder
 
-from ajmc.commons.miscellaneous import walk_dirs
+from ajmc.commons.file_management.utils import walk_dirs
 from ajmc.olr.map_utils import initialize_general_results, update_general_results
 from ajmc.olr.yolo.utils import parse_yolo_txt
 

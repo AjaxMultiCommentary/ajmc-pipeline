@@ -2,8 +2,13 @@ from ajmc.commons import variables
 from ajmc.commons.file_management import utils
 import os
 from tests import sample_objects as so
+import time
 
 def test_get_62_based_datecode():
+    #make the computer wait for 1 second to make sure the datecode is different
+    a = utils.get_62_based_datecode()
+    time.sleep(1)
+    assert a != utils.get_62_based_datecode()
     assert len(utils.get_62_based_datecode()) == 6
 
 
@@ -33,3 +38,14 @@ def test_verify_path_integrity():
 def test_get_path_from_id():
     assert utils.get_path_from_id(so.sample_page_id, so.sample_image_dir) == os.path.join(so.sample_image_dir, so.sample_page_id + '.png')
     assert not utils.get_path_from_id(so.sample_page_id.split('_')[0] + '_9999', so.sample_image_dir)
+
+
+def test_parse_ocr_path():
+    path = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/2480ei_greek-english_porson_sophoclesplaysa05campgoog/outputs'
+    base, commentary_id, ocr_run = utils.parse_ocr_path(path)
+    assert base == '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174'
+    assert commentary_id == 'cu31924087948174'
+    assert ocr_run == '2480ei_greek-english_porson_sophoclesplaysa05campgoog'
+
+
+

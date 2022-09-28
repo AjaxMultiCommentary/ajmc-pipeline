@@ -1,16 +1,12 @@
 """Miscellaneous helpers and utilities."""
 import inspect
-import os
-from abc import abstractmethod
 from functools import wraps
 import json
 import logging
 import timeit
-from typing import List, Tuple, Iterable, Generator, Optional, Callable
+from typing import List, Tuple, Iterable, Generator, Callable, Type
 import pandas as pd
 from jsonschema import Draft6Validator
-
-from ajmc.commons import variables
 
 BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 
@@ -35,17 +31,17 @@ def timer(iterations: int = 3, number: int = 1_000):
     return timer_decorator
 
 
-def recursive_iterator(iterable: Iterable, iterable_types: Tuple[Iterable] = (list, tuple)) -> Generator:
+def recursive_iterator(iterable: Iterable, iterable_types: Iterable[Type[Iterable]] = (list, tuple)) -> Generator:
     """Iterates recursively through an iterable potentially containing iterables of `iterable_types`."""
     for x in iterable:
-        if isinstance(x, iterable_types):
+        if any([isinstance(x, iterable_type) for iterable_type in iterable_types]):
             for y in recursive_iterator(x):
                 yield y
         else:
             yield x
 
 
-def get_unique_elements(iterable: Iterable, iterable_types: Tuple[Iterable] = (list, tuple)) -> List[str]:
+def get_unique_elements(iterable: Iterable, iterable_types: Iterable[Type[Iterable]] = (list, tuple)) -> List[str]:
     """Get the list of elements from any potentially recursive iterable."""
     return list(set([l for l in recursive_iterator(iterable, iterable_types)]))
 
@@ -88,13 +84,19 @@ def read_google_sheet(sheet_id: str, sheet_name: str, **kwargs) -> pd.DataFrame:
     return pd.read_csv(url, **kwargs)
 
 
-def split_list(list_: list, n: int, pad: object) -> List[List[object]]:
-    """Divides a list into a list of lists with n elements, padding the last chunk with `pad`."""
+def split_list(list_: list, n: int, pad: object= False) -> List[List[object]]:
+    """Divides a list into lists with n elements, pads the last chunk with `pad` if the latter is not `False`.
+
+    Args:
+        list_: the list to split
+        n: the number of elements in each chunk
+        pad: the object to pad the last chunk with. If `False`, no padding is performed.
+    """
     chunks = []
     for x in range(0, len(list_), n):
         chunk = list_[x: n + x]
 
-        if len(chunk) < n:
+        if len(chunk) < n and pad is not False:
             chunk += [pad for _ in range(n - len(chunk))]
 
         chunks.append(chunk)
@@ -245,7 +247,7 @@ def lazy_init(func):
     return wrapper
 
 
-def lazy_attributer(attr_name, func, attr_decorator=lambda x: x):
+def lazy_attributer(attr_name: str, func: Callable, attr_decorator: Callable=lambda x: x):
     """Parametrized decorator returning a decorator which adds the attribute of
     name `attr_name` and of value `func` to the `class_` it decorizes.
 
@@ -273,29 +275,6 @@ def lazy_attributer(attr_name, func, attr_decorator=lambda x: x):
         return class_
 
     return set_attribute
-
-
-def walk_dirs(path: str, prepend_base: bool = False) -> List[str]:
-    """Walks over the dirs in path."""
-    if prepend_base:
-        return [os.path.join(path, dir_) for dir_ in sorted(next(os.walk(path))[1])]
-    else:
-        return sorted(next(os.walk(path))[1])
-
-
-def get_olr_splits_page_ids(commentary_id: 'OcrCommentary',
-                            splits: Optional[List[str]] = None) -> List[str]:
-    """Gets the data from splits on the olr_gt sheet."""
-
-    olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
-    if splits is not None:
-        filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
-                   range(len(olr_gt['page_id']))]
-    else:
-        filter_ = [(olr_gt['commentary_id'][i] == commentary_id) for i in
-                   range(len(olr_gt['page_id']))]
-
-    return list(olr_gt['page_id'][filter_])
 
 
 class LazyObject:

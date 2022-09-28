@@ -5,6 +5,7 @@ import tests.sample_objects as so
 points = so.sample_points
 bboxes = so.sample_bboxes
 
+
 def test_shape():
     shape = geo.Shape(points['base'])
     # Test `width` and `height` attributes
@@ -43,7 +44,8 @@ def test_are_bboxes_overlapping():
 def test_compute_bbox_area():
     assert geo.compute_bbox_area(bboxes['base']) == 9
 
-def test_measure_overlap_area():
+
+def test_compute_bbox_overlap_area():
     # Test with an overlapping and a non-overlapping bbox
     assert geo.compute_bbox_overlap_area(bboxes['base'], bboxes['included']) == 4
     assert geo.compute_bbox_overlap_area(bboxes['base'], bboxes['base']) == 9
@@ -57,12 +59,14 @@ def test_is_bbox_within_bbox_with_threshold():
     # Test with non overlapping bboxes
     assert not geo.is_bbox_within_bbox_with_threshold(bboxes['base'], bboxes['non_overlapping'], 0.1)
 
+
 def test_are_bboxes_overlapping_with_threshold():
     assert geo.are_bboxes_overlapping_with_threshold(bboxes['base'], bboxes['overlapping'], 4 / 14)
     assert not geo.are_bboxes_overlapping_with_threshold(bboxes['base'], bboxes['overlapping'], 5 / 14)
     assert not geo.are_bboxes_overlapping_with_threshold(bboxes['base'], bboxes['non_overlapping'], 0.1)
 
-def test_shrink_to_included_contours():
+
+def test_adjust_bbox_to_included_contours():
     # Make sure it takes only horizontally overlappping shapes
     contours_1 = [geo.Shape(points[k]) for k in ['base', 'overlapping', 'horizontally_overlapping']]
     contours_2 = [geo.Shape(points[k]) for k in ['base', 'horizontally_overlapping']]
