@@ -7,8 +7,9 @@
 
 import csv
 import os
-from typing import List, Dict, Tuple, Union, Optional
 import Levenshtein
+from tqdm import tqdm
+from typing import List, Dict, Tuple, Union, Optional
 from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import is_bbox_within_bbox, are_bboxes_overlapping_with_threshold
@@ -76,8 +77,8 @@ def bag_of_word_evaluation(gt_bag: List[str],
     return error_counts
 
 
-def simple_coordinates_based_evaluation(gt_words: List['OcrWord'],
-                                        pred_words: List['OcrWord'],
+def simple_coordinates_based_evaluation(gt_words: List[Union['CanonicalWord','OcrWord']],
+                                        pred_words: List[Union['CanonicalWord','OcrWord']],
                                         overlap_threshold: float = 0.8) -> float:
     """Computes edit distance between spacially overlapping words and returns the CER.
 
@@ -86,8 +87,8 @@ def simple_coordinates_based_evaluation(gt_words: List['OcrWord'],
      (e.g. with crummy groundtruth- or preds-boxes), the word is left out and not counted in the final result.
 
      Args:
-         gt_words: The list of gt words (e.g. `OcrPage.children.words` or `OlrRegion.children.words`)
-         pred_words: The list of ocr words (e.g. `OcrPage.children.words` or `OlrRegion.children.words`)
+         gt_words: The list of ground truth words (e.g. coming from `OcrPage.children.words`)
+         pred_words: The list of predicted words (e.g. coming from `OcrPage.children.words`)
          overlap_threshold: The minimal overlap-proportion.
 
      Returns:
@@ -237,7 +238,7 @@ def commentary_evaluation(commentary: 'OcrCommentary',
     bow_error_counts, coord_error_counts, editops = None, None, None
     soups = []
 
-    for gt_page in commentary.ocr_groundtruth_pages:
+    for gt_page in tqdm(commentary.ocr_groundtruth_pages, desc='Evaluating commentary pages'):
         pred_page = [p for p in commentary.children.pages if p.id == gt_page.id][0]
 
         bow_error_counts = bag_of_word_evaluation(gt_bag=[w.text for w in gt_page.children.words],
@@ -273,12 +274,3 @@ def commentary_evaluation(commentary: 'OcrCommentary',
         write_error_counts(bow_error_counts, coord_error_counts, output_dir)
 
     return bow_error_counts, coord_error_counts, editops
-
-
-def evaluate_all():
-    """Evaluate all commentaries and runs"""
-    # a single ocr models output for all commentaries
-    # do the evaluate on each of the models outputs
-    # weright average to get the general results
-
-    raise NotImplementedError
