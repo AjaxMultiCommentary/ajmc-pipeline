@@ -27,11 +27,30 @@ class TextContainer:
                 setattr(self, k, v)
 
     @abstractmethod
+    @docstring_formatter(**docstrings)
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
+        """Gets the children of `self` which are of the given `children_type`.
+
+        Args:
+            children_type: {children_type}
+
+        Returns:
+            A list of children.
+        """
         pass
 
     @abstractmethod
+    @docstring_formatter(**docstrings)
     def _get_parent(self, parent_type) -> Optional[Type['TextContainer']]:
+        """Gets the `TextContainer` of type `parent_type` which has self as a child.
+
+        Note:
+            Unlike `_get_children`, `get_parent` returns a single text container and not lists of
+            text containers, as each text container can only have one parent.
+
+        Args:
+            parent_type: {parent_type}
+        """
         pass
 
     @lazy_property
@@ -81,6 +100,12 @@ class CanonicalCommentary(TextContainer):
 
     @classmethod
     def from_json(cls, json_path: str):
+        """Instantiate a `CanonicalCommentary` from a json file.
+
+        Args:
+            json_path: The path to a canonical/v2 json file containing a commentary and respecting the
+            ajmc folder structure.
+        """
 
         with open(json_path, "r") as file:
             logger.info(f'Importing canonical commentary from {json_path}')
@@ -177,12 +202,6 @@ class CanonicalTextContainer(TextContainer):
                 and self.id != tc.id]
 
     def _get_parent(self, parent_type: str) -> Optional[Type['CanonicalTextContainer']]:
-        """Fetches the `TextContainers` in the parent commentary  in which `self.text_container` is included.
-
-        Note:
-            Unlike `_get_children`, `get_parent` returns a single text container and not lists of
-            text containers, as each text container can only have one parent.
-        """
         if parent_type not in ['line', 'region', 'page', 'commentary']:
             raise ValueError(f'`parent_type` must be one of line, region, page, commentary, not {parent_type}')
 

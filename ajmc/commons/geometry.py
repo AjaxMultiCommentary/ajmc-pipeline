@@ -3,31 +3,28 @@ import numpy as np
 
 from ajmc.commons.arithmetic import compute_interval_overlap
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.miscellaneous import lazy_property, BoxType
+from ajmc.commons.miscellaneous import lazy_property
+from ajmc.commons.variables import BoxType
 
 
 class Shape:
     """The basic class for contours, bounding boxes and coordinates.
 
-    `Shape` objects can be instanciated directly from points. Other constructors are `Shape.from_numpy_array()`, `Shape.from_center_w_h()`
-    and `Shape.from_xywh()`. Notice that default constructor expects an iterable of x-y points, like
-    `[[x:int,y:int], ...]`.
-
-    Attributes:
-
-        points (Iterable[Iterable[int]]): a list of list of x,y-points `[[x:int,y:int], ...]`
-
+    `Shape` objects can be instanciated directly from points. Other constructors are `Shape.from_numpy_array()`,
+    `Shape.from_center_w_h()`and `Shape.from_xywh()`.
     """
 
+    @docstring_formatter(**docstrings)
     def __init__(self, points: Iterable[Iterable[int]] = None):
         """Default constructor.
         
         Args:
-            points: an iterable of iterable of points such as `[[int,int], ...]` or `[(int,int), ...]`.
+            points: {points}
         """
         self.points = points
 
     @classmethod
+    @docstring_formatter(**docstrings)
     def from_numpy_array(cls, points: np.ndarray):
         """Creates a Shape from a numpy array of points.
 
@@ -48,18 +45,21 @@ class Shape:
 
     @classmethod
     def from_center_w_h(cls, center_x: int, center_y: int, w: int, h: int):
+        """Creates a Shape from `center_x`, `center_y`, `w`, `h`, where `center_x` and `center_y` are the coordinates
+        of the center and `w` and `h` represent width and height respectively."""
         x = center_x - int(w / 2)
         y = center_y - int(h / 2)
         return cls.from_xywh(x, y, w, h)
 
     @lazy_property
     @docstring_formatter(**docstrings)
-    def bbox(self) -> Tuple[Tuple[int, int], Tuple[int, int]]:
+    def bbox(self) -> BoxType:
         """{bbox}"""
         return get_bbox_from_points(self.points)
 
     @lazy_property
     def xyxy(self) -> Tuple[int, int, int, int]:
+        """Returns the coordinates of the upper left corner and the lower right corner of the bounding box."""
         return self.bbox[0][0], self.bbox[0][1], self.bbox[1][0], self.bbox[1][1]
 
     @lazy_property
@@ -86,7 +86,7 @@ class Shape:
 
 
 @docstring_formatter(**docstrings)
-def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> Tuple[Tuple[int, int], Tuple[int, int]]:
+def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> BoxType:
     """Gets the bounding box (i.e. the minimal rectangle containing all points) from a sequence of x-y points.
 
     Args:

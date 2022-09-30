@@ -1,9 +1,9 @@
-"""Contains all the necessary utils for the management of spreadsheets."""
+"""This module contains utils for the management of spreadsheets."""
 
 import json
 import os
 from typing import List, Tuple, Set
-from ajmc.commons.variables import SPREADSHEETS_IDS
+from ajmc.commons.variables import SPREADSHEETS
 from ajmc.commons.miscellaneous import get_custom_logger, read_google_sheet
 from ajmc.commons import docstrings, variables
 
@@ -37,9 +37,11 @@ def check_via_spreadsheet_conformity(via_project: dict,
 
     for v in via_project['_via_img_metadata'].values():
 
+        # If the page has annotations which are neither commentary nor undefined, append to full pages
         if any([r['region_attributes']['text'] not in ['commentary', 'undefined'] for r in v['regions']]):
             via_full_gt_pages.append(v['filename'].split('.')[0])
 
+        # if the page has only commentary or undefined annotations, append to commentary pages
         elif all([r['region_attributes']['text'] in ['commentary', 'undefined'] for r in v['regions']]) and \
                 any([r['region_attributes']['text'] in ['commentary'] for r in v['regions']]):
             via_comm_gt_pages.append(v['filename'].split('.')[0])
@@ -64,9 +66,15 @@ def check_via_spreadsheet_conformity(via_project: dict,
     return diff_sheet_via, diff_via_sheet
 
 
-def check_entire_via_spreadsheets_conformity(sheet_id:str = SPREADSHEETS_IDS['olr_gt'],
-                                             sheet_name:str = 'olr_gt'):
-    """Applies `check_via_spreadsheet_conformity` to an entire spreadsheet with multiple commentaries."""
+@docstrings.docstring_formatter(**docstrings.docstrings)
+def check_all_via_spreadsheets_conformity(sheet_id: str = SPREADSHEETS['olr_gt'],
+                                          sheet_name: str = 'olr_gt'):
+    """Applies `check_via_spreadsheet_conformity` to an entire spreadsheet with multiple commentaries.
+
+    Args:
+        sheet_id: {sheet_id}
+        sheet_name: {sheet_name}
+    """
 
     df = read_google_sheet(sheet_id=sheet_id, sheet_name=sheet_name)
     differences = {}
@@ -82,4 +90,3 @@ def check_entire_via_spreadsheets_conformity(sheet_id:str = SPREADSHEETS_IDS['ol
     if not any([s for t in differences.values() for s in t]):
         logger.info("""Checking passed, sheet is conform with vias.""")
     return differences
-

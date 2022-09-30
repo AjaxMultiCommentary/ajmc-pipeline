@@ -4,6 +4,11 @@ import os
 from tests import sample_objects as so
 import time
 
+def test_int_to_x_based_code():
+    assert utils.int_to_x_based_code(0, 62) == '0'
+    assert utils.int_to_x_based_code(64, 62) == '12'
+    assert utils.int_to_x_based_code(3, base=62, fixed_min_len=3) == '003'
+
 def test_get_62_based_datecode():
     #make the computer wait for 1 second to make sure the datecode is different
     a = utils.get_62_based_datecode()
@@ -36,8 +41,8 @@ def test_verify_path_integrity():
 
 
 def test_get_path_from_id():
-    assert utils.get_path_from_id(so.sample_page_id, so.sample_image_dir) == os.path.join(so.sample_image_dir, so.sample_page_id + '.png')
-    assert not utils.get_path_from_id(so.sample_page_id.split('_')[0] + '_9999', so.sample_image_dir)
+    assert utils.find_file_by_name(so.sample_page_id, so.sample_image_dir) == os.path.join(so.sample_image_dir, so.sample_page_id + '.png')
+    assert not utils.find_file_by_name(so.sample_page_id.split('_')[0] + '_9999', so.sample_image_dir)
 
 
 def test_parse_ocr_path():

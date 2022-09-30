@@ -1,4 +1,8 @@
 import re
+from typing import Tuple
+
+# Custom types
+BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 
 PATHS = {
     'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
@@ -28,7 +32,7 @@ FOLDER_STRUCTURE_PATHS = {
 }
 
 # Sheet names corresponds to the dictionary's keys
-SPREADSHEETS_IDS = {
+SPREADSHEETS = {
     'metadata': '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE',
     'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
 }
@@ -169,13 +173,11 @@ COLORS = {
 
 TEXTCONTAINER_TYPES = ['commentary', 'page', 'region', 'line', 'word']
 
-
 SAMPLE_PAGES = [
     'bsb10234118_0096',
     'sophokle1v3soph_0126',
     'cu31924087948174_0063',
     'cu31924087948174_0063',
     'Wecklein1894_0087'
-
 
 ]

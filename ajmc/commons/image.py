@@ -1,8 +1,11 @@
 import cv2
 from typing import List, Tuple, Optional, Union
 import numpy as np
+
+from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
-from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init, BoxType
+from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init
+from ajmc.commons.variables import BoxType
 
 logger = get_custom_logger(__name__)
 
@@ -16,11 +19,20 @@ class Image:
     """
 
     @lazy_init
+    @docstring_formatter(**docstrings)
     def __init__(self,
                  id: Optional[str] = None,
                  path: Optional[str] = None,
                  matrix: Optional[np.ndarray] = None,
                  word_range: Optional[Tuple[int, int]] = None):
+        """Default constructor.
+
+        Args:
+            id: The id of the image
+            path: {path} to the image.
+            matrix: an np.ndarray containing the image. Overrides self.matrix if not None.
+            word_range: {word_range}
+        """
         pass
 
     @lazy_property

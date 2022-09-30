@@ -107,7 +107,7 @@ def get_olr_splits_page_ids(commentary_id: 'OcrCommentary',
                             splits: Optional[List[str]] = None) -> List[str]:
     """Gets the data from splits on the olr_gt sheet."""
 
-    olr_gt = read_google_sheet(variables.SPREADSHEETS_IDS['olr_gt'], 'olr_gt')
+    olr_gt = read_google_sheet(variables.SPREADSHEETS['olr_gt'], 'olr_gt')
     if splits is not None:
         filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
                    range(len(olr_gt['page_id']))]

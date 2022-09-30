@@ -27,7 +27,7 @@ from ajmc.text_processing.canonical_classes import CanonicalCommentary, Canonica
     CanonicalLine, TextContainer
 from ajmc.text_processing.markup_processing import parse_markup_file, get_element_bbox, \
     get_element_text, find_all_elements
-from ajmc.commons.file_management.utils import verify_path_integrity, parse_ocr_path, get_path_from_id, guess_ocr_format
+from ajmc.commons.file_management.utils import verify_path_integrity, parse_ocr_path, find_file_by_name, guess_ocr_format
 
 logger = get_custom_logger(__name__)
 
@@ -90,6 +90,9 @@ class OcrCommentary(TextContainer):
             This pipeline must cope with the fact that the OCR may not be perfect. For instance, it may happen that a word
             is empty, or that coordinates are fuzzy. It hence rely on OcrPage.optimize() to fix these issues. Though this code
             is far from elegant, I wouldn't recommend touching it unless you are 100% sure of what you are doing.
+
+        Returns:
+            A `CanonicalCommentary` object.
         """
 
         # We start by creating an empty `CanonicalCommentary`
@@ -133,11 +136,6 @@ class OcrCommentary(TextContainer):
         return can
 
     def _get_children(self, children_type):
-        """Get the children of the commentary.
-
-        Args:
-            children_type: The type of children to get. Must be one of `pages`, `regions`, `lines` or `words`.
-        """
         if children_type not in ['words', 'lines', 'regions', 'pages']:
             raise ValueError(f'`children_type` must be one of words, lines, regions, pages, not {children_type}')
 
@@ -146,7 +144,7 @@ class OcrCommentary(TextContainer):
             for file in [f for f in os.listdir(self.ocr_dir) if f[-4:] in ['.xml', 'hocr', 'html']]:
                 pages.append(OcrPage(ocr_path=os.path.join(self.ocr_dir, file),
                                      id=file.split('.')[0],
-                                     image_path=get_path_from_id(file.split('.')[0], self.image_dir),
+                                     image_path=find_file_by_name(file.split('.')[0], self.image_dir),
                                      commentary=self))
 
             return sorted(pages, key=lambda x: x.id)
@@ -157,10 +155,6 @@ class OcrCommentary(TextContainer):
     def _get_parent(self) -> None:
         return None  # A commentary has no parent
 
-    @lazy_property
-    def children(self):
-        return LazyObject(compute_function=self._get_children)
-
     @lazy_property  # Todo 👁️ This should not be maintained anymore
     def ocr_groundtruth_pages(self) -> Union[List['OcrPage'], list]:
         """The commentary's pages which have a groundtruth file in `self.paths['groundtruth']`."""
@@ -168,7 +162,7 @@ class OcrCommentary(TextContainer):
         for file in [f for f in os.listdir(self.groundtruth_dir) if f.endswith('.html')]:
             pages.append(OcrPage(ocr_path=os.path.join(self.groundtruth_dir, file),
                                  id=file.split('.')[0],
-                                 image_path=get_path_from_id(file.split('.')[0], self.image_dir),
+                                 image_path=find_file_by_name(file.split('.')[0], self.image_dir),
                                  commentary=self))
 
         return sorted(pages, key=lambda x: x.id)
@@ -456,7 +450,7 @@ class OlrRegion(OcrTextContainer):
 
 
 class OcrLine(OcrTextContainer):
-
+    """Class for OCR lines."""
     def __init__(self,
                  markup: 'bs4.element.Tag',
                  page: OcrPage,
@@ -470,7 +464,7 @@ class OcrLine(OcrTextContainer):
 
 
 class OcrWord(OcrTextContainer):
-    """Class for Words."""
+    """Class for ocr words."""
 
     def __init__(self,
                  id: Union[int, str],

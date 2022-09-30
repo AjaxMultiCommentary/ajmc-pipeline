@@ -4,11 +4,10 @@ from functools import wraps
 import json
 import logging
 import timeit
-from typing import List, Tuple, Iterable, Generator, Callable, Type
+from typing import List, Iterable, Generator, Callable, Type
 import pandas as pd
 from jsonschema import Draft6Validator
-
-BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
+from ajmc.commons.docstrings import docstring_formatter, docstrings
 
 
 def timer(iterations: int = 3, number: int = 1_000):
@@ -73,18 +72,23 @@ def get_custom_logger(name: str,
     return logger
 
 
+@docstring_formatter(**docstrings)
 def read_google_sheet(sheet_id: str, sheet_name: str, **kwargs) -> pd.DataFrame:
     """A simple function to read a google sheet in a `pd.DataFrame`.
 
-    Works at 2022-05-17. See https://towardsdatascience.com/read-data-from-google-sheets-into-pandas-without-the-google-sheets-api-5c468536550
+    Works at 2022-09-29. See https://towardsdatascience.com/read-data-from-google-sheets-into-pandas-without-the-google-sheets-api-5c468536550
     for more info.
+
+    Args:
+        sheet_id: {sheet_id}
+        sheet_name: {sheet_name}
     """
 
     url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
     return pd.read_csv(url, **kwargs)
 
 
-def split_list(list_: list, n: int, pad: object= False) -> List[List[object]]:
+def split_list(list_: list, n: int, pad: object = False) -> List[List[object]]:
     """Divides a list into lists with n elements, pads the last chunk with `pad` if the latter is not `False`.
 
     Args:
@@ -138,56 +142,6 @@ def lazy_property(func):
             delattr(self, private_attr)
 
     return property(fget, fset, fdel, func.__doc__)
-
-
-# todo 👁️ make this handle *args and **kwargs.
-def lazy_init(func):
-    """Set attributes for required arguments and defaulted keyword argument which are not None at instantiation.
-
-    Example:
-        ```python
-        @lazy_init
-        def __init__(self, hello, world = None):
-            pass
-        ```
-
-        is actually equivalent to :
-
-        ```python
-        def __init__(self, hello, world = None):
-            self.hello = hello
-
-            if world is not None:
-                self.world = world
-        ```
-
-    Note:
-        Warning, this does not handle `*args` and `**kwargs`.
-
-    """
-    specs = inspect.getfullargspec(func)
-
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        defaults_args_len = len(specs.defaults) if specs.defaults else 0
-        required_args_len = len(specs.args) - defaults_args_len
-
-        # Start with required args
-        required_from_args = [(name, value) for name, value in zip(specs.args[1:required_args_len], args)]
-        required_from_kwargs = [(n, v) for n, v in kwargs.items() if n in specs.args[1:required_args_len]]
-        for n, v in required_from_args + required_from_kwargs:
-            setattr(self, n, v)
-
-        # For defaulted args, only append
-        def_from_args = [(n, v) for n, v in zip(specs.args[required_args_len:], args[required_args_len:]) if
-                         v is not None]
-        def_from_kwargs = [(n, v) for n, v in kwargs.items() if n in specs.args[required_args_len:] and v is not None]
-        for n, v in def_from_args + def_from_kwargs:
-            setattr(self, n, v)
-
-        func(self, *args, **kwargs)
-
-    return wrapper
 
 
 def lazy_init(func):
@@ -247,7 +201,7 @@ def lazy_init(func):
     return wrapper
 
 
-def lazy_attributer(attr_name: str, func: Callable, attr_decorator: Callable=lambda x: x):
+def lazy_attributer(attr_name: str, func: Callable, attr_decorator: Callable = lambda x: x):
     """Parametrized decorator returning a decorator which adds the attribute of
     name `attr_name` and of value `func` to the `class_` it decorizes.
 

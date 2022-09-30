@@ -3,11 +3,10 @@ import os
 import random
 from ajmc.commons.docstrings import docstrings, docstring_formatter
 from typing import List, Optional, Dict, Union, Tuple
-from ajmc.commons.miscellaneous import BoxType
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.nlp.token_classification.config import parse_config_from_json
 from ajmc.nlp.token_classification.pipeline import train
-from ajmc.commons.variables import COLORS, PATHS, ORDERED_OLR_REGION_TYPES
+from ajmc.commons.variables import COLORS, PATHS, ORDERED_OLR_REGION_TYPES, BoxType
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset, \
     align_labels_to_tokenized
 from ajmc.nlp.token_classification.model import predict_dataset
