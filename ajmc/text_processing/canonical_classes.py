@@ -13,6 +13,8 @@ from ajmc.commons import variables
 from ajmc.commons.miscellaneous import get_custom_logger
 from abc import abstractmethod
 
+from ajmc.olr.utils import get_olr_splits_page_ids
+
 logger = get_custom_logger(__name__)
 
 
@@ -171,6 +173,17 @@ class CanonicalCommentary(TextContainer):
     def _get_parent(self, parent_type) -> Optional[Type['TextContainer']]:
         return None  # A commentary has no parents
 
+    @lazy_property
+    def olr_groundtruth_pages(self) -> List['CanonicalPage']:
+        """A list of `CanonicalPage` objects containing the groundtruth of the OLR."""
+        page_ids = get_olr_splits_page_ids(self.id)
+        return [p for p in self.children.pages if p.id in page_ids]
+
+    @lazy_property
+    def ocr_groundtruth_pages(self) -> List['CanonicalPage']:
+        """A list of `CanonicalPage` objects containing the groundtruth of the OCR."""
+        return [p for p in self.children.pages if p.info['is_ocr_gt']]
+
 
 class CanonicalTextContainer(TextContainer):
 
@@ -236,8 +249,7 @@ class CanonicalTextContainer(TextContainer):
     @lazy_property
     def image(self) -> Image:
         """Generic method to create a `CanonicalTextContainer`'s image."""
-        return [img for img in self.parents.commentary.images
-                if is_interval_within_interval(contained=self.word_range, container=img.word_range)][0]
+        return self.parents.page.Image.crop(self.bbox)
 
 
 class CanonicalPage(CanonicalTextContainer):
@@ -265,9 +277,10 @@ class CanonicalPage(CanonicalTextContainer):
             f.write(
                 template.render(page=self, elements=children_types, region_types=variables.ORDERED_OLR_REGION_TYPES))
 
+
     @lazy_property
-    def bbox(self):
-        return Shape.from_xywh(0, 0, self.image.width, self.image.height)
+    def image(self) -> Image:  # Special case of page's images
+        return [img for img in self.parents.commentary.images if img.id == self.id][0]
 
 
 class CanonicalRegion(CanonicalTextContainer):

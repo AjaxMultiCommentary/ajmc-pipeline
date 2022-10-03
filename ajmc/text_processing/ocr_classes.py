@@ -20,7 +20,7 @@ from ajmc.commons.geometry import (
     is_bbox_within_bbox, adjust_bbox_to_included_contours, get_bbox_from_points
 )
 from ajmc.commons.image import Image, draw_page_regions_lines_words
-from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via
+from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via, get_olr_splits_page_ids
 import jsonschema
 
 from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalWord, CanonicalPage, CanonicalRegion, \
@@ -83,7 +83,7 @@ class OcrCommentary(TextContainer):
                    groundtruth_dir=os.path.join(base_dir, id, variables.PATHS['groundtruth']),
                    ocr_run=ocr_run)
 
-    def to_canonical(self):
+    def to_canonical(self, include_ocr_groundtruth: bool = False) -> CanonicalCommentary:
         """Export the commentary to a `CanonicalCommentary` object.
 
         Note:
@@ -106,9 +106,15 @@ class OcrCommentary(TextContainer):
         # We now populate the children and images
         children = {k: [] for k in ['pages', 'regions', 'lines', 'words']}
         w_count = 0
+        if include_ocr_groundtruth:
+            gt_ids = [p.id for p in self.ocr_groundtruth_pages]
+
         for i, p in enumerate(self.children.pages):
             if i % 20 == 0:
                 logger.info(f'Processing page {i} of {len(self.children.pages)}')
+
+            if include_ocr_groundtruth and p.id in gt_ids:
+                p = self.ocr_groundtruth_pages[gt_ids.index(p.id)]
 
             p.optimise()
             p_start = w_count
@@ -152,8 +158,15 @@ class OcrCommentary(TextContainer):
         else:  # For regions, lines and words, retrieve them from each page
             return [tc for p in self.children.pages for tc in getattr(p.children, children_type)]
 
-    def _get_parent(self) -> None:
+    def _get_parent(self, parent_type) -> None:
         return None  # A commentary has no parent
+
+    @lazy_property
+    def olr_groundtruth_pages(self) -> List['CanonicalPage']:
+        """A list of `CanonicalPage` objects containing the groundtruth of the OLR."""
+        page_ids = get_olr_splits_page_ids(self.id)
+        return [p for p in self.children.pages if p.id in page_ids]
+
 
     @lazy_property  # Todo 👁️ This should not be maintained anymore
     def ocr_groundtruth_pages(self) -> Union[List['OcrPage'], list]:
@@ -360,7 +373,7 @@ class OcrPage(TextContainer):
 
     @lazy_property
     def bbox(self) -> Shape:
-        return Shape([0, 0, self.image.width, self.image.height])
+        return Shape(get_bbox_from_points([xy for w in self.children.words for xy in w.bbox.bbox]))
 
 
 class OcrTextContainer(TextContainer):

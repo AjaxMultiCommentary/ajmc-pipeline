@@ -40,8 +40,8 @@ def int_to_x_based_code(number: int,
     """
 
     # Start the by getting the highest power of 62 that is smaller or equal to the number
-    power = 0
-    powers = []
+    power = 1
+    powers = [0]
     while base ** power <= number:
         powers.append(power)
         power += 1
