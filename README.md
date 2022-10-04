@@ -20,9 +20,8 @@ For a more detailed description of the codebase's architecture and innerworkings
 
 ## Install from source
 
-Please install `ajmc` using `git clone https://github.com/AjaxMultiCommentary/ajmc`. `requirements.txt` 
-specifies the pip-requirements for creating an environment 
-(for instance with [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)). 
+Please install `ajmc` using `git clone https://github.com/AjaxMultiCommentary/ajmc`. `setup.py` lists all the required dependencies. For collaborative development, please use a dedicated virtual environment (for instance with [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)). 
+
 
 
 
