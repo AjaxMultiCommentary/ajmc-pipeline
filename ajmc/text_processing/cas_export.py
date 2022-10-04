@@ -110,7 +110,7 @@ def compute_image_links(page: dict,
     return image_links
 
 
-def rebuilt_to_xmi(page: dict,  # todo 👁️ should this accept CommentaryPage objects ?
+def rebuilt_to_xmi(page: dict,
                    output_dir: str,
                    typesystem_path: str = PATHS['typesystem'],
                    iiif_mappings=None,
@@ -190,7 +190,6 @@ def main(commentaries: List[Dict[str, str]],
             os.makedirs(xmi_dir, exist_ok=True)
 
             for page in tqdm(commentary.children.pages, desc=f'Building jsons and xmis for {commentary_id}'):
-                logger.info('Processing page  ' + page.id)
                 page.to_json(output_dir=json_dir)
                 rebuild = basic_rebuild(page.to_canonical_v1(), region_types)
                 if len(rebuild['fulltext']) > 0:  # handles the empty-page case
