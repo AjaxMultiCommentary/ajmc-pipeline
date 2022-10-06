@@ -13,7 +13,7 @@ from ajmc.text_processing.ocr_classes import OcrCommentary
 
 logger = get_custom_logger(__name__)
 
-
+# Todo : See how to handle the three 'coords' (instead of bbox) keys. change all the existing canonical ?
 def basic_rebuild(page: dict,
                   region_types: Union[List[str], str] = "all",
                   string: str = "") -> dict:
@@ -46,15 +46,15 @@ def basic_rebuild(page: dict,
 
                     texts["words"].append(word["text"] + " ")
                     offsets['words'].append(word_offsets)
-                    coordinates['words'].append(word['bbox'])
+                    coordinates['words'].append(word['coords'])
 
                 line_offsets.append(len(string) - 1)
                 offsets["lines"].append(line_offsets)
-                coordinates['lines'].append(line['bbox'])
+                coordinates['lines'].append(line['coords'])
                 texts["lines"].append(line_text)
 
             region_offsets.append(len(string) - 1)
-            coordinates['regions'].append(region['bbox'])
+            coordinates['regions'].append(region['coords'])
             offsets["regions"].append(region_offsets)
             texts["regions"].append(region_text)
 

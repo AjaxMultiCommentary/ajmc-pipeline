@@ -168,7 +168,7 @@ class Image:
 ```
 In the second example, `self.matrix` is read from the file at initialization, which causes the computation to be done even-though the matrix is maybe not going to be used.
 
-**Note**. `lazy_property`es handling heavy or possibly changing objects should be used with parsimony. Remember that the object is kept in memory! If you want the property to be forgotten, please go for a method or use `del self.lazy_prop_name`.
+**Note**. `lazy_property` handling heavy or possibly changing objects should be used with parsimony. Remember that the object is kept in memory! If you want the property to be forgotten, please go for a method or use `del self.lazy_prop_name`.
 
 3. Know the [basics of python optimization](https://stackify.com/20-simple-python-performance-tuning-tips/). If you doubt the efficiency of your code, use `commons.miscellaneous.timer` for robust experimenting.
 
@@ -180,7 +180,7 @@ Programmers with a reasonable level in python should be able to easily walk thro
 
 #### Examples
 
-1. **Abbreviations** should be strictly prohibited unless absolutely necessary ; They make no sense in the age of code completion.
+1. **Abbreviations** should be strictly prohibited unless absolutely necessary or blatantly clear ; They make no sense in the age of code completion.
 
  ❌ This is bad practice:
  ```python
@@ -207,7 +207,7 @@ def find_divisors(dividend):
 - `dir_` for directory
 -  `gt` for ground_truth
 - `char` for character
-- In loops and comprehensions only : (`w`, `l`, `r` and `p` for word, line, region and page)
+- If they can easily be understood from context (e.g. In loops and comprehensions : `[w for w in words]`)
 
 
 2. **Variable names** should say what variables are
@@ -222,7 +222,7 @@ Just like *Ajax*'s name foreshadows his lament *Alas*, variable names should ann
 
 3. **Functions names** should say what functions do.
 
-Functions should be named with verbs, and with verbs that correspond to their actual action.
+Functions should be named with **verbs** which correspond to their actual action.
 
 ✅ This is good writing:
 ```python
@@ -250,7 +250,7 @@ def is_square(rectangle):
 
 4. Use simple objects and structure
 
-Also adding to the readability of the code is its simplicity. Unless optimisation requires it, nested comprehension and smarter-than-smart structures should be avoided. Likewise, the use of special objects (i.e. non-native should be motivated). Use OOP if necessary, but remember that functional code is often easier to read. Objects should be objects at all only if there is a reason it.
+Also adding to the readability of the code is its simplicity. Unless optimisation requires it, nested comprehension and smarter-than-smart structures should be avoided. Likewise, the use of special objects (i.e. non-native should be motivated). Use OOP, but remember that functional code is often easier to read. Objects should be objects at all only if there is a reason it.
 
 
 
