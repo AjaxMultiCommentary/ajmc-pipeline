@@ -279,7 +279,7 @@ def safe_import_page_annotations(page_id,
                                  cas,
                                  rebuild,
                                  annotation_layer: str,
-                                 manual_safe_check: bool = False) -> list[FeatureStructure]:
+                                 manual_safe_check: bool = False) -> List[FeatureStructure]:
     if manual_safe_check and cas.sofa_string != rebuild['fulltext']:
         print(f'Alignment error, skipping: {page_id}')
         print('REBUILD**************************')
