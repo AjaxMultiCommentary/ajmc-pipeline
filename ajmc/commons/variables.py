@@ -147,10 +147,6 @@ TC_TYPES_TO_CHILD_TYPES = {t: t+'s' if t[-1] != 'y' else t[:-1]+'ies' for t in T
 
 CHILD_TYPES = list(TC_TYPES_TO_CHILD_TYPES.values())
 
-
-# todo add parents entity
-PARENT_TYPES = ['word', 'line', 'region', 'page']
-
 # ======================================================================================================================
 #                                                 ANNOTATIONS
 # ======================================================================================================================

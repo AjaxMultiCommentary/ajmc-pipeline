@@ -5,7 +5,7 @@ from typing import List, Optional, Type, Union, Iterable
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.image import draw_textcontainers
 from ajmc.commons.miscellaneous import lazy_property, LazyObject, recursive_iterator
-from ajmc.commons.variables import CHILD_TYPES, PARENT_TYPES, TEXTCONTAINER_TYPES
+from ajmc.commons.variables import CHILD_TYPES, TEXTCONTAINER_TYPES
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.cas_utils import export_commentary_to_xmis
 
@@ -53,7 +53,7 @@ class TextContainer:
 
     @lazy_property
     def parents(self) -> LazyObject:
-        return LazyObject(compute_function=self._get_parent, constrained_attrs=PARENT_TYPES)
+        return LazyObject(compute_function=self._get_parent, constrained_attrs=TEXTCONTAINER_TYPES)
 
     @lazy_property
     def type(self) -> str:

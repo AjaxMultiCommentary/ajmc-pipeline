@@ -2,7 +2,7 @@ from ajmc.commons.miscellaneous import LazyObject
 from tests import sample_objects as so
 from ajmc.commons.geometry import Shape
 from ajmc.text_processing import canonical_classes as cc
-from ajmc.commons.variables import CHILD_TYPES, PARENT_TYPES, TEXTCONTAINER_TYPES
+from ajmc.commons.variables import CHILD_TYPES, TEXTCONTAINER_TYPES
 import pytest
 
 
@@ -25,7 +25,7 @@ def test_textcontainer(tc):
 
     # Test CanonicalCommentary.parents
     assert isinstance(tc.parents, LazyObject)
-    for tc_type in PARENT_TYPES:
+    for tc_type in TEXTCONTAINER_TYPES:
         parent = getattr(tc.parents, tc_type)
         assert isinstance(parent, cc.get_tc_type_class(tc_type)) or parent is None
 
