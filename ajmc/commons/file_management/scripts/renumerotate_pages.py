@@ -23,7 +23,7 @@ new_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/comment
 # %% Rename images
 
 img_dir = os.path.join(variables.PATHS['base_dir'], commentary_id, variables.PATHS['png'])
-# img_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/Kamerbeek1953/images/png_binary'
+# img_dir = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary/commentaries_data/Kamerbeek1953/images/png_binary'
 fnames = [fname for fname in os.listdir(img_dir) if fname.endswith('.png')]
 
 for fname in fnames:

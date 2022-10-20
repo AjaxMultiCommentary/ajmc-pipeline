@@ -1,3 +1,4 @@
+import csv
 import os
 import re
 import Levenshtein
@@ -269,3 +270,26 @@ def write_error_counts(bow_error_counts: dict,
 
     df = pd.concat([df_bow, df_coord], axis=1)
     df.to_csv(os.path.join(output_dir, 'evaluation_results.tsv'), index=False, sep='\t')
+
+
+def write_editops_record(editops_record, output_dir):
+    editops_record = {k: v for k, v in sorted(editops_record.items(), key=lambda item: item[1], reverse=True)}
+    with open(os.path.join(output_dir, "editops.tsv"), 'w', encoding="utf-8") as csv_file:
+        spamwriter = csv.writer(csv_file, delimiter='\t', quotechar='"')
+        spamwriter.writerow(['Operation', 'From', 'To', 'Count'])
+        for k, v in editops_record.items():
+            spamwriter.writerow([k[0], k[1], k[2], v])
+
+
+def compute_word_distance(gt, pred):
+    """Computes the number of errors in the word level.
+
+    Args:
+        gt: ground-truth string
+        pred: prediction string
+    """
+    return Levenshtein.distance(gt.split(), pred.split())
+
+
+
+

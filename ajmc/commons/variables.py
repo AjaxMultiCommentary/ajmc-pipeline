@@ -1,9 +1,16 @@
 import re
 from typing import Tuple
 
-# Custom types
+# ======================================================================================================================
+#                                                 TYPES
+# ======================================================================================================================
 BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 
+# ======================================================================================================================
+#                                                 PATHS
+# ======================================================================================================================
+
+# Todo change paths
 PATHS = {
     'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
     'drive_base_dir': '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
@@ -17,11 +24,15 @@ PATHS = {
     'typesystem': 'data/templates/TypeSystem.xml',
     'olr_initiation': 'olr/annotation/project_initiation',
     'ocr': 'ocr/runs',
-    'canonical': 'canonical/v2'
+    'canonical': 'canonical/v2',
+    'annotations': 'ner/entities',
+    'ajmc_ne_corpus': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/AjMC-NE-corpus'
 }
 
-PARAMETERS = {
-    'ocr_region_inclusion_threshold': 0.7,
+# Sheet names corresponds to the dictionary's keys
+SPREADSHEETS = {
+    'metadata': '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE',
+    'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
 }
 
 FOLDER_STRUCTURE_PATHS = {
@@ -31,27 +42,23 @@ FOLDER_STRUCTURE_PATHS = {
     'canonical_json': '[commentary_id]/canonical/v2/[json]'
 }
 
-# Sheet names corresponds to the dictionary's keys
-SPREADSHEETS = {
-    'metadata': '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE',
-    'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
-}
-
-VIA_CSV_DICT_TEMPLATE = {'filename': [],
-                         'file_size': [],
-                         'file_attributes': [],
-                         'region_count': [],
-                         'region_id': [],
-                         'region_shape_attributes': [],
-                         'region_attributes': []}
+# ======================================================================================================================
+#                                                 COMMENTARIES
+# ======================================================================================================================
 
 COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Finglass2011', 'Garvie1998', 'Kamerbeek1953',
                   'Paduano1982', 'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174',
                   'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'thukydides02thuc',
-                  'pvergiliusmaroa00virggoog',
-                  'annalsoftacitusp00taci']
+                  'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
 
 PD_COMMENTARY_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
+
+SAMPLE_PAGES = ['bsb10234118_0096', 'sophokle1v3soph_0126', 'cu31924087948174_0063', 'cu31924087948174_0063',
+                'Wecklein1894_0087']
+
+# ======================================================================================================================
+#                                                 LAYOUT
+# ======================================================================================================================
 
 ORDERED_OLR_REGION_TYPES = ['commentary',
                             'primary_text',
@@ -113,6 +120,41 @@ REGION_TYPES_TO_COARSE_LABELS = {
 
 REGION_TYPES_TO_FINE_LABELS = {k: k for k in REGION_TYPES_TO_COARSE_LABELS.keys()}
 
+VIA_CSV_DICT_TEMPLATE = {'filename': [],
+                         'file_size': [],
+                         'file_attributes': [],
+                         'region_count': [],
+                         'region_id': [],
+                         'region_shape_attributes': [],
+                         'region_attributes': []}
+
+# ======================================================================================================================
+#                                                 TEXT CONTAINERS
+# ======================================================================================================================
+
+TEXTCONTAINER_TYPES = ['commentary',
+                       'chapter',
+                       'page',
+                       'region',
+                       'sentence',
+                       'line',
+                       'hyphenation',
+                       'entity',
+                       'word']
+
+
+TC_TYPES_TO_CHILD_TYPES = {t: t+'s' if t[-1] != 'y' else t[:-1]+'ies' for t in TEXTCONTAINER_TYPES}
+
+CHILD_TYPES = list(TC_TYPES_TO_CHILD_TYPES.values())
+
+
+# todo add parents entity
+PARENT_TYPES = ['word', 'line', 'region', 'page']
+
+# ======================================================================================================================
+#                                                 ANNOTATIONS
+# ======================================================================================================================
+
 MINIREF_PAGES = [
     'cu31924087948174_0035',
     'cu31924087948174_0063',
@@ -129,14 +171,32 @@ MINIREF_PAGES = [
     'sophokle1v3soph_0125',
 ]
 
-CHARSETS = {
-    'latin': re.compile(r'([A-Za-z]|[\u00C0-\u00FF]|\u0152|\u0153)', re.UNICODE),
-    'greek': re.compile(r'([\u0373-\u03FF]|[\u1F00-\u1FFF]|\u0300|\u0301|\u0313|\u0314|\u0345|\u0342|\u0308)',
-                        re.UNICODE),
-    'numbers': re.compile(r'([0-9])', re.UNICODE),
-    'punctuation': re.compile(r'([\u0020-\u002F]|[\u003A-\u003F]|[\u005B-\u0060]|[\u007B-\u007E]|\u00A8|\u00B7)',
-                              re.UNICODE)
+IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run_id used as a base in the annotation campaign.
+    'cu31924087948174': '1bm0b3_tess_final',
+    'lestragdiesdeso00tourgoog': '21i0dA_tess_hocr',
+    'sophokle1v3soph': '1bm0b5_tess_final',
+    'sophoclesplaysa05campgoog': '15o0dN_lace_retrained_sophoclesplaysa05campgoog-2021-05-24-08-15-12-porson-with-sophoclesplaysa05campgoog-2021-05-23-22-17-38',
+    'Wecklein1894': '1bm0b6_tess_final'
 }
+IDS_TO_REGIONS = {  # Maps commentary_ids to the region_types used in the annotation campaign.
+    'cu31924087948174': ['commentary', 'introduction', 'preface'],
+    'Wecklein1894': ['commentary', 'introduction', 'preface'],
+    'sophokle1v3soph': ['commentary', 'introduction', 'preface'],
+    'sophoclesplaysa05campgoog': ['commentary', 'introduction', 'preface', 'footnote'],
+    'lestragdiesdeso00tourgoog': ['commentary', 'introduction', 'preface', 'footnote']
+}
+
+ANNOTATION_LAYERS = {
+    'entities': 'webanno.custom.AjMCNamedEntity',
+    'segments': 'de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence',
+    'sentences': 'webanno.custom.GoldSentences',
+    'hyphenations': 'webanno.custom.GoldHyphenation',
+    'tokens': 'de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token',
+}
+
+# ======================================================================================================================
+#                                                 AESTHETICS
+# ======================================================================================================================
 
 COLORS = {
     # https://coolors.co/b2001e-f02282-461e44-3b9ff1-37507d-125b4f-98e587-ffc802-af7159-b5a267
@@ -171,13 +231,34 @@ COLORS = {
     # https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167
 }
 
-TEXTCONTAINER_TYPES = ['commentary', 'page', 'region', 'line', 'word']
+TEXTCONTAINERS_TYPES_TO_COLORS = {
+    'word': COLORS['hues']['pink'],
+    'line': COLORS['hues']['byzantine'],
+    'region': COLORS['hues']['purple1'],
+    'page': COLORS['hues']['purple2'],
+    'entity': COLORS['hues']['trypan_blue1'],
+    'hyphenation': COLORS['hues']['trypan_blue2'],
+    'sentence': COLORS['hues']['persian_blue'],
+}
 
-SAMPLE_PAGES = [
-    'bsb10234118_0096',
-    'sophokle1v3soph_0126',
-    'cu31924087948174_0063',
-    'cu31924087948174_0063',
-    'Wecklein1894_0087'
+REGION_TYPES_TO_COLORS = {l: c for l, c in zip(ORDERED_OLR_REGION_TYPES,
+                                               list(COLORS['distinct'].values()) + list(COLORS['hues'].values()))}
 
-]
+# ======================================================================================================================
+#                                                 MISC
+# ======================================================================================================================
+
+
+PARAMETERS = {
+    'ocr_region_inclusion_threshold': 0.7,
+    'entity_inclusion_threshold': 0.8,
+}
+
+CHARSETS = {
+    'latin': re.compile(r'([A-Za-z]|[\u00C0-\u00FF]|\u0152|\u0153)', re.UNICODE),
+    'greek': re.compile(r'([\u0373-\u03FF]|[\u1F00-\u1FFF]|\u0300|\u0301|\u0313|\u0314|\u0345|\u0342|\u0308)',
+                        re.UNICODE),
+    'numbers': re.compile(r'([0-9])', re.UNICODE),
+    'punctuation': re.compile(r'([\u0020-\u002F]|[\u003A-\u003F]|[\u005B-\u0060]|[\u007B-\u007E]|\u00A8|\u00B7)',
+                              re.UNICODE)
+}

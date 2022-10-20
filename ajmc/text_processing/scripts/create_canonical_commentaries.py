@@ -1,5 +1,4 @@
-"""Use this script to bulk convert ocr runs to canonical commentaries"""
-from ajmc.commons.image import draw_page_regions_lines_words
+"""Use this script to bulk convert ocr runs to canonical commentary"""
 from ajmc.commons.variables import PATHS
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from ajmc.text_processing.ocr_classes import OcrCommentary

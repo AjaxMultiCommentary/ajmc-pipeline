@@ -1,6 +1,6 @@
 import os
 from ajmc.commons.variables import PATHS
-from ajmc.commons import get_62_based_datecode
+from ajmc.commons.miscellaneous import get_62_based_datecode
 
 
 def get_kraken_command(commentary_id, model_path):
