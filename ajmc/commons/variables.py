@@ -133,7 +133,7 @@ VIA_CSV_DICT_TEMPLATE = {'filename': [],
 # ======================================================================================================================
 
 TEXTCONTAINER_TYPES = ['commentary',
-                       'chapter',
+                       # 'chapter',
                        'page',
                        'region',
                        'sentence',

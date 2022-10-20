@@ -152,7 +152,7 @@ class CanonicalTextContainer(TextContainer):
         if parent_type == 'commentary':
             raise AttributeError('`parents.commentary` cannot be computed ex nihilo. It must be set manually.')
 
-        parents = [tc for tc in getattr(self.parents.commentary.children, parent_type + 's')
+        parents = [tc for tc in getattr(self.parents.commentary.children, TC_TYPES_TO_CHILD_TYPES[parent_type])
                    if is_interval_within_interval(contained=self.word_range, container=tc.word_range)
                    and self.id != tc.id]
 
