@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <alto xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.loc.gov/standards/alto/ns-v4#"
+        xsi:schemaLocation="http://www.loc.gov/standards/alto/ns-v4# http://www.loc.gov/standards/alto/v4/alto-4-2.xsd">
+      <Description>
+          <MeasurementUnit>pixel</MeasurementUnit>
+          <sourceImageInformation>
+              <fileName>{{ page.image.path.split('/')[-1] }}</fileName>
+          </sourceImageInformation>
+      </Description>
+
+      <Tags>
+          {% for rt in region_types %}
+              <OtherTag ID="{{ value_ids[mappings[rt]] }}" LABEL="{{mappings[rt]}}" DESCRIPTION="block type {{ value_ids[mappings[rt]] }}"/>
+          {% endfor %}
+      </Tags>
+
+      <Layout>
+          <Page WIDTH="{{ page.bbox.width }}"
+                HEIGHT="{{ page.bbox.height }}"
+                ID="{{ page.id }}"
+                PHYSICAL_IMG_NR="{{ page.id.split('_')[-1] }}">
+              <PrintSpace HPOS="0" VPOS="0" WIDTH="{{ page.bbox.width }}" HEIGHT="{{ page.bbox.height }}">
+                  {% if 'region' in elements %}
+                      {% for r in page.children['region'] %}
+                        {% if r.info['region_type'] != 'line_region' %}
+                          <TextBlock ID="{{ r.id }}"
+                                    HPOS="{{ r.bbox.xywh[0] }}" VPOS="{{ r.bbox.xywh[1] }}"
+                                    WIDTH="{{ r.bbox.width }}" HEIGHT="{{ r.bbox.height }}"
+                                    TAGREFS="{{ value_ids[mappings[r.info['region_type']]] }}">
+                              {% if 'line' in elements %}
+                                  {% for l in r.children['line'] %}
+                                      <TextLine ID="{{ l.id }}" HPOS="{{ l.bbox.xywh[0] }}" VPOS="{{ l.bbox.xywh[1] }}"
+                                                WIDTH="{{ l.bbox.width }}" HEIGHT="{{ l.bbox.height }}">
+                                          {% if 'word' in elements %}
+                                              {% for w in l.children['word'] %}
+                                                  <String ID="{{ w.id }}" CONTENT="{{ w.text }}"
+                                                          HPOS="{{ w.bbox.xywh[0] }}"
+                                                          VPOS="{{ w.bbox.xywh[1] }}" WIDTH="{{ w.bbox.width }}"
+                                                          HEIGHT="{{ w.bbox.height }}"/>
+                                              {% endfor %}
+                                          {% endif %}
+                                      </TextLine>
+                                  {% endfor %}
+                              {% endif %}
+                          </TextBlock>
+                        {% endif %}
+                      {% endfor %}
+                  {% endif %}
+              </PrintSpace>
+          </Page>
+      </Layout>
+  </alto>
