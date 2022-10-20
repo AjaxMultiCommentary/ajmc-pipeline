@@ -69,7 +69,7 @@ def check_via_spreadsheet_conformity(via_project: dict,
 @docstrings.docstring_formatter(**docstrings.docstrings)
 def check_all_via_spreadsheets_conformity(sheet_id: str = SPREADSHEETS['olr_gt'],
                                           sheet_name: str = 'olr_gt'):
-    """Applies `check_via_spreadsheet_conformity` to an entire spreadsheet with multiple commentaries.
+    """Applies `check_via_spreadsheet_conformity` to an entire spreadsheet with multiple commentary.
 
     Args:
         sheet_id: {sheet_id}

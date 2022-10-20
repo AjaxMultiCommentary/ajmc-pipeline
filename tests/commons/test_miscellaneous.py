@@ -16,7 +16,8 @@ def test_split_list():
 
 @pytest.mark.parametrize('sheet_name', ['sheet_1', 'sheet_2'])
 def test_read_google_sheet(sheet_name):
-    df = misc.read_google_sheet(sheet_id='1Ao9zSzmvdwvn7OAAtq7gwLbrJQg21TARg0roO1-CoHg',
+    df = misc.read_google_sheet(sheet_id='1qABQgkQeQJPDn9SkJPtyXFwe9bUhgID6xWM6adRS3vc',
+                                # sheet_id='1Ao9zSzmvdwvn7OAAtq7gwLbrJQg21TARg0roO1-CoHg',
                                 sheet_name=sheet_name)
     assert df['test_int'][0] == 108
     assert df['test_str'][1] == 'coucou'
@@ -73,5 +74,6 @@ def test_lazy_attributer():
 
 
 def test_lazyobject():
-    a = misc.LazyObject(lambda x: len(x))
-    assert a.coucou == 6
+    a = misc.LazyObject(compute_function=lambda x: len(x),
+                        constrained_attrs=['a', 'bcd'])
+    assert a.bcd == 3

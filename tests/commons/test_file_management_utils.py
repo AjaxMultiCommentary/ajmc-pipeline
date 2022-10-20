@@ -19,11 +19,11 @@ def test_get_62_based_datecode():
 
 def test_verify_path_integrity():
     good_paths = [
-        '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/2480ei_greek-english_porson_sophoclesplaysa05campgoog/outputs',
+        '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary/commentaries_data/cu31924087948174/ocr/runs/2480ei_greek-english_porson_sophoclesplaysa05campgoog/outputs',
         ]
     wrong_paths = [
-        '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/2480ei_greek-english_porson_sophoclesplaysa05campgoog/output',
-        '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/coucou/ocr/runs/2480ei_greek-english_porson_sophoclesplaysa05campgoog/outputs'
+        '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary/commentaries_data/cu31924087948174/ocr/runs/2480ei_greek-english_porson_sophoclesplaysa05campgoog/output',
+        '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentary/commentaries_data/coucou/ocr/runs/2480ei_greek-english_porson_sophoclesplaysa05campgoog/outputs'
     ]
     for path in good_paths:
         utils.verify_path_integrity(path=path,
@@ -45,6 +45,7 @@ def test_get_path_from_id():
     assert not utils.find_file_by_name(so.sample_page_id.split('_')[0] + '_9999', so.sample_image_dir)
 
 
+# todo : path management
 def test_parse_ocr_path():
     path = '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/cu31924087948174/ocr/runs/2480ei_greek-english_porson_sophoclesplaysa05campgoog/outputs'
     base, commentary_id, ocr_run = utils.parse_ocr_path(path)

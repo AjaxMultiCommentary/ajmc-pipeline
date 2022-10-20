@@ -8,10 +8,13 @@ import re
 import json
 import os
 from time import strftime
-from typing import Dict, Optional, List, Union, Any, Type
+from typing import Dict, Optional, List, Union, Any, Tuple
 import bs4.element
 from abc import abstractmethod
-from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init, LazyObject
+
+from tqdm import tqdm
+
+from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, LazyObject
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons import variables
 from ajmc.commons.geometry import (
@@ -19,20 +22,24 @@ from ajmc.commons.geometry import (
     is_bbox_within_bbox_with_threshold,
     is_bbox_within_bbox, adjust_bbox_to_included_contours, get_bbox_from_points
 )
-from ajmc.commons.image import Image, draw_page_regions_lines_words
-from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via, get_olr_splits_page_ids
+from ajmc.commons.image import Image, draw_textcontainers
+from ajmc.commons.variables import PATHS, CHILD_TYPES, ANNOTATION_LAYERS
+from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via
 import jsonschema
 
 from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalWord, CanonicalPage, CanonicalRegion, \
-    CanonicalLine, TextContainer
+    CanonicalLine, CanonicalEntity, CanonicalSentence, CanonicalHyphenation
+from ajmc.text_processing import cas_utils
+from ajmc.text_processing.generic_classes import Commentary, TextContainer, Page
 from ajmc.text_processing.markup_processing import parse_markup_file, get_element_bbox, \
     get_element_text, find_all_elements
-from ajmc.commons.file_management.utils import verify_path_integrity, parse_ocr_path, find_file_by_name, guess_ocr_format
+from ajmc.commons.file_management.utils import verify_path_integrity, parse_ocr_path, find_file_by_name, \
+    guess_ocr_format
 
 logger = get_custom_logger(__name__)
 
 
-class OcrCommentary(TextContainer):
+class OcrCommentary(Commentary, TextContainer):
     """`OcrCommentary` objects reprensent a single ocr-run of on a commentary, i.e. a collection of page OCRed pages."""
 
     @docstring_formatter(**docstrings)
@@ -88,7 +95,7 @@ class OcrCommentary(TextContainer):
 
         Note:
             This pipeline must cope with the fact that the OCR may not be perfect. For instance, it may happen that a word
-            is empty, or that coordinates are fuzzy. It hence rely on OcrPage.optimize() to fix these issues. Though this code
+            is empty, or that coordinates are fuzzy. It hence relies on OcrPage.optimize() to fix these issues. Though this code
             is far from elegant, I wouldn't recommend touching it unless you are 100% sure of what you are doing.
 
         Returns:
@@ -99,19 +106,17 @@ class OcrCommentary(TextContainer):
         can = CanonicalCommentary(id=self.id, children=None, images=[], info={})
 
         # We fill the metadata
-        if hasattr(self, 'ocr_run'):
+        if hasattr(self, 'ocr_run'):  # todo, why should this be an if ?
             can.info['ocr_run'] = self.ocr_run
-        can.info['base_dir'] = self.base_dir
+            can.info['base_dir'] = self.base_dir
 
         # We now populate the children and images
-        children = {k: [] for k in ['pages', 'regions', 'lines', 'words']}
+        children = {k: [] for k in CHILD_TYPES}
         w_count = 0
         if include_ocr_groundtruth:
             gt_ids = [p.id for p in self.ocr_groundtruth_pages]
 
-        for i, p in enumerate(self.children.pages):
-            if i % 20 == 0:
-                logger.info(f'Processing page {i} of {len(self.children.pages)}')
+        for i, p in enumerate(tqdm(self.children.pages, desc=f'Canonizing {can.id}')):
 
             if include_ocr_groundtruth and p.id in gt_ids:
                 p = self.ocr_groundtruth_pages[gt_ids.index(p.id)]
@@ -123,6 +128,7 @@ class OcrCommentary(TextContainer):
                 for l in r.children.lines:
                     l_start = w_count
                     for w in l.children.words:
+                        w.index = w_count  # for later use with annotations
                         children['words'].append(CanonicalWord(text=w.text, bbox=w.bbox.bbox, commentary=can))
                         w_count += 1  # Hence w_count - 1 below
 
@@ -134,10 +140,41 @@ class OcrCommentary(TextContainer):
 
             children['pages'].append(CanonicalPage(id=p.id, word_range=(p_start, w_count - 1), commentary=can))
 
+            # Adding images
             can.images.append(Image(id=p.id, path=p.image_path, word_range=(p_start, w_count - 1)))
+
+            # Adding entities
+            for ent in p.children.entities:
+                if ent.children.words:
+                    children['entities'].append(
+                        CanonicalEntity(word_range=(ent.children.words[0].index, ent.children.words[-1].index),
+                                        commentary=can,
+                                        shifts=ent.shifts,
+                                        transcript=ent.transcript,
+                                        entity_type=ent.entity_type,
+                                        wikidata_id=ent.wikidata_id))
+            # Adding sentences
+            for s in p.children.sentences:
+                if s.children.words:
+                    children['sentences'].append(
+                        CanonicalSentence(word_range=(s.children.words[0].index, s.children.words[-1].index),
+                                          commentary=can,
+                                          shifts=s.shifts,
+                                          corrupted=s.corrupted,
+                                          incomplete_continuing=s.incomplete_continuing,
+                                          incomplete_truncated=s.incomplete_truncated))
+
+            # Adding hyphenations
+            for h in p.children.hyphenations:
+                if h.children.words:
+                    children['hyphenations'].append(
+                        CanonicalHyphenation(word_range=(h.children.words[0].index, h.children.words[-1].index),
+                                             commentary=can,
+                                             shifts=h.shifts))
+
             p.reset()  # We reset the page to free up memory
 
-        can.children = LazyObject(lambda x: x, **children)
+        can.children = LazyObject((lambda x: x), constrained_attrs=CHILD_TYPES, **children)
 
         return can
 
@@ -155,18 +192,8 @@ class OcrCommentary(TextContainer):
 
             return sorted(pages, key=lambda x: x.id)
 
-        else:  # For regions, lines and words, retrieve them from each page
+        else:  # For other children, them from each page
             return [tc for p in self.children.pages for tc in getattr(p.children, children_type)]
-
-    def _get_parent(self, parent_type) -> None:
-        return None  # A commentary has no parent
-
-    @lazy_property
-    def olr_groundtruth_pages(self) -> List['CanonicalPage']:
-        """A list of `CanonicalPage` objects containing the groundtruth of the OLR."""
-        page_ids = get_olr_splits_page_ids(self.id)
-        return [p for p in self.children.pages if p.id in page_ids]
-
 
     @lazy_property  # Todo 👁️ This should not be maintained anymore
     def ocr_groundtruth_pages(self) -> Union[List['OcrPage'], list]:
@@ -190,7 +217,7 @@ class OcrCommentary(TextContainer):
         return [p.image for p in self.children.pages]
 
 
-class OcrPage(TextContainer):
+class OcrPage(Page, TextContainer):
     """A class representing a commentary page."""
 
     def __init__(self,
@@ -225,12 +252,33 @@ class OcrPage(TextContainer):
 
             return getattr(self.children, children_type)
 
+        elif children_type in ['entities', 'sentences', 'hyphenations']:
+            rebuild = cas_utils.import_page_rebuild(self.id)
+            cas = cas_utils.import_page_cas(self.id)
+            if cas is not None:
+                annotations = cas_utils.safe_import_page_annotations(self.id, cas, rebuild,
+                                                                     ANNOTATION_LAYERS[children_type])
+
+                if children_type == 'entities':
+                    return [RawEntity.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
+                elif children_type == 'sentences':
+                    return [RawSentence.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
+                elif children_type == 'hyphenations':
+                    return [RawHyphenation.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
+
+            else:  # page has no CAS
+                return []
+
+        else:
+            return []
+
     def _get_parent(self, parent_type):
         raise NotImplementedError('OcrPage.parents must be set at __init__ or manually.')
 
     def to_canonical_v1(self) -> Dict[str, Any]:
         """Creates canonical data, as used for INCEpTION. """
-        logger.warning('You are creating a canonical data version 1. For version two, use `commentary.to_canonical`.')
+        logger.warning(
+            'You are creating a canonical data version 1. For version 2, use `OcrCommentary.to_canonical()`.')
         data = {'id': self.id,
                 'iiif': 'None',
                 'cdate': strftime('%Y-%m-%d %H:%M:%S'),
@@ -287,8 +335,8 @@ class OcrPage(TextContainer):
         """
 
         if debug_dir is not None:
-            _ = draw_page_regions_lines_words(self.image.matrix.copy(), self,
-                                              os.path.join(debug_dir, self.id + '_raw.png'))
+            _ = draw_textcontainers(self.image.matrix.copy(), self,
+                                    os.path.join(debug_dir, self.id + '_raw.png'))
 
         logger.warning("You are optimising a page, bboxes and children are going to be changed")
         self.reset()
@@ -356,8 +404,8 @@ class OcrPage(TextContainer):
         self.children.words = [w for l in self.children.lines for w in l.children.words]
 
         if debug_dir:
-            _ = draw_page_regions_lines_words(self.image.matrix.copy(), self,
-                                              f"/Users/sven/Desktop/{self.id}_optimised.png")
+            _ = draw_textcontainers(self.image.matrix.copy(), self,
+                                    os.path.join(debug_dir, self.id + '_raw.png'))
 
     @lazy_property
     def image(self) -> Image:
@@ -464,6 +512,7 @@ class OlrRegion(OcrTextContainer):
 
 class OcrLine(OcrTextContainer):
     """Class for OCR lines."""
+
     def __init__(self,
                  markup: 'bs4.element.Tag',
                  page: OcrPage,
@@ -486,7 +535,7 @@ class OcrWord(OcrTextContainer):
                  **kwargs):
         super().__init__(id=id, markup=markup, page=page, **kwargs)
 
-    def _get_children(self, children_type):
+    def _get_children(self, children_type: str):
         return []  # Words have no children
 
     @lazy_property
@@ -495,3 +544,94 @@ class OcrWord(OcrTextContainer):
 
     def adjust_bbox(self):
         self.bbox = adjust_bbox_to_included_contours(self.bbox.bbox, self.parents.page.image.contours)
+
+
+class RawAnnotation(TextContainer):
+
+    @docstring_formatter(**docstrings)
+    def __init__(self,
+                 page: 'OcrPage',
+                 bboxes: List['Shape'],
+                 shifts: Tuple[int, int],
+                 text_window: str,
+                 warnings: List[str],
+                 **kwargs
+                 ):
+        """Default constructor for annotation.
+
+        Though it can be used directly, it is usually called via `from_cas_annotation` class method instead.
+        `kwargs` are used to pass any desired attribute or to manually set the values of properties and to
+        pass subclass-specific attributes, such as entity_type for entities or `corrputed` for gold sentences.
+
+        Args:
+            page: {parent_page}
+            bboxes: A list of `Shape` objects representing the bounding boxes of the annotation.
+            shifts: A tuple of two integers representing the shifts of the annotation wrt its word.
+            text_window: A string representing the text window of the annotation.
+            warnings: A list of strings representing the warnings of the annotation.
+        """
+        self.parents.page = page
+        self.parents.commentary = self.parents.page.parents.commentary
+        super().__init__(bboxes=bboxes, shifts=shifts, text_window=text_window, warnings=warnings, **kwargs)
+
+    def _get_parent(self, parent_type):
+        return OcrTextContainer._get_parent(self, parent_type)
+
+    def _get_children(self, children_type):
+        """Returns the children of the annotation, coping with the fact that annotation have multiple bboxes."""
+        return [c for c in getattr(self.parents.page.children, children_type)
+                if any([is_bbox_within_bbox_with_threshold(contained=c.bbox.bbox,
+                                                           container=bbox.bbox,
+                                                           threshold=variables.PARAMETERS['entity_inclusion_threshold'])
+                        for bbox in self.bboxes])]
+
+
+class RawEntity(RawAnnotation):
+    """Class for cas imported entities."""
+
+    @classmethod
+    def from_cas_annotation(cls, page, cas_annotation, rebuild, verbose: bool = False):
+        # Get general text-alignment-related about the annotation
+        bboxes, shifts, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
+                                                                               rebuild=rebuild, verbose=verbose)
+        return cls(page,
+                   bboxes=[Shape.from_xywh(*bbox) for bbox in bboxes],
+                   shifts=shifts,
+                   transcript=cas_annotation.transcript,
+                   entity_type=cas_annotation.value,
+                   wikidata_id=cas_annotation.wikidata_id,
+                   text_window=text_window,
+                   warnings=warnings)
+
+
+class RawSentence(RawAnnotation):
+    """Class for cas imported gold sentences."""
+
+    @classmethod
+    def from_cas_annotation(cls, page, cas_annotation, rebuild, verbose: bool = False):
+        # Get general text-alignment-related about the annotation
+        bboxes, shifts, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
+                                                                               rebuild=rebuild, verbose=verbose)
+        return cls(page,
+                   bboxes=[Shape.from_xywh(*bbox) for bbox in bboxes],
+                   shifts=shifts,
+                   text_window=text_window,
+                   warnings=warnings,
+                   corrupted=cas_annotation.corrupted,
+                   incomplete_continuing=cas_annotation.incomplete_continuing,
+                   incomplete_truncated=cas_annotation.incomplete_truncated)
+
+
+class RawHyphenation(RawAnnotation):
+    """Class for cas imported hyphenations."""
+
+    @classmethod
+    def from_cas_annotation(cls, page, cas_annotation, rebuild, verbose: bool = False):
+        # Get general text-alignment-related about the annotation
+        bboxes, shifts, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
+                                                                               rebuild=rebuild, verbose=verbose)
+        return cls(page,
+                   bboxes=[Shape.from_xywh(*bbox) for bbox in bboxes],
+                   shifts=shifts,
+                   text_window=text_window,
+                   warnings=warnings)

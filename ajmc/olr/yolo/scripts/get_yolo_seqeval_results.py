@@ -9,7 +9,7 @@ from ajmc.olr.yolo.utils import parse_yolo_txt_line
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
 WORD_INCLUSION_THRESH: float = 0.9
-base_data_dir = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data'
+base_data_dir = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentary/commentaries_data'
 yolo_path = '/scratch/sven/yolo'
 runs_path = os.path.join(yolo_path, 'runs/yolov5m_1280_ep300/train')
 
@@ -29,7 +29,7 @@ for xp_name in next(os.walk(runs_path))[1]:
     with open(config_path, 'r') as file:
         config = json.loads(file.read())
 
-    # Create the commentaries
+    # Create the commentary
     for dict_ in config['data']['eval']:
         if not dict_['id'] in commentaries.keys():
             commentaries[dict_['id']] = CanonicalCommentary.from_json(dict_['path'])

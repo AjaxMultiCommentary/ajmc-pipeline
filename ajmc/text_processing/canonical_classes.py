@@ -1,82 +1,23 @@
 import json
 import os
-import re
 from typing import Optional, Dict, List, Tuple, Union, Any, Iterable, Type
 from ajmc.commons.arithmetic import is_interval_within_interval
 from ajmc.commons.docstrings import docstrings, docstring_formatter
 from ajmc.commons.file_management.utils import verify_path_integrity
 from ajmc.commons.geometry import Shape, get_bbox_from_points
 from ajmc.commons.image import Image
-from ajmc.commons.miscellaneous import lazy_property, lazy_init, LazyObject
+from ajmc.commons.variables import CHILD_TYPES, TC_TYPES_TO_CHILD_TYPES
+from ajmc.commons.miscellaneous import lazy_property, LazyObject
 from jinja2 import Environment, FileSystemLoader
 from ajmc.commons import variables
 from ajmc.commons.miscellaneous import get_custom_logger
 from abc import abstractmethod
-
-from ajmc.olr.utils import get_olr_splits_page_ids
+from ajmc.text_processing.generic_classes import Commentary, TextContainer, Page
 
 logger = get_custom_logger(__name__)
 
 
-class TextContainer:
-    """Generic object for ocr and canonical representations of text containers."""
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            if k == 'commentary':
-                self.parents.commentary = v
-            else:
-                setattr(self, k, v)
-
-    @abstractmethod
-    @docstring_formatter(**docstrings)
-    def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
-        """Gets the children of `self` which are of the given `children_type`.
-
-        Args:
-            children_type: {children_type}
-
-        Returns:
-            A list of children.
-        """
-        pass
-
-    @abstractmethod
-    @docstring_formatter(**docstrings)
-    def _get_parent(self, parent_type) -> Optional[Type['TextContainer']]:
-        """Gets the `TextContainer` of type `parent_type` which has self as a child.
-
-        Note:
-            Unlike `_get_children`, `get_parent` returns a single text container and not lists of
-            text containers, as each text container can only have one parent.
-
-        Args:
-            parent_type: {parent_type}
-        """
-        pass
-
-    @lazy_property
-    def children(self) -> LazyObject:
-        return LazyObject(compute_function=self._get_children)
-
-    @lazy_property
-    def parents(self) -> LazyObject:
-        return LazyObject(compute_function=self._get_parent)
-
-    @lazy_property
-    def type(self) -> str:
-        """Generic method to get a `CanonicalTextContainer`'s type."""
-        return re.findall(r'[A-Z][a-z]+', self.__class__.__name__)[-1].lower()
-
-    # todo 👁️ there should be a possibility to add various space chars at the end of words
-    # todo 👁️ there should be a possibility to de-hyphenate
-    @lazy_property
-    def text(self) -> str:
-        """Generic method to get a `CanonicalTextContainer`'s text."""
-        return ' '.join([w.text for w in self.children.words])
-
-
-class CanonicalCommentary(TextContainer):
+class CanonicalCommentary(Commentary, TextContainer):
 
     @docstring_formatter(**docstrings)
     def __init__(self,
@@ -129,8 +70,10 @@ class CanonicalCommentary(TextContainer):
         # Set its children
         commentary.children = LazyObject(
             compute_function=lambda x: x,
-            **{tc_type: [get_tc_type_class(tc_type)(commentary=commentary, **tc) for tc in tcs]
-               for tc_type, tcs in can_json['textcontainers'].items()})
+            constrained_attrs=CHILD_TYPES,
+            **{tc_type: [get_tc_type_class(tc_type)(commentary=commentary, **tc)
+                         for tc in can_json['textcontainers'][tc_type]] if tc_type in can_json['textcontainers'] else []
+               for tc_type in CHILD_TYPES})
 
         return commentary
 
@@ -170,15 +113,6 @@ class CanonicalCommentary(TextContainer):
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
         raise NotImplementedError('`CanonicalCommentary.children` must be set at __init__.')
 
-    def _get_parent(self, parent_type) -> Optional[Type['TextContainer']]:
-        return None  # A commentary has no parents
-
-    @lazy_property
-    def olr_groundtruth_pages(self) -> List['CanonicalPage']:
-        """A list of `CanonicalPage` objects containing the groundtruth of the OLR."""
-        page_ids = get_olr_splits_page_ids(self.id)
-        return [p for p in self.children.pages if p.id in page_ids]
-
     @lazy_property
     def ocr_groundtruth_pages(self) -> List['CanonicalPage']:
         """A list of `CanonicalPage` objects containing the groundtruth of the OCR."""
@@ -201,27 +135,24 @@ class CanonicalTextContainer(TextContainer):
             - This methods works with word ranges, NOT with coordinates.
             - This methods does retrieve elements which overlap only partially with `self`.
         """
-        if children_type not in ['words', 'lines', 'regions', 'pages']:
-            raise ValueError(f'`children_type` must be one of words, lines, regions, pages, not {children_type}')
 
-        if self.type == 'word':
+        if self.type == 'word':  # Special efficiency hack for words
             return []
 
-        if children_type == 'words':  # Specal efficiency hack for words
+        if children_type == 'words':  # Special efficiency hack for words
             return self.parents.commentary.children.words[self.word_range[0]:self.word_range[1] + 1]
 
+        # General case
         return [tc for tc in getattr(self.parents.commentary.children, children_type)
                 if is_interval_within_interval(contained=tc.word_range, container=self.word_range)
                 and self.id != tc.id]
 
     def _get_parent(self, parent_type: str) -> Optional[Type['CanonicalTextContainer']]:
-        if parent_type not in ['line', 'region', 'page', 'commentary']:
-            raise ValueError(f'`parent_type` must be one of line, region, page, commentary, not {parent_type}')
 
         if parent_type == 'commentary':
             raise AttributeError('`parents.commentary` cannot be computed ex nihilo. It must be set manually.')
 
-        parents = [tc for tc in getattr(self.parents.commentary.children, parent_type + 's')
+        parents = [tc for tc in getattr(self.parents.commentary.children, TC_TYPES_TO_CHILD_TYPES[parent_type])
                    if is_interval_within_interval(contained=self.word_range, container=tc.word_range)
                    and self.id != tc.id]
 
@@ -230,12 +161,12 @@ class CanonicalTextContainer(TextContainer):
     @lazy_property
     def id(self) -> str:
         """Generic method to create a `CanonicalTextContainer`'s id."""
-        return self.type[0] + '_' + str(self.index)
+        return self.type + '_' + str(self.index)
 
     @lazy_property
     def index(self) -> int:
         """Generic method to get a `CanonicalTextContainer`'s index in its parent commentary's children list."""
-        return getattr(self.parents.commentary.children, self.type + 's').index(self)
+        return getattr(self.parents.commentary.children, TC_TYPES_TO_CHILD_TYPES[self.type]).index(self)
 
     @lazy_property
     def word_range(self) -> Tuple[int, int]:
@@ -252,7 +183,7 @@ class CanonicalTextContainer(TextContainer):
         return self.parents.page.Image.crop(self.bbox)
 
 
-class CanonicalPage(CanonicalTextContainer):
+class CanonicalPage(Page, CanonicalTextContainer):
 
     def __init__(self, id: str, word_range: Tuple[int, int], commentary: CanonicalCommentary, **kwargs):
         super().__init__(id=id, word_range=word_range, commentary=commentary, **kwargs)
@@ -276,7 +207,6 @@ class CanonicalPage(CanonicalTextContainer):
         with open(output_path, 'w') as f:
             f.write(
                 template.render(page=self, elements=children_types, region_types=variables.ORDERED_OLR_REGION_TYPES))
-
 
     @lazy_property
     def image(self) -> Image:  # Special case of page's images
@@ -315,5 +245,91 @@ class CanonicalWord(CanonicalTextContainer):
         return self.index, self.index
 
 
+# todo 👁️ not very elegant. try to revise.
 def get_tc_type_class(tc_type) -> Type[CanonicalTextContainer]:
-    return globals()[f'Canonical{tc_type.capitalize() if tc_type[-1] != "s" else tc_type[:-1].capitalize()}']
+    if not tc_type.endswith('s'):
+        return globals()[f'Canonical{tc_type.capitalize()}']
+    else:
+        if tc_type.endswith('ies'):
+            return globals()[f'Canonical{tc_type[:-3].capitalize()}y']
+        else:
+            return globals()[f'Canonical{tc_type[:-1].capitalize()}']
+
+
+
+class CanonicalAnnotation(CanonicalTextContainer):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def text(self):
+        return ' '.join([w.text for w in self.children.words])[self.shifts[0]:self.shifts[1]]
+
+    def get_text_window(self, window_size=5):
+        return ' '.join(self.parents.commentary.children.words[
+                        self.word_range[0] - window_size:self.word_range[1] + window_size + 1])
+
+
+class CanonicalEntity(CanonicalAnnotation):
+
+    def __init__(self,
+                 commentary: 'CanonicalCommentary',
+                 word_range: Tuple[int, int],
+                 shifts: Tuple[int, int],
+                 transcript: Optional[str],
+                 entity_type: str,
+                 wikidata_id: Optional[str],
+                 ):
+        super().__init__(word_range=word_range,
+                         commentary=commentary,
+                         shifts=shifts,
+                         transcript=transcript,
+                         entity_type=entity_type,
+                         wikidata_id=wikidata_id)
+
+    def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
+        return {'word_range': self.word_range,
+                'shifts': self.shifts,
+                'transcript': self.transcript,
+                'entity_type': self.value,
+                'wikidata_id': self.wikidata_id}
+
+
+class CanonicalSentence(CanonicalAnnotation):
+
+    def __init__(self,
+                 commentary: 'CanonicalCommentary',
+                 word_range: Tuple[int, int],
+                 shifts: Tuple[int, int],
+                 corrupted: Optional[str],
+                 incomplete_continuing: str,
+                 incomplete_truncated: Optional[str],
+                 ):
+        super().__init__(word_range=word_range,
+                         commentary=commentary,
+                         shifts=shifts,
+                         corrupted=corrupted,
+                         incomplete_continuing=incomplete_continuing,
+                         incomplete_truncated=incomplete_truncated)
+
+    def to_json(self) -> Dict[str, Union[str, Tuple[int, int], bool]]:
+        return {'word_range': self.word_range,
+                'shifts': self.shifts,
+                'corrupted': self.corrupted,
+                'incomplete_continuing': self.incomplete_continuing,
+                'incomplete_truncated': self.incomplete_truncated}
+
+
+class CanonicalHyphenation(CanonicalAnnotation):
+
+    def __init__(self,
+                 commentary: 'CanonicalCommentary',
+                 word_range: Tuple[int, int],
+                 shifts: Tuple[int, int]):
+        super().__init__(word_range=word_range,
+                         commentary=commentary,
+                         shifts=shifts)
+
+    def to_json(self) -> Dict[str, Union[str, Tuple[int, int], bool]]:
+        return {'word_range': self.word_range,
+                'shifts': self.shifts}

@@ -18,7 +18,7 @@ from ajmc.commons.variables import PATHS
 # Constants
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
-BASE_DATA_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data'
+BASE_DATA_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentary/commentaries_data'
 LAYOUTLM_XP_DIR = '/scratch/sven/layoutlm/experiments'
 YOLO_XP_DIR = '/scratch/sven/yolo/runs/binary_class'
 WORD_INCLUSION_THRESHOLD = 0.6

@@ -54,7 +54,7 @@ docstrings['BatchEncoding'] = """The default ouput of HuggingFace's `TokenizerFa
         list of example, containing notably the offsets. Please note that not using a `TokenizerFast` (i.e. using a `Tokenizer` instead) can lead to the cumbersome
         situation in which `self.encodings` is set to `None`.""",
 
-docstrings['base_dir'] = """The base directory to commentaries data. Use variables.PATHS['base_dir'] to access the default value."""
+docstrings['base_dir'] = """The base directory to commentary data. Use variables.PATHS['base_dir'] to access the default value."""
 
 docstrings['bbox'] = """A tuple of two (x, y) tuples representing upper-left and lower right coordinates."""
 

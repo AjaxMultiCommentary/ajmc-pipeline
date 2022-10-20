@@ -2,7 +2,7 @@ import os
 import csv
 
 base_dir = "../exps/evaluation"
-commentaries = ["cu31924087948174", "sophokle1v3soph"]
+commentary = ["cu31924087948174", "sophokle1v3soph"]
 
 def move_to_top(model_str, replace_l):
     for scheme in replace_l:
@@ -61,7 +61,7 @@ replace_lists = [
     "+deu",
 ]
 
-for commentary in commentaries:
+for commentary in commentary:
     aggregated_file = os.path.join(base_dir, f"{commentary}.tsv")
     run_dir = os.path.join(base_dir, commentary, "ocr", "runs")
     initial = True

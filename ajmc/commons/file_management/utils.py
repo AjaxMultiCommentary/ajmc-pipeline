@@ -4,13 +4,13 @@ import os
 import shutil
 from string import ascii_letters
 from datetime import datetime
-from typing import Tuple, Optional, List, Union
+from typing import Tuple, Optional, List, Union, Callable
 
 from ajmc.commons import variables
 from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.commons.variables import PATHS
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-
+from pathlib import Path
 logger = get_custom_logger(__name__)
 
 NUMBERS_LETTERS = '0123456789' + ascii_letters
@@ -45,7 +45,6 @@ def int_to_x_based_code(number: int,
     while base ** power <= number:
         powers.append(power)
         power += 1
-
 
     # Then, we can start building the code
     code = ''
@@ -102,6 +101,7 @@ def get_62_based_datecode(date: Optional[datetime] = None):
 
     return datecode
 
+
 def verify_path_integrity(path: str, path_pattern: str) -> None:
     """Verify the integrity of an `ocr_path` with respect to ajmc's folder structure.
     Args:
@@ -154,7 +154,8 @@ def find_file_by_name(base_name: str,
 
     files = [f for f in os.listdir(directory) if base_name in f]
 
-    assert len(files) <= 1, f"""There are {len(files)} files matching the name {base_name} in {directory}. Please check."""
+    assert len(
+        files) <= 1, f"""There are {len(files)} files matching the name {base_name} in {directory}. Please check."""
 
     if len(files) == 0:
         logger.debug(f"""Page_id {base_name} matches no file in {directory}, skipping...""")
@@ -207,7 +208,7 @@ def move_files_in_each_commentary_dir(relative_src: str,
 
 @docstring_formatter(**docstrings)
 def create_folder_in_each_commentary_dir(relative_dir_path: str,
-                                         base_dir:str = PATHS['base_dir']):
+                                         base_dir: str = PATHS['base_dir']):
     """Creates an empty directory in each commentary directory.
 
     Args:
@@ -228,9 +229,37 @@ def merge_subdirectories(parent_dir: str, destination_dir: str):
             merge_subdirectories(os.path.join(root, dir_), destination_dir)
 
 
-def walk_dirs(path: str, prepend_base: bool = False) -> List[str]:
+# Todo change this to return a Path object
+def walk_dirs(path: str, prepend_base: bool = False, recursive: bool = False) -> List[str]:
     """Walks over the dirs in path."""
-    if prepend_base:
-        return [os.path.join(path, dir_) for dir_ in sorted(next(os.walk(path))[1])]
-    else:
-        return sorted(next(os.walk(path))[1])
+    for root, dirs, files in os.walk(path):
+        for dir_ in sorted(dirs):
+            if prepend_base:
+                yield os.path.join(root, dir_)
+            else:
+                yield dir_
+        if not recursive:
+            break
+
+
+def walk_files(path: str,
+               filter: Optional[Callable[[Path], bool]] = None,
+               recursive: bool = False):
+    """Walks over the files in path.
+
+    Args:
+        path: The path to walk over.
+        filter: A function that takes a filename as input and returns a boolean.
+        recursive: Whether to walk recursively or not.
+    """
+    for root, dirs, files in os.walk(path):
+        for filename in sorted(files):
+            path = Path(os.path.join(root, filename))
+            if filter is not None:
+                if filter(path):
+                    yield path
+            else:
+                yield path
+
+        if not recursive:
+            break

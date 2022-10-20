@@ -6,7 +6,7 @@ from ajmc.commons.docstrings import docstrings, docstring_formatter
 
 @docstring_formatter(**docstrings)
 def compute_interval_overlap(i1: Tuple[int, int], i2: Tuple[int, int]):
-    """Computes the overlap between two interevals defined by their start and their stop included.
+    """Computes the overlap between two intervals defined by their start and their stop included.
 
     Args:
         i1: {interval}

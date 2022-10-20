@@ -24,20 +24,20 @@ from ajmc.text_processing.ocr_classes import OcrCommentary
 from ajmc.ocr.preprocessing import image_preprocessing
 
 # Data dir with whole images
-RAW_DATA_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data/'
+RAW_DATA_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentary/commentaries_data/'
 RAW_COMMENTARY_DIRS = ['Wecklein1894', 'Kamerbeek1953', 'sophoclesplaysa05campgoog', 'Paduano1982', 'lestragdiesdeso00tourgoog', 
                         'Untersteiner1934', 'Ferrari1974', 'sophokle1v3soph', 'DeRomilly1976', 'Finglass2011', 'Colonna1975', 
                         'bsb10234118', 'cu31924087948174', 'Garvie1998']
 
 # Data dir containing line images and ground truths
-TRAIN_DATA_DIR = os.path.join(PARENT_DIR, "GT-commentaries-OCR", "data")
+TRAIN_DATA_DIR = os.path.join(PARENT_DIR, "GT-commentary-OCR", "data")
 TRAIN_COMMENTARY_DIRS = ['Wecklein1894', 'sophoclesplaysa05campgoog', 'bsb10234118', 'sophokle1v3soph', 'cu31924087948174']
 
 POGRETRA_DATA_DIR = os.path.join(PARENT_DIR, "pogretra-v1.0", "Data")
 POGRETRA_COMMENTARY_DIRS = ['German-serifs/ldpd_10922736_000', 'German-serifs/OU_ligature_ST_ligature/nnc1.50178386-1593613693-redux', 
                         'German-serifs/platonisdialogi06plat', 'German-serifs/actaphilippietac00bonnuoft', 'German-serifs/bsb10234118', 
                         'German-serifs/stoicorumveterum02arniuoft', 'German-serifs/bub_gb_FZbfaq7tcvAC', 'German-serifs/churchfathers', 
-                        'German-serifs/b21459162_0003', 'Porson/Porson-commentaries', 'Porson/Old-Oxford', 'Porson/Porson', 
+                        'German-serifs/b21459162_0003', 'Porson/Porson-commentary', 'Porson/Old-Oxford', 'Porson/Porson',
                         'Porson/sourcesforgreek02hillgoog', 'Old-Teubner-serif/602250676brucerob', 
                         'Old-Teubner-serif/inplatonisrempu02krolgoog_teubner_serif', 'Old-Teubner-serif/aeschinisoration00aesc', 
                         'Old-Teubner-serif/Teubner-serif-training', 'Old-Teubner-serif/sextiempiriciope12sext07', 

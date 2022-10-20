@@ -5,7 +5,6 @@
 2. **Coordinate based evaluation**: computes errors by matching words with overlapping coordinates.
 """
 
-import csv
 import os
 import Levenshtein
 from tqdm import tqdm
@@ -14,7 +13,7 @@ from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import is_bbox_within_bbox, are_bboxes_overlapping_with_threshold
 from ajmc.ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
-    insert_text_in_soup, write_error_counts
+    insert_text_in_soup, write_error_counts, write_editops_record
 from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
 from ajmc.commons.miscellaneous import get_custom_logger
 
@@ -263,14 +262,7 @@ def commentary_evaluation(commentary: 'OcrCommentary',
                       encoding="utf-8") as html_file:
                 html_file.write(str(soup))
 
-        # Sort and write editops record
-        editops = {k: v for k, v in sorted(editops.items(), key=lambda item: item[1], reverse=True)}
-        with open(os.path.join(output_dir, "editops.tsv"), 'w', encoding="utf-8") as csv_file:
-            spamwriter = csv.writer(csv_file, delimiter='\t', quotechar='"')
-            spamwriter.writerow(['Operation', 'From', 'To', 'Count'])
-            for k, v in editops.items():
-                spamwriter.writerow([k[0], k[1], k[2], v])
-
+        write_editops_record(editops_record=editops, output_dir=output_dir)
         write_error_counts(bow_error_counts, coord_error_counts, output_dir)
 
     return bow_error_counts, coord_error_counts, editops

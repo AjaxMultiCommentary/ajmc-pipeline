@@ -4,7 +4,7 @@ from functools import wraps
 import json
 import logging
 import timeit
-from typing import List, Iterable, Generator, Callable, Type
+from typing import List, Iterable, Generator, Callable, Type, Optional
 import pandas as pd
 from jsonschema import Draft6Validator
 from ajmc.commons.docstrings import docstring_formatter, docstrings
@@ -185,15 +185,14 @@ def lazy_init(func):
             setattr(self, name, value)
 
         # For defaulted args and potential **kwargs, only add if not None
-        def_from_args = [(n, v) for n, v in zip(defaults_args_names, args[required_args_len:])
-                         if v is not None]
-        def_from_kwargs = [(n, v) for n, v in kwargs.items() if n in defaults_args_names and v is not None]
+        def_from_args = [(n, v) for n, v in zip(defaults_args_names, args[required_args_len:])]
+        def_from_kwargs = [(n, v) for n, v in kwargs.items() if n in defaults_args_names]
         for name, value in def_from_args + def_from_kwargs:
             setattr(self, name, value)
 
         # Add potential **kwargs
         for name, value in kwargs.items():
-            if name not in required_args_names + defaults_args_names and value is not None:
+            if name not in required_args_names + defaults_args_names:
                 setattr(self, name, value)
 
         func(self, *args, **kwargs)
@@ -232,19 +231,68 @@ def lazy_attributer(attr_name: str, func: Callable, attr_decorator: Callable = l
 
 
 class LazyObject:
-    """An object that computes its attributes lazily, using `compute_function`."""
+    """An object that computes attributes lazily using `compute_function`.
+
+    The set of possible attributes is infinite by default, but can be constrained by setting `constrained_attrs`.
+    Otherwise, any called attribute will be created and computing on the fly.
+
+    Example:
+        >>> my_lazy_object = LazyObject(lambda attr_name: attr_name + ' has been computed')
+        >>> my_lazy_object.hello
+        'hello has been computed'
+        >>> my_lazy_object.another_greeting_word
+        'another_greeting_word has been computed'
+    """
 
     @lazy_init
-    def __init__(self, compute_function: Callable, **kwargs):
+    def __init__(self,
+                 compute_function: Callable,
+                 constrained_attrs: Optional[List[str]] = None,
+                 **kwargs):
         """Initializes the object.
 
         Args:
             compute_function: The function to call to compute the attributes.
+            constrained_attrs: Constrains the list of possible attributes. The given attributes will be the only one itered upon.
+             If `None`, any attribute can be computed.
             **kwargs: Pass kwargs to manually set attributes.
         """
         pass
 
     def __getattr__(self, attribute):
         if attribute not in self.__dict__:
-            self.__dict__[attribute] = self.compute_function(attribute)
+            if self.constrained_attrs is None or attribute in self.constrained_attrs:  # If constrained, only compute if in constrained attrs
+                self.__dict__[attribute] = self.compute_function(attribute)  # Compute and set attribute lazily
+            else:
+                raise AttributeError(
+                    f"""Attribute {attribute} is not in the list of allowed attributes: {self.constrained_attrs}""")
         return self.__dict__[attribute]
+
+    def __dir__(self):
+        return ['compute_function',
+                'constrained_attrs'] + self.constrained_attrs if self.constrained_attrs is not None else []
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.__dict__})'
+
+    def __iter__(self):
+        if self.constrained_attrs is None:
+            raise TypeError(
+                f'You are trying to iterate on a {self.__class__.__name__} but the attributes to iter upon are not defined (self.constrained_attrs is None).')
+        else:
+            for attr in self.constrained_attrs:
+                yield attr, getattr(self, attr)
+
+
+def inline_def(func, name, doc=None):
+    """Returns a function with a new name and docstring.
+
+    Args:
+        func: the function to rename
+        name: the new name
+        doc: the new docstring
+    """
+    func.__name__ = name
+    if doc is not None:
+        func.__doc__ = doc
+    return func
