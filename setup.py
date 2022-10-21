@@ -158,7 +158,7 @@ setup(
     # ========= DATA===============
     include_package_data=True,
     package_data={  # Optional
-        "data": ["data/templates"],
+        "data": ["data/templates/*"],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
