@@ -156,7 +156,7 @@ setup(
     # installed, specify them here.
 
     # ========= DATA===============
-    # include_package_data=True,
+    include_package_data=True,
     # package_data={  # Optional
     #     "data": ["data/templates/*"],
     # },
