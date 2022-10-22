@@ -128,6 +128,54 @@ VIA_CSV_DICT_TEMPLATE = {'filename': [],
                          'region_shape_attributes': [],
                          'region_attributes': []}
 
+REGION_TYPES_TO_SEGMONTO = {
+    'commentary': 'MainZone:commentary',
+    'primary_text': 'MainZone:primaryText',
+    'preface': 'MainZone:preface',
+    'translation': 'MainZone:translation',
+    'introduction': 'MainZone:introduction',
+    'line_number_text': 'NumberingZone:textNumber',
+    'line_number_commentary': '',
+    'page_number': 'NumberingZone:pageNumber',
+    'appendix': 'MainZone:appendix',
+    'app_crit': 'MarginTextZone:criticalApparatus',
+    'bibliography': 'MainZone:bibliography',
+    'footnote': 'MarginTextZone:footnote',
+    'index_siglorum': 'MainZone:index',
+    'running_header': 'RunningTitleZone',
+    'table_of_contents': 'MainZone:ToC',
+    'title': 'TitlePageZone',
+    'printed_marginalia': 'MarginTextZone:printedNote',
+    'handwritten_marginalia': 'MarginTextZone:handwrittenNote',
+    'other': 'CustomZone:other',
+    'undefined': 'CustomZone:undefined',
+    'line_region': 'CustomZone:line_region'
+}
+
+SEGMONTO_TO_VALUE_IDS = {
+    'MainZone:commentary': 'BT01',
+    'MainZone:primaryText': 'BT02',
+    'MainZone:preface': 'BT03',
+    'MainZone:translation': 'BT04',
+    'MainZone:introduction': 'BT05',
+    'NumberingZone:textNumber': 'BT06',
+    'NumberingZone:pageNumber': 'BT07',
+    'MainZone:appendix': 'BT08',
+    'MarginTextZone:criticalApparatus': 'BT09',
+    'MainZone:bibliography': 'BT10',
+    'MarginTextZone:footnote': 'BT11',
+    'MainZone:index': 'BT12',
+    'RunningTitleZone': 'BT13',
+    'MainZone:ToC': 'BT14',
+    'TitlePageZone': 'BT15',
+    'MarginTextZone:printedNote': 'BT16',
+    'MarginTextZone:handwrittenNote': 'BT17',
+    'CustomZone:other': 'BT18',
+    'CustomZone:undefined': 'BT19',
+    'CustomZone:line_region': 'BT20',
+    'CustomZone:weird': 'BT21',
+}
+
 # ======================================================================================================================
 #                                                 TEXT CONTAINERS
 # ======================================================================================================================
@@ -142,8 +190,7 @@ TEXTCONTAINER_TYPES = ['commentary',
                        'entity',
                        'word']
 
-
-TC_TYPES_TO_CHILD_TYPES = {t: t+'s' if t[-1] != 'y' else t[:-1]+'ies' for t in TEXTCONTAINER_TYPES}
+TC_TYPES_TO_CHILD_TYPES = {t: t + 's' if t[-1] != 'y' else t[:-1] + 'ies' for t in TEXTCONTAINER_TYPES}
 
 CHILD_TYPES = list(TC_TYPES_TO_CHILD_TYPES.values())
 

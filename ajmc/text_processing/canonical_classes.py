@@ -8,11 +8,12 @@ from ajmc.commons.geometry import Shape, get_bbox_from_points
 from ajmc.commons.image import Image
 from ajmc.commons.variables import CHILD_TYPES, TC_TYPES_TO_CHILD_TYPES
 from ajmc.commons.miscellaneous import lazy_property, LazyObject
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, PackageLoader
 from ajmc.commons import variables
 from ajmc.commons.miscellaneous import get_custom_logger
 from abc import abstractmethod
 from ajmc.text_processing.generic_classes import Commentary, TextContainer, Page
+# import xmlformatter
 
 logger = get_custom_logger(__name__)
 
@@ -193,20 +194,37 @@ class CanonicalPage(Page, CanonicalTextContainer):
 
     def to_alto(self,
                 children_types: List[str],
-                output_path: str):
+                region_types_mapping: Dict[str, str],
+                region_types_ids: Dict[str, str],
+                output_path: str,
+                regions_types: List[str] = variables.ROIS):
         """Exports a page to ALTO-xml.
 
         Args:
-            children_types: The list of sub-page element-types you want to includ, e.g. `['region', 'line']`.
+            children_types: The types of children to be exported. Must be a subset of ['regions', 'lines', 'words'].
+            region_types_mapping: A dictionary mapping the types of regions to the types of regions in the ALTO-xml, for instance variables.REGION_TYPES_TO_SEGMONTO
+            region_types_ids: A dictionary mapping the values of `region_types_mapping` to the ids of regions in the ALTO-xml, for instance variables.REGION_TYPES_TO_SEGMONTO_ID
             output_path: self-explanatory.
+            regions_types: The types of regions to be exported, for instance variables.ROIS. This allows for filtering only the regions of interested, excluded regions types like 'undefined'.
         """
-        file_loader = FileSystemLoader('data/templates')
-        env = Environment(loader=file_loader)
+        env = Environment(loader=PackageLoader('ajmc', 'data/templates'),
+                          trim_blocks=True,
+                          lstrip_blocks=True,
+                          autoescape=True)
         template = env.get_template('alto.xml.jinja2')
 
+        # xml_formatter = xmlformatter.Formatter(indent="1", indent_char="\t", encoding_output="UTF-8", correct=True)
         with open(output_path, 'w') as f:
-            f.write(
-                template.render(page=self, elements=children_types, region_types=variables.ORDERED_OLR_REGION_TYPES))
+            alto_xml_data = template.render(
+                page=self,
+                children_types=children_types,
+                region_types=regions_types,
+                region_types_mapping=region_types_mapping,
+                region_types_ids=region_types_ids
+            )
+            # formatted_xml = xml_formatter.format_string(alto_xml_data.replace('\n', ""))
+            # f.write(formatted_xml.decode('utf-8'))
+            f.write(alto_xml_data)
 
     @lazy_property
     def image(self) -> Image:  # Special case of page's images

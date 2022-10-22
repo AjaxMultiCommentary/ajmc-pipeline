@@ -157,9 +157,9 @@ setup(
 
     # ========= DATA===============
     include_package_data=True,
-    # package_data={  # Optional
-    #     "data": ["data/templates/*"],
-    # },
+    package_data={  # Optional
+        "data": ["data/templates/*"],
+    },
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
