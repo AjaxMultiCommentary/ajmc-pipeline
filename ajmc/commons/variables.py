@@ -181,7 +181,7 @@ SEGMONTO_TO_VALUE_IDS = {
 # ======================================================================================================================
 
 TEXTCONTAINER_TYPES = ['commentary',
-                       # 'chapter',
+                       'section',
                        'page',
                        'region',
                        'sentence',

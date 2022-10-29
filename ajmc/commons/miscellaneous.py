@@ -165,7 +165,7 @@ def lazy_init(func):
         ```
 
     Note:
-        Warning, this does not handle `*args` and `**kwargs`.
+        Warning, this does not handle `*args`.
 
     """
     specs = inspect.getfullargspec(func)

@@ -8,7 +8,7 @@ import re
 import json
 import os
 from time import strftime
-from typing import Dict, Optional, List, Union, Any, Tuple
+from typing import Dict, Optional, List, Union, Any, Tuple, Type
 import bs4.element
 from abc import abstractmethod
 
@@ -28,7 +28,7 @@ from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via
 import jsonschema
 
 from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalWord, CanonicalPage, CanonicalRegion, \
-    CanonicalLine, CanonicalEntity, CanonicalSentence, CanonicalHyphenation
+    CanonicalLine, CanonicalEntity, CanonicalSentence, CanonicalHyphenation, CanonicalSection
 from ajmc.text_processing import cas_utils
 from ajmc.text_processing.generic_classes import Commentary, TextContainer, Page
 from ajmc.text_processing.markup_processing import parse_markup_file, get_element_bbox, \
@@ -151,7 +151,7 @@ class OcrCommentary(Commentary, TextContainer):
                                         commentary=can,
                                         shifts=ent.shifts,
                                         transcript=ent.transcript,
-                                        entity_type=ent.entity_type,
+                                        label=ent.label,
                                         wikidata_id=ent.wikidata_id))
             # Adding sentences
             for s in p.children.sentences:
@@ -174,13 +174,20 @@ class OcrCommentary(Commentary, TextContainer):
 
             p.reset()  # We reset the page to free up memory
 
+
+        # Adding sections
+        for s in self.children.sections:
+            children['sections'].append(
+                CanonicalSection(word_range=(s.children.words[0].index, s.children.words[-1].index),
+                                 commentary=can,
+                                 section_type=s.section_type,
+                                 section_title=s.section_title))
+
         can.children = LazyObject((lambda x: x), constrained_attrs=CHILD_TYPES, **children)
 
         return can
 
     def _get_children(self, children_type):
-        if children_type not in ['words', 'lines', 'regions', 'pages']:
-            raise ValueError(f'`children_type` must be one of words, lines, regions, pages, not {children_type}')
 
         if children_type == 'pages':
             pages = []
@@ -192,8 +199,14 @@ class OcrCommentary(Commentary, TextContainer):
 
             return sorted(pages, key=lambda x: x.id)
 
+        # Todo : not implemented yet
+        elif children_type == 'sections':
+            logger.warning('Sections are not implemented yet')
+            return []
+
         else:  # For other children, them from each page
             return [tc for p in self.children.pages for tc in getattr(p.children, children_type)]
+
 
     @lazy_property  # Todo 👁️ This should not be maintained anymore
     def ocr_groundtruth_pages(self) -> Union[List['OcrPage'], list]:
@@ -424,6 +437,43 @@ class OcrPage(Page, TextContainer):
         return Shape(get_bbox_from_points([xy for w in self.children.words for xy in w.bbox.bbox]))
 
 
+class RawSection(TextContainer):
+
+    def __init__(self,
+                 commentary,
+                 section_type: str,
+                 section_title: str,
+                 start: int,
+                 end: int,
+                 **kwargs):
+
+        super().__init__(commentary=commentary,
+                         section_type=section_type,
+                         section_title=section_title,
+                         start=start,
+                         end=end,
+                         **kwargs)
+
+    @classmethod
+    def from_json(cls, json_dict: dict):
+
+        return cls(**json_dict)
+
+    def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
+        if children_type == 'pages':
+            return [p for p in self.parents.commentary.children.pages
+                    if self.start >= p.number <= self.end]
+
+        else:
+            return [child for p in self.children.pages for child in getattr(p.children, children_type)]
+
+    def _get_parent(self, parent_type) -> Optional[Type['TextContainer']]:
+        if parent_type == 'commentary':
+            return self.parents.commentary
+        else:
+            return None
+
+
 class OcrTextContainer(TextContainer):
 
     def __init__(self, **kwargs):
@@ -561,7 +611,7 @@ class RawAnnotation(TextContainer):
 
         Though it can be used directly, it is usually called via `from_cas_annotation` class method instead.
         `kwargs` are used to pass any desired attribute or to manually set the values of properties and to
-        pass subclass-specific attributes, such as entity_type for entities or `corrputed` for gold sentences.
+        pass subclass-specific attributes, such as label for entities or `corrputed` for gold sentences.
 
         Args:
             page: {parent_page}
@@ -598,7 +648,7 @@ class RawEntity(RawAnnotation):
                    bboxes=[Shape.from_xywh(*bbox) for bbox in bboxes],
                    shifts=shifts,
                    transcript=cas_annotation.transcript,
-                   entity_type=cas_annotation.value,
+                   label=cas_annotation.value,
                    wikidata_id=cas_annotation.wikidata_id,
                    text_window=text_window,
                    warnings=warnings)

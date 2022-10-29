@@ -179,7 +179,7 @@ def draw_textcontainers(img_matrix, outfile: Optional[str] = None, *textcontaine
                                           stroke_thickness=2,
                                           fill_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           fill_opacity=.3,
-                                          text=tc.entity_type if tc.type=='entity' else tc.type)
+                                          text=tc.label if tc.type == 'entity' else tc.type)
                 else:
                     img_matrix = draw_box(box=bbox.bbox,
                                           img_matrix=img_matrix,

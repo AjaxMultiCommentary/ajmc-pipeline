@@ -55,18 +55,18 @@ class CanonicalCommentary(Commentary, TextContainer):
             logger.info(f'Importing canonical commentary from {json_path}')
             can_json = json.loads(file.read())
 
-        # Create the commentary
+        # Create the (empty) commentary and populate its info
         commentary = cls(id=can_json['metadata']['id'], children=None, images=None, info={**can_json['metadata']})
 
         # Automatically determinates paths
         verify_path_integrity(json_path, variables.FOLDER_STRUCTURE_PATHS['canonical_json'])
         commentary.info['base_dir'] = '/' + '/'.join([p for p in json_path.split('/')[:-3]])
-        logger.info(f"Assuming {commentary.info['base_dir']} as base directory")
+        logger.debug(f"Assuming {commentary.info['base_dir']} as base directory")
         image_dir = os.path.join(commentary.info['base_dir'], variables.PATHS['png'])
 
         # Set its images
         commentary.images = [Image(id=img['id'], path=os.path.join(image_dir, img['id'] + '.png'),
-                                   word_range=img['word_range']) for img in can_json['images']]
+                                   word_range=img['word_range']) for img in can_json['textcontainers']['pages']]
 
         # Set its children
         commentary.children = LazyObject(
@@ -89,9 +89,8 @@ class CanonicalCommentary(Commentary, TextContainer):
         """
 
         data = {'metadata': {'id': self.id, 'ocr_run': self.info['ocr_run']},
-                'images': [{'id': img.id, 'word_range': img.word_range} for img in self.images],
                 'textcontainers': {tc_type: [tc.to_json() for tc in getattr(self.children, tc_type)]
-                                   for tc_type in ['pages', 'regions', 'lines', 'words']}}
+                                   for tc_type in CHILD_TYPES}}
 
         if output_path is None:
             output_dir = os.path.join(self.info['base_dir'], 'canonical/v2/')
@@ -182,6 +181,21 @@ class CanonicalTextContainer(TextContainer):
     def image(self) -> Image:
         """Generic method to create a `CanonicalTextContainer`'s image."""
         return self.parents.page.Image.crop(self.bbox)
+
+class CanonicalSection(CanonicalTextContainer):
+
+        def __init__(self,
+                     commentary,
+                     section_type,
+                     section_title,
+                     **kwargs):
+            super().__init__(commentary=commentary,
+                             section_type=section_type,
+                             section_title=section_title,
+                             **kwargs)
+
+        def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
+            return {'id': self.id, 'word_range': self.word_range}
 
 
 class CanonicalPage(Page, CanonicalTextContainer):
@@ -295,21 +309,21 @@ class CanonicalEntity(CanonicalAnnotation):
                  word_range: Tuple[int, int],
                  shifts: Tuple[int, int],
                  transcript: Optional[str],
-                 entity_type: str,
+                 label: str,
                  wikidata_id: Optional[str],
                  ):
         super().__init__(word_range=word_range,
                          commentary=commentary,
                          shifts=shifts,
                          transcript=transcript,
-                         entity_type=entity_type,
+                         label=label,
                          wikidata_id=wikidata_id)
 
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
         return {'word_range': self.word_range,
                 'shifts': self.shifts,
                 'transcript': self.transcript,
-                'entity_type': self.value,
+                'label': self.label,
                 'wikidata_id': self.wikidata_id}
 
 

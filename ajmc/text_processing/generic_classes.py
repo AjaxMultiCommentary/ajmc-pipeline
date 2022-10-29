@@ -4,21 +4,26 @@ from typing import List, Optional, Type, Union, Iterable
 
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.image import draw_textcontainers
-from ajmc.commons.miscellaneous import lazy_property, LazyObject, recursive_iterator
+from ajmc.commons.miscellaneous import lazy_property, LazyObject, recursive_iterator, lazy_init
 from ajmc.commons.variables import CHILD_TYPES, TEXTCONTAINER_TYPES
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.cas_utils import export_commentary_to_xmis
+from dataclasses import dataclass
 
 
+# @dataclass
 class TextContainer:
     """Generic object for ocr and canonical representations of text containers."""
 
+
+    @lazy_init
     def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            if k == 'commentary':
-                self.parents.commentary = v
-            else:
-                setattr(self, k, v)
+        if hasattr(self, 'commentary'):
+            self.parents.commentary = self.commentary
+            del self.commentary
+
+    # def __post_init__(self):
+
 
     @abstractmethod
     @docstring_formatter(**docstrings)
@@ -103,3 +108,8 @@ class Page:
             draw = draw_textcontainers(draw, output_path, *getattr(self.children, type))
 
         return draw
+
+    @lazy_property
+    def number(self) -> int:
+        """The page number."""
+        return int(self.id.split('_')[-1])

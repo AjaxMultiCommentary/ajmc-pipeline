@@ -13,9 +13,9 @@ stream_handler.setLevel(0)
 
 base_data_dir = variables.PATHS['cluster_base_dir']
 base_xp_dir = '/scratch/sven/yolo'
-configs_dir = '/scratch/sven/tmp/ajmc/data/layoutlm/configs'
+configs_dir = '/scratch/sven/tmp/ajmc/data/yolo/configs'
 
-excluded_configs = ['1D_jebb_kamerbeek.json']
+excluded_configs = ['4D_omnibus_segmonto.json']
 DATASET_NAME = 'multiclass'
 # for config_name in os.listdir(configs_dir):
 for config_name in os.listdir(configs_dir):
@@ -63,13 +63,13 @@ for config_name in os.listdir(configs_dir):
 
             for p in pages:
                 # write page image
-                img_name = p.image.path.split('/')[-1]
-                p.image.write(os.path.join(abs_paths['images'][set_], img_name))
+                # img_name = p.image.path.split('/')[-1]
+                # p.image.write(os.path.join(abs_paths['images'][set_], img_name))
                 # get page labels
                 yolo_labels = []
                 for r in p.children.regions:
-                    if r.info['region_type'] in config['rois']:
-                        r_coarse_label = config['region_types_to_labels'][r.info['region_type']]
+                    if r.region_type in config['rois']:
+                        r_coarse_label = config['region_types_to_labels'][r.region_type]
                         r_label_id = config['labels_to_ids'][r_coarse_label]
                         # r_label_id = 0
                         r_width = r.bbox.width / p.image.width

@@ -37,7 +37,7 @@ def do_map_for_yolo(images_dir: str,
                                image_width=image.width,
                                image_height=image.height,
                                is_groundtruth=False)
-        preds_array = np.array([l['bbox'].xyxy + [l['label_id'], l['conf']] for l in preds])
+        preds_array = np.array([list(l['bbox'].xyxy) + [l['label_id'], l['conf']] for l in preds])
 
         # Parse Groundtruth
         gt = parse_yolo_txt(path=os.path.join(gt_dir, pred_name),
@@ -46,7 +46,7 @@ def do_map_for_yolo(images_dir: str,
                             image_height=image.height,
                             is_groundtruth=True)
 
-        gt_array = np.array([l['bbox'].xyxy + [l['label_id']] + [0, 0] for l in gt])
+        gt_array = np.array([list(l['bbox'].xyxy) + [l['label_id']] + [0, 0] for l in gt])
 
         metric_fn.add(preds_array, gt_array)
 
@@ -60,38 +60,55 @@ def do_map_for_yolo(images_dir: str,
 
     return metrics
 
-
-xp_series = ['binary_class',
-             'multiclass']
+#%%
 
 DATASETS_DIR = '/scratch/sven/yolo/datasets/'
 RUNS_DIR = '/scratch/sven/yolo/runs/'
 
-for xp_serie in xp_series:
+with open(os.path.join(DATASETS_DIR, 'multiclass', '4D_omnibus_segmonto', 'config.yaml')) as f:
+    config = yaml.load(f, Loader=yaml.FullLoader)
+ids_to_labels = {i: l for i, l in enumerate(config['names'])}
+metrics = do_map_for_yolo(images_dir='/scratch/sven/yolo/datasets/multiclass/4D_omnibus_segmonto/images/eval',
+                          gt_dir='/scratch/sven/yolo/datasets/multiclass/4D_omnibus_segmonto/labels/eval',
+                          preds_dir='/scratch/sven/yolo/runs/multiclass/4D_omnibus_segmonto/exp2/labels',
+                          ids_to_labels=ids_to_labels,)
+general_results = initialize_general_results(ids_to_labels)
+general_results = update_general_results(general_results, metrics, '4D_omnibus_segmonto', ids_to_labels)
 
-    for i, xp_name in enumerate(walk_dirs(os.path.join(DATASETS_DIR, xp_serie))):
-        images_dir = os.path.join(DATASETS_DIR, xp_serie, xp_name, 'images/eval')
-        gt_dir = os.path.join(DATASETS_DIR, xp_serie, xp_name, 'labels/eval')
-        preds_dir = os.path.join(RUNS_DIR, xp_serie, xp_name, 'detect/labels', )
+df = pd.DataFrame.from_dict(general_results)
+tsv_path = os.path.join(RUNS_DIR, 'multiclass', '4D_omnibus_segmonto', 'general_results.tsv')
+df.to_csv(tsv_path, sep='\t', index=False)
 
-        # get labels_map
-        with open(os.path.join(DATASETS_DIR, xp_serie, xp_name, 'config.yaml')) as f:
-            config = yaml.load(f, Loader=yaml.FullLoader)
-        ids_to_labels = {i: l for i, l in enumerate(config['names'])}
-
-        # Create the general_results.
-        if i == 0:
-            general_results = initialize_general_results(ids_to_labels=ids_to_labels)
-
-        metrics = do_map_for_yolo(images_dir=images_dir,
-                                  gt_dir=gt_dir,
-                                  preds_dir=preds_dir,
-                                  ids_to_labels=ids_to_labels,
-                                  )
-
-        general_results = update_general_results(general_results=general_results, metrics=metrics,
-                                                 xp_name=xp_name, ids_to_labels=ids_to_labels)
-
-    df = pd.DataFrame.from_dict(general_results)
-    tsv_path = os.path.join(RUNS_DIR, xp_serie, 'general_results.tsv')
-    df.to_csv(tsv_path, sep='\t', index=False)
+# #%%
+# xp_series = ['binary_class',
+#              'multiclass']
+#
+#
+# for xp_serie in xp_series:
+#
+#     for i, xp_name in enumerate(walk_dirs(os.path.join(DATASETS_DIR, xp_serie))):
+#         images_dir = os.path.join(DATASETS_DIR, xp_serie, xp_name, 'images/eval')
+#         gt_dir = os.path.join(DATASETS_DIR, xp_serie, xp_name, 'labels/eval')
+#         preds_dir = os.path.join(RUNS_DIR, xp_serie, xp_name, 'detect/labels', )
+#
+#         # get labels_map
+#         with open(os.path.join(DATASETS_DIR, xp_serie, xp_name, 'config.yaml')) as f:
+#             config = yaml.load(f, Loader=yaml.FullLoader)
+#         ids_to_labels = {i: l for i, l in enumerate(config['names'])}
+#
+#         # Create the general_results.
+#         if i == 0:
+#             general_results = initialize_general_results(ids_to_labels=ids_to_labels)
+#
+#         metrics = do_map_for_yolo(images_dir=images_dir,
+#                                   gt_dir=gt_dir,
+#                                   preds_dir=preds_dir,
+#                                   ids_to_labels=ids_to_labels,
+#                                   )
+#
+#         general_results = update_general_results(general_results=general_results, metrics=metrics,
+#                                                  xp_name=xp_name, ids_to_labels=ids_to_labels)
+#
+#     df = pd.DataFrame.from_dict(general_results)
+#     tsv_path = os.path.join(RUNS_DIR, xp_serie, 'general_results.tsv')
+#     df.to_csv(tsv_path, sep='\t', index=False)
