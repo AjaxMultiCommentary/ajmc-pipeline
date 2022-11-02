@@ -64,20 +64,20 @@ def do_map_for_yolo(images_dir: str,
 
 DATASETS_DIR = '/scratch/sven/yolo/datasets/'
 RUNS_DIR = '/scratch/sven/yolo/runs/'
+for xp in ['4D_segmonto_fine', '4E_segmonto_coarse']:
+    with open(os.path.join(DATASETS_DIR, 'multiclass', f'{xp}', 'config.yaml')) as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    ids_to_labels = {i: l for i, l in enumerate(config['names'])}
+    metrics = do_map_for_yolo(images_dir=f'/scratch/sven/yolo/datasets/multiclass/{xp}/images/eval',
+                              gt_dir=f'/scratch/sven/yolo/datasets/multiclass/{xp}/labels/eval',
+                              preds_dir=f'/scratch/sven/yolo/runs/multiclass/{xp}/detect/exp/labels',
+                              ids_to_labels=ids_to_labels,)
+    general_results = initialize_general_results(ids_to_labels)
+    general_results = update_general_results(general_results, metrics, f'{xp}', ids_to_labels)
 
-with open(os.path.join(DATASETS_DIR, 'multiclass', '4D_omnibus_segmonto', 'config.yaml')) as f:
-    config = yaml.load(f, Loader=yaml.FullLoader)
-ids_to_labels = {i: l for i, l in enumerate(config['names'])}
-metrics = do_map_for_yolo(images_dir='/scratch/sven/yolo/datasets/multiclass/4D_omnibus_segmonto/images/eval',
-                          gt_dir='/scratch/sven/yolo/datasets/multiclass/4D_omnibus_segmonto/labels/eval',
-                          preds_dir='/scratch/sven/yolo/runs/multiclass/4D_omnibus_segmonto/exp2/labels',
-                          ids_to_labels=ids_to_labels,)
-general_results = initialize_general_results(ids_to_labels)
-general_results = update_general_results(general_results, metrics, '4D_omnibus_segmonto', ids_to_labels)
-
-df = pd.DataFrame.from_dict(general_results)
-tsv_path = os.path.join(RUNS_DIR, 'multiclass', '4D_omnibus_segmonto', 'general_results.tsv')
-df.to_csv(tsv_path, sep='\t', index=False)
+    df = pd.DataFrame.from_dict(general_results)
+    tsv_path = os.path.join(RUNS_DIR, 'multiclass', f'{xp}', 'general_results.tsv')
+    df.to_csv(tsv_path, sep='\t', index=False)
 
 # #%%
 # xp_series = ['binary_class',

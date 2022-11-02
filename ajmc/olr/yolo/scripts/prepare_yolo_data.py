@@ -15,11 +15,13 @@ base_data_dir = variables.PATHS['cluster_base_dir']
 base_xp_dir = '/scratch/sven/yolo'
 configs_dir = '/scratch/sven/tmp/ajmc/data/yolo/configs'
 
-excluded_configs = ['4D_omnibus_segmonto.json']
+configs_to_run = [#'4D_segmonto_fine.json',
+                  '4E_segmonto_coarse.json'
+                  ]
 DATASET_NAME = 'multiclass'
-# for config_name in os.listdir(configs_dir):
+
 for config_name in os.listdir(configs_dir):
-    if config_name.endswith('.json') and config_name in excluded_configs:
+    if config_name.endswith('.json') and config_name in configs_to_run:
         print(f'******** Processing {config_name} *********')
         config = create_olr_config(os.path.join(configs_dir, config_name),
                                    prefix=base_data_dir)
@@ -63,8 +65,8 @@ for config_name in os.listdir(configs_dir):
 
             for p in pages:
                 # write page image
-                # img_name = p.image.path.split('/')[-1]
-                # p.image.write(os.path.join(abs_paths['images'][set_], img_name))
+                img_name = p.image.path.split('/')[-1]
+                p.image.write(os.path.join(abs_paths['images'][set_], img_name))
                 # get page labels
                 yolo_labels = []
                 for r in p.children.regions:

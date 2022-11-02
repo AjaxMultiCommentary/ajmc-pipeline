@@ -3,6 +3,21 @@
   "data": {
     "eval": [
       {
+        "id": "annalsoftacitusp00taci",
+        "run": "28o09e_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "pvergiliusmaroa00virggoog",
+        "run": "28o09d_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "thukydides02thuc",
+        "run": "28o09a_tess_base",
+        "split": "test"
+      },
+      {
         "id": "Colonna1975",
         "run": "28qlZa_tess_base",
         "split": "test"
@@ -64,6 +79,21 @@
       }
     ],
     "train": [
+      {
+        "id": "annalsoftacitusp00taci",
+        "run": "28o09e_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "pvergiliusmaroa00virggoog",
+        "run": "28o09d_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "thukydides02thuc",
+        "run": "28o09a_tess_base",
+        "split": "train"
+      },
       {
         "id": "Colonna1975",
         "run": "28qlZa_tess_base",
@@ -127,7 +157,7 @@
     ]
   },
   "device_name": "cuda",
-  "epochs": 300,
+  "epochs": 200,
   "excluded_region_types": [
     "line_number_commentary",
     "handwritten_marginalia",
@@ -137,26 +167,26 @@
   "image_size": 1280,
   "model_name_or_path": "yolov5m",
   "region_types_to_labels": {
-    "commentary": "MainZone:commentary",
-    "primary_text": "MainZone:primaryText",
-    "preface": "MainZone:preface",
-    "translation": "MainZone:translation",
-    "introduction": "MainZone:introduction",
-    "line_number_text": "NumberingZone:textNumber",
+    "commentary": "MainZone",
+    "primary_text": "MainZone",
+    "preface": "MainZone",
+    "translation": "MainZone",
+    "introduction": "MainZone",
+    "line_number_text": "NumberingZone",
     "line_number_commentary": "",
-    "page_number": "NumberingZone:pageNumber",
-    "appendix": "MainZone:appendix",
-    "app_crit": "MarginTextZone:criticalApparatus",
-    "bibliography": "MainZone:bibliography",
-    "footnote": "MarginTextZone:footnote",
-    "index_siglorum": "MainZone:index",
+    "page_number": "NumberingZone",
+    "appendix": "MainZone",
+    "app_crit": "MarginTextZone",
+    "bibliography": "MainZone",
+    "footnote": "MarginTextZone",
+    "index_siglorum": "MainZone",
     "running_header": "RunningTitleZone",
-    "table_of_contents": "MainZone:ToC",
+    "table_of_contents": "MainZone",
     "title": "TitlePageZone",
-    "printed_marginalia": "MarginTextZone:printedNote",
-    "handwritten_marginalia": "MarginTextZone:handwrittenNote",
-    "other": "CustomZone:other",
-    "undefined": "CustomZone:undefined",
-    "line_region": "CustomZone:line_region"
+    "printed_marginalia": "MarginTextZone",
+    "handwritten_marginalia": "MarginTextZone",
+    "other": "CustomZone",
+    "undefined": "CustomZone",
+    "line_region": "CustomZone"
   }
 }
