@@ -1,4 +1,3 @@
-import glob
 import os
 import shutil
 from typing import Optional
@@ -10,27 +9,7 @@ from tqdm import tqdm
 from ajmc.commons.file_management.utils import walk_files
 from ajmc.commons.image import resize_image
 from ajmc.commons.miscellaneous import get_custom_logger
-from ajmc.ocr.evaluation.utils import count_chars_by_charset
-
-
-def is_greek(text: str, threshold: float = 0.5) -> bool:
-    """Returns True if more than `threshold` of alphabet chars in text are Greek, False otherwise."""
-    alphanum_text = "".join([c for c in text if c.isalpha()])  # cleaning the text from non-alphabetical characters
-    if alphanum_text:
-        proportion_greek_chars = count_chars_by_charset(string=alphanum_text, charset='greek') / len(alphanum_text)
-        return proportion_greek_chars >= threshold
-    else:
-        return False
-
-
-def is_latin(text: str, threshold: float = 0.5) -> bool:
-    """Returns True if more than `threshold` of alphabet chars in text are Greek, False otherwise."""
-    alphanum_text = "".join([c for c in text if c.isalpha()])  # cleaning the text from non-alphabetical characters
-    if alphanum_text:
-        proportion_latin_chars = count_chars_by_charset(string=alphanum_text, charset='latin') / len(alphanum_text)
-        return proportion_latin_chars >= threshold
-    else:
-        return False
+from ajmc.ocr.utils import count_chars_by_charset, is_greek_string, is_latin_string
 
 
 def get_ocr_dataset_text_stats(dataset_dir: str,
@@ -50,8 +29,8 @@ def get_ocr_dataset_text_stats(dataset_dir: str,
                 stats['total_chars'].append(len(gt_text))
                 stats['greek_chars'].append(count_chars_by_charset(gt_text, charset='greek'))
                 stats['latin_chars'].append(count_chars_by_charset(gt_text, charset='latin'))
-                stats['is_greek'].append(is_greek(gt_text, is_greek_thresh))
-                stats['is_latin'].append(is_latin(gt_text, is_latin_thresh))
+                stats['is_greek'].append(is_greek_string(gt_text, is_greek_thresh))
+                stats['is_latin'].append(is_latin_string(gt_text, is_latin_thresh))
 
     df = pd.DataFrame(stats)
     print(df.describe())

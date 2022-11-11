@@ -114,7 +114,7 @@ def verify_path_integrity(path: str, path_pattern: str) -> None:
     for dir_, pattern in zip(reversed(dirs), reversed(dirs_pattern)):
         # Make sure the detected commentary id is known
         if pattern == '[commentary_id]':
-            assert dir_ in variables.ALL_COMMENTARY_IDS, f"""The commentary id ({dir_}) detected 
+            assert dir_ in variables.COMMENTARY_IDS, f"""The commentary id ({dir_}) detected 
             in the provided path ({path}) does not match any known commentary_id. """
 
         # Skip other placeholder patterns (e.g. '[ocr_run]').

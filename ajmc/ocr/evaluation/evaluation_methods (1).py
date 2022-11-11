@@ -12,9 +12,8 @@ from typing import List, Dict, Tuple, Union, Optional
 from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import is_bbox_within_bbox, are_bboxes_overlapping_with_threshold
-from ajmc.ocr.evaluation.utils import initialize_soup, count_errors_by_charset, record_editops, \
+from ajmc.ocr.evaluation.utils import initialize_soup, count_chars_by_charset, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts, write_editops_record
-from ajmc.ocr.utils import count_chars_by_charset
 from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
 from ajmc.commons.miscellaneous import get_custom_logger
 

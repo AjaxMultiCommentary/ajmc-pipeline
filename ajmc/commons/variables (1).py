@@ -1,6 +1,5 @@
 import re
 from typing import Tuple
-from pathlib import Path
 
 # ======================================================================================================================
 #                                                 TYPES
@@ -17,7 +16,7 @@ PATHS = {
     'drive_base_dir': '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
     'cluster_base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data',
     'schema': 'data/templates/page.schema.json',
-    'groundtruth': 'ocr/groundtruth',
+    'groundtruth': 'ocr/groundtruth/evaluation',
     'png': 'images/png',
     'via_path': 'olr/via_project.json',
     'json': 'canonical',
@@ -30,13 +29,10 @@ PATHS = {
     'ajmc_ne_corpus': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/AjMC-NE-corpus'
 }
 
-TESS_XP_DIR = Path('/Users/sven/Desktop/tess_xps')
-
 # Sheet names corresponds to the dictionary's keys
 SPREADSHEETS = {
     'metadata': '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE',
-    'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito',
-    'ocr_gt': '1RsJQTgM4oO-ds0cK3rstx-iBxsvxjwCSVRWS63NvQrQ'
+    'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
 }
 
 FOLDER_STRUCTURE_PATHS = {
@@ -50,12 +46,10 @@ FOLDER_STRUCTURE_PATHS = {
 #                                                 COMMENTARIES
 # ======================================================================================================================
 
-ALL_COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Finglass2011', 'Garvie1998', 'Kamerbeek1953',
+COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Finglass2011', 'Garvie1998', 'Kamerbeek1953',
                   'Paduano1982', 'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174',
                   'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'thukydides02thuc',
                   'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
-
-EXTERNAL_COMMENTARY_IDS = ['thukydides02thuc', 'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
 
 PD_COMMENTARY_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
 
@@ -311,4 +305,3 @@ CHARSETS = {
     'punctuation': re.compile(r'([\u0020-\u002F]|[\u003A-\u003F]|[\u005B-\u0060]|[\u007B-\u007E]|\u00A8|\u00B7)',
                               re.UNICODE)
 }
-

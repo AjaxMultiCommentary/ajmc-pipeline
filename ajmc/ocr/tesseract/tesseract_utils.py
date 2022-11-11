@@ -10,7 +10,8 @@ from typing import Tuple
 import pandas as pd
 
 from ajmc.commons.arithmetic import safe_divide
-from ajmc.ocr.evaluation.utils import record_editops, write_editops_record, harmonise_unicode
+from ajmc.ocr.evaluation.utils import record_editops, write_editops_record
+from ajmc.ocr.utils import harmonise_unicode
 from ajmc.commons.file_management.utils import get_62_based_datecode
 from ajmc.ocr.preprocessing.data_preparation import resize_ocr_dataset
 
@@ -23,13 +24,12 @@ def run_tesseract(img_dir: str,
                   img_suffix: str = '.png',
                   tessdata_prefix: str = '/Users/sven/packages/tesseract/tessdata/'
                   ):
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Write the config
-    if config is not None:
-        with open(os.path.join(output_dir, 'tess_config'), 'w') as f:
-            for k, v in config.items():
-                f.write(f'{k} {v}\n')
+    if config:
+        (output_dir / 'tess_config').write_text('\n'.join([f'{k} {v}' for k, v in config.items()]))
 
     command = f"""cd {img_dir}; export TESSDATA_PREFIX={tessdata_prefix}; \
 for i in *{img_suffix} ; \
@@ -120,22 +120,32 @@ def reformulate_output_dir(output_dir: str) -> pathlib.Path:
     return output_dir.parent / f'{get_62_based_datecode()}_{output_dir.name}/outputs'
 
 
-# %%%
+def create_general_table(xps_root):
+    xps_root = Path(xps_root)
+    general_table = pd.DataFrame()
+    for xp_dir in xps_root.glob('*'):
+        if xp_dir.is_dir():
+            xp_name = xp_dir.name
+            resizing = [par for par in xp_name.split('_') if 'rsz' in par]
+            resizing = int(resizing[0][3:]) if resizing else None
+            model = xp_name.split('_')[1]
+            psm = [par for par in xp_name.split('_') if 'psm' in par]
+            psm = int(psm[0][3:]) if psm else 7
 
-# for size in range(21, 25):
-#     data_dir = f'/Users/sven/Desktop/ocr_xps/data/ajmc_gr_lines_rsz{size}'
-#     if not os.path.exists(data_dir):
-#         resize_ocr_dataset(dataset_dir='/Users/sven/Desktop/ocr_xps/data/ajmc_gr_lines',
-#                            output_dir=data_dir,
-#                            target_height=size)
-#
-#     psm = 7
-#     output_dir = f'/Users/sven/Desktop/ocr_xps/results/base_gr_lines_psm{psm}_rsz{size}'
-#     output_dir = reformulate_output_dir(output_dir)
-#     run_tesseract(img_dir=data_dir,
-#                   output_dir=str(output_dir),
-#                   langs='grc',
-#                   psm=psm)
-#
-#     evaluate_tesseract(gt_dir=data_dir,
-#                        ocr_dir=str(output_dir))
+            if (xp_dir / 'evaluation' / 'results.txt').exists():
+                with open(xp_dir / 'evaluation' / 'results.txt', 'r') as f:
+                    cer, wer = f.read().split('\n')[1].split('\t')
+                general_table = pd.concat([general_table,
+                                           pd.DataFrame({'xp_name': [xp_name],
+                                                         'models': [model],
+                                                         'data': [None],
+                                                         'psm': [psm],
+                                                         'resize': [resizing],
+                                                         'cer': [cer],
+                                                         'wer': [wer]})
+                                           ])
+
+    general_table.to_csv(xps_root / 'general_table.tsv', sep='\t', index=False)
+    return general_table
+
+

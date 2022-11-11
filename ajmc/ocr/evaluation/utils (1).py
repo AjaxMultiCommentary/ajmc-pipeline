@@ -190,6 +190,16 @@ def compute_confusion_metrics(error_counts: Dict) -> Tuple[float, float, float]:
     return precision, recall, f1
 
 
+def harmonise_unicode(text:str):
+    text = re.sub(r"᾽", "’", text)
+    text = re.sub(r"ʼ", "’", text)
+    text = re.sub(r"'", "’", text)
+    text = re.sub(r"—", "-", text)
+    text = re.sub(r"„", '"', text)
+
+    return text
+
+
 def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> int:
     """Counts the number of errors among the character comprised in an unicode character set.
 
@@ -200,7 +210,7 @@ def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> i
     Args:
         pred_string: prediction/source string
         gt_string: groundtruth/destination string
-        charset: should be `'greek'`, `'l‹atin'`, `'numbers'`, `'punctuation'` or a valid `re`-pattern,
+        charset: should be `'greek'`, `'latin'`, `'numbers'`, `'punctuation'` or a valid `re`-pattern,
                  for instance `r'([\u00F4-\u00FF])'`
 
     Returns:
@@ -217,6 +227,29 @@ def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> i
 
     # min() is there to cope with insertion at the end of the string
     return sum([1 for e in editops if min(e[2], len(gt_string) - 1) in indices])
+
+
+def count_chars_by_charset(string: str, charset: str) -> int:
+    """Counts the number of chars by unicode characters set.
+
+    Example:
+        `count_chars_by_charset('γεια σας, world', 'greek')` returns `7` as there are 7 greek
+        chars in `string`.
+
+    Args:
+        string: self explanatory
+        charset: should be `'greek'`, `'latin'`, `'numbers'`, `'punctuation'` or a valid `re`-pattern,
+                 for instance `r'([\u00F4-\u00FF])'`
+
+    Returns:
+        int: the number of charset-matching characters in `string`.
+    """
+    try:
+        pattern = CHARSETS[charset]
+    except KeyError:
+        pattern = re.compile(charset, flags=re.UNICODE)
+
+    return len(re.findall(pattern, string))
 
 
 def write_error_counts(bow_error_counts: dict,
