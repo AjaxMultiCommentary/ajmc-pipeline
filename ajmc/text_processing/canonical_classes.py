@@ -113,10 +113,6 @@ class CanonicalCommentary(Commentary, TextContainer):
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
         raise NotImplementedError('`CanonicalCommentary.children` must be set at __init__.')
 
-    @lazy_property
-    def ocr_groundtruth_pages(self) -> List['CanonicalPage']:
-        """A list of `CanonicalPage` objects containing the groundtruth of the OCR."""
-        return [p for p in self.children.pages if p.info['is_ocr_gt']]
 
 
 class CanonicalTextContainer(TextContainer):
@@ -180,7 +176,7 @@ class CanonicalTextContainer(TextContainer):
     @lazy_property
     def image(self) -> Image:
         """Generic method to create a `CanonicalTextContainer`'s image."""
-        return self.parents.page.Image.crop(self.bbox)
+        return self.parents.page.image.crop(self.bbox.bbox)
 
 class CanonicalSection(CanonicalTextContainer):
 

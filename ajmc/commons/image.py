@@ -1,7 +1,11 @@
 import random
+from pathlib import Path
+
 import cv2
 from typing import List, Tuple, Optional, Union
 import numpy as np
+from PIL import ImageFont, ImageDraw
+from PIL import Image as PILImage
 
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
@@ -172,7 +176,8 @@ def draw_textcontainers(img_matrix, outfile: Optional[str] = None, *textcontaine
 
         elif tc.type in ['entity', 'sentence', 'hyphenation']:
             for i, bbox in enumerate(tc.bboxes):
-                if i == len(tc.bboxes) - 1:  # We write the region label text only if it's the last bbox to avoid overlap
+                if i == len(
+                        tc.bboxes) - 1:  # We write the region label text only if it's the last bbox to avoid overlap
                     img_matrix = draw_box(box=bbox.bbox,
                                           img_matrix=img_matrix,
                                           stroke_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
@@ -280,3 +285,52 @@ def resize_image(img: np.ndarray,
     dim = target_width, target_height
 
     return cv2.resize(src=img, dsize=dim, interpolation=cv2.INTER_AREA)
+
+
+def create_text_image(text: str,
+                      font_path: Path,
+                      padding: int,
+                      image_height: int,
+                      output_file: Optional[Path] = None) -> 'PIL.Image':
+    """Draws text on a white image with given font, padding and image height."""
+    # Todo come back here once tesseract experiments are done
+
+    # Get the font size
+    font_size = int(0.75*(image_height - 2 * padding))  # 0.75 for conversion from pixels to points
+
+    # Get the font
+    font = ImageFont.truetype(str(font_path), font_size)
+
+    # Get the text size
+    length = font.getlength(text)
+
+    # Create the image
+    image = PILImage.new('RGB', (int(length + 2 * padding), image_height), color='white')
+
+    # Draw the text
+    draw = ImageDraw.Draw(image)
+    draw.text((padding, 0), text, font=font, fill='black')
+
+    if output_file:
+        image.save(output_file)
+
+    return image
+
+    # lines = {
+    #     'modern_greek_line': 'Η Ελλάδα είναι μια χώρα στην Μεσόγειο, στην Ευρώπη',
+    #     'polytonic_greek_line': 'μῆνιν ἄειδε θεὰ Πηληϊάδεω Ἀχιλῆος',
+    #     'number_line': '1234567890',
+    #     'english_line': 'The quick brown fox jumps',
+    #     'mixed_line': '123. μῆνιν ἄειδε θεὰ — The quick brown fox jumps',
+    # }
+    #
+    # output_dir = Path('/Users/sven/Desktop/test/')
+    # for font in Path('data/greek_fonts').rglob('*.[ot]tf'):
+    #     for type_, line in lines.items():
+    #         create_text_image(text=line,
+    #                           font_path=font,
+    #                           padding=0,
+    #                           image_height=100,
+    #                           output_file=output_dir / f'{font.stem}_{type_}.png')
+
+

@@ -1,14 +1,16 @@
 import re
 from abc import abstractmethod
+from pathlib import Path
 from typing import List, Optional, Type, Union, Iterable
-
+import unicodedata
+from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.image import draw_textcontainers
-from ajmc.commons.miscellaneous import lazy_property, LazyObject, recursive_iterator, lazy_init
-from ajmc.commons.variables import CHILD_TYPES, TEXTCONTAINER_TYPES
+from ajmc.commons.miscellaneous import lazy_property, LazyObject, recursive_iterator, lazy_init, read_google_sheet
+from ajmc.commons.variables import CHILD_TYPES, TEXTCONTAINER_TYPES, PATHS
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.cas_utils import export_commentary_to_xmis
-from dataclasses import dataclass
+
 
 
 # @dataclass
@@ -78,7 +80,7 @@ class Commentary:
     def _get_parent(self, parent_type: str) -> Optional[Type['TextContainer']]:
         return None  # A commentary has no parents
 
-    def get_page(self, page_id: str) -> Optional['CanonicalPage']:
+    def get_page(self, page_id: str) -> Optional['Page']:
         """A simple shortcut to get a page from its id."""
         return [p for p in self.children.pages if p.id == page_id][0]
 
@@ -95,6 +97,39 @@ class Commentary:
         """A list of `CanonicalPage` objects containing the groundtruth of the OLR."""
         page_ids = get_olr_splits_page_ids(self.id)
         return [p for p in self.children.pages if p.id in page_ids]
+
+
+    @lazy_property
+    def ocr_groundtruth_pages(self) -> List['CanonicalPage']:
+        """A list of `CanonicalPage` objects containing the groundtruth of the OCR."""
+        ocr_gt = read_google_sheet(variables.SPREADSHEETS['ocr_gt'], 'ocr_gt')
+        page_ids = ocr_gt['page_id'][ocr_gt['commentary_id'] == self.id].tolist()
+        return [p for p in self.children.pages if p.id in page_ids]
+
+
+    @docstring_formatter(default_path=PATHS['ocr_gt_file_pairs'])
+    def export_ocr_gt_file_pairs(self,
+                                 output_dir: Optional[Union[str, Path]] = None,
+                                 unicode_format: str = 'NFC'):
+        """Exports png-txt file pairs for each line in each ocr groundtruth page of the commentary.
+
+        Args:
+            output_dir: The directory to which the file pairs should be exported. If None, files are written to the
+            default output directory ({default_path}).
+            unicode_format: The unicode format to which the text should be normalized. See
+            https://docs.python.org/3/library/unicodedata.html#unicodedata.normalize for more information.
+        """
+
+        # Define output directory
+        output_dir = Path(self.info['base_dir']) / PATHS['ocr_gt_file_pairs'] if output_dir is None else Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Iterate over groundtruth pages
+        for page in self.ocr_groundtruth_pages:
+            for i, line in enumerate(page.children.lines):
+                line.image.write(str(output_dir/f'{page.id}_{i}.png'))
+                (output_dir/f'{page.id}_{i}.gt.txt').write_text(unicodedata.normalize(unicode_format, line.text))
+
 
 
 class Page:

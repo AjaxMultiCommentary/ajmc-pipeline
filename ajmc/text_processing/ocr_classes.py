@@ -90,7 +90,7 @@ class OcrCommentary(Commentary, TextContainer):
                    groundtruth_dir=os.path.join(base_dir, id, variables.PATHS['groundtruth']),
                    ocr_run=ocr_run)
 
-    def to_canonical(self, include_ocr_groundtruth: bool = False) -> CanonicalCommentary:
+    def to_canonical(self, include_ocr_groundtruth: bool = True) -> CanonicalCommentary:
         """Export the commentary to a `CanonicalCommentary` object.
 
         Note:
@@ -266,7 +266,11 @@ class OcrPage(Page, TextContainer):
             return getattr(self.children, children_type)
 
         elif children_type in ['entities', 'sentences', 'hyphenations']:
-            rebuild = cas_utils.import_page_rebuild(self.id)
+            try:
+                rebuild = cas_utils.import_page_rebuild(self.id)
+            except:
+                logger.warning(f'No rebuild file found for page {self.id}')
+                return []
             cas = cas_utils.import_page_cas(self.id)
             if cas is not None:
                 annotations = cas_utils.safe_import_page_annotations(self.id, cas, rebuild,
@@ -357,6 +361,7 @@ class OcrPage(Page, TextContainer):
         # Process words
         self.children.words = [w for w in self.children.words if re.sub(r'\s+', '', w.text) != '']
         for w in self.children.words:
+            w.text = w.text.strip()  # Remove leading and trailing whitespace (happens sometimes)
             w.adjust_bbox()
 
         # Process lines
@@ -509,7 +514,7 @@ class OcrTextContainer(TextContainer):
 
     @lazy_property
     def image(self) -> Image:
-        return self.parents.page.Image
+        return self.parents.page.image
 
     @lazy_property
     def ocr_format(self) -> str:

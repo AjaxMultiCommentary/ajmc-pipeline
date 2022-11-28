@@ -27,7 +27,8 @@ PATHS = {
     'ocr': 'ocr/runs',
     'canonical': 'canonical/v2',
     'annotations': 'ner/entities',
-    'ajmc_ne_corpus': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/AjMC-NE-corpus'
+    'ajmc_ne_corpus': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/AjMC-NE-corpus',
+    'ocr_gt_file_pairs': 'ocr/gt_file_pairs',
 }
 
 TESS_XP_DIR = Path('/Users/sven/Desktop/tess_xps')
@@ -51,9 +52,9 @@ FOLDER_STRUCTURE_PATHS = {
 # ======================================================================================================================
 
 ALL_COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Finglass2011', 'Garvie1998', 'Kamerbeek1953',
-                  'Paduano1982', 'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174',
-                  'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'thukydides02thuc',
-                  'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
+                      'Paduano1982', 'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174',
+                      'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'thukydides02thuc',
+                      'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
 
 EXTERNAL_COMMENTARY_IDS = ['thukydides02thuc', 'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
 
@@ -62,6 +63,25 @@ PD_COMMENTARY_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgo
 SAMPLE_PAGES = ['bsb10234118_0096', 'sophokle1v3soph_0126', 'cu31924087948174_0063', 'cu31924087948174_0063',
                 'Wecklein1894_0087']
 
+COMMENTARY_IDS_TO_LANG = {
+    'Colonna1975': 'ita',
+    'DeRomilly1976': 'fra',
+    'Ferrari1974': 'ita',
+    'Finglass2011': 'eng',
+    'Garvie1998': 'eng',
+    'Kamerbeek1953': 'eng',
+    'Paduano1982': 'ita',
+    'Untersteiner1934': 'ita',
+    'Wecklein1894': 'deu',
+    'bsb10234118': 'deu',
+    'cu31924087948174': 'eng',
+    'lestragdiesdeso00tourgoog': 'fra',
+    'sophoclesplaysa05campgoog': 'eng',
+    'sophokle1v3soph': 'deu',
+    'thukydides02thuc': 'deu',
+    'pvergiliusmaroa00virggoog': 'deu',
+    'annalsoftacitusp00taci': 'eng'
+}
 # ======================================================================================================================
 #                                                 LAYOUT
 # ======================================================================================================================
@@ -220,6 +240,39 @@ MINIREF_PAGES = [
     'sophokle1v3soph_0125',
 ]
 
+LINKAGE_MINIREF_PAGES = [
+    'annalsoftacitusp00taci_0210',
+    'annalsoftacitusp00taci_0211',
+    'bsb10234118_0090',
+    'bsb10234118_0115',
+    'cu31924087948174_0063',
+    'cu31924087948174_0152',
+    'DeRomilly1976_0032',
+    'DeRomilly1976_0088',
+    'Ferrari1974_0050',
+    'Ferrari1974_0115',
+    'Garvie1998_0224',
+    'Garvie1998_0257',
+    'Kamerbeek1953_0098',
+    'Kamerbeek1953_0099',
+    'lestragdiesdeso00tourgoog_0113',
+    'lestragdiesdeso00tourgoog_0120',
+    'Paduano1982_0195',
+    'Paduano1982_0214',
+    'pvergiliusmaroa00virggoog_0199',
+    'pvergiliusmaroa00virggoog_0200',
+    'sophoclesplaysa05campgoog_0094',
+    'sophoclesplaysa05campgoog_0095',
+    'sophokle1v3soph_0047',
+    'sophokle1v3soph_0062',
+    'thukydides02thuc_0009',
+    'thukydides02thuc_0011',
+    'Untersteiner1934_0104',
+    'Untersteiner1934_0105',
+    'Wecklein1894_0016',
+    'Wecklein1894_0024',
+]
+
 IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run_id used as a base in the annotation campaign.
     'cu31924087948174': '1bm0b3_tess_final',
     'lestragdiesdeso00tourgoog': '21i0dA_tess_hocr',
@@ -311,4 +364,3 @@ CHARSETS = {
     'punctuation': re.compile(r'([\u0020-\u002F]|[\u003A-\u003F]|[\u005B-\u0060]|[\u007B-\u007E]|\u00A8|\u00B7)',
                               re.UNICODE)
 }
-
