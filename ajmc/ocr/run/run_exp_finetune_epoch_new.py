@@ -56,3 +56,14 @@ for ite in [5,6,7,8,9,10]:
             custom_ckpt,
             custom_lang=custom_lang)
 
+
+
+ajmc_eng_train,
+ajmc_eng_train_rsz25,
+ajmc_eng_train_rsz70,
+ajmc_eng_train_rsz50,
+ajmc_eng_train_rot1,
+ajmc_eng_train_rot359,
+ajmc_eng_train_blr,
+ajmc_eng_train_ero,
+ajmc_eng_train_dil

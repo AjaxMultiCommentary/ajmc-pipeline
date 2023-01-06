@@ -21,4 +21,4 @@ def test_remove_artifacts_from_contours(art_size):
 
 def test_image():
     assert isinstance(so.sample_image.matrix, np.ndarray)
-    assert isinstance(so.sample_image.crop(so.sample_bboxes['base']), img.Image)
+    assert isinstance(so.sample_image.crop(so.sample_bboxes['base']), img.AjmcImage)

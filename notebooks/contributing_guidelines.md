@@ -150,7 +150,7 @@ As they constitute the backend of a dynamic platform, `ajmc`'s modules should be
 ✅ This is good practice:
 
 ```python
-class Image:
+class AjmcImage:
     def __init__(self, path_to_file:str):
         self.path = path_to_file
 
@@ -161,7 +161,7 @@ class Image:
 
 ❌ This should be avoided:
 ```python
-class Image:
+class AjmcImage:
     def __init__(self, path_to_file:str):
         self.path = path_to_file
         self.matrix = cv2.imread(self.path)

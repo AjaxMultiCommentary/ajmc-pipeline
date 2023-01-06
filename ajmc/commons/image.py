@@ -5,7 +5,7 @@ import cv2
 from typing import List, Tuple, Optional, Union
 import numpy as np
 from PIL import ImageFont, ImageDraw
-from PIL import Image as PILImage
+from PIL import Image
 
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
@@ -15,11 +15,11 @@ from ajmc.commons.variables import BoxType, COLORS, REGION_TYPES_TO_COLORS, TEXT
 logger = get_custom_logger(__name__)
 
 
-class Image:
+class AjmcImage:
     """Default class for ajmc images.
 
     Note:
-          The center of `Image`-coordinates is the upper left corner, consistantly with cv2 and numpy. This implies
+          The center of `AjmcImage`-coordinates is the upper left corner, consistantly with cv2 and numpy. This implies
           that Y-coordinates are ascending towards the bottom of the image.
     """
 
@@ -27,7 +27,7 @@ class Image:
     @docstring_formatter(**docstrings)
     def __init__(self,
                  id: Optional[str] = None,
-                 path: Optional[str] = None,
+                 path: Optional[Path] = None,
                  matrix: Optional[np.ndarray] = None,
                  word_range: Optional[Tuple[int, int]] = None):
         """Default constructor.
@@ -38,12 +38,12 @@ class Image:
             matrix: an np.ndarray containing the image. Overrides self.matrix if not None.
             word_range: {word_range}
         """
-        pass
+
 
     @lazy_property
     def matrix(self) -> np.ndarray:
         """np.ndarray of the image image matrix. Its shape is (height, width, channels)."""
-        return cv2.imread(self.path)
+        return cv2.imread(str(self.path))
 
     @lazy_property
     def height(self) -> int:
@@ -59,7 +59,7 @@ class Image:
 
     def crop(self,
              box: BoxType,
-             margin: int = 0) -> 'Image':
+             margin: int = 0) -> 'AjmcImage':
         """Gets the slice of `self.matrix` corresponding to `box`.
 
         Args:
@@ -67,11 +67,11 @@ class Image:
             margin: The extra margin desired around `box`
 
         Returns:
-             A new `Image` containing the desired crop.
+             A new `AjmcImage` containing the desired crop.
         """
         cropped = self.matrix[box[0][1] - margin:box[1][1] + margin, box[0][0] - margin:box[1][0] + margin, :]
 
-        return Image(matrix=cropped)
+        return AjmcImage(matrix=cropped)
 
     def write(self, output_path: str):
         cv2.imwrite(output_path, self.matrix)
@@ -244,7 +244,7 @@ def find_contours(img_matrix: np.ndarray,
     return contours
 
 
-def draw_contours(image: Image, outfile: Optional[str] = None):
+def draw_contours(image: AjmcImage, outfile: Optional[str] = None):
     white = np.zeros([image.matrix.shape[0], image.matrix.shape[1], 3], dtype=np.uint8)
     white.fill(255)
 

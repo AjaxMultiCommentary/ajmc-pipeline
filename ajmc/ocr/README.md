@@ -38,6 +38,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/some/dir/local/lib
 LIBLEPT_HEADERSDIR=/some/dir/local/include ./configure \
                --prefix=/some/dir/local/ \
                --with-extra-libraries=/some/dir/local/lib \
+# eventually PKG_CONFIG_PATH="/scratch/sven/ocr_exp/lib/local/lib/pkgconfig"
 CXXFLAGS="-I/some/dir/local/include" \
 LDFLAGS="-L/some/dir/local/lib" \
 CFLAGS="-I/some/dir/local/include"

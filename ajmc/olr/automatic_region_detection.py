@@ -37,7 +37,7 @@ def detect_regions(img_path: str,
                    dilation_iterations: int,
                    draw_images: bool,
                    via_csv_dict: dict,
-                   artifact_size_threshold: int = 0.003) -> dict:
+                   artifact_size_threshold: float = 0.003) -> dict:
     """Automatically detects regions of interest in an image, using a simple dilation process.
     Returns a `'key':[values]`-like dictionnary containing all the generated bboxes for all the images.
 

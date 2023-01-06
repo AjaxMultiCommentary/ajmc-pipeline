@@ -1,4 +1,5 @@
 """This module contains sample objects which are sent to `sample_objects.json` and used as fixtures elsewhere."""
+from pathlib import Path
 
 from ajmc.nlp.token_classification.evaluation import seqeval_evaluation
 from ajmc.commons import variables, geometry, image
@@ -56,7 +57,7 @@ sample_page = [p for p in sample_ocrcommentary.children.pages if p.id == sample_
 # Image
 sample_image_dir = os.path.join(sample_base_dir, sample_commentary_id, variables.PATHS['png'])
 sample_image_path = os.path.join(sample_image_dir, sample_page_id + '.png')
-sample_image = image.Image(id=sample_page_id, path=sample_image_path)
+sample_image = image.AjmcImage(id=sample_page_id, path=Path(sample_image_path))
 
 # NLP, NER...
 from transformers import DistilBertTokenizerFast

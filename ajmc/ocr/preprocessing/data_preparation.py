@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import shutil
@@ -6,12 +7,13 @@ import cv2
 import pandas as pd
 from tqdm import tqdm
 import unicodedata
-from ajmc.commons.file_management.utils import walk_files
-from ajmc.commons.image import resize_image, create_text_image
 from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.ocr.utils import count_chars_by_charset, is_greek_string, is_latin_string, is_number_string
 from ajmc.commons import variables
+from ajmc.ocr import variables as ocr_vars
 from pathlib import Path
+from PIL import Image as PILImage, ImageFilter
+from ajmc.ocr.config import get_all_configs
 
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
@@ -20,24 +22,26 @@ logger = get_custom_logger(__name__)
 
 def get_source_dataset_from_line_id(line_id: str) -> str:
     """Returns the source dataset of a line id."""
-
     return 'ajmc' if line_id.split('_')[0] in variables.ALL_COMMENTARY_IDS else 'pogretra'
 
 
-def get_ocr_dataset_metadata(dataset_dir: Union[Path, str],
+def get_ocr_dataset_metadata(dataset_dir: Path,
                              img_suffix: str = '.png',
                              txt_suffix: str = '.gt.txt',
                              write_tsv: bool = True,
                              from_existing: bool = False) -> pd.DataFrame:
     """Returns a DataFrame containing the length of each txt and its proportion of Greek characters."""
 
-    dataset_dir = Path(dataset_dir)
-
     if from_existing:
-        try:
-            metadata = pd.read_csv(dataset_dir / 'metadata.tsv', sep='\t', index_col=False)
-        except FileNotFoundError:
+        metadata_path = dataset_dir / 'metadata.tsv'
+        if metadata_path.is_file():
+            metadata = pd.read_csv(metadata_path, sep='\t', index_col=False, encoding='utf-8')
+            if len(metadata) != len(list(dataset_dir.glob('*.png'))):
+                logger.warning('Missmatching metadata file, re-computing it...')
+                metadata = get_ocr_dataset_metadata(dataset_dir)
+        else:
             metadata = get_ocr_dataset_metadata(dataset_dir)
+
 
     else:
         logger.info('Creating dataset metadata')
@@ -45,11 +49,11 @@ def get_ocr_dataset_metadata(dataset_dir: Union[Path, str],
         metadata = {k: [] for k in ['family', 'id', 'source',  # Commentary family and id
                                     'image_height', 'image_width',  # Image stats
                                     'total_chars', 'total_words',
-                                    'greek_chars', 'latin_chars', 'number_chars',
+                                    'grc_chars', 'lat_chars', 'num_chars',
                                     'script', 'language', 'font',
                                     'text']}
 
-        for img in dataset_dir.rglob(f'*{img_suffix}'):
+        for img in dataset_dir.glob(f'*{img_suffix}'):
             if img.is_file():  # Pogretra's simlinks....
                 family_id = img.stem.split('_')[0]
                 metadata['family'].append(family_id)  # Commentary id or pogretra family
@@ -62,33 +66,33 @@ def get_ocr_dataset_metadata(dataset_dir: Union[Path, str],
                 metadata['image_width'].append(gt_image.shape[1])
 
                 # Text stats
-                gt_text = img.with_suffix(txt_suffix).read_text()
+                gt_text = img.with_suffix(txt_suffix).read_text(encoding='utf-8')
                 metadata['total_chars'].append(len(gt_text))
                 metadata['total_words'].append(len(gt_text.split()))
-                metadata['greek_chars'].append(count_chars_by_charset(gt_text, charset='greek'))
-                metadata['latin_chars'].append(count_chars_by_charset(gt_text, charset='latin'))
-                metadata['number_chars'].append(count_chars_by_charset(gt_text, charset='numbers'))
+                metadata['grc_chars'].append(count_chars_by_charset(gt_text, charset='greek'))
+                metadata['lat_chars'].append(count_chars_by_charset(gt_text, charset='latin'))
+                metadata['num_chars'].append(count_chars_by_charset(gt_text, charset='numbers'))
 
-                script = 'greek' if is_greek_string(gt_text, 1) else \
-                    'latin' if is_latin_string(gt_text, 1) else \
-                        'number' if is_number_string(gt_text, 1) else \
-                            'mixed' if (count_chars_by_charset(gt_text, charset='greek') > 0 and
-                                        count_chars_by_charset(gt_text, charset='latin') > 0) else 'unk'
+                script = 'grc' if is_greek_string(gt_text, 1) else \
+                    'lat' if is_latin_string(gt_text, 1) else \
+                        'num' if is_number_string(gt_text, 1) else \
+                            'mix' if (count_chars_by_charset(gt_text, charset='greek') > 0 and
+                                      count_chars_by_charset(gt_text, charset='latin') > 0) else 'unk'
                 metadata['script'].append(script)
 
                 # Language
-                if script in ['greek', 'number']:
+                if script in ['grc', 'num']:
                     metadata['language'].append(script[:3])
                 else:
                     if family_id in variables.ALL_COMMENTARY_IDS:
-                        if script == 'latin':
+                        if script == 'lat':
                             metadata['language'].append(variables.COMMENTARY_IDS_TO_LANG[family_id])
-                        elif script == 'mixed':
+                        elif script == 'mix':
                             metadata['language'].append('gre' + variables.COMMENTARY_IDS_TO_LANG[family_id])
                         else:
-                            metadata['language'].append('other')
+                            metadata['language'].append('unk')
                     else:
-                        metadata['language'].append('other')
+                        metadata['language'].append('unk')
 
                 # Font
                 metadata['font'].append('unk')
@@ -102,9 +106,7 @@ def get_ocr_dataset_metadata(dataset_dir: Union[Path, str],
             lambda x: x['image_height'] / grouped.mean()['image_height'][x['family']], axis=1)
 
     if write_tsv:
-        metadata.to_csv(os.path.join(dataset_dir, 'metadata.tsv'), sep='\t', index=False)
-
-    print(metadata.describe())
+        metadata.to_csv(os.path.join(dataset_dir, 'metadata.tsv'), sep='\t', index=False, encoding='utf-8')
 
     return metadata
 
@@ -132,12 +134,12 @@ def filter_ocr_dataset_by_text(dataset_dir: Union[Path, str],
 
     for img in tqdm(dataset_dir.rglob(f'*{img_suffix}'), desc='Filtering dataset'):
         txt = img.with_suffix(txt_suffix)
-        if filter_func(txt.read_text(), threshold):
+        if filter_func(txt.read_text(encoding='utf-8'), threshold):
             shutil.copy(txt, target_dir)
             shutil.copy(img, target_dir)
 
 
-def filter_ocr_dataset_by_metadata(dataset_dir: Union[Path, str],
+def filter_ocr_dataset_by_metadata(dataset_dir: Path,
                                    filter_func: callable,
                                    target_dir: Optional[Union[Path, str]] = None,
                                    inplace: bool = False,
@@ -156,51 +158,6 @@ def filter_ocr_dataset_by_metadata(dataset_dir: Union[Path, str],
         assert target_dir is not None
         for line_id in tqdm(metadata[metadata['keep'] == False]['id'], desc='Removing lines'):
             dataset_dir.joinpath(f'{line_id}{img_suffix}').unlink()
-
-
-def resize_ocr_dataset(dataset_dir: str,
-                       output_dir: str,
-                       target_height: int,
-                       image_suffix: str = ".png",
-                       txt_suffix: str = ".gt.txt",
-                       return_stats: bool = False) -> Optional[pd.DataFrame]:
-    """Resize OCR dataset to `target_height` and exports it to `output_dir`.
-
-    Args:
-        dataset_dir: Path to directory containing raw images.
-        output_dir: Path to directory where resized images will be exported.
-        target_height: Target height of resized images.
-        image_suffix: Suffix of raw images.
-        txt_suffix: Suffix of raw text files.
-        return_stats: If True, returns a DataFrame mapping each image to its height.
-      """
-
-    height_map = {}
-
-    os.makedirs(output_dir, exist_ok=True)
-
-    for img_path in tqdm(walk_files(dataset_dir, filter=lambda x: x.suffix == image_suffix, recursive=True),
-                         desc=f"Resizing images in {dataset_dir} to {target_height}"):
-        # Process the image
-        img = cv2.imread(str(img_path))
-        height_map[img_path.name] = img.shape[0]
-        resized_img = resize_image(img, target_height)
-
-        # Get the corresponding txt file
-        txt_path = img_path.with_suffix(txt_suffix)
-
-        # Save the resized image and txt
-        cv2.imwrite(os.path.join(output_dir, img_path.name), resized_img)
-        shutil.copyfile(txt_path, os.path.join(output_dir, txt_path.name))
-
-    # Print the stats
-    stats = pd.DataFrame(data={'heights': list(height_map.values())}, index=list(height_map.keys()))
-    print(f"Dataset successfully resized to target height of {target_height} and exported to `{output_dir}`. \n"
-          f"Stats of initial heights are shown below.")
-    print(stats.describe())
-
-    if return_stats:
-        return stats
 
 
 def clean_ocr_dataset(dataset_dir: Union[Path, str],
@@ -244,7 +201,7 @@ def clean_ocr_dataset(dataset_dir: Union[Path, str],
             missing_pairs += 1
 
     # Remove double-height lines
-    metadata = get_ocr_dataset_metadata(output_dir, write_tsv=False)
+    metadata = get_ocr_dataset_metadata(output_dir, write_tsv=False, )
 
     for line_id in tqdm(metadata[metadata['normalized_image_height'] >= double_line_threshold]['id'],
                         desc=f'Removing double-height lines from...'):
@@ -273,9 +230,11 @@ def make_clean_ajmc_dataset(output_dir: Path,
         commentary.export_ocr_gt_file_pairs(temp_dir, unicode_format=unicode_format)
 
     clean_ocr_dataset(temp_dir, output_dir, unicode_form=unicode_format)
+    # Remove the tmpdir
+    shutil.rmtree(temp_dir)
 
-    get_ocr_dataset_metadata(output_dir)
-    custom_split_source_dataset(output_dir)
+    # Write metadata
+    custom_split_source_dataset(output_dir, write_tsv=True)
 
 
 def make_clean_pogretra_dataset(output_dir: Path,
@@ -309,13 +268,23 @@ def make_clean_pogretra_dataset(output_dir: Path,
 
         # Remove temp_dir
         shutil.rmtree(temp_dir)
-        temp_dir.rmdir()
+        try:
+            temp_dir.rmdir()
+        except:
+            pass
 
     else:
         clean_ocr_dataset(pogretra_source_dir, output_dir)
 
-    get_ocr_dataset_metadata(output_dir)
-    custom_split_source_dataset(output_dir)
+    # remove the files which are already in ajmc
+    for file_path in output_dir.glob('*'):
+        if file_path.stem.split('_')[0] in variables.ALL_COMMENTARY_IDS:
+            file_path.unlink()
+
+    # Rewrite metadata
+    get_ocr_dataset_metadata(output_dir, from_existing=False)
+
+    custom_split_source_dataset(output_dir, write_tsv=True)
 
 
 # Todo come back here once tesseract experiments are done
@@ -364,12 +333,14 @@ def custom_split_source_dataset(dataset_dir: Path,
 
     def get_custom_split_ratio(group_name: Tuple[str, str], group_df: pd.DataFrame):
         df_len = len(group_df)
-        if group_name[0] == 'ajmc' and group_name[1] in ['greek', 'latin', 'mixed']:
+        # For ajmc, we keep a hundred lines per subset
+        if group_name[0] == 'ajmc' and group_name[1] in ['grc', 'lat', 'mix']:
             return [('test', 100 / df_len),
                     ('train', (df_len - 100) / df_len)]
 
-        elif group_name in [('pogretra', 'greek')]:
-            return [('test', 50 / df_len), ('train', (df_len - 100) / df_len)]
+        # For pog, we keep only 50 for the fully greek and give the whole rest to training
+        elif group_name in [('pogretra', 'grc')]:
+            return [('test', 100 / df_len), ('train', (df_len - 100) / df_len)]
         else:
             return [('train', 1.00)]
 
@@ -383,58 +354,104 @@ def custom_split_source_dataset(dataset_dir: Path,
         recomposed = pd.concat([recomposed, group_df], axis=0)
 
     if write_tsv:
-        metadata.to_csv(os.path.join(dataset_dir, 'metadata.tsv'), sep='\t', index=False)
+        recomposed.to_csv((dataset_dir / 'metadata.tsv'), sep='\t', index=False)
 
 
-def create_ocr_subdataset(source_dataset_dir: Path,
-                          cleaning: str,
-                          sample,
-                          resize,
-                          rotate,
-                          blurr,
-                          erode,
-                          dilate,
-                          output_dir: Path,
-                          ) -> None:
-    """Create an OCR subdataset from a source dataset.
+def sample_metadata(metadata, config):
+    # sample metadata
+    for k, v in config['sampling'].items():
+        if type(v) == list:
+            filter_ = metadata.apply(lambda x: x[k] in v, axis=1)
+            metadata = metadata[filter_]
+        elif type(v) == str:
+            filter_ = metadata.apply(lambda x: x[k] == v, axis=1)
+            metadata = metadata[filter_]
+        else:
+            continue
+
+    if config['sampling']['random'] is not None:
+        metadata = metadata.sample(frac=config['sampling']['random'], random_state=42)
+
+    return metadata
+
+
+def transform_ocr_dataset(config: dict,
+                          dataset_dir: Optional[Path] = None,
+                          file_list: List[Path] = None,
+                          output_dir: Optional[Path] = None):
+    """Does transform operation on a dataset or a file list, doing it inplace if `output_dir` is not given.
+
+    Deals with the corresponding .gt.txt files.
 
     Args:
-        source_dataset_dir: Path to the source dataset.
-        cleaning: Cleaning method to apply to the source dataset. Must be in ['basic', 'advanced'].
-        sample: Sampling method to apply to the source dataset. Must be in ['none', 'random', 'stratified'].
-        resize: Resize method to apply to the source dataset. Must be in ['none', 'random', 'stratified'].
-        rotate: Rotation method to apply to the source dataset. Must be in ['none', 'random', 'stratified'].
-        blurr: Blurr method to apply to the source dataset. Must be in ['none', 'random', 'stratified'].
-        erode: Skeletonize method to apply to the source dataset. Must be in ['none',
-            'random', 'stratified'].
-        dilate: Dilation method to apply to the source dataset. Must be in ['none', 'random',
-            'stratified'].
-        output_dir: Path to the directory where the subdataset will be exported.
+        dataset_dir: `Path` to the dataset's directory.
+        config: A dataset config
+        file_list: A `List[Path]` to the image files to be changed.
+        output_dir: `Path` to the directory to which to export the new dataset, leaving the source untouched
     """
-    pass
+
+    assert dataset_dir is not None or file_list is not None, """`dataset_dir` or `file_list` must be given."""
+
+    img_paths_generator = dataset_dir.glob('.png') if file_list is None else file_list
+
+    for img_path in img_paths_generator:
+        # import image
+        img = PILImage.open(img_path)
+        # rotate image
+        img_id = img_path.stem
+
+        transform_config = config['transform']
+
+        if transform_config['resize'] is not None:
+            img = img.resize(size=(int(transform_config['resize'] * img.width / img.height), transform_config['resize'],))
+            img_id += f'_res{transform_config["resize"]}'
+
+        if transform_config['rotate'] is not None:
+            img = img.rotate(angle=transform_config['rotate'], expand=True, fillcolor=(255, 255, 255))
+            img_id += f'_rot{transform_config["rotate"]}'
+
+        if transform_config['blur'] is not None:
+            img = img.filter(ImageFilter.GaussianBlur(transform_config['blur']))
+            img_id += f'_blu{transform_config["blur"]}'
+
+        if transform_config['erode'] is not None:
+            img = img.filter(ImageFilter.MaxFilter(transform_config['erode']))
+            img_id += f'_ero{transform_config["erode"]}'
+
+        if transform_config['dilate'] is not None:
+            img = img.filter(ImageFilter.MinFilter(transform_config['dilate']))
+            img_id += f'_dil{transform_config["dilate"]}'
+
+        # rename image name
+        new_path = (img_path.parent if not output_dir else output_dir) / (img_id + '.png')
+        # delete old image
+        if not output_dir:
+            img_path.unlink()
+        # write image
+        img.save(new_path)
+
+        # Deal with the corresponding .gt.txt
+        txt_path = img_path.with_suffix('.gt.txt')
+        if output_dir is not None: # Create a new txt
+            new_path.with_suffix('.gt.txt').write_text(txt_path.read_text(encoding='utf-8'), encoding='utf-8')
+        else:  # renames it
+            txt_path.rename(new_path.with_suffix('.gt.txt'))
 
 
+def get_or_create_dataset_dir(config: dict,
+                              overwrite: bool= False) -> Path:
+    """Returns the path to a dataset's dir, creating the dataset if it doesn't exist"""
 
-#%%%
-# The process of dataset creation
-# Create source datasets using makefunction.
-#   Create their metadata using get ocr dataset metadata
-# Create derived datasets using :
-#   Sampling
-#   Composition
+    dataset_dir = ocr_vars.get_dataset_dir(config['id'])
+    all_dataset_configs: dict = get_all_configs()['datasets']
 
+    if dataset_dir.is_dir() and not overwrite: # If the dataset already exists
+        return dataset_dir
 
-def copy_dataset(dataset_dir, output_dir):
-    for file in dataset_dir.rglob('*.*'):
-        shutil.copy(file, (output_dir/file.name))
+    # else
+    dataset_dir.mkdir(parents=True, exist_ok=True)
 
-import json
-def create_dataset_from_config(config:dict,
-                               parent_dir:Path):
-
-    dataset_dir = parent_dir / config['id']
-    dataset_dir.mkdir(parents=True, exist_ok=False)
-
+    # Special methods for ajmc and pogretra source datasets
     if config['id'] == 'ajmc':
         make_clean_ajmc_dataset(dataset_dir)
 
@@ -442,47 +459,36 @@ def create_dataset_from_config(config:dict,
         make_clean_pogretra_dataset(dataset_dir)
 
     else:
-        # Create a temp dir with source datasets
-        temp_dir = parent_dir / config['id']+'_TEMP'
-        temp_metadata = pd.DataFrame()
+        # Merge the sources' metadatas
+        metadata = pd.DataFrame()
         for source in config['source']:
-            source_dir = parent_dir / source
-            copy_dataset(source_dir, temp_dir)
+            source_config = all_dataset_configs[source]
+            source_dir = get_or_create_dataset_dir(source_config)
             source_metadata = get_ocr_dataset_metadata(source_dir, from_existing=True)
-            temp_metadata = pd.concat([temp_metadata, source_metadata], axis=1)
+            source_metadata['path'] = source_metadata['id'].apply(lambda x: (source_dir / (x + '.png')))
+            metadata = pd.concat([metadata, source_metadata], axis=1)
 
-        # sample and write new metadata
-        for k, v in config.items():
-            if k.startswith('sampling_') and v is not None:
-                sampling_type = k.split('_')[0]
-                if sampling_type in ['family', 'font', 'script', 'language']:
-                    filter = temp_metadata.apply(lambda x: x[sampling_type] in v)
-                    temp_metadata = temp_metadata[filter]
+        # Sample
+        metadata = sample_metadata(metadata=metadata, config=config)
 
-                elif sampling_type in ['sampling_total_words']:
-                    filter = temp_metadata.apply(lambda x: x[sampling_type] >= v)
-                    temp_metadata = temp_metadata[filter]
+        # transform and copies the images to new datasets
+        transform_ocr_dataset(config=config,
+                              file_list=metadata['path'].tolist(),
+                              output_dir=dataset_dir)
 
-        temp_metadata.to_csv((temp_dir/ 'metadata.tsv'), sep='\t')
+        # Write metadata
+        metadata.drop('path', inplace=True, axis=1)
+        metadata.to_csv((dataset_dir / 'metadata.tsv'), sep='\t', index=False)
 
-
-
+    return dataset_dir
 
 
+def create_all_datasets(overwrite:bool = False):
+    configs = get_all_configs()
 
-            df.apply()
-
-        sampled_metadata = temp_metadata[]
-
-        # delete all the files which are not in the metadata
-        # resize
-        # rotate,
-        # blurr,
-        # erode,
-        # dilate
-
-        #
+    for dataset_config in configs['datasets'].values():
+        get_or_create_dataset_dir(dataset_config, overwrite=overwrite)
 
 
-    (dataset_dir / 'config.json').write_text(json.dumps(config))
+
 

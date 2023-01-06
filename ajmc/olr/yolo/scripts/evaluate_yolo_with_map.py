@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-from ajmc.commons.image import Image
+from ajmc.commons.image import AjmcImage
 import glob
 import yaml
 import numpy as np
@@ -11,7 +11,7 @@ from mean_average_precision import MetricBuilder
 from ajmc.commons.file_management.utils import walk_dirs
 from ajmc.olr.map_utils import initialize_general_results, update_general_results
 from ajmc.olr.yolo.utils import parse_yolo_txt
-
+from pathlib import Path
 
 def do_map_for_yolo(images_dir: str,
                     gt_dir: str,
@@ -29,7 +29,7 @@ def do_map_for_yolo(images_dir: str,
 
         # Get the image to un-normalize
         image_name = pred_name.replace('.txt', '.' + image_format)
-        image = Image(path=os.path.join(images_dir, image_name))
+        image = AjmcImage(path=Path(images_dir) /image_name)
 
         # Parse preds
         preds = parse_yolo_txt(path=pred_path,

@@ -41,7 +41,7 @@ def test_textcontainer(tc):
                                 so.sample_cancommentary_from_json])
 def test_canonical_commentary(commentary):
     # test CanonicalCommentary.images
-    assert all([isinstance(i, cc.Image) for i in commentary.images])
+    assert all([isinstance(i, cc.AjmcImage) for i in commentary.images])
     assert len(commentary.images) == len(commentary.children.pages)
 
 @pytest.mark.parametrize('tc', [so.sample_cancommentary.children.pages[0],

@@ -7,12 +7,23 @@ from ajmc.commons.miscellaneous import stream_handler
 from pathlib import Path
 from tqdm import tqdm
 
-stream_handler.setLevel(0)
+stream_handler.setLevel(20)
 
+DESIRED_COMMENTARIES = [
+    'annalsoftacitusp00taci',
+    'bsb10234118',
+    'Colonna1975',
+    'DeRomilly1976',
+    'Ferrari1974',
+    'Garvie1998',
+    'Kamerbeek1953',
+    'Paduano1982',
+    'pvergiliusmaroa00virggoog',
+    'thukydides02thuc',
+    'Untersteiner1934',
+]
 
-for comm_id in tqdm(ALL_COMMENTARY_IDS, desc='Processing commentaries'):
-    if comm_id.startswith('Colo') or comm_id.startswith('DeRo'):
-        continue
+for comm_id in tqdm(DESIRED_COMMENTARIES, desc='Processing commentaries'):
 
     comm_dir = Path(PATHS['base_dir']) / comm_id
     runs_dir = comm_dir / 'ocr/runs'

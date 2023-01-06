@@ -123,6 +123,12 @@ def aligned_print(*args, **kwargs):
     print(to_print)
 
 
+def prefix_command_with_conda_env(command: str,
+                                  env_name: str,
+                                  conda_install_dir: 'Path'):
+    return f'source {conda_install_dir / "etc/profile.d/conda.sh"}; conda activate {env_name}; ' + command
+
+
 def lazy_property(func):
     """Decorator. Makes property computation lazy."""
 
@@ -296,3 +302,9 @@ def inline_def(func, name, doc=None):
     if doc is not None:
         func.__doc__ = doc
     return func
+
+
+def log_to_file(log_message: str, log_file: 'Path'):
+    """Appends `log_message` to `log_file`"""
+    with open(log_file, "a+") as tmp_file:
+        tmp_file.write(log_message)

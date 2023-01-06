@@ -43,7 +43,7 @@ def pagify_dataset(dataset_dir, output_dir, margin=0.1, interline=1.5):
 
     for img_path in walk_files(dataset_dir, filter=lambda x: x.suffix == '.png'):
         page_img_lines.append(cv2.imread(str(img_path)))
-        page_txt_lines.append(img_path.with_suffix('.gt.txt').read_text())
+        page_txt_lines.append(img_path.with_suffix('.gt.txt').read_text(encoding='utf-8'))
         comm_id = img_path.name.split('_')[0]
 
         if len(page_img_lines) > 0 and \

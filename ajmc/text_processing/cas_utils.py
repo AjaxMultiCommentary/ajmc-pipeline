@@ -52,15 +52,15 @@ def basic_rebuild(page: dict,
 
                     texts["words"].append(word["text"] + " ")
                     offsets['words'].append(word_offsets)
-                    coordinates['words'].append(word['coords'])
+                    coordinates['words'].append(word['bbox'])
 
                 line_offsets.append(len(string) - 1)
                 offsets["lines"].append(line_offsets)
-                coordinates['lines'].append(line['coords'])
+                coordinates['lines'].append(line['bbox'])
                 texts["lines"].append(line_text)
 
             region_offsets.append(len(string) - 1)
-            coordinates['regions'].append(region['coords'])
+            coordinates['regions'].append(region['bbox'])
             offsets["regions"].append(region_offsets)
             texts["regions"].append(region_text)
 
@@ -173,7 +173,7 @@ def export_commentary_to_xmis(commentary: Type['Commentary'],
     Main function for the pipeline.
     
     Args:
-        commentary: A list of dicts `{'commentary_id': 'ocr_run'}` linking to the commentary to be processed.
+        commentary:
         json_dir: Absolute path to the directory in which to write the json files or take them from.
         xmi_dir: Absolute path to the directory in which to write the xmi files.
         make_jsons: Whether to create canonical jsons. If false, jsons are grepped from json_dir.

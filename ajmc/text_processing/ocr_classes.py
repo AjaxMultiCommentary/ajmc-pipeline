@@ -7,6 +7,7 @@ confidence in your changes.
 import re
 import json
 import os
+from pathlib import Path
 from time import strftime
 from typing import Dict, Optional, List, Union, Any, Tuple, Type
 import bs4.element
@@ -22,7 +23,7 @@ from ajmc.commons.geometry import (
     is_bbox_within_bbox_with_threshold,
     is_bbox_within_bbox, adjust_bbox_to_included_contours, get_bbox_from_points
 )
-from ajmc.commons.image import Image, draw_textcontainers
+from ajmc.commons.image import AjmcImage, draw_textcontainers
 from ajmc.commons.variables import PATHS, CHILD_TYPES, ANNOTATION_LAYERS
 from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via
 import jsonschema
@@ -141,7 +142,7 @@ class OcrCommentary(Commentary, TextContainer):
             children['pages'].append(CanonicalPage(id=p.id, word_range=(p_start, w_count - 1), commentary=can))
 
             # Adding images
-            can.images.append(Image(id=p.id, path=p.image_path, word_range=(p_start, w_count - 1)))
+            can.images.append(AjmcImage(id=p.id, path=Path(p.image_path), word_range=(p_start, w_count - 1)))
 
             # Adding entities
             for ent in p.children.entities:
@@ -201,8 +202,11 @@ class OcrCommentary(Commentary, TextContainer):
 
         # Todo : not implemented yet
         elif children_type == 'sections':
-            logger.warning('Sections are not implemented yet')
+            # sections_path = Path(variables.PATHS['base_dir']) / self.id / 'sections.json'
+            # sections = json.loads(sections_path.read_text(encoding='utf-8'))
+            # return [RawSection(self, **s) for s in sections]
             return []
+
 
         else:  # For other children, them from each page
             return [tc for p in self.children.pages for tc in getattr(p.children, children_type)]
@@ -226,7 +230,7 @@ class OcrCommentary(Commentary, TextContainer):
             return json.load(file)
 
     @lazy_property
-    def images(self) -> List[Image]:
+    def images(self) -> List[AjmcImage]:
         return [p.image for p in self.children.pages]
 
 
@@ -426,8 +430,8 @@ class OcrPage(Page, TextContainer):
                                     os.path.join(debug_dir, self.id + '_raw.png'))
 
     @lazy_property
-    def image(self) -> Image:
-        return Image(id=self.id, path=self.image_path)
+    def image(self) -> AjmcImage:
+        return AjmcImage(id=self.id, path=Path(self.image_path))
 
     @lazy_property
     def markup(self) -> bs4.BeautifulSoup:
@@ -513,7 +517,7 @@ class OcrTextContainer(TextContainer):
         return get_element_bbox(self.markup, self.ocr_format)
 
     @lazy_property
-    def image(self) -> Image:
+    def image(self) -> AjmcImage:
         return self.parents.page.image
 
     @lazy_property

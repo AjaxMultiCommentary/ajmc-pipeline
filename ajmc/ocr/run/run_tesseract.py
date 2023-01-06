@@ -349,7 +349,7 @@ def train(model_name, commentary_names, mode, output_dir, cleaned_suffix="clean"
         # f_out.write(f"mkdir {os.path.join(output_dir, model_name)}\n")
         f_out.write(f"cp {langdata_dir}/grc.config {os.path.join(output_dir, model_name, model_name+'.config')};\n")
         f_out.write(log_str(cmd_line, log_file))
-    os.system(f"sh {sh_file}")
+    os.system(f"bash {sh_file}")
 
 def check_dataset_size(commentary_names, mode, cleaned_suffix="clean"):
     count = 0
@@ -407,3 +407,4 @@ def evaluate_model(commentary_ids, tessdata_dir, greek_model_name, custom_lang=N
             commentary_evaluation(commentary=commentary,output_dir=evaluation_dir)
 
     print("done")
+

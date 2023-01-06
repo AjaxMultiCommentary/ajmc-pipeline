@@ -1,3 +1,4 @@
+import subprocess
 import os
 import pathlib
 import shutil
@@ -12,8 +13,9 @@ import pandas as pd
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.ocr.evaluation.utils import record_editops, write_editops_record
 from ajmc.ocr.utils import harmonise_unicode
+from ajmc.ocr import variables as ocr_vars
 from ajmc.commons.file_management.utils import get_62_based_datecode
-from ajmc.ocr.preprocessing.data_preparation import resize_ocr_dataset
+from ajmc.commons.miscellaneous import prefix_command_with_conda_env
 
 
 def run_tesseract(img_dir: str,
@@ -29,7 +31,7 @@ def run_tesseract(img_dir: str,
 
     # Write the config
     if config:
-        (output_dir / 'tess_config').write_text('\n'.join([f'{k} {v}' for k, v in config.items()]))
+        (output_dir / 'tess_config').write_text('\n'.join([f'{k} {v}' for k, v in config.items()]), encoding='utf-8')
 
     command = f"""cd {img_dir}; export TESSDATA_PREFIX={tessdata_prefix}; \
 for i in *{img_suffix} ; \
@@ -48,7 +50,7 @@ done;"""
         shutil.copyfile(os.path.join(img_dir, 'metadata.json'), os.path.join(output_dir, 'data_metadata.json'))
 
     # Run the command
-    os.system(command=command)
+    os.system(command)
 
 
 def evaluate_tesseract(gt_dir: str,
@@ -149,3 +151,13 @@ def create_general_table(xps_root):
     return general_table
 
 
+
+def prefix_tess_command(command:str, env_name = ocr_vars.CONDA_ENV, conda_install_dir=ocr_vars.CONDA_INSTALL_DIR):
+    command = 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LD_LIBRARY_PATH/lib/:$CONDA_PREFIX/lib/ ;' + command
+    return prefix_command_with_conda_env(command, env_name=env_name, conda_install_dir=conda_install_dir)
+
+def run_tess_command(command:str, env_name = ocr_vars.CONDA_ENV, conda_install_dir=ocr_vars.CONDA_INSTALL_DIR):
+    """Wrapper around subprocess to run a tesscommand in the proper subshell"""
+    command = prefix_tess_command(command, env_name=env_name, conda_install_dir=conda_install_dir)
+    command = command.encode('ascii')
+    return subprocess.run(['bash'], input=command, shell=True, capture_output=True)

@@ -25,7 +25,7 @@ def test_ocrcommentary():
         assert all([isinstance(w, ocr_classes.OcrWord) for w in comm.children.words])
 
         # test OcrCommentary.images
-        assert all([isinstance(i, image.Image) for i in comm.images])
+        assert all([isinstance(i, image.AjmcImage) for i in comm.images])
         
 
         # Test OcrCommentary.groundtruth_pages
@@ -43,7 +43,7 @@ def test_ocrcommentary_to_canonical():
     assert len(so.sample_cancommentary.children.pages) == len(so.sample_ocrcommentary.children.pages)
     for ocr_p, can_p in zip(so.sample_ocrcommentary.children.pages, so.sample_cancommentary.children.pages):
         # Assert images stay the same
-        assert isinstance(can_p.image, image.Image)
+        assert isinstance(can_p.image, image.AjmcImage)
         assert ocr_p.image.id == can_p.image.id
 
         # Assert each canonical page has the same number of words, minus those which have been deleted on purpose
@@ -77,7 +77,7 @@ def test_ocrpage():
 
     assert isinstance(page.ocr_format, str)
 
-    assert isinstance(page.image, image.Image)
+    assert isinstance(page.image, image.AjmcImage)
 
     assert all([isinstance(r, ocr_classes.OlrRegion) for r in page.children.regions])
     assert all([isinstance(l, ocr_classes.OcrLine) for l in page.children.lines])

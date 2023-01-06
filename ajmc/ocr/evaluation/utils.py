@@ -74,7 +74,7 @@ def insert_text_in_soup(soup: "BeautifulSoup", word: 'OcrWord', is_gt: bool, is_
     return soup
 
 
-def actualize_overlap_matrix(args: "ArgumentParser", image: "Image", zonemask: "ZonesMasks", groundtruth: "OcrObject",
+def actualize_overlap_matrix(args: "ArgumentParser", image: "AjmcImage", zonemask: "ZonesMasks", groundtruth: "OcrObject",
                              ocr: "OcrObject") -> "ndarray":
     """Creates the overlap matrix used to match overlaping segments and zones
 

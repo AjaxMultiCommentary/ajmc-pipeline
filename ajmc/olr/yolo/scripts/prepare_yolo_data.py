@@ -1,7 +1,7 @@
 import os
 import random
 import numpy as np
-from ajmc.commons.image import Image
+from ajmc.commons.image import AjmcImage
 from ajmc.olr.layoutlm.layoutlm import create_olr_config
 import yaml
 from ajmc.text_processing import canonical_classes
@@ -87,7 +87,7 @@ for config_name in os.listdir(configs_dir):
         # write blank images
         num_blank_pages = 2
         for i in range(num_blank_pages):
-            blank_img = Image(matrix=np.ones(p.image.matrix.shape))
+            blank_img = AjmcImage(matrix=np.ones(p.image.matrix.shape))
             blank_img.write(os.path.join(abs_paths['images']['train'], f'blank_{i}.png'))
             # write page labels
             with open(os.path.join(abs_paths['labels']['train'], f'blank_{i}.txt'), 'w') as f:

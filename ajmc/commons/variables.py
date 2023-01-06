@@ -1,6 +1,6 @@
+import os
 import re
 from typing import Tuple
-from pathlib import Path
 
 # ======================================================================================================================
 #                                                 TYPES
@@ -12,17 +12,19 @@ BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 # ======================================================================================================================
 
 # Todo change paths
+EXEC_ENV = 'local' #cluster or drive or local
+
 PATHS = {
-    'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
+    'local_base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
     'drive_base_dir': '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
     'cluster_base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data',
-    'schema': 'data/templates/page.schema.json',
+    'schema': 'ajmc/data/templates/page.schema.json',
     'groundtruth': 'ocr/groundtruth',
     'png': 'images/png',
     'via_path': 'olr/via_project.json',
     'json': 'canonical',
     'xmi': 'ner/annotation',
-    'typesystem': 'data/templates/TypeSystem.xml',
+    'typesystem': 'ajmc/data/templates/TypeSystem.xml',
     'olr_initiation': 'olr/annotation/project_initiation',
     'ocr': 'ocr/runs',
     'canonical': 'canonical/v2',
@@ -30,8 +32,8 @@ PATHS = {
     'ajmc_ne_corpus': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/AjMC-NE-corpus',
     'ocr_gt_file_pairs': 'ocr/gt_file_pairs',
 }
-
-TESS_XP_DIR = Path('/Users/sven/Desktop/tess_xps')
+PATHS['base_dir'] = PATHS[f'{EXEC_ENV}_base_dir']
+PATHS['temp_dir'] = os.getenv('TMPDIR')
 
 # Sheet names corresponds to the dictionary's keys
 SPREADSHEETS = {

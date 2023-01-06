@@ -1,11 +1,12 @@
 import json
 import os
+from pathlib import Path
 from typing import Optional, Dict, List, Tuple, Union, Any, Iterable, Type
 from ajmc.commons.arithmetic import is_interval_within_interval
 from ajmc.commons.docstrings import docstrings, docstring_formatter
 from ajmc.commons.file_management.utils import verify_path_integrity
 from ajmc.commons.geometry import Shape, get_bbox_from_points
-from ajmc.commons.image import Image
+from ajmc.commons.image import AjmcImage
 from ajmc.commons.variables import CHILD_TYPES, TC_TYPES_TO_CHILD_TYPES
 from ajmc.commons.miscellaneous import lazy_property, LazyObject
 from jinja2 import Environment, FileSystemLoader, PackageLoader
@@ -13,6 +14,7 @@ from ajmc.commons import variables
 from ajmc.commons.miscellaneous import get_custom_logger
 from abc import abstractmethod
 from ajmc.text_processing.generic_classes import Commentary, TextContainer, Page
+
 # import xmlformatter
 
 logger = get_custom_logger(__name__)
@@ -24,7 +26,7 @@ class CanonicalCommentary(Commentary, TextContainer):
     def __init__(self,
                  id: Optional[str],
                  children: Optional['LazyObject'],
-                 images: Optional[List[Image]],
+                 images: Optional[List[AjmcImage]],
                  info: Optional[Dict[str, Any]] = None,
                  **kwargs):
         """Initialize a `CanonicalCommentary`.
@@ -32,7 +34,7 @@ class CanonicalCommentary(Commentary, TextContainer):
         Args:
             id: The id of the commentary.
             children: A `LazyObject` containing the children of the commentary. Can be manually set after init.
-            images: A list of `Image` objects. Can be instantiated after init.
+            images: A list of `AjmcImage` objects. Can be instantiated after init.
             info: A dictionary containing additional information about the commentary.
             kwargs: {kwargs_for_properties}
 
@@ -65,8 +67,9 @@ class CanonicalCommentary(Commentary, TextContainer):
         image_dir = os.path.join(commentary.info['base_dir'], variables.PATHS['png'])
 
         # Set its images
-        commentary.images = [Image(id=img['id'], path=os.path.join(image_dir, img['id'] + '.png'),
-                                   word_range=img['word_range']) for img in can_json['textcontainers']['pages']]
+        commentary.images = [AjmcImage(id=img['id'],
+                                       path=Path(image_dir) / (img['id'] + '.png'),
+                                       word_range=img['word_range']) for img in can_json['textcontainers']['pages']]
 
         # Set its children
         commentary.children = LazyObject(
@@ -112,7 +115,6 @@ class CanonicalCommentary(Commentary, TextContainer):
 
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
         raise NotImplementedError('`CanonicalCommentary.children` must be set at __init__.')
-
 
 
 class CanonicalTextContainer(TextContainer):
@@ -174,24 +176,25 @@ class CanonicalTextContainer(TextContainer):
         return Shape(get_bbox_from_points([xy for w in self.children.words for xy in w.bbox.bbox]))
 
     @lazy_property
-    def image(self) -> Image:
+    def image(self) -> AjmcImage:
         """Generic method to create a `CanonicalTextContainer`'s image."""
         return self.parents.page.image.crop(self.bbox.bbox)
 
+
 class CanonicalSection(CanonicalTextContainer):
 
-        def __init__(self,
-                     commentary,
-                     section_type,
-                     section_title,
-                     **kwargs):
-            super().__init__(commentary=commentary,
-                             section_type=section_type,
-                             section_title=section_title,
-                             **kwargs)
+    def __init__(self,
+                 commentary,
+                 section_type,
+                 section_title,
+                 **kwargs):
+        super().__init__(commentary=commentary,
+                         section_type=section_type,
+                         section_title=section_title,
+                         **kwargs)
 
-        def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
-            return {'id': self.id, 'word_range': self.word_range}
+    def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
+        return {'id': self.id, 'word_range': self.word_range}
 
 
 class CanonicalPage(Page, CanonicalTextContainer):
@@ -237,7 +240,7 @@ class CanonicalPage(Page, CanonicalTextContainer):
             f.write(alto_xml_data)
 
     @lazy_property
-    def image(self) -> Image:  # Special case of page's images
+    def image(self) -> AjmcImage:  # Special case of page's images
         return [img for img in self.parents.commentary.images if img.id == self.id][0]
 
 
@@ -282,7 +285,6 @@ def get_tc_type_class(tc_type) -> Type[CanonicalTextContainer]:
             return globals()[f'Canonical{tc_type[:-3].capitalize()}y']
         else:
             return globals()[f'Canonical{tc_type[:-1].capitalize()}']
-
 
 
 class CanonicalAnnotation(CanonicalTextContainer):

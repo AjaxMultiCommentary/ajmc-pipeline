@@ -1,17 +1,20 @@
 import re
 from abc import abstractmethod
 from pathlib import Path
-from typing import List, Optional, Type, Union, Iterable
+from time import strftime
+from typing import List, Optional, Type, Union, Iterable, Dict, Any
 import unicodedata
 from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.image import draw_textcontainers
-from ajmc.commons.miscellaneous import lazy_property, LazyObject, recursive_iterator, lazy_init, read_google_sheet
+from ajmc.commons.miscellaneous import lazy_property, LazyObject, recursive_iterator, lazy_init, read_google_sheet, \
+    get_custom_logger
 from ajmc.commons.variables import CHILD_TYPES, TEXTCONTAINER_TYPES, PATHS
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.cas_utils import export_commentary_to_xmis
 
 
+logger = get_custom_logger(__name__)
 
 # @dataclass
 class TextContainer:
@@ -128,7 +131,7 @@ class Commentary:
         for page in self.ocr_groundtruth_pages:
             for i, line in enumerate(page.children.lines):
                 line.image.write(str(output_dir/f'{page.id}_{i}.png'))
-                (output_dir/f'{page.id}_{i}.gt.txt').write_text(unicodedata.normalize(unicode_format, line.text))
+                (output_dir/f'{page.id}_{i}.gt.txt').write_text(unicodedata.normalize(unicode_format, line.text), encoding='utf-8')
 
 
 
@@ -148,3 +151,35 @@ class Page:
     def number(self) -> int:
         """The page number."""
         return int(self.id.split('_')[-1])
+
+
+    # def to_canonical_v1(self) -> Dict[str, Any]:
+    #     """Creates canonical data, as used for INCEpTION. """
+    #     logger.warning(
+    #         'You are creating a canonical data version 1. For version 2, use `OcrCommentary.to_canonical()`.')
+    #     data = {'id': self.id,
+    #             'iiif': 'None',
+    #             'cdate': strftime('%Y-%m-%d %H:%M:%S'),
+    #             'regions': []}
+    #
+    #     for r in self.children.regions:
+    #         r_dict = {'region_type': r.region_type,
+    #                   'bbox': list(r.bbox.xywh),
+    #                   'lines': [
+    #                       {
+    #                           'bbox': list(l.bbox.xywh),
+    #                           'words': [
+    #                               {
+    #                                   'bbox': list(w.bbox.xywh),
+    #                                   'text': w.text
+    #                               } for w in l.children.words
+    #                           ]
+    #
+    #                       } for l in r.children.lines
+    #                   ]
+    #                   }
+    #         data['regions'].append(r_dict)
+    #
+    #     return data
+
+    # def to_xmi_json(self):

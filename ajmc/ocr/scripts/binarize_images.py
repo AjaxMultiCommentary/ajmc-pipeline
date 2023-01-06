@@ -6,7 +6,7 @@ import os
 from ajmc.commons.image import binarize
 
 comm_ids = [  # 'annalsoftacitusp00taci',
-    'pvergiliusmaroa00virggoog',
+    'Finglass2011',
     # 'thukydides02thuc'
 ]
 
@@ -18,5 +18,4 @@ for comm_id in comm_ids:
         if img_name.endswith('.png'):
             img = cv2.imread(os.path.join(jp2_dir, img_name))
             img = binarize(img)
-            cv2.imwrite(os.path.join(png_dir, img_name.replace('.png', '.png')),
-                        img)
+            cv2.imwrite(os.path.join(png_dir, img_name.replace('.png', '.png')), img)
