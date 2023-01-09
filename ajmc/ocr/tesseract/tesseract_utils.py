@@ -1,131 +1,76 @@
 import subprocess
-import os
 import pathlib
-import shutil
 from pathlib import Path
-import os
-
-import Levenshtein
-from typing import Tuple
-
 import pandas as pd
-
-from ajmc.commons.arithmetic import safe_divide
-from ajmc.ocr.evaluation.utils import record_editops, write_editops_record
-from ajmc.ocr.utils import harmonise_unicode
 from ajmc.ocr import variables as ocr_vars
 from ajmc.commons.file_management.utils import get_62_based_datecode
 from ajmc.commons.miscellaneous import prefix_command_with_conda_env
 
 
-def run_tesseract(img_dir: str,
-                  output_dir: str,
+def run_tesseract(img_dir: Path,
+                  output_dir: Path,
                   langs: str,
                   config: dict = None,
                   psm: int = 3,
                   img_suffix: str = '.png',
-                  tessdata_prefix: str = '/Users/sven/packages/tesseract/tessdata/'
+                  tessdata_prefix: Path = ocr_vars.TESSDATA_DIR,
                   ):
-    output_dir = Path(output_dir)
+    """Runs tesseract on images in `img_dir`.
+
+    Note:
+        assumes tesseract is installed.
+
+    Args:
+        img_dir (Path): path to directory containing images to be OCR'd
+        output_dir (Path): path to directory where OCR'd text will be saved
+        langs (str): language(s) to use for OCR. Use '+' to separate multiple languages, e.g. 'eng+fra'
+        config (dict): dictionary of config options to pass to tesseract. See https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html
+        psm (int): page segmentation mode. See https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html
+        img_suffix (str): suffix of images to be OCR'd
+        tessdata_prefix (Path): path to directory containing tesseract language data
+    """
+
+
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Write the config
     if config:
         (output_dir / 'tess_config').write_text('\n'.join([f'{k} {v}' for k, v in config.items()]), encoding='utf-8')
 
-    command = f"""cd {img_dir}; export TESSDATA_PREFIX={tessdata_prefix}; \
+    command = f"""\
+cd {img_dir}; export TESSDATA_PREFIX={tessdata_prefix}; \
 for i in *{img_suffix} ; \
 do tesseract "$i" "{output_dir}/${{i::${{#i}}-4}}" \
 -l {langs} \
 --psm {psm} \
-{os.path.join(output_dir, 'tess_config') if config else ''}; \
+{(output_dir /'tess_config') if config else ''}; \
 done;"""
 
     # Writes the command to remember how this was run
-    with open(os.path.join(output_dir, 'command.sh'), 'w') as f:
-        f.write(command)
+    (output_dir / 'command.sh').write_text(command)
 
     # Write the data related metadata
-    if os.path.exists(os.path.join(img_dir, 'metadata.json')):
-        shutil.copyfile(os.path.join(img_dir, 'metadata.json'), os.path.join(output_dir, 'data_metadata.json'))
+    if (img_dir / 'metadata.json').is_file():
+        (output_dir / 'data_metadata.json').write_bytes((img_dir / 'metadata.json').read_bytes())
 
     # Run the command
-    os.system(command)
+    subprocess.run(['bash'], input=command, shell=True)
 
 
-def evaluate_tesseract(gt_dir: str,
-                       ocr_dir: str,
-                       gt_suffix: str = '.gt.txt',
-                       ocr_suffix: str = '.txt',
-                       error_record: dict = None,
-                       editops_record: dict = None,
-                       write_to_file: bool = True, ) -> Tuple[dict, dict]:
-    error_record = error_record if error_record else {k: [] for k in ['id', 'gt', 'ocr',
-                                                                      'chars', 'chars_distance',
-                                                                      'words', 'words_distance']}
-    editops_record = editops_record if editops_record else {}
-    ocr_dir, gt_dir = Path(ocr_dir), Path(gt_dir)
-
-    for ocr_path in ocr_dir.glob(f'*{ocr_suffix}'):
-        gt_path = gt_dir / ocr_path.with_suffix(gt_suffix).name
-        gt_text = gt_path.read_text(encoding='utf-8')
-        ocr_text = ocr_path.read_text(encoding='utf-8')
-
-        # Postprocess the OCR text
-        ocr_text = ocr_text.strip('\n')
-        ocr_text = ocr_text.strip()
-        ocr_text = harmonise_unicode(ocr_text)
-        gt_text = gt_text.strip(' ')
-        gt_text = harmonise_unicode(gt_text)
-
-        # compute distance
-        error_record['id'].append(ocr_path.stem)
-        error_record['gt'].append(gt_text)
-        error_record['ocr'].append(ocr_text)
-        error_record['chars'].append(len(gt_text))
-        error_record['chars_distance'].append(Levenshtein.distance(gt_text, ocr_text))
-        error_record['words'].append(len(gt_text.split(' ')))
-        error_record['words_distance'].append(Levenshtein.distance(gt_text.split(), ocr_text.split()))
-
-        # Record edit operations
-        editops_record = record_editops(gt_word=gt_text,
-                                        ocr_word=ocr_text,
-                                        editops=Levenshtein.editops(ocr_text, gt_text),
-                                        editops_record=editops_record)
-
-    cer = round(safe_divide(sum(error_record['chars_distance']), sum(error_record['chars'])), 3)
-    wer = round(safe_divide(sum(error_record['words_distance']), sum(error_record['words'])), 3)
-
-    print(f'Character Error Rate: {cer}')
-    print(f'Word Error Rate: {wer}')
-
-    # Write files
-    if write_to_file:
-        eval_dir = ocr_dir.parent / 'evaluation'
-        os.makedirs(eval_dir, exist_ok=True)
-
-        editops_record = {k: v for k, v in sorted(editops_record.items(), key=lambda item: item[1], reverse=True)}
-        write_editops_record(editops_record=editops_record, output_dir=eval_dir)
-
-        pd.DataFrame.from_dict(error_record, orient='columns').to_csv(os.path.join(eval_dir, 'error_record.tsv'),
-                                                                      sep='\t',
-                                                                      index=False)
-
-        with open(os.path.join(eval_dir, 'results.txt'), 'w') as f:
-            f.write(f'cer\twer\n{cer}\t{wer}')
-
-    return error_record, editops_record
-
-
-def reformulate_output_dir(output_dir: str) -> pathlib.Path:
-    output_dir = Path(output_dir)
+def reformulate_output_dir(output_dir: Path) -> pathlib.Path:
     return output_dir.parent / f'{get_62_based_datecode()}_{output_dir.name}/outputs'
 
 
-def create_general_table(xps_root):
-    xps_root = Path(xps_root)
+# todo ⚠️ come back here
+def create_general_table(xps_dir:Path):
+    """Creates a general table from the outputs of the tesseract OCR.
+
+    Args:
+        xps_dir (Path): path to the mother directory containing the experiments
+    """
+
     general_table = pd.DataFrame()
-    for xp_dir in xps_root.glob('*'):
+    for xp_dir in xps_dir.glob('*'):
         if xp_dir.is_dir():
             xp_name = xp_dir.name
             resizing = [par for par in xp_name.split('_') if 'rsz' in par]
@@ -147,15 +92,18 @@ def create_general_table(xps_root):
                                                          'wer': [wer]})
                                            ])
 
-    general_table.to_csv(xps_root / 'general_table.tsv', sep='\t', index=False)
+    general_table.to_csv(xps_dir / 'general_table.tsv', sep='\t', index=False)
     return general_table
 
 
 
+# Todo see if this is still necesary
 def prefix_tess_command(command:str, env_name = ocr_vars.CONDA_ENV, conda_install_dir=ocr_vars.CONDA_INSTALL_DIR):
     command = 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LD_LIBRARY_PATH/lib/:$CONDA_PREFIX/lib/ ;' + command
     return prefix_command_with_conda_env(command, env_name=env_name, conda_install_dir=conda_install_dir)
 
+
+# Todo see if this is still necesary
 def run_tess_command(command:str, env_name = ocr_vars.CONDA_ENV, conda_install_dir=ocr_vars.CONDA_INSTALL_DIR):
     """Wrapper around subprocess to run a tesscommand in the proper subshell"""
     command = prefix_tess_command(command, env_name=env_name, conda_install_dir=conda_install_dir)

@@ -1,7 +1,8 @@
+import os
 import re
 
 from ajmc.commons.arithmetic import safe_divide
-from ajmc.commons.variables import CHARSETS
+from ajmc.commons.variables import CHARSETS, PATHS
 
 
 def harmonise_unicode(text: str):
@@ -94,3 +95,20 @@ def is_number_string(text: str, threshold: float = 0.5) -> bool:
         return proportion_numbers >= threshold
     else:
         return False
+
+
+def get_kraken_command(commentary_id, model_path):
+    model_name = model_path.split('/')[-1].split('.')[0]
+
+    ocr_dir = get_62_based_datecode()+'_'+model_name
+    ocr_path = os.path.join(PATHS['base_dir'], commentary_id, 'ocr/runs/' + ocr_dir)
+    os.makedirs(ocr_path, exist_ok=True)
+
+    png_abs_path = os.path.join(PATHS['base_dir'], commentary_id, PATHS['png'])
+    image_names = sorted([fname for fname in os.listdir(png_abs_path) if fname.endswith('.png')])
+    image_paths = [os.path.join(png_abs_path, f) for f in image_names]
+    ocr_paths = [os.path.join(ocr_path, f[:-3] + 'hocr') for f in image_names]
+
+    file_list = ' '.join([f'-i {img} {ocr}' for img, ocr in zip(image_paths, ocr_paths)])
+    command = ' '.join(['kraken', file_list, '-h segment ocr --model '+model_path])
+    return command

@@ -6,7 +6,10 @@
 """
 
 import os
+from pathlib import Path
+
 import Levenshtein
+import pandas as pd
 from tqdm import tqdm
 from typing import List, Dict, Tuple, Union, Optional
 from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES
@@ -14,7 +17,7 @@ from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import is_bbox_within_bbox, are_bboxes_overlapping_with_threshold
 from ajmc.ocr.evaluation.utils import initialize_soup, count_errors_by_charset, record_editops, \
     insert_text_in_soup, write_error_counts, write_editops_record
-from ajmc.ocr.utils import count_chars_by_charset
+from ajmc.ocr.utils import count_chars_by_charset, harmonise_unicode
 from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
 from ajmc.commons.miscellaneous import get_custom_logger
 
@@ -267,3 +270,81 @@ def commentary_evaluation(commentary: 'OcrCommentary',
         write_error_counts(bow_error_counts, coord_error_counts, output_dir)
 
     return bow_error_counts, coord_error_counts, editops
+
+
+def line_by_line_evaluation(gt_dir: Path,
+                            ocr_dir: Path,
+                            gt_suffix: str = '.gt.txt',
+                            ocr_suffix: str = '.txt',
+                            error_record: dict = None,
+                            editops_record: dict = None,
+                            write_to_file: bool = True,
+                            normalize: bool = True) -> Tuple[dict, dict]:
+    """Evaluates all the text files in `ocr_dir` against the corresponding text files in `gt_dir`.
+
+    Args:
+        gt_dir: The directory containing the groundtruth files.
+        ocr_dir: The directory containing the OCR files.
+        gt_suffix: The suffix of the groundtruth files.
+        ocr_suffix: The suffix of the OCR files.
+        error_record: The error record to update (pass only if you want to aggregate multiple evaluations).
+        editops_record: The editops record to update (pass only if you want to aggregate multiple evaluations).
+        write_to_file: Whether to write the error record and editops record to file.
+        normalize: Whether to harmonise the unicode of the groundtruth and OCR files.
+    """
+
+    error_record = error_record if error_record else {k: [] for k in ['id', 'gt', 'ocr',
+                                                                      'chars', 'chars_distance',
+                                                                      'words', 'words_distance']}
+    editops_record = editops_record if editops_record else {}
+
+    for ocr_path in ocr_dir.glob(f'*{ocr_suffix}'):
+        gt_path = gt_dir / ocr_path.with_suffix(gt_suffix).name
+        gt_text = gt_path.read_text(encoding='utf-8')
+        ocr_text = ocr_path.read_text(encoding='utf-8')
+
+        # Postprocess the OCR text
+        if normalize:
+            ocr_text = ocr_text.strip('\n')
+            ocr_text = ocr_text.strip()
+            ocr_text = harmonise_unicode(ocr_text)
+            gt_text = gt_text.strip(' ')
+            gt_text = harmonise_unicode(gt_text)
+
+        # compute distance
+        error_record['id'].append(ocr_path.stem)
+        error_record['gt'].append(gt_text)
+        error_record['ocr'].append(ocr_text)
+        error_record['chars'].append(len(gt_text))
+        error_record['chars_distance'].append(Levenshtein.distance(gt_text, ocr_text))
+        error_record['words'].append(len(gt_text.split(' ')))
+        error_record['words_distance'].append(Levenshtein.distance(gt_text.split(), ocr_text.split()))
+
+        # Record edit operations
+        editops_record = record_editops(gt_word=gt_text,
+                                        ocr_word=ocr_text,
+                                        editops=Levenshtein.editops(ocr_text, gt_text),
+                                        editops_record=editops_record)
+
+    cer = round(safe_divide(sum(error_record['chars_distance']), sum(error_record['chars'])), 3)
+    wer = round(safe_divide(sum(error_record['words_distance']), sum(error_record['words'])), 3)
+
+    logger.info(f'Character Error Rate: {cer}')
+    logger.info(f'Word Error Rate: {wer}')
+
+    # Write files
+    if write_to_file:
+        eval_dir = ocr_dir.parent / 'evaluation'
+        os.makedirs(eval_dir, exist_ok=True)
+
+        editops_record = {k: v for k, v in sorted(editops_record.items(), key=lambda item: item[1], reverse=True)}
+        write_editops_record(editops_record=editops_record, output_dir=eval_dir)
+
+        pd.DataFrame.from_dict(error_record, orient='columns').to_csv(os.path.join(eval_dir, 'error_record.tsv'),
+                                                                      sep='\t',
+                                                                      index=False)
+
+        with open(os.path.join(eval_dir, 'results.txt'), 'w') as f:
+            f.write(f'cer\twer\n{cer}\t{wer}')
+
+    return error_record, editops_record

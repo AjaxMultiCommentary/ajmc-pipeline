@@ -15,6 +15,7 @@ LOCAL = True if vs.EXEC_ENV == 'local' else False
 XP_DIR = Path('/Users/sven/Desktop/tess_xps') if LOCAL else Path('/scratch/sven/ocr_exp/')
 CONDA_ENV = 'base' if LOCAL else 'tess-build'
 CONDA_INSTALL_DIR = Path('/Users/sven/opt/anaconda3/') if LOCAL else Path('/scratch/sven/anaconda3')
+LD_LIBRARY_PATH = CONDA_INSTALL_DIR / 'lib'
 TESSTRAIN_DIR = Path('/Users/sven/packages/tesseract') if LOCAL else XP_DIR / 'lib/tesstrain'
 TESSDATA_DIR = Path('/Users/sven/packages/tesseract_/tessdata') if LOCAL else XP_DIR / 'lib/tessdata_best'
 LANGDATA_DIR = None if LOCAL else XP_DIR / 'lib/langdata_lstm'

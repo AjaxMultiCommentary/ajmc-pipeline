@@ -1,4 +1,3 @@
-import json
 import os
 import re
 import shutil
@@ -438,11 +437,11 @@ def transform_ocr_dataset(config: dict,
             txt_path.rename(new_path.with_suffix('.gt.txt'))
 
 
-def get_or_create_dataset_dir(config: dict,
+def get_or_create_dataset_dir(dataset_config: dict,
                               overwrite: bool= False) -> Path:
     """Returns the path to a dataset's dir, creating the dataset if it doesn't exist"""
 
-    dataset_dir = ocr_vars.get_dataset_dir(config['id'])
+    dataset_dir = ocr_vars.get_dataset_dir(dataset_config['id'])
     all_dataset_configs: dict = get_all_configs()['datasets']
 
     if dataset_dir.is_dir() and not overwrite: # If the dataset already exists
@@ -452,16 +451,16 @@ def get_or_create_dataset_dir(config: dict,
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
     # Special methods for ajmc and pogretra source datasets
-    if config['id'] == 'ajmc':
+    if dataset_config['id'] == 'ajmc':
         make_clean_ajmc_dataset(dataset_dir)
 
-    elif config['id'] == 'pogretra':
+    elif dataset_config['id'] == 'pogretra':
         make_clean_pogretra_dataset(dataset_dir)
 
     else:
         # Merge the sources' metadatas
         metadata = pd.DataFrame()
-        for source in config['source']:
+        for source in dataset_config['source']:
             source_config = all_dataset_configs[source]
             source_dir = get_or_create_dataset_dir(source_config)
             source_metadata = get_ocr_dataset_metadata(source_dir, from_existing=True)
@@ -469,10 +468,10 @@ def get_or_create_dataset_dir(config: dict,
             metadata = pd.concat([metadata, source_metadata], axis=1)
 
         # Sample
-        metadata = sample_metadata(metadata=metadata, config=config)
+        metadata = sample_metadata(metadata=metadata, config=dataset_config)
 
         # transform and copies the images to new datasets
-        transform_ocr_dataset(config=config,
+        transform_ocr_dataset(config=dataset_config,
                               file_list=metadata['path'].tolist(),
                               output_dir=dataset_dir)
 
@@ -483,7 +482,7 @@ def get_or_create_dataset_dir(config: dict,
     return dataset_dir
 
 
-def create_all_datasets(overwrite:bool = False):
+def create_all_datasets(overwrite: bool = False):
     configs = get_all_configs()
 
     for dataset_config in configs['datasets'].values():

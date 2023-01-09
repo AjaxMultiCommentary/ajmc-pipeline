@@ -1,6 +1,4 @@
 import os
-import shutil
-
 from ajmc.commons.file_management.utils import get_62_based_datecode
 from ajmc.text_processing.ocr_classes import OcrCommentary
 from ajmc.commons.variables import PATHS

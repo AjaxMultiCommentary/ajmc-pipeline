@@ -1,4 +1,5 @@
-"""This module handles reading of configs from tsv-files.
+"""
+This module handles reading of configs from tsv-files.
 
 Note:
     Configs are stored in central tsv files rather than json for easier comparability.
@@ -38,25 +39,27 @@ def get_config_reader(config_type: str):
         else row_to_experiment_config
 
 
-def config_to_tesstrain_config(config, cores: int = 12):
+def config_to_tesstrain_config(config):
     """Transforms a config to a tesstrain config which will be added to the training command.
 
     Note:
         See https://github.com/tesseract-ocr/tesstrain for all possible parameters.
     """
-    tesstrain_config = {}
-    tesstrain_config['MODEL_NAME'] = config["id"]
-    tesstrain_config['START_MODEL'] = config['source']
-    tesstrain_config['GROUND_TRUTH_DIR'] = str(ocr_vars.get_dataset_dir(config['train_dataset']))
-    tesstrain_config['LANGDATA_DIR'] = str(ocr_vars.LANGDATA_DIR)
-    tesstrain_config['TESSDATA'] = ocr_vars.get_traineddata_dir(config['source'])
-    tesstrain_config['CORES'] = cores
-    tesstrain_config['EPOCHS'] = config['epochs']
-    tesstrain_config['LEARNING_RATE'] = config['learning_rate']
-    tesstrain_config['PSM'] = 7
-    tesstrain_config['RATIO_TRAIN'] = config['train_ratio']
 
-    return tesstrain_config
+    return {
+        'MODEL_NAME': config['id'],
+        'START_MODEL': config['source'],
+        'GROUND_TRUTH_DIR': str(ocr_vars.get_dataset_dir(config['train_dataset'])),
+        'LANGDATA_DIR': str(ocr_vars.LANGDATA_DIR),
+        'TESSDATA': ocr_vars.get_traineddata_dir(config['source']),
+        'DATA_DIR': str(ocr_vars.get_model_train_dir(config['id'])),
+        'CORES': config['train_cores'],
+        'EPOCHS': config['epochs'],
+        'LEARNING_RATE': config['learning_rate'],
+        'PSM': 7,
+        'RATIO_TRAIN': config['tess_train_ratio'],
+        'TARGET_ERROR_RATE': 0.001
+    }
 
 
 def get_all_configs(xl_path: Path = ocr_vars.CONFIGS_PATH) -> Dict[str, Dict[str, dict]]:

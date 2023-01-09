@@ -12,7 +12,7 @@ BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 # ======================================================================================================================
 
 # Todo change paths
-EXEC_ENV = 'local' #cluster or drive or local
+EXEC_ENV = 'cluster' #cluster or drive or local
 
 PATHS = {
     'local_base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
@@ -33,7 +33,7 @@ PATHS = {
     'ocr_gt_file_pairs': 'ocr/gt_file_pairs',
 }
 PATHS['base_dir'] = PATHS[f'{EXEC_ENV}_base_dir']
-PATHS['temp_dir'] = os.getenv('TMPDIR')
+# PATHS['temp_dir'] = os.getenv('TMPDIR')
 
 # Sheet names corresponds to the dictionary's keys
 SPREADSHEETS = {

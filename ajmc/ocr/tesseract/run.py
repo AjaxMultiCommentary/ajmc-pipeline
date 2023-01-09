@@ -1,6 +1,6 @@
 """Train or evaluate tesseract"""
 from ajmc.commons.miscellaneous import recursive_iterator
-from ajmc.ocr.tesseract.models import get_model, train
+from ajmc.ocr.tesseract.models import train, get_or_create_traineddata_path
 from ajmc.ocr.config import get_all_configs
 from ajmc.ocr.preprocessing import data_preparation
 
@@ -14,7 +14,7 @@ def pipeline(xp_config: dict):
     # Check if the required models exists, build if not
     for model_id in xp_config['models']:
         model_config = configs['models'][model_id]
-        _ = get_model(model_config)
+        _ = get_or_create_traineddata_path(model_config)
 
 
     # Check whether the required datasets exist

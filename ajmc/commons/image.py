@@ -6,6 +6,8 @@ from typing import List, Tuple, Optional, Union
 import numpy as np
 from PIL import ImageFont, ImageDraw
 from PIL import Image
+from matplotlib import pyplot as plt
+from skimage.util import random_noise
 
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
@@ -334,3 +336,24 @@ def create_text_image(text: str,
     #                           output_file=output_dir / f'{font.stem}_{type_}.png')
 
 
+def align_rgb_values(img):
+    # input is numpy array
+    mean = np.mean(img, axis=2, keepdims=True)
+    mean_img = np.tile(mean, (1,1,3))
+    return np.array(mean_img, dtype='uint8')
+
+
+def add_noise(img, noise_type, show_fig=True):
+    if noise_type.lower() in ["s&p"]:
+        # Add salt-and-pepper noise to the image.
+        noise_img = random_noise(img, mode='s&p',amount=0.4)
+    elif noise_type.lower() in ["gaussian"]:
+        noise_img = random_noise(img, mode='gaussian', clip=True, mean=0, var=0.2)
+    # The above function returns a floating-point image
+    # on the range [0, 1], thus we changed it to 'uint8'
+    # and from [0,255]
+    noise_img = align_rgb_values(255*noise_img)
+    if show_fig:
+        plt.imshow(noise_img)
+        plt.axis("off")
+    return noise_img
