@@ -12,7 +12,7 @@ BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 # ======================================================================================================================
 
 # Todo change paths
-EXEC_ENV = 'cluster' #cluster or drive or local
+EXEC_ENV = 'local' #cluster or drive or local
 
 PATHS = {
     'local_base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
@@ -53,9 +53,23 @@ FOLDER_STRUCTURE_PATHS = {
 #                                                 COMMENTARIES
 # ======================================================================================================================
 
-ALL_COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Finglass2011', 'Garvie1998', 'Kamerbeek1953',
-                      'Paduano1982', 'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174',
-                      'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'thukydides02thuc',
+ALL_COMMENTARY_IDS = ['Colonna1975',
+                      'DeRomilly1976',
+                      'Ferrari1974',
+                      'Finglass2011',
+                      'Garvie1998',
+                      'Hermann1851',
+                      'Kamerbeek1953',
+                      'Paduano1982',
+                      'Untersteiner1934',
+                      'Wecklein1894',
+                      'bsb10234118',
+                      'cu31924087948174',
+                      'lestragdiesdeso00tourgoog',
+                      'Schneidewin_Nauck_Radermacher1913',
+                      'sophoclesplaysa05campgoog', 'sophokle1v3soph',
+                      'Stanford1963',
+                      'thukydides02thuc',
                       'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
 
 EXTERNAL_COMMENTARY_IDS = ['thukydides02thuc', 'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']

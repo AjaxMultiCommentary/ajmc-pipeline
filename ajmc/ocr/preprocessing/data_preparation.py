@@ -29,7 +29,15 @@ def get_ocr_dataset_metadata(dataset_dir: Path,
                              txt_suffix: str = '.gt.txt',
                              write_tsv: bool = True,
                              from_existing: bool = False) -> pd.DataFrame:
-    """Returns a DataFrame containing the length of each txt and its proportion of Greek characters."""
+    """Returns a DataFrame containing the length of each txt and its proportion of Greek characters.
+
+    Args:
+        dataset_dir: Path to directory containing images and their corresponding text files.
+        img_suffix: Suffix of image files.
+        txt_suffix: Suffix of text files.
+        write_tsv: Whether to write the metadata to a tsv file.
+        from_existing: Whether to read the metadata from the existing tsv file.
+    """
 
     if from_existing:
         metadata_path = dataset_dir / 'metadata.tsv'
@@ -110,8 +118,8 @@ def get_ocr_dataset_metadata(dataset_dir: Path,
     return metadata
 
 
-def filter_ocr_dataset_by_text(dataset_dir: Union[Path, str],
-                               target_dir: Union[Path, str],
+def filter_ocr_dataset_by_text(dataset_dir: Path,
+                               target_dir: Path,
                                filter_func: callable,
                                threshold: float = 0.5,
                                txt_suffix: str = ".gt.txt",
@@ -127,8 +135,6 @@ def filter_ocr_dataset_by_text(dataset_dir: Union[Path, str],
         img_suffix: Suffix of images.
     """
 
-    dataset_dir = Path(dataset_dir)
-    target_dir = Path(target_dir)
     target_dir.mkdir(parents=True, exist_ok=True)
 
     for img in tqdm(dataset_dir.rglob(f'*{img_suffix}'), desc='Filtering dataset'):
@@ -145,7 +151,19 @@ def filter_ocr_dataset_by_metadata(dataset_dir: Path,
                                    img_suffix: str = ".png",
                                    txt_suffix: str = ".gt.txt",
                                    ):
-    metadata = get_ocr_dataset_metadata(dataset_dir, from_existing=True)
+    """Filters dataset by applying `filter_func` to each text file in `data_dir` and exports it to `target_dir`.
+
+    Args:
+        dataset_dir: Path to directory containing images and their corresponding text files.
+        filter_func: Function to use as an pd.apply filter.
+            Example: lambda x: x['total_chars'] > 10 and x['total_chars'] < 100
+        target_dir: Path to directory where filtered images and texts will be exported.
+        inplace: If True, the dataset will be filtered in place.
+        img_suffix: Suffix of image files.
+        txt_suffix: Suffix of text files.
+    """
+
+    metadata = get_ocr_dataset_metadata(dataset_dir, from_existing=True, write_tsv=False)
 
     metadata['keep'] = metadata.apply(lambda x: filter_func(x), axis=1)
 
@@ -173,6 +191,13 @@ def clean_ocr_dataset(dataset_dir: Union[Path, str],
     2. Removes trailing whitespaces and newlines from txts
     3. Normalizing the OCR data to a single unicode form
     4. Removes double-height lines
+
+    Args:
+        dataset_dir: Path to directory containing images and their corresponding text files.
+        output_dir: Path to directory where cleaned images and texts will be exported.
+        unicode_form: Unicode form to normalize the OCR data to.
+        double_line_threshold: Threshold for detecting double-height lines.
+            Example: If set to 1.8, all lines above 1.8 times the average line height of a commentary will be removed.
     """
 
     dataset_dir = Path(dataset_dir)
@@ -402,7 +427,8 @@ def transform_ocr_dataset(config: dict,
         transform_config = config['transform']
 
         if transform_config['resize'] is not None:
-            img = img.resize(size=(int(transform_config['resize'] * img.width / img.height), transform_config['resize'],))
+            img = img.resize(
+                size=(int(transform_config['resize'] * img.width / img.height), transform_config['resize'],))
             img_id += f'_res{transform_config["resize"]}'
 
         if transform_config['rotate'] is not None:
@@ -431,20 +457,20 @@ def transform_ocr_dataset(config: dict,
 
         # Deal with the corresponding .gt.txt
         txt_path = img_path.with_suffix('.gt.txt')
-        if output_dir is not None: # Create a new txt
+        if output_dir is not None:  # Create a new txt
             new_path.with_suffix('.gt.txt').write_text(txt_path.read_text(encoding='utf-8'), encoding='utf-8')
         else:  # renames it
             txt_path.rename(new_path.with_suffix('.gt.txt'))
 
 
-def get_or_create_dataset_dir(dataset_config: dict,
-                              overwrite: bool= False) -> Path:
+def get_or_make_dataset_dir(dataset_config: dict,
+                            overwrite: bool = False) -> Path:
     """Returns the path to a dataset's dir, creating the dataset if it doesn't exist"""
 
     dataset_dir = ocr_vars.get_dataset_dir(dataset_config['id'])
     all_dataset_configs: dict = get_all_configs()['datasets']
 
-    if dataset_dir.is_dir() and not overwrite: # If the dataset already exists
+    if dataset_dir.is_dir() and not overwrite:  # If the dataset already exists
         return dataset_dir
 
     # else
@@ -462,7 +488,7 @@ def get_or_create_dataset_dir(dataset_config: dict,
         metadata = pd.DataFrame()
         for source in dataset_config['source']:
             source_config = all_dataset_configs[source]
-            source_dir = get_or_create_dataset_dir(source_config)
+            source_dir = get_or_make_dataset_dir(source_config, overwrite=overwrite)
             source_metadata = get_ocr_dataset_metadata(source_dir, from_existing=True)
             source_metadata['path'] = source_metadata['id'].apply(lambda x: (source_dir / (x + '.png')))
             metadata = pd.concat([metadata, source_metadata], axis=1)
@@ -482,12 +508,22 @@ def get_or_create_dataset_dir(dataset_config: dict,
     return dataset_dir
 
 
-def create_all_datasets(overwrite: bool = False):
+def make_datasets(dataset_ids: Optional[List[str]], overwrite: bool = False):
+    """Creates datasets.
+
+    Args:
+        dataset_ids: The list of dataset ids to create. If none, creates all datasets in the config.
+        overwrite: Wheter to overwrite existing datasets. Note that this function calls on `get_or_make_dataset_dir`,
+        which is recursive. If `overwrite` is True, all required datasets will be overwritten
+        (i.e. also each dataset's source-dataset).
+    """
     configs = get_all_configs()
 
-    for dataset_config in configs['datasets'].values():
-        get_or_create_dataset_dir(dataset_config, overwrite=overwrite)
+    if dataset_ids is None:
+        for dataset_config in tqdm(configs['datasets'].values()):
+            get_or_make_dataset_dir(dataset_config, overwrite=overwrite)
 
-
-
-
+    else:
+        for dataset_id in tqdm(dataset_ids):
+            dataset_config = configs['datasets'][dataset_id]
+            get_or_make_dataset_dir(dataset_config, overwrite=overwrite)

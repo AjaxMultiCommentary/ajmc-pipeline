@@ -58,3 +58,19 @@ def get_model_config_path(model_name: str) -> Path:
 
 def get_wordlist_path(wordlist_name: str) -> Path:
     return DICTIONARIES_DIR / (wordlist_name + '.txt')
+
+
+def get_experiment_dir(experiment_id: str) -> Path:
+    return EXPERIMENTS_DIR / experiment_id
+
+
+def get_experiment_config_path(experiment_id: str) -> Path:
+    return get_experiment_dir(experiment_id) / 'config.json'
+
+
+def get_experiment_models_dir(experiment_id: str) -> Path:
+    return get_experiment_dir(experiment_id) / 'models'
+
+
+def get_experiment_model_outputs_dir(experiment_id: str) -> Path:
+    return get_experiment_dir(experiment_id) / 'model_outputs'

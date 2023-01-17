@@ -4,25 +4,176 @@
 1. **Bag-of-word evaluation**: computes errors by matching words which have the minimal edit distance in a bag of groundtruth and in a a bag of predicted word.
 2. **Coordinate based evaluation**: computes errors by matching words with overlapping coordinates.
 """
-
+import csv
 import os
+import re
 from pathlib import Path
 
 import Levenshtein
 import pandas as pd
+from bs4 import BeautifulSoup
 from tqdm import tqdm
 from typing import List, Dict, Tuple, Union, Optional
-from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES
+from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES, CHARSETS
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import is_bbox_within_bbox, are_bboxes_overlapping_with_threshold
-from ajmc.ocr.evaluation.utils import initialize_soup, count_errors_by_charset, record_editops, \
-    insert_text_in_soup, write_error_counts, write_editops_record
 from ajmc.ocr.utils import count_chars_by_charset, harmonise_unicode
 from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
 from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
 
+
+# ======================================================================================================================
+#                                       UTILS
+# ======================================================================================================================
+
+def initialize_soup(img_width: int, img_height: int) -> "BeautifulSoup":
+    """Initializes a blank html page for comparing predictions and errors
+
+    Args:
+        img_width: Width of the page's image.
+        img_height: Height of the page's image
+
+    Returns:
+        The initialized BeautifulSoup Object
+    """
+
+    divisor = img_width * 2 / 1440
+
+    soup = BeautifulSoup(f"""<!doctype html><html lang="en"><head>
+                         <meta charset="utf-8" divisor="{divisor}" half_width="{int(img_width / divisor)}"></head>
+                         <body><p style="margin:auto;text-align:center"> 
+                         <b>OCR/GROUNDTRUTH COMPARISON </b><br> 
+                         Ocr is displayed on the left, groundtruth on the right.<br>
+                         Missrecognized words are contoured in red. </p>
+                         </body></html>""", features='lxml')
+
+    soup.html.body.append(soup.new_tag(name='div',
+                                       attrs={'style': f"""margin:auto; position:relative; 
+                                              width:{int(img_width * 2 / divisor)}px; 
+                                              height:{int(img_height / (divisor * 0.8))}px"""}))
+
+    return soup
+
+
+def insert_text_in_soup(soup: "BeautifulSoup", word: 'OcrWord', is_gt: bool, is_false: bool) -> "BeautifulSoup":
+    """Adds content to `soup` object.
+
+    This function is used to add single words to the `soup` object initialized by `initialize_soup`, thereby
+    reconstructing both the groundtruth and the preds page, with false words in red.
+
+    Args:
+        soup: an initilised BeautifulSoup object
+        word: The ocr- or groundtruth word to add
+        is_gt: Wheter the word is groundtruth or not (determines where to place it).
+        is_false: Whether the word was falsely predicted or not.
+
+    Returns
+        The modified BeautifulSoup object"""
+
+    divisor = float(soup.html.head.meta['divisor'])
+
+    # Write groundtruth to the right
+    x_coord = int(word.bbox.bbox[0][0] / divisor) + (int(soup.html.head.meta["half_width"]) if is_gt else 0)
+    y_coord = int(word.bbox.bbox[0][1] / divisor)
+
+    new_div = soup.new_tag(name="div",
+                           attrs={"style": f"""position:absolute; 
+                                             width:{word.bbox.width / divisor}px; 
+                                             height:{word.bbox.height / divisor}px; 
+                                             left:{x_coord}px; 
+                                             top:{y_coord}px;
+                                             font-size: 80%;
+                                             """ + ("""color: red;font-weight: bold;""" if is_false else '')})
+
+    new_div.string = word.text
+    soup.html.body.div.append(new_div)
+
+    return soup
+
+
+def record_editops(gt_word: str, ocr_word: str, editops: list,
+                   editops_record: Dict[Tuple[str, str, str], int]) -> Dict[Tuple[str, str, str], int]:
+    """Adds word-level edit operation to the record of all edit operations"""
+
+    for editop in editops:
+        if editop[0] == 'delete':
+            editop_tuple = ('delete', ocr_word[editop[1]], '')
+        elif editop[0] == 'insert':
+            editop_tuple = ('insert', gt_word[editop[2]], '')
+        else:
+            editop_tuple = (editop[0], ocr_word[int(editop[1])], gt_word[int(editop[2])])
+
+        try:
+            editops_record[editop_tuple] += 1
+        except KeyError:
+            editops_record[editop_tuple] = 1
+
+    return editops_record
+
+
+def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> int:
+    """Counts the number of errors among the character comprised in an unicode character set.
+
+    Example:
+        `count_errors_by_charset('Hεll_ World1', 'ηειι- world', 'greek')` returns `3` as among the 4 greek
+        chars in `gt`, 3 are misrecognized.
+
+    Args:
+        pred_string: prediction/source string
+        gt_string: groundtruth/destination string
+        charset: should be `'greek'`, `'l‹atin'`, `'numbers'`, `'punctuation'` or a valid `re`-pattern,
+                 for instance `r'([\u00F4-\u00FF])'`
+
+    Returns:
+        int: the number of errors on selected caracters in `pred_string`
+    """
+
+    try:
+        pattern = CHARSETS[charset]
+    except KeyError:
+        pattern = re.compile(charset, re.UNICODE)
+
+    indices = [m.span()[0] for m in re.finditer(pattern, gt_string)]
+    editops = Levenshtein.editops(pred_string, gt_string)
+
+    # min() is there to cope with insertion at the end of the string
+    return sum([1 for e in editops if min(e[2], len(gt_string) - 1) in indices])
+
+
+def write_error_counts(bow_error_counts: dict,
+                       coord_error_counts: dict,
+                       output_dir: str):
+    sorted_bow_keys = ['ccr', 'cwr', 'f1', 'precision', 'recall']
+    sorted_bow_keys = sorted_bow_keys + [k for k in bow_error_counts.keys() if k not in sorted_bow_keys]
+
+    reformed_bow = {('global', 'bow', k): [bow_error_counts[k]] for k in sorted_bow_keys}
+
+    reformed_coord = {(i, j, k): [coord_error_counts[i][j][k]]
+                      for i in coord_error_counts.keys()
+                      for j in coord_error_counts[i].keys()
+                      for k in ['cr', 'total', 'evaluated', 'false']}
+
+    df_bow = pd.DataFrame.from_dict(reformed_bow, orient='columns')
+    df_coord = pd.DataFrame.from_dict(reformed_coord, orient='columns')
+
+    df = pd.concat([df_bow, df_coord], axis=1)
+    df.to_csv(os.path.join(output_dir, 'evaluation_results.tsv'), index=False, sep='\t')
+
+
+def write_editops_record(editops_record, output_dir):
+    editops_record = {k: v for k, v in sorted(editops_record.items(), key=lambda item: item[1], reverse=True)}
+    with open(os.path.join(output_dir, "editops.tsv"), 'w', encoding="utf-8") as csv_file:
+        spamwriter = csv.writer(csv_file, delimiter='\t', quotechar='"')
+        spamwriter.writerow(['Operation', 'From', 'To', 'Count'])
+        for k, v in editops_record.items():
+            spamwriter.writerow([k[0], k[1], k[2], v])
+
+
+# ======================================================================================================================
+#                                       EVALUATION METHODS
+# ======================================================================================================================
 
 # todo 👁️ add fuzzy eval
 def bag_of_word_evaluation(gt_bag: List[str],
@@ -348,3 +499,5 @@ def line_by_line_evaluation(gt_dir: Path,
             f.write(f'cer\twer\n{cer}\t{wer}')
 
     return error_record, editops_record
+
+

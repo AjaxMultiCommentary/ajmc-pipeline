@@ -1,22 +1,26 @@
 import json
 import subprocess
 from pathlib import Path
+from typing import Optional, List
+from tqdm import tqdm
 from ajmc.commons.miscellaneous import log_to_file, get_custom_logger
 from ajmc.ocr import variables as ocr_vars
-from ajmc.ocr.preprocessing.data_preparation import get_or_create_dataset_dir
+from ajmc.ocr.preprocessing.data_preparation import get_or_make_dataset_dir
 from ajmc.ocr.tesseract.dictionaries import change_traineddata_wordlist, write_unpacked_traineddata
 from ajmc.ocr.config import get_all_configs, config_to_tesstrain_config
 
 logger = get_custom_logger(__name__)
 
+
 def make_model_dirs(model_id: str):
-    """Creates an empty model with its subdir"""
+    """Creates an empty model directory with its subdirectories"""
     ocr_vars.get_model_dir(model_id).mkdir(parents=True, exist_ok=True)
     ocr_vars.get_traineddata_dir(model_id).mkdir(parents=True, exist_ok=True)
     ocr_vars.get_model_train_dir(model_id).mkdir(parents=True, exist_ok=True)
 
 
-def get_or_create_traineddata_path(model_config: dict, overwrite: bool = False) -> Path:
+def get_or_make_traineddata_path(model_config: dict,
+                                 overwrite: bool = False) -> Path:
     """Creates the model repo"""
 
     # Get the model's paths
@@ -45,8 +49,8 @@ def get_or_create_traineddata_path(model_config: dict, overwrite: bool = False) 
     # Else, build the model from its model_config
     else:
         source_model_config = get_all_configs()['models'][model_config['source']]
-        source_model_path = get_or_create_traineddata_path(source_model_config,
-                                                           overwrite=overwrite)  # Gets the source model recursively
+        source_model_path = get_or_make_traineddata_path(source_model_config,
+                                                         overwrite=overwrite)  # Gets the source model recursively
         model_path.write_bytes(source_model_path.read_bytes())
 
         # Change the wordlist if necessary
@@ -59,8 +63,11 @@ def get_or_create_traineddata_path(model_config: dict, overwrite: bool = False) 
         # train the model ?
         if model_config['train_dataset'] is not None:
             train_dataset_config = get_all_configs()['datasets'][model_config['train_dataset']]
-            get_or_create_dataset_dir(train_dataset_config, overwrite=overwrite)
+            get_or_make_dataset_dir(train_dataset_config, overwrite=overwrite)
             train(model_config)
+
+    # Write the config file
+    config_path.write_text(json.dumps(model_config, indent=2), encoding='utf-8')
 
     return model_path
 
@@ -109,12 +116,71 @@ def train(model_config: dict):
     log_to_file(output.stdout.decode('ascii'), log_path)
 
 
+def run(img_dir: Path,
+        output_dir: Path,
+        langs: str,
+        config: dict = None,
+        psm: int = 3,
+        img_suffix: str = '.png',
+        tessdata_prefix: Path = ocr_vars.TESSDATA_DIR,
+        ):
+    """Runs tesseract on images in `img_dir`.
+
+    Note:
+        assumes tesseract is installed.
+
+    Args:
+        img_dir (Path): path to directory containing images to be OCR'd
+        output_dir (Path): path to directory where OCR'd text will be saved
+        langs (str): language(s) to use for OCR. Use '+' to separate multiple languages, e.g. 'eng+fra'
+        config (dict): dictionary of config options to pass to tesseract. See https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html
+        psm (int): page segmentation mode. See https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html
+        img_suffix (str): suffix of images to be OCR'd
+        tessdata_prefix (Path): path to directory containing tesseract language data
+    """
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Write the config
+    if config:
+        (output_dir / 'tess_config').write_text('\n'.join([f'{k} {v}' for k, v in config.items()]), encoding='utf-8')
+
+    command = f"""\
+cd {img_dir}; export TESSDATA_PREFIX={tessdata_prefix}; \
+for i in *{img_suffix} ; \
+do tesseract "$i" "{output_dir}/${{i::${{#i}}-4}}" \
+-l {langs} \
+--psm {psm} \
+{(output_dir / 'tess_config') if config else ''}; \
+done;"""
+
+    # Writes the command to remember how this was run
+    (output_dir / 'command.sh').write_text(command)
+
+    # Write the data related metadata
+    if (img_dir / 'metadata.json').is_file():
+        (output_dir / 'data_metadata.json').write_bytes((img_dir / 'metadata.json').read_bytes())
+
+    # Run the command
+    subprocess.run(['bash'], input=command, shell=True)
 
 
+def make_models(models_ids: Optional[List[str]], overwrite: bool = False):
+    """Creates datasets.
 
+    Args:
+        models_ids: The list of models to create. If None, creates all models.
+        overwrite: Wheter to overwrite existing models. Note that this function calls on `get_or_make_trainneddata_path``,
+        which is recursive. If `overwrite` is True, all required models will be overwritten
+        (i.e. also each models's source-model).
+    """
+    configs = get_all_configs()
 
-# configs = get_all_configs()
-# model_config = configs['models']['test']
-#
-# get_or_create_traineddata_path(model_config=model_config, overwrite=True)
-# print('coucou')
+    if models_ids is None:
+        for model_config in tqdm(configs['models'].values()):
+            get_or_make_traineddata_path(model_config=model_config, overwrite=overwrite)
+
+    else:
+        for model_id in tqdm(models_ids):
+            model_config = configs['models'][model_id]
+            get_or_make_traineddata_path(model_config=model_config, overwrite=overwrite)

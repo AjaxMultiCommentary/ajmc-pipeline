@@ -4,8 +4,21 @@ from pathlib import Path
 from ajmc.commons import variables
 
 comm_ids = [
-    'Colonna1975',
-    # 'pvergiliusmaroa00virggoog',
+    # 'annalsoftacitusp00taci',
+    # 'bsb10234118',
+    # 'Colonna1975',
+    # 'DeRomilly1976',
+    # 'Ferrari1974',
+    # 'Finglass2011',
+    # # 'Garvie1998',
+    # 'Hermann1851',
+    # # 'Kamerbeek1953',
+    # # 'Paduano1982',
+    # # 'pvergiliusmaroa00virggoog',
+    # 'Schneidewin_Nauck_Radermacher1913',
+    'Stanford1963',
+    # 'thukydides02thuc',
+    # 'Untersteiner1934',
 ]
 
 skiped = []

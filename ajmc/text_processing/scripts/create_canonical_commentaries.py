@@ -10,18 +10,23 @@ from tqdm import tqdm
 stream_handler.setLevel(20)
 
 DESIRED_COMMENTARIES = [
-    'annalsoftacitusp00taci',
-    'bsb10234118',
-    'Colonna1975',
-    'DeRomilly1976',
-    'Ferrari1974',
-    'Garvie1998',
-    'Kamerbeek1953',
-    'Paduano1982',
-    'pvergiliusmaroa00virggoog',
-    'thukydides02thuc',
-    'Untersteiner1934',
+    # 'annalsoftacitusp00taci',
+    # 'bsb10234118',
+    # 'Colonna1975',
+    # 'DeRomilly1976',
+    # 'Ferrari1974',
+    # 'Finglass2011',
+    # 'Garvie1998',
+    # 'Hermann1851',
+    # 'Kamerbeek1953',
+    # 'Paduano1982',
+    # 'pvergiliusmaroa00virggoog',
+    # 'Schneidewin_Nauck_Radermacher1913',
+    'Stanford1963',
+    # 'thukydides02thuc',
+    # 'Untersteiner1934',
 ]
+
 
 for comm_id in tqdm(DESIRED_COMMENTARIES, desc='Processing commentaries'):
 

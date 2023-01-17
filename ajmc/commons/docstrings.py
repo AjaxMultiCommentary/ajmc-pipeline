@@ -82,6 +82,10 @@ to the original label names (str), e.g. `{{0: "O", 1: "B-PERS", ...}}`""",
 
 docstrings['image_dir'] = 'The absolute path to the directory containing the images.'
 
+docstrings['image_path'] = 'The absolute path to the image.'
+
+docstrings['image_format'] = 'The format of the image, e.g. "png" or "jpg".'
+
 docstrings['interval'] = 'A `Tuple[int, int]` defining the included boundaries of an interval, with start <= stop.'
 
 docstrings['kwargs_for_properties'] = 'Use **kwargs to manually set or override properties.'

@@ -1,14 +1,11 @@
 import random
 from pathlib import Path
-
 import cv2
 from typing import List, Tuple, Optional, Union
 import numpy as np
 from PIL import ImageFont, ImageDraw
-from PIL import Image
 from matplotlib import pyplot as plt
 from skimage.util import random_noise
-
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
 from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init
@@ -86,7 +83,7 @@ class AjmcImage:
 
 def binarize(img_matrix: np.ndarray,
              inverted: bool = False):
-    """Binarizes a cv2 `image`"""
+    """Binarizes a cv2 `image` using Otsu's method."""
     binarization_type = (cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV) if inverted else (cv2.THRESH_OTSU | cv2.THRESH_BINARY)
     gray = cv2.cvtColor(img_matrix, cv2.COLOR_BGR2GRAY)
     return cv2.threshold(gray, 0, 255, type=binarization_type)[1]

@@ -7,56 +7,6 @@ from ajmc.commons.file_management.utils import get_62_based_datecode
 from ajmc.commons.miscellaneous import prefix_command_with_conda_env
 
 
-def run_tesseract(img_dir: Path,
-                  output_dir: Path,
-                  langs: str,
-                  config: dict = None,
-                  psm: int = 3,
-                  img_suffix: str = '.png',
-                  tessdata_prefix: Path = ocr_vars.TESSDATA_DIR,
-                  ):
-    """Runs tesseract on images in `img_dir`.
-
-    Note:
-        assumes tesseract is installed.
-
-    Args:
-        img_dir (Path): path to directory containing images to be OCR'd
-        output_dir (Path): path to directory where OCR'd text will be saved
-        langs (str): language(s) to use for OCR. Use '+' to separate multiple languages, e.g. 'eng+fra'
-        config (dict): dictionary of config options to pass to tesseract. See https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html
-        psm (int): page segmentation mode. See https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html
-        img_suffix (str): suffix of images to be OCR'd
-        tessdata_prefix (Path): path to directory containing tesseract language data
-    """
-
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Write the config
-    if config:
-        (output_dir / 'tess_config').write_text('\n'.join([f'{k} {v}' for k, v in config.items()]), encoding='utf-8')
-
-    command = f"""\
-cd {img_dir}; export TESSDATA_PREFIX={tessdata_prefix}; \
-for i in *{img_suffix} ; \
-do tesseract "$i" "{output_dir}/${{i::${{#i}}-4}}" \
--l {langs} \
---psm {psm} \
-{(output_dir /'tess_config') if config else ''}; \
-done;"""
-
-    # Writes the command to remember how this was run
-    (output_dir / 'command.sh').write_text(command)
-
-    # Write the data related metadata
-    if (img_dir / 'metadata.json').is_file():
-        (output_dir / 'data_metadata.json').write_bytes((img_dir / 'metadata.json').read_bytes())
-
-    # Run the command
-    subprocess.run(['bash'], input=command, shell=True)
-
-
 def reformulate_output_dir(output_dir: Path) -> pathlib.Path:
     return output_dir.parent / f'{get_62_based_datecode()}_{output_dir.name}/outputs'
 
