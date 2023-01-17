@@ -263,3 +263,7 @@ def walk_files(path: str,
 
         if not recursive:
             break
+
+def get_x_digit_number(number: Union[int, str], digits:int = 4) -> str:
+    """Returns a four digit number as a string."""
+    return f'{int(number):0{digits}d}'

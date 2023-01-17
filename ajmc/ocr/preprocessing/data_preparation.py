@@ -362,7 +362,7 @@ def custom_split_source_dataset(dataset_dir: Path,
             return [('test', 100 / df_len),
                     ('train', (df_len - 100) / df_len)]
 
-        # For pog, we keep only 50 for the fully greek and give the whole rest to training
+        # For pog, we keep only 100 for the fully greek and give the whole rest to training
         elif group_name in [('pogretra', 'grc')]:
             return [('test', 100 / df_len), ('train', (df_len - 100) / df_len)]
         else:

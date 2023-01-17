@@ -12,7 +12,7 @@ BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 # ======================================================================================================================
 
 # Todo change paths
-EXEC_ENV = 'local' #cluster or drive or local
+EXEC_ENV = 'cluster' #cluster or drive or local
 
 PATHS = {
     'local_base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
