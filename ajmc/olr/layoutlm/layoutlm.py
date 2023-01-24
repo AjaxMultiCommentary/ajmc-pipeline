@@ -1,18 +1,18 @@
 import json
 import os
 import random
-from ajmc.commons.docstrings import docstrings, docstring_formatter
-from typing import List, Optional, Dict, Union, Tuple
-from ajmc.olr.utils import get_olr_splits_page_ids
-from ajmc.nlp.token_classification.config import parse_config_from_json
-from ajmc.nlp.token_classification.pipeline import train
-from ajmc.commons.variables import COLORS, PATHS, ORDERED_OLR_REGION_TYPES, BoxType
-from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, CustomDataset, \
-    align_labels_to_tokenized
-from ajmc.nlp.token_classification.model import predict_dataset
-from ajmc.nlp.token_classification.pipeline import create_dirs
-from ajmc.text_processing.canonical_classes import CanonicalCommentary
+from typing import Dict, List, Optional, Tuple, Union
+
 from PIL import Image
+
+from ajmc.commons.docstrings import docstring_formatter, docstrings
+from ajmc.nlp.token_classification.config import parse_config_from_json
+from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, align_labels_to_tokenized, \
+    CustomDataset
+from ajmc.nlp.token_classification.model import predict_dataset
+from ajmc.nlp.token_classification.pipeline import create_dirs, train
+from ajmc.olr.utils import get_olr_splits_page_ids
+from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
 V3 = True
 
@@ -34,7 +34,7 @@ else:
 ROBERTA_MODEL_INPUTS = ['input_ids', 'attention_mask']
 
 
-def create_olr_config(json_path: str,
+def create_olr_config(json_path: Path,
                       prefix: str):
 
     config = parse_config_from_json(json_path=json_path)
@@ -376,6 +376,6 @@ if __name__ == '__main__':
     config = create_olr_config(
         # json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json',
         json_path='/Users/sven/packages/ajmc/data/layoutlm/configs/1E_jebb_text_only.json',
-        prefix=PATHS['base_dir']
+        prefix=COMMS_DATA_DIR
     )
     main(config)

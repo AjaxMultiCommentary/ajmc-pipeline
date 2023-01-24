@@ -1,25 +1,21 @@
 """File management tools and utilities, such as moving/renaming/replacing files, get paths..."""
-
-import os
+# CHECKED 2023-01-24
 import shutil
-from string import ascii_letters
 from datetime import datetime
-from typing import Tuple, Optional, List, Union, Callable
-
-from ajmc.commons import variables
-from ajmc.commons.miscellaneous import get_custom_logger
-from ajmc.commons.variables import PATHS
-from ajmc.commons.docstrings import docstring_formatter, docstrings
 from pathlib import Path
+from string import ascii_letters
+from typing import Callable, List, Optional, Union
+
+from ajmc.commons import variables as vs
+from ajmc.commons.docstrings import docstring_formatter, docstrings
+from ajmc.commons.miscellaneous import get_custom_logger
+
 logger = get_custom_logger(__name__)
-
-NUMBERS_LETTERS = '0123456789' + ascii_letters
-
 
 def int_to_x_based_code(number: int,
                         base: int = 62,
                         fixed_min_len: Union[bool, int] = False,
-                        symbols: str = NUMBERS_LETTERS) -> str:
+                        symbols: str = '0123456789' + ascii_letters) -> str:
     """Converts an integer to an x-based code.
 
     Args:
@@ -56,15 +52,15 @@ def int_to_x_based_code(number: int,
 
     # If the code is shorter than the fixed length, we add leading zeros
     if fixed_min_len:
-        code = symbols[0] * (fixed_min_len - len(code)) + code
+        code = code.rjust(fixed_min_len, symbols[0])
 
     return code
 
 
-def get_62_based_datecode(date: Optional[datetime] = None):
+def get_62_based_datecode(date: Optional[datetime] = None) -> str:
     """Returns a 62-based code based on the date and time.
 
-    This function is used to generate a unique id for each OCR run, based on the date and time. It takes the form of a
+    This function is mainly used to generate a unique id for each OCR run, based on the date and time. It takes the form of a
     6 digits numbers, where each digit is a letter or a number.
         - The first digit correspond to the last number of the year (e.g. 1 for 2021).
         - The second digit correspond to the month (e.g. 1 for January, B for december).
@@ -102,168 +98,48 @@ def get_62_based_datecode(date: Optional[datetime] = None):
     return datecode
 
 
-def verify_path_integrity(path: str, path_pattern: str) -> None:
-    """Verify the integrity of an `ocr_path` with respect to ajmc's folder structure.
-    Args:
-        path: The path to be tested
-        path_pattern: The pattern to be respected (see `commons.variables.FOLDER_STRUCTURE_PATHS`).
-    """
-    dirs = path.strip('/').split('/')  # Stripping trailing and leading '/' before splitting
-    dirs_pattern = path_pattern.strip('/').split('/')
-
-    for dir_, pattern in zip(reversed(dirs), reversed(dirs_pattern)):
-        # Make sure the detected commentary id is known
-        if pattern == '[commentary_id]':
-            assert dir_ in variables.ALL_COMMENTARY_IDS, f"""The commentary id ({dir_}) detected 
-            in the provided path ({path}) does not match any known commentary_id. """
-
-        # Skip other placeholder patterns (e.g. '[ocr_run]').
-        elif pattern[0] == '[' and pattern[-1] == ']':
-            continue
-
-        # Verify fixed patterns
-        else:
-            assert pattern == dir_, f"""The provided path ({path}) does not seem to be compliant with AJMC's 
-            folder structure. Please make sure you are observing the following pattern: \n {path_pattern} """
-
-
-def parse_ocr_path(path: str) -> Tuple[str, str, str]:
-    """Extracts the base_path, commentary_id and ocr_run from an AJMC compliant OCR-outputs path."""
-    dirs = path.rstrip('/').split('/')  # Stripping trailing '/' before splitting
-    dirs_pattern = variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'].strip('/').split('/')
-    base = '/'.join(dirs[:-len(dirs_pattern)])
-    rest = dirs[-len(dirs_pattern):]
-    commentary_id = rest[dirs_pattern.index('[commentary_id]')]
-    ocr_run = rest[dirs_pattern.index('[ocr_run]')]
-
-    return base, commentary_id, ocr_run
-
-
 @docstring_formatter(**docstrings)
-def find_file_by_name(base_name: str,
-                      directory: str = None) -> Optional[str]:
-    """Gets the path to a file from its base name.
-
-    Args:
-        base_name: The base name of the file to be found.
-        directory: {directory} in which to look for the file.
-
-    Returns:
-        The absolute path to the file.
-    """
-
-    files = [f for f in os.listdir(directory) if base_name in f]
-
-    assert len(
-        files) <= 1, f"""There are {len(files)} files matching the name {base_name} in {directory}. Please check."""
-
-    if len(files) == 0:
-        logger.debug(f"""Page_id {base_name} matches no file in {directory}, skipping...""")
-        return None
-
-    else:
-        return os.path.join(directory, files[0])
-
-
-@docstring_formatter(**docstrings)
-def guess_ocr_format(ocr_path: str) -> str:
-    """Guesses the ocr-format of a file.
-
-    Args:
-        ocr_path: {ocr_path}
-
-    Returns:
-        The ocr-format of the file, either 'pagexml', 'krakenhocr' or 'tesshocr'.
-    """
-
-    if ocr_path[-3:] == 'xml':
-        return 'pagexml'
-    elif ocr_path[-4:] == 'html':
-        return 'krakenhocr'
-    elif ocr_path[-4:] == 'hocr':
-        return 'tesshocr'
-    else:
-        raise NotImplementedError("""The format could not be identified. It looks like the format is neither 
-        `tesshocr`, nor `krakenhocr` nor `pagexml`, which are the only formats this module deals with.""")
-
-
-@docstring_formatter(**docstrings)
-def move_files_in_each_commentary_dir(relative_src: str,
-                                      relative_dst: str,
-                                      base_dir: str = PATHS['base_dir']):
+def move_files_in_each_commentary_dir(relative_src_path: Union[str, Path],
+                                      relative_dst_path: Union[str, Path],
+                                      base_dir: Path = vs.COMMS_DATA_DIR):
     """Moves/rename files/folders in the folder structure.
 
     Args:
-        relative_src: relative path of the source file/folder, from commentary root (e.g. `'ocr/groundtruth'`)
-        relative_dst: relative path of the destination file/folder,  from commentary root (e.g. `'ocr/groundtruth'`)
+        relative_src_path: relative path of the source file/folder, from commentary base_dir (e.g. `'ocr/groundtruth'`)
+        relative_dst_path: relative path of the destination file/folder,  from commentary base_dir (e.g. `'ocr/groundtruth'`)
         base_dir: {base_dir}
     """
 
-    for dir_name in walk_dirs(base_dir):
-        if os.path.exists(os.path.join(base_dir, dir_name, relative_src)):
-            # Moves the file/folder
-            shutil.move(os.path.join(base_dir, dir_name, relative_src),
-                        os.path.join(base_dir, dir_name, relative_dst))
+    for dir_ in walk_dirs(base_dir):
+        abs_src_path = dir_ / relative_src_path
+        abs_dst_path = dir_ / relative_dst_path
+        if abs_src_path.exists():
+            logger.info(f"Moving {abs_src_path} to {abs_dst_path}")
+            abs_dst_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(abs_src_path, abs_dst_path)
 
 
-@docstring_formatter(**docstrings)
-def create_folder_in_each_commentary_dir(relative_dir_path: str,
-                                         base_dir: str = PATHS['base_dir']):
-    """Creates an empty directory in each commentary directory.
-
-    Args:
-        relative_dir_path: relative path of the directory to be created, from the base_dir.
-        base_dir: {base_dir}
-    """
-    for dir_path in walk_dirs(base_dir, prepend_base=True):
-        os.makedirs(os.path.join(dir_path, relative_dir_path), exist_ok=True)
-
-
-def merge_subdirectories(parent_dir: str, destination_dir: str):
-    """Recursive function to merge the content of all sub-directories in `parent_dir` into one"""
-    os.makedirs(destination_dir, exist_ok=True)
-    for root, dirs, files in os.walk(parent_dir):
-        for file in files:
-            shutil.copy(os.path.join(root, file), destination_dir)
-        for dir_ in dirs:
-            merge_subdirectories(os.path.join(root, dir_), destination_dir)
-
-
-# Todo change this to return a Path object
-def walk_dirs(path: str, prepend_base: bool = False, recursive: bool = False) -> List[str]:
+def walk_dirs(path: Path, recursive: bool = False) -> List[Path]:
     """Walks over the dirs in path."""
-    for root, dirs, files in os.walk(path):
-        for dir_ in sorted(dirs):
-            if prepend_base:
-                yield os.path.join(root, dir_)
-            else:
-                yield dir_
-        if not recursive:
-            break
+    for dir_ in path.glob('*'):
+        if dir_.is_dir():
+            yield dir_
+            if recursive:
+                for dir__ in walk_dirs(dir_, recursive):
+                    yield dir__
 
 
-def walk_files(path: str,
-               filter: Optional[Callable[[Path], bool]] = None,
+def walk_files(parent_dir: Path,
+               filter_func: Optional[Callable[[Path], bool]] = None,
                recursive: bool = False):
-    """Walks over the files in path.
+    """Walks over the files in parent_dir.
 
     Args:
-        path: The path to walk over.
-        filter: A function that takes a filename as input and returns a boolean.
+        parent_dir: The path to walk over.
+        filter_func: A function that takes a filename as input and returns a boolean.
         recursive: Whether to walk recursively or not.
     """
-    for root, dirs, files in os.walk(path):
-        for filename in sorted(files):
-            path = Path(os.path.join(root, filename))
-            if filter is not None:
-                if filter(path):
-                    yield path
-            else:
+    for path in parent_dir.glob('**/*' if recursive else '*'):
+        if path.is_file():
+            if filter_func is None or filter_func(path):
                 yield path
-
-        if not recursive:
-            break
-
-def get_x_digit_number(number: Union[int, str], digits:int = 4) -> str:
-    """Returns a four digit number as a string."""
-    return f'{int(number):0{digits}d}'

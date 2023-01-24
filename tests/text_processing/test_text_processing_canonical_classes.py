@@ -1,9 +1,10 @@
-from ajmc.commons.miscellaneous import LazyObject
-from tests import sample_objects as so
-from ajmc.commons.geometry import Shape
-from ajmc.text_processing import canonical_classes as cc
-from ajmc.commons.variables import CHILD_TYPES, TEXTCONTAINER_TYPES
 import pytest
+
+from ajmc.commons import variables
+from ajmc.commons.geometry import Shape
+from ajmc.commons.miscellaneous import LazyObject
+from ajmc.text_processing import canonical_classes as cc
+from tests import sample_objects as so
 
 
 @pytest.mark.parametrize('tc', [so.sample_cancommentary,
@@ -19,13 +20,13 @@ import pytest
 def test_textcontainer(tc):
     # test CanonicalCommentary.children
     assert isinstance(tc.children, LazyObject)
-    for tc_type in CHILD_TYPES:
+    for tc_type in variables.CHILD_TYPES:
         assert isinstance(getattr(tc.children, tc_type), list)
         assert all([isinstance(tc, cc.get_tc_type_class(tc_type)) for tc in getattr(tc.children, tc_type)])
 
     # Test CanonicalCommentary.parents
     assert isinstance(tc.parents, LazyObject)
-    for tc_type in TEXTCONTAINER_TYPES:
+    for tc_type in variables.TEXTCONTAINER_TYPES:
         parent = getattr(tc.parents, tc_type)
         assert isinstance(parent, cc.get_tc_type_class(tc_type)) or parent is None
 

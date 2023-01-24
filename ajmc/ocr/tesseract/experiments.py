@@ -3,10 +3,16 @@ Contains the code for running experiments.
 """
 import json
 from pathlib import Path
-from ajmc.ocr.config import get_all_configs
+from typing import List, Optional
+
+import ajmc.ocr.evaluation as ocr_eval
+from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.ocr import variables as ocr_vars
+from ajmc.ocr.config import CONFIGS
 from ajmc.ocr.preprocessing import data_preparation
 from ajmc.ocr.tesseract.models import get_or_make_traineddata_path, run
-from ajmc.ocr import variables as ocr_vars
+
+logger = get_custom_logger(__name__)
 
 
 def make_experiment_dir(experiment_id: str):
@@ -15,9 +21,12 @@ def make_experiment_dir(experiment_id: str):
     ocr_vars.get_experiment_model_outputs_dir(experiment_id).mkdir(parents=True, exist_ok=True)
     ocr_vars.get_experiment_models_dir(experiment_id).mkdir(parents=True, exist_ok=True)
 
+
 def get_or_make_experiment_dir(xp_config: dict,
                                overwrite: bool = False) -> Path:
     """Creates the experiment repo"""
+
+    logger.info(f"Making experiment {xp_config['id']}")
 
     # Get the experiment's paths
     xp_dir = ocr_vars.get_experiment_dir(xp_config['id'])
@@ -34,15 +43,14 @@ def get_or_make_experiment_dir(xp_config: dict,
 
     # If the experiment does not already exist
     make_experiment_dir(xp_config['id'])  # Create the experiment's repository
-    configs = get_all_configs()
 
     # Get the required test datasets exist, else create it
-    test_dataset_config = configs['datasets'][xp_config['test_dataset']]
-    test_dataset_dir = data_preparation.get_or_make_dataset_dir(test_dataset_config, overwrite=overwrite)
+    test_dataset_config = CONFIGS['datasets'][xp_config['test_dataset']]
+    test_dataset_dir = data_preparation.make_dataset(test_dataset_config)
 
     # Check if the required models exists, build if not
     for model_id in xp_config['models']:
-        model_config = configs['models'][model_id]
+        model_config = CONFIGS['models'][model_id]
         traineddata_path = get_or_make_traineddata_path(model_config, overwrite=overwrite)
         # copy the traineddata file to the experiment's models directory
         (xp_models_dir / traineddata_path.name).write_bytes(traineddata_path.read_bytes())
@@ -54,4 +62,19 @@ def get_or_make_experiment_dir(xp_config: dict,
         psm=7,
         tessdata_prefix=xp_models_dir)
 
+    # Evaluate the results
+    ocr_eval.line_by_line_evaluation(gt_dir=test_dataset_dir,
+                                     ocr_dir=xp_model_outputs_dir)
+
+    # Save the config file
+    xp_config_path.write_text(json.dumps(xp_config, indent=4), encoding='utf-8')
+
+    return xp_dir
+
+
+def make_experiments(experiment_ids: Optional[List[str]] = None, overwrite: bool = False):
+    """Makes the experiments"""
+    for xp_id, xp_config in CONFIGS['experiments'].items():
+        if experiment_ids is None or xp_id in experiment_ids:
+            get_or_make_experiment_dir(xp_config, overwrite=overwrite)
 

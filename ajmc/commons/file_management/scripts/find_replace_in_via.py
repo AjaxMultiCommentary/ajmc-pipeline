@@ -1,18 +1,16 @@
 """Use this script to replace a text in all via-files."""
-import os
+from ajmc.commons import variables as vs
+# CHECKED 2023-01-23
 from ajmc.commons.file_management.utils import walk_dirs
-from ajmc.commons.variables import PATHS
 
 old_pattern = ''
 new_pattern = ''
 
-for dir_ in walk_dirs(PATHS['base_dir']):
-    via_path = os.path.join(PATHS['base_dir'], dir_, PATHS['via_path'])
-    if os.path.exists(via_path):
-        with open(via_path, 'r') as f:
-            text = f.read()
-
+for dir_ in walk_dirs(vs.COMMS_DATA_DIR):
+    via_path = vs.get_comm_via_path(dir_.name)
+    if via_path.exists():
+        text = via_path.read_text(encoding='utf-8')
         text = text.replace(old_pattern, new_pattern)
+        print(f'Writing {via_path}')
+        via_path.write_text(text, encoding='utf-8')
 
-        with open(via_path, 'w') as f:
-            f.write(text)

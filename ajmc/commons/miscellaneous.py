@@ -1,12 +1,14 @@
 """Miscellaneous helpers and utilities."""
 import inspect
-from functools import wraps
 import json
 import logging
 import timeit
-from typing import List, Iterable, Generator, Callable, Type, Optional
+from functools import wraps
+from typing import Callable, Generator, Iterable, List, Optional, Type
+
 import pandas as pd
 from jsonschema import Draft6Validator
+
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 
 
@@ -57,7 +59,7 @@ def validate_json_schema(schema_path: str = 'data/page.schema.json'):
 formatter = logging.Formatter("%(levelname)s - %(name)s -   %(message)s")
 
 stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.ERROR)
+stream_handler.setLevel(logging.INFO)
 stream_handler.setFormatter(formatter)
 
 

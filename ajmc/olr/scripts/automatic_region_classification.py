@@ -48,12 +48,13 @@ CRITERIA = [
     # horizontal_position_criterion,
 ]
 
+import json
 # read section
 from pathlib import Path
-import json
+
 from ajmc.commons import variables
 
-comm_dir = Path(variables.PATHS['base_dir']) / COMM_ID
+comm_dir = Path(variables.COMMS_DATA_DIR) / COMM_ID
 sections_path = comm_dir / 'sections.json'
 sections = json.loads(sections_path.read_text(encoding='utf-8'))
 section = [s for s in sections if DESIRED_SECTION in s['section_type']][0]

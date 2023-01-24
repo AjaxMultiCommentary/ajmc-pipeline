@@ -5,17 +5,18 @@ a csv that can be directly imported to VIA.
 
 import csv
 import os
+from pathlib import Path
 from typing import List, Union
+
 import cv2
 import numpy as np
 from tqdm import tqdm
 
-from ajmc.commons.geometry import Shape, is_bbox_within_bbox
-from ajmc.commons.image import binarize, find_contours, remove_artifacts_from_contours
-from ajmc.commons.variables import VIA_CSV_DICT_TEMPLATE
+from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
+from ajmc.commons.geometry import is_bbox_within_bbox, Shape
+from ajmc.commons.image import binarize, find_contours, remove_artifacts_from_contours
 from ajmc.commons.miscellaneous import get_custom_logger
-from pathlib import Path
 
 logger = get_custom_logger(__name__)
 
@@ -149,7 +150,7 @@ def main(img_dir: Union[str, Path],
          dilation_iterations: int,
          draw_images: bool,
          artifact_size_threshold: float = 0.003,
-         img_format: str = "png"):
+         img_extension: str = variables.DEFAULT_IMG_EXTENSION):
     """
     Automatically detects regions-boxes in image-files and outputs a csv that can be directly imported to VIA.
 
@@ -182,7 +183,7 @@ def main(img_dir: Union[str, Path],
         dilation_iterations: {dilation_iterations}
         draw_images: Whether to draw the detected regions and output the image.
         artifact_size_threshold: {artifact_size_threshold}
-        img_format: {image_format}
+        img_extension: {image_format}
     """
 
     # Dirs
@@ -190,13 +191,13 @@ def main(img_dir: Union[str, Path],
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True, parents=True)
 
-    for img_path in tqdm(sorted(list(img_dir.glob(f'*.{img_format}'))), desc='Processing images '):
+    for img_path in tqdm(sorted(list(img_dir.glob(f'*.{img_extension}'))), desc='Processing images '):
         via_csv_dict = detect_regions(img_path=img_path,
                                       dilation_kernel_size=dilation_kernel_size,
                                       dilation_iterations=dilation_iterations,
                                       draw_image=draw_images,
                                       img_output_dir=output_dir,
-                                      via_csv_dict=VIA_CSV_DICT_TEMPLATE,
+                                      via_csv_dict=variables.VIA_CSV_DICT_TEMPLATE,
                                       artifact_size_threshold=artifact_size_threshold)
 
     write_csv_manually('detected_annotations.csv', via_csv_dict, str(output_dir))

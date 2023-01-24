@@ -1,15 +1,20 @@
+"""Basic operations and objects for image processing."""
+# CHECKED 2023-01-24
+
 import random
 from pathlib import Path
+from typing import List, Optional, Tuple, Union
+
 import cv2
-from typing import List, Tuple, Optional, Union
 import numpy as np
-from PIL import ImageFont, ImageDraw
 from matplotlib import pyplot as plt
+from PIL import Image as PILImage, ImageDraw, ImageFont
 from skimage.util import random_noise
+
+from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
-from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init
-from ajmc.commons.variables import BoxType, COLORS, REGION_TYPES_TO_COLORS, TEXTCONTAINERS_TYPES_TO_COLORS
+from ajmc.commons.miscellaneous import get_custom_logger, lazy_init, lazy_property
 
 logger = get_custom_logger(__name__)
 
@@ -57,7 +62,7 @@ class AjmcImage:
         return find_contours(self.matrix)
 
     def crop(self,
-             box: BoxType,
+             box: variables.BoxType,
              margin: int = 0) -> 'AjmcImage':
         """Gets the slice of `self.matrix` corresponding to `box`.
 
@@ -94,7 +99,7 @@ def rgb_to_bgr(rgb: Tuple[int, int, int]) -> Tuple[int, int, int]:
     return rgb[2], rgb[1], rgb[0]
 
 
-def draw_box(box: BoxType,
+def draw_box(box: variables.BoxType,
              img_matrix: np.ndarray,
              stroke_color: Tuple[int, int, int] = (0, 0, 255),
              stroke_thickness: int = 1,
@@ -117,7 +122,7 @@ def draw_box(box: BoxType,
         text_thickness: The thickness of the text.
 
     Returns:
-        np.ndarray: The modified `matrix`
+        np.ndarray: The modified `img_matrix`
 
     """
 
@@ -159,7 +164,7 @@ def draw_box(box: BoxType,
     return img_matrix
 
 
-def draw_textcontainers(img_matrix, outfile: Optional[str] = None, *textcontainers):
+def draw_textcontainers(img_matrix, output_path: Optional[Union[str, Path]] = None, *textcontainers):
     """Draws a list of `TextContainer`s on `img_matrix`."""
 
     # Get the set of textcontainer types
@@ -167,9 +172,9 @@ def draw_textcontainers(img_matrix, outfile: Optional[str] = None, *textcontaine
         if tc.type == 'region':
             img_matrix = draw_box(box=tc.bbox.bbox,
                                   img_matrix=img_matrix,
-                                  stroke_color=REGION_TYPES_TO_COLORS[tc.region_type],
+                                  stroke_color=variables.REGION_TYPES_TO_COLORS[tc.region_type],
                                   stroke_thickness=2,
-                                  fill_color=REGION_TYPES_TO_COLORS[tc.region_type],
+                                  fill_color=variables.REGION_TYPES_TO_COLORS[tc.region_type],
                                   fill_opacity=.3,
                                   text=tc.region_type)
 
@@ -179,53 +184,61 @@ def draw_textcontainers(img_matrix, outfile: Optional[str] = None, *textcontaine
                         tc.bboxes) - 1:  # We write the region label text only if it's the last bbox to avoid overlap
                     img_matrix = draw_box(box=bbox.bbox,
                                           img_matrix=img_matrix,
-                                          stroke_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                          stroke_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           stroke_thickness=2,
-                                          fill_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                          fill_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           fill_opacity=.3,
                                           text=tc.label if tc.type == 'entity' else tc.type)
                 else:
                     img_matrix = draw_box(box=bbox.bbox,
                                           img_matrix=img_matrix,
-                                          stroke_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                          stroke_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           stroke_thickness=2,
-                                          fill_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                          fill_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           fill_opacity=.3)
 
 
         else:
             img_matrix = draw_box(box=tc.bbox.bbox,
                                   img_matrix=img_matrix,
-                                  stroke_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                  stroke_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                   stroke_thickness=1,
                                   fill_color=None,
                                   text=tc.type.capitalize())
 
-    if outfile is not None:
-        cv2.imwrite(outfile, img_matrix)
+    if output_path is not None:
+        cv2.imwrite(str(output_path), img_matrix)
 
     return img_matrix
 
 
-def draw_reading_order(matrix: np.ndarray,
+def draw_reading_order(img_matrix: np.ndarray,
                        page: Union['OcrPage', 'CanonicalPage'],
-                       output_path: Optional[str] = None):
+                       output_path: Optional[Union[str, Path]] = None):
     # Compute word centers
     w_centers = [w.bbox.center for w in page.children.words]
-    matrix = cv2.polylines(img=matrix,
-                           pts=[np.array(w_centers, np.int32).reshape((-1, 1, 2))],
-                           isClosed=False,
-                           color=(255, 0, 0),
-                           thickness=4)
+    img_matrix = cv2.polylines(img=img_matrix,
+                               pts=[np.array(w_centers, np.int32).reshape((-1, 1, 2))],
+                               isClosed=False,
+                               color=(255, 0, 0),
+                               thickness=4)
     if output_path:
-        cv2.imwrite(output_path, matrix)
+        cv2.imwrite(output_path, img_matrix)
 
-    return matrix
+    return img_matrix
 
 
 def find_contours(img_matrix: np.ndarray,
                   binarize: bool = True) -> List[Shape]:
-    """Binarizes `img_matrix` and finds contours using `cv2.findContours`."""
+    """Finds contours using `cv2.findContours`, potentially binarizing the image first.
+
+    Args:
+        img_matrix (np.ndarray): The image matrix to find contours in.
+        binarize (bool): Whether to binarize the image first.
+
+    Returns:
+        List[Shape]: A list of `Shape`s representing the contours.
+    """
 
     # This has to be done in cv2. Using cv2.THRESH_BINARY_INV to avoid looking for the white background as a contour
     if binarize:
@@ -243,11 +256,14 @@ def find_contours(img_matrix: np.ndarray,
     return contours
 
 
-def draw_contours(image: AjmcImage, outfile: Optional[str] = None):
-    white = np.zeros([image.matrix.shape[0], image.matrix.shape[1], 3], dtype=np.uint8)
+def draw_contours(img_matrix: np.ndarray,
+                  contours: List[Shape],
+                  outfile: Optional[Union[str, Path]] = None):
+    """Draws the contours of an `img_matrix` on a white image."""
+    white = np.zeros([img_matrix.matrix.shape[0], img_matrix.matrix.shape[1], 3], dtype=np.uint8)
     white.fill(255)
 
-    for c in image.contours:
+    for c in contours:
         color = (random.randint(0, 255),
                  random.randint(0, 255),
                  random.randint(0, 255))

@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from ajmc.commons.variables import PATHS, ORDERED_OLR_REGION_TYPES
+from ajmc.commons import variables
 from ajmc.olr.layoutlm.layoutlm import create_olr_config
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
@@ -63,13 +63,13 @@ for xp_name in df.index.get_level_values(level=0):
 
     print('****************** Processing', xp_name, '*******************************')
     config = create_olr_config(json_path=os.path.join(CONFIGS_DIR, xp_name + '.json'),
-                               prefix=PATHS['cluster_base_dir'])
+                               prefix=variables.PATHS['cluster_base_dir'])
     # Retrieve the eval pages
     eval_pages = []
     for dict_ in config['data']['eval']:
         if dict_['id'] not in commentaries.keys():
-            commentaries[dict_['id']] = CanonicalCommentary.from_json(os.path.join(PATHS['cluster_base_dir'], dict_['id'],
-                                                                PATHS['canonical'], dict_['run'] + '.json'))
+            commentaries[dict_['id']] = CanonicalCommentary.from_json(os.path.join(variables.PATHS['cluster_base_dir'], dict_['id'],
+                                                                variables.PATHS['canonical'], dict_['run'] + '.json'))
 
         commentary = commentaries[dict_['id']]
         page_ids = get_olr_splits_page_ids(commentary.id, [dict_['split']])
@@ -88,8 +88,8 @@ for xp_name in df.index.get_level_values(level=0):
     # Retrieve the train pages
     train_pages = []
     for dict_ in config['data']['train']:
-        commentary = CanonicalCommentary.from_json(os.path.join(PATHS['cluster_base_dir'], dict_['id'],
-                                                                PATHS['canonical'], dict_['run'] + '.json'))
+        commentary = CanonicalCommentary.from_json(os.path.join(variables.PATHS['cluster_base_dir'], dict_['id'],
+                                                                variables.PATHS['canonical'], dict_['run'] + '.json'))
         page_ids = get_olr_splits_page_ids(commentary.id, [dict_['split']])
         train_pages += [p for p in commentary.children.pages
                         if p.id in page_ids]

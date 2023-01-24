@@ -1,11 +1,15 @@
 """This module contains utils for the management of spreadsheets."""
-
+#CHECKED 2023-01-23
 import json
-import os
 from typing import List, Tuple, Set
-from ajmc.commons.variables import SPREADSHEETS
 from ajmc.commons.miscellaneous import get_custom_logger, read_google_sheet
 from ajmc.commons import docstrings, variables
+# CHECKED 2023-01-23
+import json
+from typing import List, Set, Tuple
+
+from ajmc.commons import docstrings, variables
+from ajmc.commons.miscellaneous import get_custom_logger, read_google_sheet
 
 logger = get_custom_logger(__name__)
 
@@ -67,7 +71,7 @@ def check_via_spreadsheet_conformity(via_project: dict,
 
 
 @docstrings.docstring_formatter(**docstrings.docstrings)
-def check_all_via_spreadsheets_conformity(sheet_id: str = SPREADSHEETS['olr_gt'],
+def check_all_via_spreadsheets_conformity(sheet_id: str = variables.SPREADSHEETS['olr_gt'],
                                           sheet_name: str = 'olr_gt'):
     """Applies `check_via_spreadsheet_conformity` to an entire spreadsheet with multiple commentary.
 
@@ -81,12 +85,11 @@ def check_all_via_spreadsheets_conformity(sheet_id: str = SPREADSHEETS['olr_gt']
 
     for comm_id, comm_df in df.groupby(df['commentary_id']):
         logger.info(f"""Checking commentary {comm_id}""")
-        with open(os.path.join(variables.PATHS['base_dir'], comm_id, variables.PATHS['via_path']), 'r') as file:
-            via_project = json.load(file)
+        via_project = json.loads(variables.get_comm_via_path(comm_id).read_text(encoding='utf-8'))
 
         differences[comm_id] = check_via_spreadsheet_conformity(via_project=via_project,
                                                                 sheet_page_ids=comm_df['page_id'].tolist())
-
     if not any([s for t in differences.values() for s in t]):
         logger.info("""Checking passed, sheet is conform with vias.""")
+
     return differences

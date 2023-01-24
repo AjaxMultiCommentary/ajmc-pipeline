@@ -1,8 +1,8 @@
 """Use this script to binarize images of multiple commentary"""
 
 import cv2
-from ajmc.commons.variables import PATHS
-import os
+
+from ajmc.commons import variables
 from ajmc.commons.image import binarize
 
 comm_ids = [  # 'annalsoftacitusp00taci',
@@ -11,14 +11,13 @@ comm_ids = [  # 'annalsoftacitusp00taci',
 ]
 
 for comm_id in comm_ids:
-    jp2_dir = os.path.join(PATHS['base_dir'], comm_id, 'images/png_')
-    png_dir = os.path.join(PATHS['base_dir'], comm_id, 'images/png')
+    png_dir = variables.get_comm_img_dir(comm_id)
+    jp2_dir = png_dir.parent / 'png_'
 
-    for img_name in os.listdir(jp2_dir):
-        if img_name.endswith('.png'):
-            img = cv2.imread(os.path.join(jp2_dir, img_name))
-            img = binarize(img)
-            cv2.imwrite(os.path.join(png_dir, img_name.replace('.png', '.png')), img)
+    for img_path in jp2_dir.glob('*.png'):
+        img = cv2.imread(str(img_path))
+        img = binarize(img)
+        cv2.imwrite(str(png_dir / img_path.name), img)
 
 #%%%
 import cv2

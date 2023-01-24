@@ -1,10 +1,11 @@
 from pathlib import Path
+
 from ajmc.commons import variables as vs
 
 # ======================================================================================================================
 #                                VARIABLES
 # ======================================================================================================================
-SAMPLING_TYPES = ['family', 'script', 'language', 'font', 'split', 'random']
+SAMPLING_TYPES = ['work_id', 'script', 'language', 'font', 'split', 'random']
 TRANSFORM_OPERATIONS = ['resize', 'rotate', 'blur', 'erode', 'dilate']
 SEPARATOR = '-'
 
@@ -13,7 +14,6 @@ SEPARATOR = '-'
 # ======================================================================================================================
 LOCAL = True if vs.EXEC_ENV == 'local' else False
 XP_DIR = Path('/Users/sven/Desktop/tess_xps') if LOCAL else Path('/scratch/sven/ocr_exp/')
-CONDA_ENV = 'base' if LOCAL else 'tess-build'
 CONDA_INSTALL_DIR = Path('/Users/sven/opt/anaconda3/') if LOCAL else Path('/scratch/sven/anaconda3')
 LD_LIBRARY_PATH = CONDA_INSTALL_DIR / 'lib'
 TESSTRAIN_DIR = Path('/Users/sven/packages/tesseract') if LOCAL else XP_DIR / 'lib/tesstrain'
@@ -24,11 +24,22 @@ MODELS_DIR = XP_DIR / 'models'
 DATASETS_DIR = XP_DIR / 'datasets'
 EXPERIMENTS_DIR = XP_DIR / 'experiments'
 CONFIGS_PATH = XP_DIR / 'configs.xlsx'
+POG_SOURCE_DIR = None if LOCAL else Path('mnt/ajmcdata1/data/pogretra-v1.0')
+
+LINES_PER_TESTSET = 120
+
+TEXT_FILES_EXTENSION = '.gt.txt'
+IMG_FILES_EXTENSION = '.png'
 
 
 def get_dataset_dir(dataset_name: str) -> Path:
     return DATASETS_DIR / dataset_name
 
+def get_dataset_config_path(dataset_name: str) -> Path:
+    return get_dataset_dir(dataset_name) / 'config.json'
+
+def get_dataset_metadata_path(dataset_name: str) -> Path:
+    return get_dataset_dir(dataset_name) / 'metadata.tsv'
 
 def get_model_dir(model_name: str) -> Path:
     return MODELS_DIR / model_name

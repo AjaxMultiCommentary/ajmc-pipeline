@@ -4,17 +4,15 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 from mean_average_precision import MetricBuilder
-from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor, \
-    RobertaTokenizerFast, RobertaForTokenClassification
+from transformers import LayoutLMv3FeatureExtractor, LayoutLMv3ForTokenClassification, LayoutLMv3TokenizerFast, \
+    RobertaForTokenClassification, RobertaTokenizerFast
 
-from ajmc.commons.geometry import is_bbox_within_bbox_with_threshold
 from ajmc.commons.file_management.utils import walk_dirs
-from ajmc.olr.utils import get_olr_splits_page_ids
-from ajmc.olr.layoutlm.layoutlm import get_data_dict_pages, align_predicted_page, create_olr_config
+from ajmc.commons.geometry import is_bbox_within_bbox_with_threshold
+from ajmc.olr.layoutlm.layoutlm import align_predicted_page, create_olr_config
 from ajmc.olr.map_utils import initialize_general_results, update_general_results
+from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.olr.yolo.utils import parse_yolo_txt
-from ajmc.commons.variables import PATHS
-
 # Constants
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 

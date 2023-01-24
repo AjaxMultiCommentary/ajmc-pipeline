@@ -1,8 +1,13 @@
-import os
-import re
+"""A bunch of ocr tools."""
 
+import re
+from pathlib import Path
+from typing import Union
+
+from ajmc.commons import variables as vs
 from ajmc.commons.arithmetic import safe_divide
-from ajmc.commons.variables import CHARSETS, PATHS
+from ajmc.commons.docstrings import docstring_formatter, docstrings
+from ajmc.commons.file_management.utils import get_62_based_datecode
 
 
 def harmonise_unicode(text: str):
@@ -17,22 +22,22 @@ def harmonise_unicode(text: str):
 
 def is_greek_char(char: str) -> bool:
     """Returns True if char is a Greek character, False otherwise."""
-    return bool(re.match(CHARSETS['greek'], char))
+    return bool(re.match(vs.CHARSETS['greek'], char))
 
 
 def is_latin_char(char: str) -> bool:
     """Returns True if char is a Latin character, False otherwise."""
-    return bool(re.match(CHARSETS['latin'], char))
+    return bool(re.match(vs.CHARSETS['latin'], char))
 
 
 def is_punctuation_char(char: str) -> bool:
     """Returns True if char is a punctuation character, False otherwise."""
-    return bool(re.match(CHARSETS['punctuation'], char))
+    return bool(re.match(vs.CHARSETS['punctuation'], char))
 
 
 def is_number_char(char: str) -> bool:
     """Returns True if char is a number character, False otherwise."""
-    return bool(re.match(CHARSETS['numbers'], char))
+    return bool(re.match(vs.CHARSETS['numbers'], char))
 
 
 def count_chars_by_charset(string: str, charset: str) -> int:
@@ -51,7 +56,7 @@ def count_chars_by_charset(string: str, charset: str) -> int:
         int: the number of charset-matching characters in `string`.
     """
     try:
-        pattern = CHARSETS[charset]
+        pattern = vs.CHARSETS[charset]
     except KeyError:
         pattern = re.compile(charset, flags=re.UNICODE)
 
@@ -81,7 +86,7 @@ def is_latin_string(text: str, threshold: float = 0.5) -> bool:
 def is_punctuation_string(text: str, threshold: float = 0.5) -> bool:
     """Returns True if more than `threshold` of chars in strin are punctuation, False otherwise."""
     if text:
-        proportion_punctuation_chars = safe_divide(count_chars_by_charset(string=text, charset='punctuation') / len(text))
+        proportion_punctuation_chars = safe_divide(count_chars_by_charset(string=text, charset='punctuation'), len(text))
         return proportion_punctuation_chars >= threshold
     else:
         return False
@@ -96,19 +101,44 @@ def is_number_string(text: str, threshold: float = 0.5) -> bool:
     else:
         return False
 
+@docstring_formatter(**docstrings)
+def get_kraken_command(commentary_id: str, model_path: Union[str, Path]) -> str:
+    """LEGACY. Returns the command to be executed by Kraken.
 
-def get_kraken_command(commentary_id, model_path):
-    model_name = model_path.split('/')[-1].split('.')[0]
+    Args:
+        commentary_id: {commentary_id}
+        model_path: the path to the model to be used.
+    """
 
-    ocr_dir = get_62_based_datecode()+'_'+model_name
-    ocr_path = os.path.join(PATHS['base_dir'], commentary_id, 'ocr/runs/' + ocr_dir)
-    os.makedirs(ocr_path, exist_ok=True)
+    ocr_outputs_dir = vs.get_comm_ocr_runs_dir(commentary_id) / (get_62_based_datecode() + '_' + model_path.stem)
+    ocr_outputs_dir.mkdir(parents=True, exist_ok=True)
 
-    png_abs_path = os.path.join(PATHS['base_dir'], commentary_id, PATHS['png'])
-    image_names = sorted([fname for fname in os.listdir(png_abs_path) if fname.endswith('.png')])
-    image_paths = [os.path.join(png_abs_path, f) for f in image_names]
-    ocr_paths = [os.path.join(ocr_path, f[:-3] + 'hocr') for f in image_names]
+    img_dir = vs.get_comm_img_dir(commentary_id)
+    img_paths = sorted([p for p in img_dir.glob(f'*{vs.DEFAULT_IMG_EXTENSION}')])
+    ocr_paths = [(ocr_outputs_dir / p.name).with_suffix('.hocr') for p in img_paths]
 
-    file_list = ' '.join([f'-i {img} {ocr}' for img, ocr in zip(image_paths, ocr_paths)])
-    command = ' '.join(['kraken', file_list, '-h segment ocr --model '+model_path])
-    return command
+    file_list = ' '.join([f'-i {img} {ocr}' for img, ocr in zip(img_paths, ocr_paths)])
+
+    return f'kraken {file_list} -h segment ocr --model model_path'
+
+
+@docstring_formatter(**docstrings)
+def guess_ocr_format(ocr_path: str) -> str:
+    """Guesses the ocr-format of a file.
+
+    Args:
+        ocr_path: {ocr_path}
+
+    Returns:
+        The ocr-format of the file, either 'pagexml', 'krakenhocr' or 'tesshocr'.
+    """
+
+    if ocr_path[-3:] == 'xml':
+        return 'pagexml'
+    elif ocr_path[-4:] == 'html':
+        return 'krakenhocr'
+    elif ocr_path[-4:] == 'hocr':
+        return 'tesshocr'
+    else:
+        raise NotImplementedError("""The format could not be identified. It looks like the format is neither 
+        `tesshocr`, nor `krakenhocr` nor `pagexml`, which are the only formats this module deals with.""")

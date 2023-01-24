@@ -1,11 +1,11 @@
 """This module contains sample objects which are sent to `sample_objects.json` and used as fixtures elsewhere."""
+import os
 from pathlib import Path
 
+from ajmc.commons import geometry, image, variables
 from ajmc.nlp.token_classification.evaluation import seqeval_evaluation
-from ajmc.commons import variables, geometry, image
-import os
-from ajmc.text_processing.ocr_classes import OcrCommentary
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
+from ajmc.text_processing.ocr_classes import OcrCommentary
 
 # Arithmetic
 sample_intervals = {'base': (1, 10),
@@ -44,7 +44,12 @@ sample_ocr_page_path = os.path.join(sample_ocr_dir, sample_page_id + '.hocr')
 sample_groundtruth_dir = os.path.join(sample_base_dir, sample_commentary_id, variables.PATHS['groundtruth'])
 sample_groundtruth_page_path = os.path.join(sample_groundtruth_dir, sample_page_id + '.hmtl')
 
-sample_ocrcommentary = OcrCommentary.from_ajmc_structure(sample_ocr_dir)
+# Todo come back here
+sample_ocrcommentary = OcrCommentary(id=sample_commentary_id,
+                                     ocr_dir=sample_ocr_dir,
+                                     base_dir=sample_base_dir,
+                                     via_path=sample_via_path,
+                                     image_dir=None)
 sample_cancommentary = sample_ocrcommentary.to_canonical()
 
 sample_cancommentary.to_json()

@@ -1,10 +1,11 @@
 import json
 import os
-from tests import sample_objects as so
+
 import jsonschema
+
+from ajmc.commons import image, variables
 from ajmc.text_processing import ocr_classes
-from ajmc.commons import image
-from ajmc.commons import variables
+from tests import sample_objects as so
 
 commentary_from_paths = ocr_classes.OcrCommentary(id=so.sample_commentary_id,
                                                   ocr_dir=so.sample_ocr_dir,
@@ -12,7 +13,7 @@ commentary_from_paths = ocr_classes.OcrCommentary(id=so.sample_commentary_id,
                                                   image_dir=so.sample_image_dir,
                                                   groundtruth_dir=so.sample_groundtruth_dir)
 
-commentary_from_structure = ocr_classes.OcrCommentary.from_ajmc_structure(ocr_dir=so.sample_ocr_dir)
+commentary_from_structure = ocr_classes.OcrCommentary.from_ajmc_data(ocr_dir=so.sample_ocr_dir)
 
 
 def test_ocrcommentary():
@@ -70,10 +71,8 @@ def test_ocrcommentary_to_canonical():
 
 
 def test_ocrpage():
-    page = ocr_classes.OcrPage(ocr_path=so.sample_ocr_page_path,
-                               id=so.sample_page_id,
-                               image_path=so.sample_image_path,
-                               commentary=commentary_from_paths)
+    page = ocr_classes.OcrPage(ocr_path=so.sample_ocr_page_path, page_id=so.sample_page_id,
+                               img_path=so.sample_image_path, commentary=commentary_from_paths)
 
     assert isinstance(page.ocr_format, str)
 

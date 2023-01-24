@@ -4,38 +4,31 @@ eventhough the code is not very elegant, I would not recommend to change it with
 confidence in your changes.
 """
 
-import re
 import json
 import os
+import re
+from abc import abstractmethod
 from pathlib import Path
 from time import strftime
-from typing import Dict, Optional, List, Union, Any, Tuple, Type
-import bs4.element
-from abc import abstractmethod
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
+import bs4.element
+import jsonschema
 from tqdm import tqdm
 
-from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, LazyObject
-from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons import variables
-from ajmc.commons.geometry import (
-    Shape,
-    is_bbox_within_bbox_with_threshold,
-    is_bbox_within_bbox, adjust_bbox_to_included_contours, get_bbox_from_points
-)
+from ajmc.commons.docstrings import docstring_formatter, docstrings
+from ajmc.commons.geometry import adjust_bbox_to_included_contours, get_bbox_from_points, is_bbox_within_bbox, \
+    is_bbox_within_bbox_with_threshold, Shape
 from ajmc.commons.image import AjmcImage, draw_textcontainers
-from ajmc.commons.variables import PATHS, CHILD_TYPES, ANNOTATION_LAYERS
-from ajmc.olr.utils import sort_to_reading_order, get_page_region_dicts_from_via
-import jsonschema
-
-from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalWord, CanonicalPage, CanonicalRegion, \
-    CanonicalLine, CanonicalEntity, CanonicalSentence, CanonicalHyphenation, CanonicalSection
+from ajmc.commons.miscellaneous import get_custom_logger, lazy_property, LazyObject
+from ajmc.ocr.utils import guess_ocr_format
+from ajmc.olr.utils import get_page_region_dicts_from_via, sort_to_reading_order
 from ajmc.text_processing import cas_utils
-from ajmc.text_processing.generic_classes import Commentary, TextContainer, Page
-from ajmc.text_processing.markup_processing import parse_markup_file, get_element_bbox, \
-    get_element_text, find_all_elements
-from ajmc.commons.file_management.utils import verify_path_integrity, parse_ocr_path, find_file_by_name, \
-    guess_ocr_format
+from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalEntity, CanonicalHyphenation, \
+    CanonicalLine, CanonicalPage, CanonicalRegion, CanonicalSection, CanonicalSentence, CanonicalWord
+from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
+from ajmc.text_processing.markup_processing import find_all_elements, get_element_bbox, get_element_text
 
 logger = get_custom_logger(__name__)
 
@@ -46,11 +39,11 @@ class OcrCommentary(Commentary, TextContainer):
     @docstring_formatter(**docstrings)
     def __init__(self,
                  id: Optional[str] = None,
-                 ocr_dir: Optional[str] = None,
-                 base_dir: Optional[str] = None,
-                 via_path: Optional[str] = None,
-                 image_dir: Optional[str] = None,
-                 groundtruth_dir: Optional[str] = None,
+                 ocr_dir: Optional[Path] = None,
+                 base_dir: Optional[Path] = None,
+                 via_path: Optional[Path] = None,
+                 image_dir: Optional[Path] = None,
+                 groundtruth_dir: Optional[Path] = None,
                  ocr_run: Optional[str] = None,
                  **kwargs):
         """Default constructor, where custom paths can be provided.
@@ -61,7 +54,7 @@ class OcrCommentary(Commentary, TextContainer):
         `OcrCommentary.children.pages[0].image`).
 
         Args:
-            id: The id of the commentary (e.g. sophoclesplaysa05campgoog).
+            id: {commentary_id}
             ocr_dir: {ocr_dir}
             via_path: {via_path}
             image_dir: {image_dir}
@@ -71,24 +64,31 @@ class OcrCommentary(Commentary, TextContainer):
                          groundtruth_dir=groundtruth_dir, ocr_run=ocr_run, **kwargs)
 
     @classmethod
-    @docstring_formatter(output_dir_format=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
-    def from_ajmc_structure(cls, ocr_dir: str):
-        """Use this method to construct a `OcrCommentary`-object using ajmc's folder structure.
+    @docstring_formatter(**docstrings)
+    def from_ajmc_data(cls, id: str, ocr_run: str = '*_tess_base'):
+        """Use this method to construct a `OcrCommentary`-object using ajmc's data folder structure.
 
         Args:
-            ocr_dir: Path to the directory in which ocr-outputs are stored. It should end with
-            {output_dir_format}.
+            id: {commentary_id}
+            ocr_run: {ocr_run} Note `ocr_run` can be a *-wildcard. For instance '*_tess_base' will return
+                the first ocr-run directory that matches the pattern.
         """
 
-        verify_path_integrity(path=ocr_dir, path_pattern=variables.FOLDER_STRUCTURE_PATHS['ocr_outputs_dir'])
-        base_dir, id, ocr_run = parse_ocr_path(path=ocr_dir)
+        if '*' in ocr_run:
+            comm_ocr_runs_dir = variables.get_comm_ocr_runs_dir(id)
+            try:
+                ocr_run = next(comm_ocr_runs_dir.glob(ocr_run)).name
+            except StopIteration:
+                raise FileNotFoundError(f'No ocr run found for {comm_ocr_runs_dir} matching {ocr_run}')
+
+        ocr_outputs_dir = variables.get_comm_ocr_outputs_dir(id, ocr_run)
 
         return cls(id=id,
-                   ocr_dir=ocr_dir,
-                   base_dir=os.path.join(base_dir, id),
-                   via_path=os.path.join(base_dir, id, variables.PATHS['via_path']),
-                   image_dir=os.path.join(base_dir, id, variables.PATHS['png']),
-                   groundtruth_dir=os.path.join(base_dir, id, variables.PATHS['groundtruth']),
+                   ocr_dir=ocr_outputs_dir,
+                   base_dir=variables.get_comm_base_dir(id),
+                   via_path=variables.get_comm_via_path(id),
+                   image_dir=variables.get_comm_img_dir(id),
+                   groundtruth_dir=variables.get_comm_ocr_groundtruth_dir(id),
                    ocr_run=ocr_run)
 
     def to_canonical(self, include_ocr_groundtruth: bool = True) -> CanonicalCommentary:
@@ -112,7 +112,7 @@ class OcrCommentary(Commentary, TextContainer):
             can.info['base_dir'] = self.base_dir
 
         # We now populate the children and images
-        children = {k: [] for k in CHILD_TYPES}
+        children = {k: [] for k in variables.CHILD_TYPES}
         w_count = 0
         if include_ocr_groundtruth:
             gt_ids = [p.id for p in self.ocr_groundtruth_pages]
@@ -184,25 +184,21 @@ class OcrCommentary(Commentary, TextContainer):
                                  section_type=s.section_type,
                                  section_title=s.section_title))
 
-        can.children = LazyObject((lambda x: x), constrained_attrs=CHILD_TYPES, **children)
+        can.children = LazyObject((lambda x: x), constrained_attrs=variables.CHILD_TYPES, **children)
 
         return can
 
     def _get_children(self, children_type):
 
         if children_type == 'pages':
-            pages = []
-            for file in [f for f in os.listdir(self.ocr_dir) if f[-4:] in ['.xml', 'hocr', 'html']]:
-                pages.append(OcrPage(ocr_path=os.path.join(self.ocr_dir, file),
-                                     id=file.split('.')[0],
-                                     image_path=find_file_by_name(file.split('.')[0], self.image_dir),
-                                     commentary=self))
+            pages = [OcrPage.from_ajmc_data(ocr_path=p,commentary=self)
+                     for p in self.ocr_dir.glob('*') if p.suffix in variables.OCR_OUTPUT_EXTENSIONS]
 
             return sorted(pages, key=lambda x: x.id)
 
         # Todo : not implemented yet
         elif children_type == 'sections':
-            # sections_path = Path(variables.PATHS['base_dir']) / self.id / 'sections.json'
+            # sections_path = Path(variables.COMMS_DATA_DIR) / self.id / 'sections.json'
             # sections = json.loads(sections_path.read_text(encoding='utf-8'))
             # return [RawSection(self, **s) for s in sections]
             return []
@@ -215,13 +211,7 @@ class OcrCommentary(Commentary, TextContainer):
     @lazy_property  # Todo 👁️ This should not be maintained anymore
     def ocr_groundtruth_pages(self) -> Union[List['OcrPage'], list]:
         """The commentary's pages which have a groundtruth file in `self.paths['groundtruth']`."""
-        pages = []
-        for file in [f for f in os.listdir(self.groundtruth_dir) if f.endswith('.html')]:
-            pages.append(OcrPage(ocr_path=os.path.join(self.groundtruth_dir, file),
-                                 id=file.split('.')[0],
-                                 image_path=find_file_by_name(file.split('.')[0], self.image_dir),
-                                 commentary=self))
-
+        pages = [OcrPage(ocr_path=p, commentary=self) for p in self.groundtruth_dir.glob('*.html')]
         return sorted(pages, key=lambda x: x.id)
 
     @lazy_property
@@ -237,13 +227,21 @@ class OcrCommentary(Commentary, TextContainer):
 class OcrPage(Page, TextContainer):
     """A class representing a commentary page."""
 
-    def __init__(self,
-                 ocr_path: str,
-                 id: Optional[str] = None,
-                 image_path: Optional[str] = None,
-                 commentary: Optional[OcrCommentary] = None,
-                 **kwargs):
-        super().__init__(ocr_path=ocr_path, id=id, image_path=image_path, commentary=commentary, **kwargs)
+    def __init__(self, ocr_path: Path, page_id: Optional[str] = None, img_path: Optional[Path] = None,
+                 commentary: Optional[OcrCommentary] = None, **kwargs):
+        super().__init__(ocr_path=ocr_path, id=page_id, image_path=img_path, commentary=commentary, **kwargs)
+
+
+    @classmethod
+    def from_ajmc_data(cls, ocr_path: Path, commentary: OcrCommentary, **kwargs):
+        """Initialises an OcrPage from an AJMC data file."""
+        return cls(ocr_path=ocr_path,
+                   page_id=ocr_path.stem,
+                   img_path=commentary.image_dir / f'{ocr_path.stem}{variables.DEFAULT_IMG_EXTENSION}',
+                   commentary=commentary, **kwargs)
+
+
+
 
     def _get_children(self, children_type):
         if children_type == 'regions':
@@ -278,7 +276,7 @@ class OcrPage(Page, TextContainer):
             cas = cas_utils.import_page_cas(self.id)
             if cas is not None:
                 annotations = cas_utils.safe_import_page_annotations(self.id, cas, rebuild,
-                                                                     ANNOTATION_LAYERS[children_type])
+                                                                     variables.ANNOTATION_LAYERS[children_type])
 
                 if children_type == 'entities':
                     return [RawEntity.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
@@ -435,7 +433,7 @@ class OcrPage(Page, TextContainer):
 
     @lazy_property
     def markup(self) -> bs4.BeautifulSoup:
-        return parse_markup_file(self.ocr_path)
+        return bs4.BeautifulSoup(self.ocr_path.read_text('utf-8'), 'xml')
 
     @lazy_property
     def ocr_format(self) -> str:

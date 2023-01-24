@@ -1,13 +1,15 @@
 import os
+
 import cv2
+
 from ajmc.commons.file_management.utils import walk_files
-from ajmc.commons.variables import PATHS
-import numpy as np
+
+numpy as np
 
 
 def get_commentary_image_dimension(comm_id):
-    png_path = os.path.join(PATHS['base_dir'], comm_id, PATHS['png'])
-    img_path = [p for p in walk_files(png_path, filter=lambda x: x.suffix == '.png')][10]
+    png_path = os.path.join(COMMS_DATA_DIR, comm_id, PATHS['png'])
+    img_path = [p for p in walk_files(png_path, filter_func=lambda x: x.suffix == '.png')][10] # Todo, should be path
     img = cv2.imread(str(img_path))
     return img.shape
 
@@ -41,7 +43,7 @@ def pagify_dataset(dataset_dir, output_dir, margin=0.1, interline=1.5):
     page_txt_lines = []
     page_number = 0
 
-    for img_path in walk_files(dataset_dir, filter=lambda x: x.suffix == '.png'):
+    for img_path in walk_files(dataset_dir, filter_func=lambda x: x.suffix == '.png'): # Todo, should be path
         page_img_lines.append(cv2.imread(str(img_path)))
         page_txt_lines.append(img_path.with_suffix('.gt.txt').read_text(encoding='utf-8'))
         comm_id = img_path.name.split('_')[0]

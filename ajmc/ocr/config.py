@@ -4,9 +4,11 @@ This module handles reading of configs from tsv-files.
 Note:
     Configs are stored in central tsv files rather than json for easier comparability.
 """
-import pandas as pd
 from pathlib import Path
 from typing import Dict
+
+import pandas as pd
+
 from ajmc.ocr import variables as ocr_vars
 
 
@@ -71,3 +73,6 @@ def get_all_configs(xl_path: Path = ocr_vars.CONFIGS_PATH) -> Dict[str, Dict[str
                                 _, r in df.iterrows()}
 
     return configs
+
+
+CONFIGS = get_all_configs()

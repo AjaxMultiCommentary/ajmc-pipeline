@@ -1,10 +1,9 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
+from ajmc.commons import variables
 from ajmc.commons.arithmetic import compute_interval_overlap
-from ajmc.commons.variables import PATHS, ANNOTATION_LAYERS
+from ajmc.commons.miscellaneous import aligned_print, get_custom_logger
 from ajmc.text_processing.cas_utils import import_page_annotations_from_xmi
-from ajmc.commons.miscellaneous import aligned_print
-from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
 logger.handlers[0].setLevel('ERROR')
@@ -62,7 +61,9 @@ def retrieve_annotations_bboxes(cas,
     return annotations
 
 
-ann = import_page_annotations_from_xmi('sophoclesplaysa05campgoog_0146', PATHS['ne_corpus'], ANNOTATION_LAYERS['entity'])
+ann = import_page_annotations_from_xmi('sophoclesplaysa05campgoog_0146', variables.NE_CORPUS_DIR, variables.ANNOTATION_LAYERS['entity'])
+
+
 
 #%%
 # cas = get_cas(Path('/Users/sven/data/AjMC-NE-corpus/data/preparation/corpus/de/curated/sophokle1v3soph_0017.xmi'),

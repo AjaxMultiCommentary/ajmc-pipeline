@@ -1,5 +1,6 @@
-import os
+import platform
 import re
+from pathlib import Path
 from typing import Tuple
 
 # ======================================================================================================================
@@ -11,8 +12,55 @@ BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
 #                                                 PATHS
 # ======================================================================================================================
 
-# Todo change paths
-EXEC_ENV = 'cluster' #cluster or drive or local
+# Todo find another system for this
+
+
+EXEC_ENV = platform.uname().node
+
+def get_drive_base_dir() -> Path:
+    if EXEC_ENV == 'iccluster040':
+        return Path('/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/')
+    elif EXEC_ENV.startswith('Sven'):
+        return Path('/Users/sven/drive/_AJAX/AjaxMultiCommentary/')
+    else:
+        return Path(input('WARNING: Unknown execution environment!\nPlease enter the drive base directory below (e.g. `/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/`):\n(Note: you can change this permanently by setting `DRIVE_BASE_DIR` in `ajmc/commons/variables.py` to a custom `pathlib.Path`.)'))
+
+DRIVE_BASE_DIR = get_drive_base_dir()
+DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
+COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries/commentaries_data'
+NE_CORPUS_DIR = DRIVE_DATA_DIR / 'data/AjMC-NE-corpus'
+SCHEMA_PATH = Path('ajmc/data/templates/page.schema.json')
+TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
+
+def get_comm_base_dir(comm_id:str) -> Path:
+    return COMMS_DATA_DIR / comm_id
+def get_comm_ocr_groundtruth_dir(comm_id:str) -> Path:
+    return get_comm_base_dir(comm_id) / 'ocr/groundtruth'
+
+def get_comm_img_dir(comm_id:str) -> Path:
+    return get_comm_base_dir(comm_id) / 'images/png'
+
+def get_comm_via_path(comm_id:str) -> Path:
+    return get_comm_base_dir(comm_id) / 'olr/via_project.json'
+
+def get_comm_xmi_dir(comm_id:str) -> Path:
+    return get_comm_base_dir(comm_id) / 'ner/annotation'
+
+def get_comm_ocr_runs_dir(comm_id:str) -> Path:
+    return get_comm_base_dir(comm_id) / 'ocr/runs'
+
+def get_comm_ocr_outputs_dir(comm_id:str, run_id:str) -> Path:
+    return get_comm_ocr_runs_dir(comm_id) / run_id / 'outputs'
+
+def get_comm_ocr_gt_pairs_dir(comm_id:str) -> Path:
+    return get_comm_base_dir(comm_id) / 'ocr/gt_file_pairs'
+
+def get_comm_canonical_v1_dir(comm_id:str) -> Path:
+    return get_comm_base_dir(comm_id) / 'canonical'
+
+def get_comm_canonical_dir(comm_id:str) -> Path:
+    return get_comm_base_dir(comm_id) / 'canonical/v2'
+
 
 PATHS = {
     'local_base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
@@ -22,7 +70,6 @@ PATHS = {
     'groundtruth': 'ocr/groundtruth',
     'png': 'images/png',
     'via_path': 'olr/via_project.json',
-    'json': 'canonical',
     'xmi': 'ner/annotation',
     'typesystem': 'ajmc/data/templates/TypeSystem.xml',
     'olr_initiation': 'olr/annotation/project_initiation',
@@ -32,7 +79,7 @@ PATHS = {
     'ajmc_ne_corpus': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/AjMC-NE-corpus',
     'ocr_gt_file_pairs': 'ocr/gt_file_pairs',
 }
-PATHS['base_dir'] = PATHS[f'{EXEC_ENV}_base_dir']
+# COMMS_DATA_DIR = PATHS[f'{EXEC_ENV}_base_dir']
 # PATHS['temp_dir'] = os.getenv('TMPDIR')
 
 # Sheet names corresponds to the dictionary's keys
@@ -48,6 +95,14 @@ FOLDER_STRUCTURE_PATHS = {
     'ocr_outputs_dir': '[commentary_id]/ocr/runs/[ocr_run]/outputs',
     'canonical_json': '[commentary_id]/canonical/v2/[json]'
 }
+
+# ======================================================================================================================
+#                                                 FORMATS
+# ======================================================================================================================
+
+OCR_OUTPUT_EXTENSIONS = ['.xml', '.hocr', '.html']
+
+DEFAULT_IMG_EXTENSION = '.png'
 
 # ======================================================================================================================
 #                                                 COMMENTARIES
@@ -289,7 +344,7 @@ LINKAGE_MINIREF_PAGES = [
     'Wecklein1894_0024',
 ]
 
-IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run_id used as a base in the annotation campaign.
+IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run used as a base in the annotation campaign.
     'cu31924087948174': '1bm0b3_tess_final',
     'lestragdiesdeso00tourgoog': '21i0dA_tess_hocr',
     'sophokle1v3soph': '1bm0b5_tess_final',

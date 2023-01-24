@@ -1,10 +1,14 @@
-from typing import List, Union, Iterable, Tuple
+"""Basic geometrical operations and objects."""
+# CHECKED 2023-01-24
+
+from typing import Iterable, List, Tuple, Union
+
 import numpy as np
 
+from ajmc.commons import variables
 from ajmc.commons.arithmetic import compute_interval_overlap
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.miscellaneous import lazy_property
-from ajmc.commons.variables import BoxType
 
 
 class Shape:
@@ -53,7 +57,7 @@ class Shape:
 
     @lazy_property
     @docstring_formatter(**docstrings)
-    def bbox(self) -> BoxType:
+    def bbox(self) -> variables.BoxType:
         """{bbox}"""
         return get_bbox_from_points(self.points)
 
@@ -86,7 +90,7 @@ class Shape:
 
 
 @docstring_formatter(**docstrings)
-def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> BoxType:
+def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> variables.BoxType:
     """Gets the bounding box (i.e. the minimal rectangle containing all points) from a sequence of x-y points.
 
     Args:
@@ -113,13 +117,13 @@ def get_bbox_from_points(points: Union[np.ndarray, Iterable[Iterable[int]]]) -> 
         return (x_min, y_min), (x_max, y_max)
 
 
-def compute_bbox_area(bbox: BoxType) -> int:
+def compute_bbox_area(bbox: variables.BoxType) -> int:
     return (bbox[1][0] - bbox[0][0] + 1) * (bbox[1][1] - bbox[0][1] + 1)
 
 
 @docstring_formatter(**docstrings)
 def is_point_within_bbox(point: Union[Iterable[int], np.ndarray],
-                         bbox: BoxType) -> bool:
+                         bbox: variables.BoxType) -> bool:
     """Checks wheter a `point` is contained within a `bbox`.
 
     Note:
@@ -136,8 +140,8 @@ def is_point_within_bbox(point: Union[Iterable[int], np.ndarray],
 
 
 @docstring_formatter(**docstrings)
-def is_bbox_within_bbox(contained: BoxType,
-                        container: BoxType) -> bool:
+def is_bbox_within_bbox(contained: variables.BoxType,
+                        container: variables.BoxType) -> bool:
     """Checks whether the `contained` bbox is entirely contained within the `container` bbox.
 
     Note:
@@ -156,8 +160,8 @@ def is_bbox_within_bbox(contained: BoxType,
 
 
 @docstring_formatter(**docstrings)
-def compute_bbox_overlap_area(bbox1: BoxType,
-                              bbox2: BoxType) -> int:
+def compute_bbox_overlap_area(bbox1: variables.BoxType,
+                              bbox2: variables.BoxType) -> int:
     """Measures the area of intersection between two bboxes.
 
     Args:
@@ -174,8 +178,8 @@ def compute_bbox_overlap_area(bbox1: BoxType,
 
 
 @docstring_formatter(**docstrings)
-def are_bboxes_overlapping(bbox1: BoxType,
-                           bbox2: BoxType) -> bool:
+def are_bboxes_overlapping(bbox1: variables.BoxType,
+                           bbox2: variables.BoxType) -> bool:
     """Checks whether bboxes are overlapping with each other.
 
     Args:
@@ -186,8 +190,8 @@ def are_bboxes_overlapping(bbox1: BoxType,
 
 
 @docstring_formatter(**docstrings)
-def is_bbox_within_bbox_with_threshold(contained: BoxType,
-                                       container: BoxType,
+def is_bbox_within_bbox_with_threshold(contained: variables.BoxType,
+                                       container: variables.BoxType,
                                        threshold: float) -> bool:
     """Asserts more than `threshold` of `contained`'s area is within `container`. Is not merged with
     `are_bboxes_overlapping` for effisciency purposes.
@@ -202,8 +206,8 @@ def is_bbox_within_bbox_with_threshold(contained: BoxType,
 
 
 @docstring_formatter(**docstrings)
-def are_bboxes_overlapping_with_threshold(bbox1: BoxType,
-                                          bbox2: BoxType,
+def are_bboxes_overlapping_with_threshold(bbox1: variables.BoxType,
+                                          bbox2: variables.BoxType,
                                           threshold: float) -> bool:
     """Checks whether the overlapping (intersection) area of two bboxes is higher than `threshold`* union area
 
@@ -218,7 +222,7 @@ def are_bboxes_overlapping_with_threshold(bbox1: BoxType,
 
 
 @docstring_formatter(**docstrings)
-def adjust_bbox_to_included_contours(bbox: BoxType,
+def adjust_bbox_to_included_contours(bbox: variables.BoxType,
                                      contours: List[Shape]) -> Shape:
     """Finds the contours included in `bbox` and returns a shape objects that minimally contains them.
 

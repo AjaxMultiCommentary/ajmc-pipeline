@@ -8,18 +8,19 @@ import csv
 import os
 import re
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
 
 import Levenshtein
 import pandas as pd
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-from typing import List, Dict, Tuple, Union, Optional
-from ajmc.commons.variables import ORDERED_OLR_REGION_TYPES, CHARSETS
+
+from ajmc.commons import variables
 from ajmc.commons.arithmetic import safe_divide
-from ajmc.commons.geometry import is_bbox_within_bbox, are_bboxes_overlapping_with_threshold
-from ajmc.ocr.utils import count_chars_by_charset, harmonise_unicode
-from ajmc.text_processing.ocr_classes import OcrPage, OcrCommentary
+from ajmc.commons.geometry import are_bboxes_overlapping_with_threshold, is_bbox_within_bbox
 from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.ocr.utils import count_chars_by_charset, harmonise_unicode
+from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
 
 logger = get_custom_logger(__name__)
 
@@ -131,7 +132,7 @@ def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> i
     """
 
     try:
-        pattern = CHARSETS[charset]
+        pattern = variables.CHARSETS[charset]
     except KeyError:
         pattern = re.compile(charset, re.UNICODE)
 

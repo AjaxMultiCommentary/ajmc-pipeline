@@ -1,12 +1,12 @@
 import os
+
 import pandas as pd
+from transformers import LayoutLMv2FeatureExtractor, LayoutLMv2ForTokenClassification, LayoutLMv2TokenizerFast
+
+from ajmc.commons import variables
+from ajmc.olr.layoutlm.layoutlm import create_olr_config, draw_pages
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
-from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
-from ajmc.olr.layoutlm.layoutlm import draw_pages, create_olr_config
-from ajmc.commons.variables import PATHS
-
-
 
 base_path = '/Users/sven/drive/layout_lm_tests/first_region_token_only'
 
@@ -15,7 +15,7 @@ results = pd.DataFrame()
 for fname in next(os.walk(base_path))[1]:  # Walk in dirs only
     if not fname.startswith('z') and not fname == 'all_tokens_b_ents':
 
-        config = create_olr_config(os.path.join(base_path, fname, 'config.json'), PATHS['base_dir'] )
+        config = create_olr_config(os.path.join(base_path, fname, 'config.json'), variables.COMMS_DATA_DIR )
 
         model_name_or_path = os.path.join(base_path, fname, 'model')
 

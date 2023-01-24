@@ -1,7 +1,8 @@
+from pathlib import Path
+
+from ajmc.commons import variables
 from ajmc.text_processing import cas_utils
 from ajmc.text_processing.ocr_classes import OcrCommentary
-from pathlib import Path
-from ajmc.commons import variables
 
 comm_ids = [
     # 'annalsoftacitusp00taci',
@@ -23,7 +24,7 @@ comm_ids = [
 
 skiped = []
 for comm_id in comm_ids:
-    runs_dir = Path(variables.PATHS['base_dir']) / comm_id / variables.PATHS['ocr']
+    runs_dir = Path(variables.COMMS_DATA_DIR) / comm_id / variables.PATHS['ocr']
     try:
         ocr_dir = next(runs_dir.glob('*tess_base'))
     except StopIteration:
@@ -31,5 +32,5 @@ for comm_id in comm_ids:
         continue
 
     ocr_outputs_dir = ocr_dir / 'outputs'
-    comm = OcrCommentary.from_ajmc_structure(str(ocr_outputs_dir))
+    comm = OcrCommentary.from_ajmc_data(id=comm_id, ocr_run='*tess_base')
     cas_utils.export_commentary_to_xmis(comm, make_jsons=True, make_xmis=True, region_types=['app_crit'])

@@ -1,30 +1,29 @@
-import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import PIL
 from mean_average_precision import MetricBuilder
+from transformers import LayoutLMv3FeatureExtractor, LayoutLMv3ForTokenClassification, LayoutLMv3TokenizerFast, \
+    RobertaForTokenClassification, RobertaTokenizerFast
 
-from ajmc.commons.geometry import Shape, is_bbox_within_bbox
+from ajmc.commons import variables as vs
 from ajmc.commons.file_management.utils import walk_dirs
-from ajmc.olr.utils import get_olr_splits_page_ids
-from ajmc.olr.layoutlm.draw import draw_page_labels, draw_caption
-from ajmc.text_processing.canonical_classes import CanonicalCommentary
-from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor, \
-    RobertaTokenizerFast, RobertaForTokenClassification
+from ajmc.commons.geometry import is_bbox_within_bbox, Shape
+from ajmc.olr.layoutlm.draw import draw_caption, draw_page_labels
 from ajmc.olr.layoutlm.layoutlm import align_predicted_page, create_olr_config
-from ajmc.commons.variables import PATHS, COLORS
-from ajmc.olr.map_utils import metrics_abbrev, initialize_general_results, update_general_results
+from ajmc.olr.map_utils import initialize_general_results, update_general_results
+from ajmc.olr.utils import get_olr_splits_page_ids
+from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
-RUNS_DIR = '/scratch/sven/layoutlm/experiments'
+RUNS_DIR = Path('/scratch/sven/layoutlm/experiments')
 
 results = pd.DataFrame()
 
 # Walk over experiments
 for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
     # Create the config
-    config = create_olr_config(os.path.join(RUNS_DIR, xp_name, 'config.json'),
-                               prefix=PATHS['cluster_base_dir'])
+    config = create_olr_config((RUNS_DIR / xp_name / 'config.json'), prefix=vs.COMMS_DATA_DIR)
 
     # Initialize mAP computation
     metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=False,
@@ -36,8 +35,7 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
     # Retrieve the eval pages
     pages = []
     for dict_ in config['data']['eval']:
-        commentary = CanonicalCommentary.from_json(os.path.join(PATHS['cluster_base_dir'], dict_['id'],
-                                                                PATHS['canonical'], dict_['run'] + '.json'))
+        commentary = CanonicalCommentary.from_json(vs.get_comm_canonical_dir(dict_['id']) / dict_['run'] + '.json')
         page_ids = get_olr_splits_page_ids(commentary.id, [dict_['split']])
         pages += [p for p in commentary.children.pages
                   if p.id in page_ids]
@@ -45,11 +43,11 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
     # Create the model
     if not config['text_only']:
         tokenizer = LayoutLMv3TokenizerFast.from_pretrained(config['model_name_or_path'])
-        model = LayoutLMv3ForTokenClassification.from_pretrained(os.path.join(RUNS_DIR, xp_name, 'model'))
+        model = LayoutLMv3ForTokenClassification.from_pretrained(RUNS_DIR / xp_name / 'model')
         feature_extractor = LayoutLMv3FeatureExtractor.from_pretrained(config['model_name_or_path'], apply_ocr=False)
     else:
         tokenizer = RobertaTokenizerFast.from_pretrained(config['model_name_or_path'], add_prefix_space=True)
-        model = RobertaForTokenClassification.from_pretrained(os.path.join(RUNS_DIR, xp_name, 'model'))
+        model = RobertaForTokenClassification.from_pretrained(RUNS_DIR / xp_name / 'model')
         feature_extractor = None
 
     # Walk over pages
@@ -69,18 +67,18 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
 
         # We now create the predicted regions
         pred_regions = []
-        for i in range(len(words)):
-            if i == 0:
-                region = {'words': [words[i]]}
+        for j in range(len(words)):
+            if j == 0:
+                region = {'words': [words[j]]}
             else:
-                if labels[i] != labels[i - 1] or words[i].bbox.xyxy[-1] < (
-                        words[i - 1].bbox.xyxy[1] - 50):  # for double col
-                    region['label'] = labels[i - 1]
+                if labels[j] != labels[j - 1] or words[j].bbox.xyxy[-1] < (
+                        words[j - 1].bbox.xyxy[1] - 50):  # for double col
+                    region['label'] = labels[j - 1]
                     pred_regions.append(region)
-                    region = {'words': [words[i]]}
+                    region = {'words': [words[j]]}
 
                 else:
-                    region['words'].append(words[i])
+                    region['words'].append(words[j])
         # Append the last region
         region['label'] = labels[-1]
         pred_regions.append(region)
@@ -101,7 +99,7 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
         # Draw page words and regions to control
         labels_to_colors = {l: c + tuple([127]) for l, c in
                             zip(config['labels_to_ids'].keys(),
-                                list(COLORS['distinct'].values()) + list(COLORS['hues'].values()))}
+                                list(vs.COLORS['distinct'].values()) + list(vs.COLORS['hues'].values()))}
         img = PIL.Image.open(page.image.path)
         img = draw_page_labels(img=img,
                                words=words,
@@ -115,11 +113,11 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
                                    width=10)
 
         img = draw_caption(img, labels_to_colors=labels_to_colors,
-                           font_dir='/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/dissemination/media/fonts')
+                           font_dir=vs.DRIVE_BASE_DIR / 'dissemination/media/fonts')
 
-        img_pred_dir = os.path.join(RUNS_DIR, xp_name, 'predictions/images')
-        os.makedirs(img_pred_dir, exist_ok=True)
-        img.save(os.path.join(img_pred_dir, page.id + '.png'))
+        img_pred_dir =RUNS_DIR / xp_name / 'predictions/images'
+        img_pred_dir.mkdir(exist_ok=True, parents=True)
+        img.save(img_pred_dir / (page.id + '.png'))
 
         # Compute the mAP
 
@@ -157,5 +155,4 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
 
     df = pd.DataFrame.from_dict(general_results)
 
-tsv_path = os.path.join(RUNS_DIR, 'general_results.tsv')
-df.to_csv(tsv_path, sep='\t', index=False)
+df.to_csv(RUNS_DIR / 'general_results.tsv', sep='\t', index=False)

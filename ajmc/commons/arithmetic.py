@@ -1,7 +1,10 @@
-from typing import Tuple, List
+"""Basic arithmetic operations."""
+# CHECKED 2023-01-24
+from typing import List, Tuple
+
 import numpy as np
 
-from ajmc.commons.docstrings import docstrings, docstring_formatter
+from ajmc.commons.docstrings import docstring_formatter, docstrings
 
 
 @docstring_formatter(**docstrings)

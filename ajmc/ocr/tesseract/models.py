@@ -1,13 +1,13 @@
 import json
 import subprocess
 from pathlib import Path
-from typing import Optional, List
-from tqdm import tqdm
-from ajmc.commons.miscellaneous import log_to_file, get_custom_logger
+from typing import List, Optional
+
+from ajmc.commons.miscellaneous import get_custom_logger, log_to_file
 from ajmc.ocr import variables as ocr_vars
-from ajmc.ocr.preprocessing.data_preparation import get_or_make_dataset_dir
-from ajmc.ocr.tesseract.dictionaries import change_traineddata_wordlist, write_unpacked_traineddata
-from ajmc.ocr.config import get_all_configs, config_to_tesstrain_config
+from ajmc.ocr.config import config_to_tesstrain_config, CONFIGS
+from ajmc.ocr.preprocessing.data_preparation import make_dataset
+from ajmc.ocr.tesseract.dictionaries import change_traineddata_wordlist
 
 logger = get_custom_logger(__name__)
 
@@ -48,7 +48,8 @@ def get_or_make_traineddata_path(model_config: dict,
 
     # Else, build the model from its model_config
     else:
-        source_model_config = get_all_configs()['models'][model_config['source']]
+        logger.info(f"Building model {model_config['id']} from its model_config.")
+        source_model_config = CONFIGS['models'][model_config['source']]
         source_model_path = get_or_make_traineddata_path(source_model_config,
                                                          overwrite=overwrite)  # Gets the source model recursively
         model_path.write_bytes(source_model_path.read_bytes())
@@ -62,8 +63,8 @@ def get_or_make_traineddata_path(model_config: dict,
 
         # train the model ?
         if model_config['train_dataset'] is not None:
-            train_dataset_config = get_all_configs()['datasets'][model_config['train_dataset']]
-            get_or_make_dataset_dir(train_dataset_config, overwrite=overwrite)
+            train_dataset_config = CONFIGS['datasets'][model_config['train_dataset']]
+            make_dataset(train_dataset_config, overwrite=overwrite)
             train(model_config)
 
     # Write the config file
@@ -162,7 +163,9 @@ done;"""
         (output_dir / 'data_metadata.json').write_bytes((img_dir / 'metadata.json').read_bytes())
 
     # Run the command
-    subprocess.run(['bash'], input=command, shell=True)
+    bash_command = command.encode('ascii')
+    logger.info(f"Running tesseract on {img_dir}...")
+    subprocess.run(['bash'], input=bash_command, shell=True)
 
 
 def make_models(models_ids: Optional[List[str]], overwrite: bool = False):
@@ -174,13 +177,7 @@ def make_models(models_ids: Optional[List[str]], overwrite: bool = False):
         which is recursive. If `overwrite` is True, all required models will be overwritten
         (i.e. also each models's source-model).
     """
-    configs = get_all_configs()
 
-    if models_ids is None:
-        for model_config in tqdm(configs['models'].values()):
-            get_or_make_traineddata_path(model_config=model_config, overwrite=overwrite)
-
-    else:
-        for model_id in tqdm(models_ids):
-            model_config = configs['models'][model_id]
-            get_or_make_traineddata_path(model_config=model_config, overwrite=overwrite)
+    for model_id, model_config in CONFIGS['models'].items():
+        if models_ids is None or model_id in models_ids:
+            get_or_make_traineddata_path(model_config, overwrite=overwrite)

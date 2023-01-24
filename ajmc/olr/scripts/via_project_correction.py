@@ -1,8 +1,8 @@
 """This module contains function to enhance via project jsons by reshaping regions and reorganising reading order."""
 
 import json
-from ajmc.commons.variables import PATHS
-import os
+
+os
 import cv2
 from typing import List
 from ajmc.commons.geometry import Shape
@@ -14,7 +14,7 @@ pages = via_project["_via_img_metadata"]
 
 page = pages['sophokle1v3soph_0000.png69464']
 commentary_id = "sophokle1v3soph"
-img_path = os.path.join(PATHS["base_dir"], commentary_id, PATHS["png"], page["filename"])
+img_path = os.path.join(COMMS_DATA_DIR, commentary_id, PATHS["png"], page["filename"])
 
 image = cv2.imread(img_path)
 
