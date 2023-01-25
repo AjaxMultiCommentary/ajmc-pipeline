@@ -7,7 +7,7 @@ from typing import Union
 from ajmc.commons import variables as vs
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.file_management.utils import get_62_based_datecode
+from ajmc.commons.file_management import get_62_based_datecode
 
 
 def harmonise_unicode(text: str):

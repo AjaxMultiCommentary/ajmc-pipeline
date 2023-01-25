@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from ajmc.commons.file_management.utils import get_62_based_datecode
+from ajmc.commons.file_management import get_62_based_datecode
 from ajmc.ocr import variables as ocr_vars
 
 

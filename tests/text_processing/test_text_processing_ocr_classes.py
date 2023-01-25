@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import jsonschema
 
@@ -8,19 +9,19 @@ from ajmc.text_processing import ocr_classes
 from tests import sample_objects as so
 
 commentary_from_paths = ocr_classes.OcrCommentary(id=so.sample_commentary_id,
-                                                  ocr_dir=so.sample_ocr_dir,
+                                                  ocr_dir=so.sample_ocr_run_outputs_dir,
                                                   via_path=so.sample_via_path,
-                                                  image_dir=so.sample_image_dir,
-                                                  groundtruth_dir=so.sample_groundtruth_dir)
+                                                  img_dir=so.sample_img_dir,
+                                                  ocr_gt_dir=so.sample_ocr_gt_dir)
 
-commentary_from_structure = ocr_classes.OcrCommentary.from_ajmc_data(ocr_dir=so.sample_ocr_dir)
+commentary_from_structure = ocr_classes.OcrCommentary.from_ajmc_data(ocr_dir=so.sample_ocr_run_outputs_dir)
 
 
 def test_ocrcommentary():
     for comm in [commentary_from_paths, commentary_from_structure]:
         # test OcrCommentary.children
         assert all([isinstance(p, ocr_classes.OcrPage) for p in comm.children.pages])
-        assert len(comm.children.pages) == len([f for f in os.listdir(so.sample_ocr_dir) if comm.id in f])
+        assert len(comm.children.pages) == len([f for f in os.listdir(so.sample_ocr_run_outputs_dir) if comm.id in f])
         assert all([isinstance(r, ocr_classes.OlrRegion) for r in comm.children.regions])
         assert all([isinstance(l, ocr_classes.OcrLine) for l in comm.children.lines])
         assert all([isinstance(w, ocr_classes.OcrWord) for w in comm.children.words])
@@ -32,7 +33,7 @@ def test_ocrcommentary():
         # Test OcrCommentary.groundtruth_pages
         assert all([isinstance(p, ocr_classes.OcrPage) for p in comm.ocr_groundtruth_pages])
         assert len(comm.ocr_groundtruth_pages) == len(
-            [f for f in os.listdir(so.sample_groundtruth_dir) if comm.id in f])
+                [f for f in os.listdir(so.sample_ocr_gt_dir) if comm.id in f])
 
         # See test_page() for regions, lines, words
 
@@ -72,7 +73,7 @@ def test_ocrcommentary_to_canonical():
 
 def test_ocrpage():
     page = ocr_classes.OcrPage(ocr_path=so.sample_ocr_page_path, page_id=so.sample_page_id,
-                               img_path=so.sample_image_path, commentary=commentary_from_paths)
+                               img_path=so.sample_img_path, commentary=commentary_from_paths)
 
     assert isinstance(page.ocr_format, str)
 
@@ -83,7 +84,6 @@ def test_ocrpage():
     assert all([isinstance(w, ocr_classes.OcrWord) for w in page.children.words])
 
     # Validate page.json
-    with open(os.path.join('../ajmc/', variables.PATHS['schema']), 'r') as file:
-        schema = json.loads(file.read())
-
+    schema_path = Path('..') / variables.SCHEMA_PATH
+    schema = json.loads(schema_path.read_text('utf-8'))
     jsonschema.validate(instance=page.to_canonical_v1(), schema=schema)

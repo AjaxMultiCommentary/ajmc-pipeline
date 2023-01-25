@@ -1,7 +1,5 @@
 import time
 
-from ajmc.commons.file_management import utils
-
 
 def test_int_to_x_based_code():
     assert utils.int_to_x_based_code(0, 62) == '0'

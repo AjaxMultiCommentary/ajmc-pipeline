@@ -1,3 +1,5 @@
+"""Utils for OCR data preparation and dataset manipulations."""
+
 import json
 import re
 import shutil
@@ -19,9 +21,9 @@ from ajmc.text_processing.canonical_classes import CanonicalCommentary
 logger = get_custom_logger(__name__)
 
 
-def get_root_dataset_id(img_id: str) -> str:
+def get_root_dataset_id(dts_id: str) -> str:
     """Returns the root dataset (e.g. ajmc, pog...) from a line id."""
-    return 'ajmc' if img_id.split('_')[0] in variables.ALL_COMMENTARY_IDS else 'pog'
+    return 'ajmc' if dts_id.split('_')[0] in variables.ALL_COMM_IDS else 'pog'
 
 
 def split_root_dataset_metadata(metadata: pd.DataFrame) -> pd.DataFrame:
@@ -69,7 +71,7 @@ def import_dataset_metadata(dts_dir: Path) -> pd.DataFrame:
     return pd.read_csv(metadata_path, sep='\t', encoding='utf-8', index_col=False)
 
 
-def safe_check_dataset(dts_config:dict) -> bool:
+def safe_check_dataset(dts_config: dict) -> bool:
     """Checks if a dataset is valid."""
     dts_dir = ocr_vars.get_dataset_dir(dts_config['id'])
     dts_metadata_path = ocr_vars.get_dataset_metadata_path(dts_config['id'])
@@ -81,7 +83,8 @@ def safe_check_dataset(dts_config:dict) -> bool:
 
     # Then check the metadata is valid
     dts_metadata = import_dataset_metadata(dts_dir)
-    if set(dts_metadata['path']) != set([str(p) for p in dts_dir.glob(f'*{ocr_vars.IMG_FILES_EXTENSION}')]) or len(dts_metadata) == 0:
+    if set(dts_metadata['path']) != set([str(p) for p in dts_dir.glob(f'*{ocr_vars.IMG_FILES_EXTENSION}')]) or len(
+            dts_metadata) == 0:
         return False
 
     # Finally check the config is valid
@@ -90,7 +93,6 @@ def safe_check_dataset(dts_config:dict) -> bool:
         return False
 
     return True
-
 
 
 def make_dataset_metadata(dts_dir: Path) -> pd.DataFrame:
@@ -138,11 +140,11 @@ def make_dataset_metadata(dts_dir: Path) -> pd.DataFrame:
             if script in ['grc', 'num']:
                 metadata['language'].append(script[:3])
             else:
-                if work_id in variables.ALL_COMMENTARY_IDS:
+                if work_id in variables.ALL_COMM_IDS:
                     if script == 'lat':
-                        metadata['language'].append(variables.COMMENTARY_IDS_TO_LANG[work_id])
+                        metadata['language'].append(variables.COMM_IDS_TO_LANG[work_id])
                     elif script == 'mix':
-                        metadata['language'].append('gre' + variables.COMMENTARY_IDS_TO_LANG[work_id])
+                        metadata['language'].append('gre' + variables.COMM_IDS_TO_LANG[work_id])
                     else:
                         metadata['language'].append('unk')
                 else:
@@ -157,7 +159,7 @@ def make_dataset_metadata(dts_dir: Path) -> pd.DataFrame:
 
     grouped = metadata.groupby('work_id')
     metadata['initial_normalized_height'] = metadata.apply(
-        lambda x: x['image_height'] / grouped.mean()['image_height'][x['work_id']], axis=1)
+            lambda x: x['image_height'] / grouped.mean()['image_height'][x['work_id']], axis=1)
 
     return metadata
 
@@ -212,17 +214,17 @@ def clean_dataset(dts_dir: Union[Path, str],
     metadata = make_dataset_metadata(output_dir)
 
     for img_id in tqdm(metadata[metadata['initial_normalized_height'] >= double_line_threshold]['img_id'],
-                        desc=f'Removing double-height lines in dataset...'):
+                       desc=f'Removing double-height lines in dataset...'):
         (output_dir / f'{img_id}.png').unlink()
         (output_dir / f'{img_id}.gt.txt').unlink()
         double_height_lines += 1
 
     logger.info(
-        f'Cleaning done. Removed {missing_pairs} missing pairs, {empty_txts} empty txts and {double_height_lines} double-height lines.')
+            f'Cleaning done. Removed {missing_pairs} missing pairs, {empty_txts} empty txts and {double_height_lines} double-height lines.')
 
 
 def make_clean_ajmc_dataset(output_dir: Path = ocr_vars.get_dataset_dir('ajmc'),
-                            comm_ids: List[str] = variables.ALL_COMMENTARY_IDS,
+                            comm_ids: List[str] = variables.ALL_COMM_IDS,
                             unicode_format: str = 'NFC',
                             base_dir=Path(variables.COMMS_DATA_DIR)):
     """Uses`CanonicalCommentary.export_gt_file_pairs` to export an ocr dataset for given commentary ids."""
@@ -277,7 +279,7 @@ def make_clean_pogretra_dataset(output_dir: Path = ocr_vars.get_dataset_dir('pog
 
     # remove the files which are already in ajmc
     for file_path in output_dir.glob('*'):
-        if file_path.stem.split('_')[0] in variables.ALL_COMMENTARY_IDS:
+        if file_path.stem.split('_')[0] in variables.ALL_COMM_IDS:
             file_path.unlink()
 
 
@@ -351,8 +353,7 @@ def gather_and_transform_dataset(dts_config: dict,
     1. Sampling the datasets by iterating only over the image contained in the metadata
     2. Transforming the images by applying the transformations specified in the config
     3. Saving the images and their corresponding .gt.txt file in the output_dir
-    4. Updating and saving the metadata in the output_dir
-dataset_dir
+    4. Updating and saving the metadata in the output_dir dataset_dir
     Args:
         dts_config: A dataset config
         dts_metadata: A dataset metadata
@@ -371,9 +372,8 @@ dataset_dir
         img_id = src_img_path.stem
 
         if dts_config['transform']['resize'] is not None:
-            img = img.resize(
-                size=(
-                int(dts_config['transform']['resize'] * img.width / img.height), dts_config['transform']['resize'],))
+            img = img.resize(size=(int(dts_config['transform']['resize'] * img.width / img.height),
+                                   dts_config['transform']['resize'],))
             img_id += f"_res{dts_config['transform']['resize']}"
 
         if dts_config['transform']['rotate'] is not None:
@@ -447,7 +447,6 @@ def make_dataset(dts_config: dict, overwrite: bool = False) -> None:
     write_dataset_metadata(dts_metadata, dts_dir)
 
 
-
 def make_datasets(dts_ids: Optional[List[str]] = None, overwrite: bool = False):
     """Creates datasets.
 
@@ -462,5 +461,3 @@ def make_datasets(dts_ids: Optional[List[str]] = None, overwrite: bool = False):
         if dts_ids is None or dts_id in dts_ids:
             make_dataset(dts_config, overwrite=overwrite)
 
-
-make_datasets(['ajmc'], overwrite=True)

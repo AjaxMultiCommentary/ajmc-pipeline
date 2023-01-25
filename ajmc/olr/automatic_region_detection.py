@@ -173,7 +173,7 @@ def main(img_dir: Union[str, Path],
     - In the `annotation`-menu, chose import annotations from csv, and import the output csv annotations.
     - It is then recommended to save your project as a json (and to delete the csv).
 
-    To automatically annotated some of the detected regions, please refer to `automatic_region_classification` in `ajmc/olr/scripts`
+    To automatically annotated some of the detected regions, please refer to `automatic_region_classification` in `ajmc/olr/_scripts`
 
     Args:
         img_dir: {image_dir}. Can be both `Path` or `str` as this function is an entrypoint.

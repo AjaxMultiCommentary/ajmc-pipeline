@@ -1,86 +1,102 @@
 import platform
 import re
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Optional, Union, Type
 
 # ======================================================================================================================
 #                                                 TYPES
 # ======================================================================================================================
 BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
+PageType = Union[Type['Page'], Type['CanonicalPage'], Type['OcrPage']]
 
 # ======================================================================================================================
 #                                                 PATHS
 # ======================================================================================================================
 
-# Todo find another system for this
+# PACKAGE-RELATIVE PATHS
+SCHEMA_PATH = Path('ajmc/data/templates/page.schema.json')
+TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
 
-
+# AJMC DATA DIR AND STRUCTURE
 EXEC_ENV = platform.uname().node
 
+_DRIVE_BASE_DIR: Optional[Path] = None  # Keep this to be able to determine a custom path for the data
+
+
 def get_drive_base_dir() -> Path:
-    if EXEC_ENV == 'iccluster040':
-        return Path('/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/')
-    elif EXEC_ENV.startswith('Sven'):
-        return Path('/Users/sven/drive/_AJAX/AjaxMultiCommentary/')
+    global _DRIVE_BASE_DIR
+    if _DRIVE_BASE_DIR is None:
+        if EXEC_ENV == 'iccluster040':
+            return Path('/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/')
+        elif EXEC_ENV.startswith('Sven'):
+            return Path('/Users/sven/drive/_AJAX/AjaxMultiCommentary/')
+        else:
+            return Path(input(
+                    'WARNING: Unknown execution environment!\nPlease enter the drive base directory below (e.g. `/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/`):\n(Note: you can change this permanently by setting `DRIVE_BASE_DIR` in `ajmc/commons/variables.py` to a custom `pathlib.Path`.)'))
+
     else:
-        return Path(input('WARNING: Unknown execution environment!\nPlease enter the drive base directory below (e.g. `/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/`):\n(Note: you can change this permanently by setting `DRIVE_BASE_DIR` in `ajmc/commons/variables.py` to a custom `pathlib.Path`.)'))
+        return _DRIVE_BASE_DIR
+
 
 DRIVE_BASE_DIR = get_drive_base_dir()
 DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
 COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries/commentaries_data'
 NE_CORPUS_DIR = DRIVE_DATA_DIR / 'data/AjMC-NE-corpus'
-SCHEMA_PATH = Path('ajmc/data/templates/page.schema.json')
-TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
 
-def get_comm_base_dir(comm_id:str) -> Path:
+# RELATIVE PATHS
+COMM_IMG_REL_DIR = Path('images/png')
+COMM_OCR_RUNS_REL_DIR = Path('ocr/runs')
+COMM_OCR_GT_REL_DIR = Path('ocr/groundtruth')
+COMM_OCR_GT_PAIRS_REL_DIR = Path('ocr/gt_file_pairs')
+COMM_VIA_REL_PATH = Path('olr/via_project.json')
+COMM_XMI_REL_DIR = Path('ner/annotation')
+COMM_CANONICAL_REL_DIR = Path('canonical/v2')
+COMM_CANONICAL_V1_REL_DIR = Path('canonical')
+
+
+def get_comm_base_dir(comm_id: str) -> Path:
     return COMMS_DATA_DIR / comm_id
-def get_comm_ocr_groundtruth_dir(comm_id:str) -> Path:
-    return get_comm_base_dir(comm_id) / 'ocr/groundtruth'
 
-def get_comm_img_dir(comm_id:str) -> Path:
-    return get_comm_base_dir(comm_id) / 'images/png'
 
-def get_comm_via_path(comm_id:str) -> Path:
-    return get_comm_base_dir(comm_id) / 'olr/via_project.json'
+def get_comm_ocr_gt_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_OCR_GT_REL_DIR
 
-def get_comm_xmi_dir(comm_id:str) -> Path:
-    return get_comm_base_dir(comm_id) / 'ner/annotation'
 
-def get_comm_ocr_runs_dir(comm_id:str) -> Path:
-    return get_comm_base_dir(comm_id) / 'ocr/runs'
+def get_comm_img_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_IMG_REL_DIR
 
-def get_comm_ocr_outputs_dir(comm_id:str, run_id:str) -> Path:
+
+def get_comm_via_path(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_VIA_REL_PATH
+
+
+def get_comm_xmi_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_XMI_REL_DIR
+
+
+def get_comm_ocr_runs_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_OCR_RUNS_REL_DIR
+
+
+def get_comm_ocr_outputs_dir(comm_id: str, run_id: str) -> Path:
     return get_comm_ocr_runs_dir(comm_id) / run_id / 'outputs'
 
-def get_comm_ocr_gt_pairs_dir(comm_id:str) -> Path:
-    return get_comm_base_dir(comm_id) / 'ocr/gt_file_pairs'
 
-def get_comm_canonical_v1_dir(comm_id:str) -> Path:
-    return get_comm_base_dir(comm_id) / 'canonical'
-
-def get_comm_canonical_dir(comm_id:str) -> Path:
-    return get_comm_base_dir(comm_id) / 'canonical/v2'
+def get_comm_ocr_gt_pairs_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_OCR_GT_PAIRS_REL_DIR
 
 
-PATHS = {
-    'local_base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
-    'drive_base_dir': '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
-    'cluster_base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data',
-    'schema': 'ajmc/data/templates/page.schema.json',
-    'groundtruth': 'ocr/groundtruth',
-    'png': 'images/png',
-    'via_path': 'olr/via_project.json',
-    'xmi': 'ner/annotation',
-    'typesystem': 'ajmc/data/templates/TypeSystem.xml',
-    'olr_initiation': 'olr/annotation/project_initiation',
-    'ocr': 'ocr/runs',
-    'canonical': 'canonical/v2',
-    'annotations': 'ner/entities',
-    'ajmc_ne_corpus': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/AjMC-NE-corpus',
-    'ocr_gt_file_pairs': 'ocr/gt_file_pairs',
-}
-# COMMS_DATA_DIR = PATHS[f'{EXEC_ENV}_base_dir']
-# PATHS['temp_dir'] = os.getenv('TMPDIR')
+def get_comm_canonical_v1_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_CANONICAL_V1_REL_DIR
+
+
+def get_comm_canonical_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_CANONICAL_REL_DIR
+
+
+def get_comm_canonical_path(comm_id: str, run_id: str) -> Path:
+    return get_comm_canonical_dir(comm_id) / f'{run_id}.json'
+
 
 # Sheet names corresponds to the dictionary's keys
 SPREADSHEETS = {
@@ -89,15 +105,8 @@ SPREADSHEETS = {
     'ocr_gt': '1RsJQTgM4oO-ds0cK3rstx-iBxsvxjwCSVRWS63NvQrQ'
 }
 
-FOLDER_STRUCTURE_PATHS = {
-    # Only relative paths
-    # Placeholder pattern are between []
-    'ocr_outputs_dir': '[commentary_id]/ocr/runs/[ocr_run]/outputs',
-    'canonical_json': '[commentary_id]/canonical/v2/[json]'
-}
-
 # ======================================================================================================================
-#                                                 FORMATS
+#                                                 FORMATS AND EXTENSIONS
 # ======================================================================================================================
 
 OCR_OUTPUT_EXTENSIONS = ['.xml', '.hocr', '.html']
@@ -108,33 +117,36 @@ DEFAULT_IMG_EXTENSION = '.png'
 #                                                 COMMENTARIES
 # ======================================================================================================================
 
-ALL_COMMENTARY_IDS = ['Colonna1975',
-                      'DeRomilly1976',
-                      'Ferrari1974',
-                      'Finglass2011',
-                      'Garvie1998',
-                      'Hermann1851',
-                      'Kamerbeek1953',
-                      'Paduano1982',
-                      'Untersteiner1934',
-                      'Wecklein1894',
-                      'bsb10234118',
-                      'cu31924087948174',
-                      'lestragdiesdeso00tourgoog',
-                      'Schneidewin_Nauck_Radermacher1913',
-                      'sophoclesplaysa05campgoog', 'sophokle1v3soph',
-                      'Stanford1963',
-                      'thukydides02thuc',
-                      'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
+ALL_COMM_IDS = ['Colonna1975',
+                'DeRomilly1976',
+                'Ferrari1974',
+                'Finglass2011',
+                'Garvie1998',
+                'Hermann1851',
+                'Kamerbeek1953',
+                'Paduano1982',
+                'SchneidewinNauckRadermacher1913',
+                'Stanford1963',
+                'Untersteiner1934',
+                'Wecklein1894',
+                'annalsoftacitusp00taci',
+                'bsb10234118',
+                'cu31924087948174',
+                'lestragdiesdeso00tourgoog',
+                'pvergiliusmaroa00virggoog',
+                'sophoclesplaysa05campgoog',
+                'sophokle1v3soph',
+                'thukydides02thuc']
 
-EXTERNAL_COMMENTARY_IDS = ['thukydides02thuc', 'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
+EXTERNAL_COMM_IDS = ['thukydides02thuc', 'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
 
-PD_COMMENTARY_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
+PD_COMM_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894',
+               'SchneidewinNauckRadermacher1913']
 
 SAMPLE_PAGES = ['bsb10234118_0096', 'sophokle1v3soph_0126', 'cu31924087948174_0063', 'cu31924087948174_0063',
                 'Wecklein1894_0087']
 
-COMMENTARY_IDS_TO_LANG = {
+COMM_IDS_TO_LANG = {
     'Colonna1975': 'ita',
     'DeRomilly1976': 'fra',
     'Ferrari1974': 'ita',

@@ -6,18 +6,18 @@ Architecture should be:
 XP_DIR / models / model_name / model_name.traineddata
 ```
 """
-import os
+
 import shutil
 import subprocess
 from pathlib import Path
 from typing import List, Optional
-from ajmc.commons.miscellaneous import get_custom_logger
-from ajmc.ocr import variables as ocr_vars
+
 import pandas as pd
 
-from ajmc.ocr.utils import is_greek_string, is_latin_string, is_number_string
-from ajmc.commons.miscellaneous import prefix_command_with_conda_env
+from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.ocr import variables as ocr_vars
 from ajmc.ocr.tesseract.tesseract_utils import run_tess_command
+from ajmc.ocr.utils import is_greek_string, is_latin_string, is_number_string
 
 logger = get_custom_logger(__name__)
 
@@ -108,8 +108,9 @@ def get_or_create_wordlist_path(wordlist_name: str) -> Path:
 
     wordlist_path = ocr_vars.get_wordlist_path(wordlist_name)
     if not wordlist_path.is_file():
-        final_list = merge_wordlists([(ocr_vars.DICTIONARIES_DIR / (l + '.txt')).read_text(encoding='utf-8').splitlines()
-                                      for l in wordlist_name.split(ocr_vars.SEPARATOR)])
+        final_list = merge_wordlists(
+                [(ocr_vars.DICTIONARIES_DIR / (l + '.txt')).read_text(encoding='utf-8').splitlines()
+                 for l in wordlist_name.split(ocr_vars.SEPARATOR)])
         wordlist_path.write_text('\n'.join(final_list), encoding='utf-8')
 
     return wordlist_path
@@ -139,10 +140,6 @@ def change_traineddata_wordlist(traineddata_name: str, wordlist_name: str):
     # move the new traineddata
     command = f'mv {unpacked_dir}/{traineddata_name}.traineddata {traineddata_path.parent}'
     subprocess.run(['bash'], input=command.encode('ascii'), shell=True, capture_output=True)
-
-    # Delete the unpacked directory
-    # command = f'rm -r {unpacked_dir}'
-    # os.system(command)
 
 
 def create_traineddata_with_wordlist(source_traineddata_name,

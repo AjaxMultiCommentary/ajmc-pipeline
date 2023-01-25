@@ -16,7 +16,7 @@ import bs4.element
 import jsonschema
 from tqdm import tqdm
 
-from ajmc.commons import variables
+from ajmc.commons import variables as vs
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import adjust_bbox_to_included_contours, get_bbox_from_points, is_bbox_within_bbox, \
     is_bbox_within_bbox_with_threshold, Shape
@@ -42,8 +42,8 @@ class OcrCommentary(Commentary, TextContainer):
                  ocr_dir: Optional[Path] = None,
                  base_dir: Optional[Path] = None,
                  via_path: Optional[Path] = None,
-                 image_dir: Optional[Path] = None,
-                 groundtruth_dir: Optional[Path] = None,
+                 img_dir: Optional[Path] = None,
+                 ocr_gt_dir: Optional[Path] = None,
                  ocr_run: Optional[str] = None,
                  **kwargs):
         """Default constructor, where custom paths can be provided.
@@ -56,12 +56,14 @@ class OcrCommentary(Commentary, TextContainer):
         Args:
             id: {commentary_id}
             ocr_dir: {ocr_dir}
+            base_dir: {comm_base_dir}
             via_path: {via_path}
-            image_dir: {image_dir}
-            groundtruth_dir: {groundtruth_dir}
+            img_dir: {image_dir}
+            ocr_gt_dir: {groundtruth_dir}
+            ocr_run: {ocr_run}
         """
-        super().__init__(id=id, ocr_dir=ocr_dir, base_dir=base_dir, via_path=via_path, image_dir=image_dir,
-                         groundtruth_dir=groundtruth_dir, ocr_run=ocr_run, **kwargs)
+        super().__init__(id=id, ocr_dir=ocr_dir, base_dir=base_dir, via_path=via_path, image_dir=img_dir,
+                         groundtruth_dir=ocr_gt_dir, ocr_run=ocr_run, **kwargs)
 
     @classmethod
     @docstring_formatter(**docstrings)
@@ -75,20 +77,20 @@ class OcrCommentary(Commentary, TextContainer):
         """
 
         if '*' in ocr_run:
-            comm_ocr_runs_dir = variables.get_comm_ocr_runs_dir(id)
+            comm_ocr_runs_dir = vs.get_comm_ocr_runs_dir(id)
             try:
                 ocr_run = next(comm_ocr_runs_dir.glob(ocr_run)).name
             except StopIteration:
                 raise FileNotFoundError(f'No ocr run found for {comm_ocr_runs_dir} matching {ocr_run}')
 
-        ocr_outputs_dir = variables.get_comm_ocr_outputs_dir(id, ocr_run)
+        ocr_outputs_dir = vs.get_comm_ocr_outputs_dir(id, ocr_run)
 
         return cls(id=id,
                    ocr_dir=ocr_outputs_dir,
-                   base_dir=variables.get_comm_base_dir(id),
-                   via_path=variables.get_comm_via_path(id),
-                   image_dir=variables.get_comm_img_dir(id),
-                   groundtruth_dir=variables.get_comm_ocr_groundtruth_dir(id),
+                   base_dir=vs.get_comm_base_dir(id),
+                   via_path=vs.get_comm_via_path(id),
+                   img_dir=vs.get_comm_img_dir(id),
+                   ocr_gt_dir=vs.get_comm_ocr_gt_dir(id),
                    ocr_run=ocr_run)
 
     def to_canonical(self, include_ocr_groundtruth: bool = True) -> CanonicalCommentary:
@@ -112,10 +114,10 @@ class OcrCommentary(Commentary, TextContainer):
             can.info['base_dir'] = self.base_dir
 
         # We now populate the children and images
-        children = {k: [] for k in variables.CHILD_TYPES}
+        children = {k: [] for k in vs.CHILD_TYPES}
         w_count = 0
         if include_ocr_groundtruth:
-            gt_ids = [p.id for p in self.ocr_groundtruth_pages]
+            gt_ids = [p.id for p in self.ocr_gt_pages]
 
         for i, p in enumerate(tqdm(self.children.pages, desc=f'Canonizing {can.id}')):
 
@@ -148,57 +150,56 @@ class OcrCommentary(Commentary, TextContainer):
             for ent in p.children.entities:
                 if ent.children.words:
                     children['entities'].append(
-                        CanonicalEntity(word_range=(ent.children.words[0].index, ent.children.words[-1].index),
-                                        commentary=can,
-                                        shifts=ent.shifts,
-                                        transcript=ent.transcript,
-                                        label=ent.label,
-                                        wikidata_id=ent.wikidata_id))
+                            CanonicalEntity(word_range=(ent.children.words[0].index, ent.children.words[-1].index),
+                                            commentary=can,
+                                            shifts=ent.shifts,
+                                            transcript=ent.transcript,
+                                            label=ent.label,
+                                            wikidata_id=ent.wikidata_id))
             # Adding sentences
             for s in p.children.sentences:
                 if s.children.words:
                     children['sentences'].append(
-                        CanonicalSentence(word_range=(s.children.words[0].index, s.children.words[-1].index),
-                                          commentary=can,
-                                          shifts=s.shifts,
-                                          corrupted=s.corrupted,
-                                          incomplete_continuing=s.incomplete_continuing,
-                                          incomplete_truncated=s.incomplete_truncated))
+                            CanonicalSentence(word_range=(s.children.words[0].index, s.children.words[-1].index),
+                                              commentary=can,
+                                              shifts=s.shifts,
+                                              corrupted=s.corrupted,
+                                              incomplete_continuing=s.incomplete_continuing,
+                                              incomplete_truncated=s.incomplete_truncated))
 
             # Adding hyphenations
             for h in p.children.hyphenations:
                 if h.children.words:
                     children['hyphenations'].append(
-                        CanonicalHyphenation(word_range=(h.children.words[0].index, h.children.words[-1].index),
-                                             commentary=can,
-                                             shifts=h.shifts))
+                            CanonicalHyphenation(word_range=(h.children.words[0].index, h.children.words[-1].index),
+                                                 commentary=can,
+                                                 shifts=h.shifts))
 
             p.reset()  # We reset the page to free up memory
-
 
         # Adding sections
         for s in self.children.sections:
             children['sections'].append(
-                CanonicalSection(word_range=(s.children.words[0].index, s.children.words[-1].index),
-                                 commentary=can,
-                                 section_type=s.section_type,
-                                 section_title=s.section_title))
+                    CanonicalSection(word_range=(s.children.words[0].index, s.children.words[-1].index),
+                                     commentary=can,
+                                     section_type=s.section_type,
+                                     section_title=s.section_title))
 
-        can.children = LazyObject((lambda x: x), constrained_attrs=variables.CHILD_TYPES, **children)
+        can.children = LazyObject((lambda x: x), constrained_attrs=vs.CHILD_TYPES, **children)
 
         return can
 
     def _get_children(self, children_type):
 
         if children_type == 'pages':
-            pages = [OcrPage.from_ajmc_data(ocr_path=p,commentary=self)
-                     for p in self.ocr_dir.glob('*') if p.suffix in variables.OCR_OUTPUT_EXTENSIONS]
+            pages = [OcrPage.from_ajmc_data(ocr_path=p, commentary=self)
+                     for p in self.ocr_dir.glob('*') if p.suffix in vs.OCR_OUTPUT_EXTENSIONS]
 
             return sorted(pages, key=lambda x: x.id)
 
         # Todo : not implemented yet
         elif children_type == 'sections':
-            # sections_path = Path(variables.COMMS_DATA_DIR) / self.id / 'sections.json'
+            # sections_path = Path(vs.COMMS_DATA_DIR) / self.id / 'sections.json'
             # sections = json.loads(sections_path.read_text(encoding='utf-8'))
             # return [RawSection(self, **s) for s in sections]
             return []
@@ -207,11 +208,13 @@ class OcrCommentary(Commentary, TextContainer):
         else:  # For other children, them from each page
             return [tc for p in self.children.pages for tc in getattr(p.children, children_type)]
 
-
-    @lazy_property  # Todo 👁️ This should not be maintained anymore
+    @lazy_property
     def ocr_groundtruth_pages(self) -> Union[List['OcrPage'], list]:
         """The commentary's pages which have a groundtruth file in `self.paths['groundtruth']`."""
-        pages = [OcrPage(ocr_path=p, commentary=self) for p in self.groundtruth_dir.glob('*.html')]
+
+        pages = [OcrPage(ocr_path=p, commentary=self) for p in self.ocr_gt_dir.glob('*.html')]
+        assert self.ocr_gt_page_ids() == [p.id for p in pages], 'OCR ground-truth in  pages do not match the OCR pages'
+
         return sorted(pages, key=lambda x: x.id)
 
     @lazy_property
@@ -231,17 +234,13 @@ class OcrPage(Page, TextContainer):
                  commentary: Optional[OcrCommentary] = None, **kwargs):
         super().__init__(ocr_path=ocr_path, id=page_id, image_path=img_path, commentary=commentary, **kwargs)
 
-
     @classmethod
     def from_ajmc_data(cls, ocr_path: Path, commentary: OcrCommentary, **kwargs):
         """Initialises an OcrPage from an AJMC data file."""
         return cls(ocr_path=ocr_path,
                    page_id=ocr_path.stem,
-                   img_path=commentary.image_dir / f'{ocr_path.stem}{variables.DEFAULT_IMG_EXTENSION}',
+                   img_path=commentary.image_dir / f'{ocr_path.stem}{vs.DEFAULT_IMG_EXTENSION}',
                    commentary=commentary, **kwargs)
-
-
-
 
     def _get_children(self, children_type):
         if children_type == 'regions':
@@ -276,7 +275,7 @@ class OcrPage(Page, TextContainer):
             cas = cas_utils.import_page_cas(self.id)
             if cas is not None:
                 annotations = cas_utils.safe_import_page_annotations(self.id, cas, rebuild,
-                                                                     variables.ANNOTATION_LAYERS[children_type])
+                                                                     vs.ANNOTATION_LAYERS[children_type])
 
                 if children_type == 'entities':
                     return [RawEntity.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
@@ -297,7 +296,7 @@ class OcrPage(Page, TextContainer):
     def to_canonical_v1(self) -> Dict[str, Any]:
         """Creates canonical data, as used for INCEpTION. """
         logger.warning(
-            'You are creating a canonical data version 1. For version 2, use `OcrCommentary.to_canonical()`.')
+                'You are creating a canonical data version 1. For version 2, use `OcrCommentary.to_canonical()`.')
         data = {'id': self.id,
                 'iiif': 'None',
                 'cdate': strftime('%Y-%m-%d %H:%M:%S'),
@@ -323,16 +322,12 @@ class OcrPage(Page, TextContainer):
 
         return data
 
-    def to_json(self, output_dir: str, schema_path: str = variables.PATHS['schema']):
+    def to_json(self, output_dir: Path, schema_path: Path = vs.SCHEMA_PATH):
         """Validate `self.to_canonical_v1` and serializes it to json."""
-
-        with open(schema_path, 'r') as file:
-            schema = json.loads(file.read())
-
+        schema = json.loads(schema_path.read_text('utf-8'))
         jsonschema.validate(instance=self.to_canonical_v1(), schema=schema)
-
-        with open(os.path.join(output_dir, self.id + '.json'), 'w') as f:
-            json.dump(self.to_canonical_v1(), f, indent=4, ensure_ascii=False)
+        (output_dir / self.id + '.json').write_text(json.dumps(self.to_canonical_v1(), indent=4, ensure_ascii=False),
+                                                    encoding='utf-8')
 
     def reset(self):
         """Resets the page to free up memory."""
@@ -542,7 +537,7 @@ class OlrRegion(OcrTextContainer):
             page: {parent_page}
         """
         super().__init__(region_type=region_type, bbox=bbox, page=page)
-        self._inclusion_threshold = variables.PARAMETERS['ocr_region_inclusion_threshold']
+        self._inclusion_threshold = vs.PARAMETERS['ocr_region_inclusion_threshold']
 
     @classmethod
     @docstring_formatter(**docstrings)
@@ -639,7 +634,7 @@ class RawAnnotation(TextContainer):
         return [c for c in getattr(self.parents.page.children, children_type)
                 if any([is_bbox_within_bbox_with_threshold(contained=c.bbox.bbox,
                                                            container=bbox.bbox,
-                                                           threshold=variables.PARAMETERS['entity_inclusion_threshold'])
+                                                           threshold=vs.PARAMETERS['entity_inclusion_threshold'])
                         for bbox in self.bboxes])]
 
 

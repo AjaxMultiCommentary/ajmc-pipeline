@@ -1,15 +1,22 @@
 """Miscellaneous helpers and utilities."""
+# CHECKED 2023-01-24
 import inspect
 import json
 import logging
 import timeit
 from functools import wraps
+from pathlib import Path
 from typing import Callable, Generator, Iterable, List, Optional, Type
 
-import pandas as pd
 from jsonschema import Draft6Validator
 
-from ajmc.commons.docstrings import docstring_formatter, docstrings
+from ajmc.commons import variables as vs
+
+formatter = logging.Formatter("%(levelname)s - %(name)s -   %(message)s")
+
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.DEBUG)
+stream_handler.setFormatter(formatter)
 
 
 def timer(iterations: int = 3, number: int = 1_000):
@@ -47,20 +54,9 @@ def get_unique_elements(iterable: Iterable, iterable_types: Iterable[Type[Iterab
     return list(set([l for l in recursive_iterator(iterable, iterable_types)]))
 
 
-def validate_json_schema(schema_path: str = 'data/page.schema.json'):
+def validate_json_schema(schema_path: Path = vs.SCHEMA_PATH):
     """Validates a json schema against `Draft6Validator`"""
-
-    with open(schema_path, "r") as file:
-        schema = json.loads(file.read())
-
-    Draft6Validator.check_schema(schema)
-
-
-formatter = logging.Formatter("%(levelname)s - %(name)s -   %(message)s")
-
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.INFO)
-stream_handler.setFormatter(formatter)
+    Draft6Validator.check_schema(json.loads(schema_path.read_text(encoding='utf-8')))
 
 
 def get_custom_logger(name: str,
@@ -72,22 +68,6 @@ def get_custom_logger(name: str,
     logger.addHandler(stream_handler)
 
     return logger
-
-
-@docstring_formatter(**docstrings)
-def read_google_sheet(sheet_id: str, sheet_name: str, **kwargs) -> pd.DataFrame:
-    """A simple function to read a google sheet in a `pd.DataFrame`.
-
-    Works at 2022-09-29. See https://towardsdatascience.com/read-data-from-google-sheets-into-pandas-without-the-google-sheets-api-5c468536550
-    for more info.
-
-    Args:
-        sheet_id: {sheet_id}
-        sheet_name: {sheet_name}
-    """
-
-    url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
-    return pd.read_csv(url, **kwargs)
 
 
 def split_list(list_: list, n: int, pad: object = False) -> List[List[object]]:
@@ -127,12 +107,13 @@ def aligned_print(*args, **kwargs):
 
 def prefix_command_with_conda_env(command: str,
                                   env_name: str,
-                                  conda_install_dir: 'Path'):
+                                  conda_install_dir: Path):
+    """Prefixes a command with with conda env activation command usable in a subshell."""
     return f'source {conda_install_dir / "etc/profile.d/conda.sh"}; conda activate {env_name}; ' + command
 
 
 def lazy_property(func):
-    """Decorator. Makes property computation lazy."""
+    """Decorator. Makes property computation lazy by keeping a cache of the result."""
 
     private_attr = '_' + func.__name__
 
@@ -292,21 +273,7 @@ class LazyObject:
                 yield attr, getattr(self, attr)
 
 
-def inline_def(func, name, doc=None):
-    """Returns a function with a new name and docstring.
-
-    Args:
-        func: the function to rename
-        name: the new name
-        doc: the new docstring
-    """
-    func.__name__ = name
-    if doc is not None:
-        func.__doc__ = doc
-    return func
-
-
-def log_to_file(log_message: str, log_file: 'Path'):
+def log_to_file(log_message: str, log_file: Path):
     """Appends `log_message` to `log_file`"""
     with open(log_file, "a+") as tmp_file:
         tmp_file.write(log_message)

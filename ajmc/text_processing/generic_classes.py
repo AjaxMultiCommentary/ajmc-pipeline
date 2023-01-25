@@ -6,10 +6,11 @@ from typing import List, Optional, Type, Union
 
 import cv2
 
-from ajmc.commons import variables
+from ajmc.commons import variables as vs
 from ajmc.commons.docstrings import docstring_formatter, docstrings
+from ajmc.commons.file_management import get_ocr_gt_spreadsheet
 from ajmc.commons.image import draw_textcontainers
-from ajmc.commons.miscellaneous import get_custom_logger, lazy_init, lazy_property, LazyObject, read_google_sheet
+from ajmc.commons.miscellaneous import get_custom_logger, lazy_init, lazy_property, LazyObject
 from ajmc.olr.utils import get_olr_splits_page_ids
 
 logger = get_custom_logger(__name__)
@@ -54,11 +55,11 @@ class TextContainer:
 
     @lazy_property
     def children(self) -> LazyObject:
-        return LazyObject(compute_function=self._get_children, constrained_attrs=variables.CHILD_TYPES)
+        return LazyObject(compute_function=self._get_children, constrained_attrs=vs.CHILD_TYPES)
 
     @lazy_property
     def parents(self) -> LazyObject:
-        return LazyObject(compute_function=self._get_parent, constrained_attrs=variables.TEXTCONTAINER_TYPES)
+        return LazyObject(compute_function=self._get_parent, constrained_attrs=vs.TEXTCONTAINER_TYPES)
 
     @lazy_property
     def type(self) -> str:
@@ -78,22 +79,21 @@ class Commentary:
     def _get_parent(self, parent_type: str) -> Optional[Type['TextContainer']]:
         return None  # A commentary has no parents
 
-    def get_page(self, page_id: str) -> Optional['Page']:
+    def get_page(self, page_id: str) -> Optional[vs.PageType]:
         """A simple shortcut to get a page from its id."""
         return [p for p in self.children.pages if p.id == page_id][0]
 
     @lazy_property
-    def olr_groundtruth_pages(self) -> List['CanonicalPage']:
+    def olr_groundtruth_pages(self) -> List[vs.PageType]:
         """A list of `CanonicalPage` objects containing the groundtruth of the OLR."""
         page_ids = get_olr_splits_page_ids(self.id)
         return [p for p in self.children.pages if p.id in page_ids]
 
     @lazy_property
-    def ocr_groundtruth_pages(self) -> List['CanonicalPage']:
-        """A list of `CanonicalPage` objects containing the groundtruth of the OCR."""
-        ocr_gt = read_google_sheet(variables.SPREADSHEETS['ocr_gt'], 'ocr_gt')
-        page_ids = ocr_gt['page_id'][ocr_gt['commentary_id'] == self.id].tolist()
-        return [p for p in self.children.pages if p.id in page_ids]
+    def ocr_gt_page_ids(self) -> List[str]:
+        """A list of page ids of the OLR groundtruth pages."""
+        ocr_gt = get_ocr_gt_spreadsheet()
+        return ocr_gt['page_id'][ocr_gt['commentary_id'] == self.id].tolist()
 
     def export_ocr_gt_file_pairs(self,
                                  output_dir: Optional[Union[str, Path]] = None,
@@ -102,13 +102,13 @@ class Commentary:
 
         Args:
             output_dir: The directory to which the file pairs should be exported. If None, files are written to the
-            default output directory (`variables.get_comm_ocr_gt_pairs_dir`).
+            default output directory (`vs.get_comm_ocr_gt_pairs_dir`).
             unicode_format: The unicode format to which the text should be normalized. See
             https://docs.python.org/3/library/unicodedata.html#unicodedata.normalize for more information.
         """
 
         # Define output directory
-        output_dir = variables.get_comm_ocr_gt_pairs_dir(self.id) if output_dir is None else Path(output_dir)
+        output_dir = vs.get_comm_ocr_gt_pairs_dir(self.id) if output_dir is None else Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Iterate over groundtruth pages
@@ -122,7 +122,7 @@ class Commentary:
 class Page:
 
     def draw_textcontainers(self,
-                            tc_types: List[str] = variables.CHILD_TYPES,
+                            tc_types: List[str] = vs.CHILD_TYPES,
                             output_path: Optional[Union[str, Path]] = None) -> 'np.ndarray':
         draw = self.image.matrix.copy()
 

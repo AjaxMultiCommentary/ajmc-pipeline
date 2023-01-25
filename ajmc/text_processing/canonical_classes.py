@@ -1,3 +1,5 @@
+"""This module contains objects for the manipulation of canonical textcontainers."""
+
 import json
 from abc import abstractmethod
 from pathlib import Path
@@ -12,8 +14,6 @@ from ajmc.commons.geometry import get_bbox_from_points, Shape
 from ajmc.commons.image import AjmcImage
 from ajmc.commons.miscellaneous import get_custom_logger, lazy_property, LazyObject
 from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
-
-# import xmlformatter
 
 logger = get_custom_logger(__name__)
 
@@ -66,16 +66,18 @@ class CanonicalCommentary(Commentary, TextContainer):
 
         # Set its images
         commentary.images = [
-            AjmcImage(id=img['id'], path=image_dir / (img['id'] + vs.DEFAULT_IMG_EXTENSION), word_range=img['word_range'])
+            AjmcImage(id=img['id'], path=image_dir / (img['id'] + vs.DEFAULT_IMG_EXTENSION),
+                      word_range=img['word_range'])
             for img in can_json['textcontainers']['pages']]
 
         # Set its children
         commentary.children = LazyObject(
-            compute_function=lambda x: x,
-            constrained_attrs=vs.CHILD_TYPES,
-            **{tc_type: [get_tc_type_class(tc_type)(commentary=commentary, **tc)
-                         for tc in can_json['textcontainers'][tc_type]] if tc_type in can_json['textcontainers'] else []
-               for tc_type in vs.CHILD_TYPES})
+                compute_function=lambda x: x,
+                constrained_attrs=vs.CHILD_TYPES,
+                **{tc_type: [get_tc_type_class(tc_type)(commentary=commentary, **tc)
+                             for tc in can_json['textcontainers'][tc_type]] if tc_type in can_json[
+                    'textcontainers'] else []
+                   for tc_type in vs.CHILD_TYPES})
 
         return commentary
 
@@ -94,8 +96,7 @@ class CanonicalCommentary(Commentary, TextContainer):
                                    for tc_type in vs.CHILD_TYPES}}
 
         if output_path is None:
-            output_dir = vs.get_comm_canonical_dir(self.id)
-            output_path = output_dir / (self.info['ocr_run'] + '.json')
+            output_path = vs.get_comm_canonical_path(self.id, self.info['ocr_run'])
 
         output_path.write_text(json.dumps(data, indent=4, ensure_ascii=False), encoding='utf-8')
 
@@ -109,6 +110,12 @@ class CanonicalCommentary(Commentary, TextContainer):
 
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
         raise NotImplementedError('`CanonicalCommentary.children` must be set at __init__.')
+
+    @lazy_property
+    def ocr_groundtruth_pages(self) -> List['CanonicalPage']:
+        """A list of `CanonicalPage` objects containing the groundtruth of the OCR."""
+
+        return [p for p in self.children.pages if p.id in page_ids]
 
 
 class CanonicalTextContainer(TextContainer):

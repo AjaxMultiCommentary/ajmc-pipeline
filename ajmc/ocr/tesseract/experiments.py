@@ -46,7 +46,8 @@ def get_or_make_experiment_dir(xp_config: dict,
 
     # Get the required test datasets exist, else create it
     test_dataset_config = CONFIGS['datasets'][xp_config['test_dataset']]
-    test_dataset_dir = data_preparation.make_dataset(test_dataset_config)
+    test_dataset_dir = ocr_vars.get_dataset_dir(test_dataset_config['id'])
+    data_preparation.make_dataset(test_dataset_config, overwrite=overwrite)
 
     # Check if the required models exists, build if not
     for model_id in xp_config['models']:
