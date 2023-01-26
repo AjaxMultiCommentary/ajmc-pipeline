@@ -55,18 +55,18 @@ class CanonicalCommentary(Commentary, TextContainer):
             f"The provided `json_path` ({json_path}) is not compliant with ajmc's folder structure."
 
         logger.debug(f'Importing canonical commentary from {json_path}')
-        can_json = json.loads(json_path.read_text(encoding='utf-8'), encoding='utf-8')
+        can_json = json.loads(json_path.read_text(encoding='utf-8'))
 
         # Create the (empty) commentary and populate its info
         commentary = cls(id=can_json['metadata']['id'], children=None, images=None, info={**can_json['metadata']})
 
         # Automatically determinates paths
         commentary.info['base_dir'] = vs.get_comm_base_dir(commentary.id)
-        image_dir = vs.get_comm_img_dir(commentary.id)
+        img_dir = vs.get_comm_img_dir(commentary.id)
 
         # Set its images
         commentary.images = [
-            AjmcImage(id=img['id'], path=image_dir / (img['id'] + vs.DEFAULT_IMG_EXTENSION),
+            AjmcImage(id=img['id'], path=img_dir / (img['id'] + vs.DEFAULT_IMG_EXTENSION),
                       word_range=img['word_range'])
             for img in can_json['textcontainers']['pages']]
 

@@ -77,8 +77,8 @@ class AjmcImage:
 
         return AjmcImage(matrix=cropped)
 
-    def write(self, output_path: str):
-        cv2.imwrite(output_path, self.matrix)
+    def write(self, output_path: Path):
+        cv2.imwrite(str(output_path), self.matrix)
 
     def show(self):
         cv2.imshow('image', self.matrix)
@@ -88,7 +88,7 @@ class AjmcImage:
 
 def binarize(img_matrix: np.ndarray,
              inverted: bool = False):
-    """Binarizes a cv2 `image` using Otsu's method."""
+    """Binarizes an `img_matrix` using cv2 and Otsu's method."""
     binarization_type = (cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV) if inverted else (cv2.THRESH_OTSU | cv2.THRESH_BINARY)
     gray = cv2.cvtColor(img_matrix, cv2.COLOR_BGR2GRAY)
     return cv2.threshold(gray, 0, 255, type=binarization_type)[1]
@@ -164,7 +164,7 @@ def draw_box(box: variables.BoxType,
     return img_matrix
 
 
-def draw_textcontainers(img_matrix, output_path: Optional[Union[str, Path]] = None, *textcontainers):
+def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str, Path]] = None, *textcontainers):
     """Draws a list of `TextContainer`s on `img_matrix`."""
 
     # Get the set of textcontainer types

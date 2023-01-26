@@ -1,5 +1,5 @@
-import tests.sample_objects as so
 import ajmc.commons.arithmetic as ar
+import tests.sample_objects as so
 
 
 def test_compute_inter_overlap():

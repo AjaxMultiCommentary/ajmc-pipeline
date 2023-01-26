@@ -21,15 +21,19 @@ TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
 EXEC_ENV = platform.uname().node
 
 _DRIVE_BASE_DIR: Optional[Path] = None  # Keep this to be able to determine a custom path for the data
+_DRIVE_BASE_DIR = Path('/Users/sven/packages/ajmc/tests/data')
 
 
 def get_drive_base_dir() -> Path:
+    cluster_drive_dir = Path('/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/')
+    local_drive_dir = Path('/Users/sven/drive/_AJAX/AjaxMultiCommentary/')
+
     global _DRIVE_BASE_DIR
     if _DRIVE_BASE_DIR is None:
-        if EXEC_ENV == 'iccluster040':
-            return Path('/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/')
-        elif EXEC_ENV.startswith('Sven'):
-            return Path('/Users/sven/drive/_AJAX/AjaxMultiCommentary/')
+        if EXEC_ENV == 'iccluster040' or cluster_drive_dir.exists():
+            return cluster_drive_dir
+        elif EXEC_ENV.startswith('Sven') or local_drive_dir.exists():
+            return local_drive_dir
         else:
             return Path(input(
                     'WARNING: Unknown execution environment!\nPlease enter the drive base directory below (e.g. `/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/`):\n(Note: you can change this permanently by setting `DRIVE_BASE_DIR` in `ajmc/commons/variables.py` to a custom `pathlib.Path`.)'))

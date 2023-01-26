@@ -15,7 +15,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-from ajmc.commons import variables
+from ajmc.commons import variables as vs
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import are_bboxes_overlapping_with_threshold, is_bbox_within_bbox
 from ajmc.commons.miscellaneous import get_custom_logger
@@ -132,7 +132,7 @@ def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> i
     """
 
     try:
-        pattern = variables.CHARSETS[charset]
+        pattern = vs.CHARSETS[charset]
     except KeyError:
         pattern = re.compile(charset, re.UNICODE)
 
@@ -232,8 +232,8 @@ def bag_of_word_evaluation(gt_bag: List[str],
     return error_counts
 
 
-def simple_coordinates_based_evaluation(gt_words: List[Union['CanonicalWord','OcrWord']],
-                                        pred_words: List[Union['CanonicalWord','OcrWord']],
+def simple_coordinates_based_evaluation(gt_words: List[Union['CanonicalWord', 'OcrWord']],
+                                        pred_words: List[Union['CanonicalWord', 'OcrWord']],
                                         overlap_threshold: float = 0.8) -> float:
     """Computes edit distance between spacially overlapping words and returns the CER.
 
@@ -315,7 +315,7 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
                             {level:
                                  {count: 0 for count in ['total', 'evaluated', 'false']}
                              for level in ['words', 'chars'] + charsets}
-                        for region in ['global'] + ORDERED_OLR_REGION_TYPES}
+                        for region in ['global'] + vs.ORDERED_OLR_REGION_TYPES}
 
     if not editops_record:
         editops_record = {}
@@ -369,7 +369,7 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
                 break
 
     # Compute error rates
-    for region in ['global'] + ORDERED_OLR_REGION_TYPES:
+    for region in ['global'] + vs.ORDERED_OLR_REGION_TYPES:
         for level in ['words', 'chars'] + charsets:
             error_counts[region][level]['cr'] = 1 - safe_divide(error_counts[region][level]['false'],
                                                                 error_counts[region][level]['evaluated'])
@@ -393,7 +393,7 @@ def commentary_evaluation(commentary: 'OcrCommentary',
     bow_error_counts, coord_error_counts, editops = None, None, None
     soups = []
 
-    for gt_page in tqdm(commentary.ocr_groundtruth_pages, desc='Evaluating commentary pages'):
+    for gt_page in tqdm(commentary.ocr_gt_pages, desc='Evaluating commentary pages'):
         pred_page = [p for p in commentary.children.pages if p.id == gt_page.id][0]
 
         bow_error_counts = bag_of_word_evaluation(gt_bag=[w.text for w in gt_page.children.words],
@@ -414,7 +414,7 @@ def commentary_evaluation(commentary: 'OcrCommentary',
         os.makedirs(output_dir, exist_ok=True)
 
         for i, soup in enumerate(soups):
-            with open(os.path.join(output_dir, commentary.ocr_groundtruth_pages[i].id + ".html"), "w",
+            with open(os.path.join(output_dir, commentary.ocr_gt_pages[i].id + ".html"), "w",
                       encoding="utf-8") as html_file:
                 html_file.write(str(soup))
 
@@ -487,7 +487,7 @@ def line_by_line_evaluation(gt_dir: Path,
     # Write files
     if write_to_file:
         eval_dir = ocr_dir.parent / 'evaluation'
-        os.makedirs(eval_dir, exist_ok=True)
+        eval_dir.mkdir(parents=True, exist_ok=True)
 
         editops_record = {k: v for k, v in sorted(editops_record.items(), key=lambda item: item[1], reverse=True)}
         write_editops_record(editops_record=editops_record, output_dir=eval_dir)

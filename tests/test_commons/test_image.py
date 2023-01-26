@@ -20,6 +20,6 @@ def test_remove_artifacts_from_contours(art_size):
     assert len(contours_) <= len(contours)
 
 
-def test_image():
+def test_ajmcimage():
     assert isinstance(so.sample_img.matrix, np.ndarray)
     assert isinstance(so.sample_img.crop(so.sample_bboxes['base']), img.AjmcImage)

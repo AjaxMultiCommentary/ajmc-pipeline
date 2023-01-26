@@ -196,7 +196,8 @@ def check_via_spreadsheet_conformity(comm_id: str,
     """
 
     via_project = json.loads(vs.get_comm_via_path(comm_id).read_text(encoding='utf-8'))
-    sheet_page_ids = get_olr_gt_spreasheet()[comm_id].tolist()
+    sheet = get_olr_gt_spreadsheet()
+    sheet_pages = set(sheet['page_id'][sheet['commentary_id'] == comm_id])
 
     via_full_gt_pages = []  # This contains the pages which are entirely annotated
     via_comm_gt_pages = []  # This contains the pages where only commentary sections are annotated
@@ -213,7 +214,6 @@ def check_via_spreadsheet_conformity(comm_id: str,
             via_comm_gt_pages.append(v['filename'].split('.')[0])
 
     via_pages = set(via_comm_gt_pages) if check_comm_only else set(via_full_gt_pages)
-    sheet_pages = set(sheet_page_ids)
 
     diff_sheet_via = sheet_pages.difference(via_pages)
     diff_via_sheet = via_pages.difference(sheet_pages)
@@ -227,18 +227,20 @@ def check_via_spreadsheet_conformity(comm_id: str,
         but not in sheet : \n{diff_via_sheet}\n""")
 
     if not diff_sheet_via and not diff_via_sheet:
-        print("""Checking passed : The set of via pages equates the set of sheet pages""")
+        print("""OLR checking passed : pages in via and sheet are identical.""")
 
     return diff_sheet_via, diff_via_sheet
 
 
 def check_ocr_gt_spreadsheet_conformity(comm_id: str):
     """Checks that a commentary's ocr gt directory contains the same pages as the spreadsheet."""
-    spreadsheet_page_ids = set(get_olr_gt_spreasheet()[comm_id].tolist())
-    drive_page_ids = set([p.stem for p in vs.get_comm_ocr_gt_dir(comm_id).glob('*.txt')])
 
-    diff_drive_sheet = drive_page_ids.difference(spreadsheet_page_ids)
-    diff_sheet_drive = spreadsheet_page_ids.difference(drive_page_ids)
+    sheet = get_ocr_gt_spreadsheet()
+    sheet_page_ids = set(sheet['page_id'][sheet['commentary_id'] == comm_id])
+    drive_page_ids = set([p.stem for p in vs.get_comm_ocr_gt_dir(comm_id).glob('*.html')])
+
+    diff_drive_sheet = drive_page_ids.difference(sheet_page_ids)
+    diff_sheet_drive = sheet_page_ids.difference(drive_page_ids)
 
     if diff_drive_sheet:
         print(f"""The following pages are in annotated in drive 
@@ -249,7 +251,7 @@ def check_ocr_gt_spreadsheet_conformity(comm_id: str):
         but not in drive : \n{diff_sheet_drive}\n""")
 
     if not diff_drive_sheet and not diff_sheet_drive:
-        print("""Checking passed : The set of drive pages equates the set of sheet pages""")
+        print("""OCR checking passed : Pages in drive and sheet are identical.""")
 
 
 def data_sanity_check():
@@ -271,9 +273,11 @@ def data_sanity_check():
         logger.warning(f"Commentaries ids in the code but not in the drive: {code_comm_ids.difference(drive_comm_ids)}")
 
     # Check that all the commentaries have the right folder structure
-    for comm_dir in walk_dirs(vs.COMMS_DATA_DIR):
+    for comm_dir in sorted(walk_dirs(vs.COMMS_DATA_DIR)):
 
         comm_id = comm_dir.name
+
+        print(f"\n\nChecking commentary {comm_id}...".center(40, '-'))
 
         if not vs.get_comm_img_dir(comm_id).exists():
             logger.warning(f"Commentary {comm_id} does not have an image folder.")
@@ -315,7 +319,7 @@ def read_google_sheet(sheet_id: str, sheet_name: str, **kwargs) -> pd.DataFrame:
 _OLR_GT_SPREADSHEET = None
 
 
-def get_olr_gt_spreasheet() -> pd.DataFrame:
+def get_olr_gt_spreadsheet() -> pd.DataFrame:
     """Returns the OLR spreadsheet as a `pd.DataFrame`."""
 
     global _OLR_GT_SPREADSHEET
@@ -346,6 +350,3 @@ def get_metadata_spreadsheet() -> pd.DataFrame:
     if _METADATA_SPREADSHEET is None:
         _METADATA_SPREADSHEET = read_google_sheet(vs.SPREADSHEETS['metadata'], 'metadata')
     return _METADATA_SPREADSHEET
-
-
-data_sanity_check()

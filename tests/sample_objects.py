@@ -1,10 +1,9 @@
 """This module contains sample objects which are sent to `sample_objects.json` and used as fixtures elsewhere."""
-from pathlib import Path
 
 from ajmc.commons import geometry, image, variables as vs
-from ajmc.nlp.token_classification.evaluation import seqeval_evaluation
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from ajmc.text_processing.ocr_classes import OcrCommentary
+
 
 # Arithmetic
 sample_intervals = {'base': (1, 10),
@@ -29,7 +28,7 @@ sample_points = {'base': [(0, 0), (2, 0), (1, 1), (2, 2), (0, 2)],
 sample_bboxes = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.items()}
 
 # Commentaries, OCR, path and via
-_DRIVE_BASE_DIR = Path('data')
+
 sample_base_dir = vs.COMMS_DATA_DIR
 
 sample_commentary_id = 'cu31924087948174'
@@ -54,7 +53,7 @@ sample_ocrcommentary = OcrCommentary(id=sample_commentary_id,
                                      ocr_run=sample_ocr_run,
                                      ocr_gt_dir=sample_ocr_gt_dir)
 
-sample_cancommentary = sample_ocrcommentary.to_canonical()
+sample_cancommentary = sample_ocrcommentary.to_canonical(include_ocr_gt=False)
 
 sample_canonical_path = vs.get_comm_canonical_path(sample_commentary_id, sample_ocr_run)
 sample_cancommentary.to_json(sample_canonical_path)
@@ -68,19 +67,22 @@ sample_img_path = sample_img_dir / (sample_page_id + '.png')
 sample_img = image.AjmcImage(id=sample_page_id, path=sample_img_path)
 
 # NLP, NER...
-from transformers import DistilBertTokenizerFast
+# from transformers import DistilBertTokenizerFast
+# from ajmc.nlp.token_classification.evaluation import seqeval_evaluation
 
 sample_ner_labels_pred = ['O', 'B-PERS', 'I-PERS', 'B-LOC', 'O']
 sample_ner_labels_gt = ['O', 'B-PERS', 'I-PERS', 'B-LOC', 'I-LOC']
 sample_labels_to_ids = {'O': 0, 'B-PERS': 1, 'I-PERS': 2, 'B-LOC': 3, 'I-LOC': 4}
-sample_seqeval_output = seqeval_evaluation([sample_ner_labels_pred],
-                                           [sample_ner_labels_gt])
 
-sample_model_name_or_path = 'distilbert-base-uncased'
-sample_tokenizer = DistilBertTokenizerFast.from_pretrained(sample_model_name_or_path)
-
-sample_encodings = sample_tokenizer(text=[w.text for w in sample_page.children.words],
-                                    truncation=True,
-                                    padding=True,
-                                    return_overflowing_tokens=True,
-                                    is_split_into_words=True)
+# Uncomment this to work with transformers
+# sample_seqeval_output = seqeval_evaluation([sample_ner_labels_pred],
+#                                            [sample_ner_labels_gt])
+#
+# sample_model_name_or_path = 'distilbert-base-uncased'
+# sample_tokenizer = DistilBertTokenizerFast.from_pretrained(sample_model_name_or_path)
+#
+# sample_encodings = sample_tokenizer(text=[w.text for w in sample_page.children.words],
+#                                     truncation=True,
+#                                     padding=True,
+#                                     return_overflowing_tokens=True,
+#                                     is_split_into_words=True)

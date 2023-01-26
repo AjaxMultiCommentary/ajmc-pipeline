@@ -14,7 +14,7 @@ commentary_from_paths = ocr_classes.OcrCommentary(id=so.sample_commentary_id,
                                                   img_dir=so.sample_img_dir,
                                                   ocr_gt_dir=so.sample_ocr_gt_dir)
 
-commentary_from_structure = ocr_classes.OcrCommentary.from_ajmc_data(ocr_dir=so.sample_ocr_run_outputs_dir)
+commentary_from_structure = ocr_classes.OcrCommentary.from_ajmc_data(so.sample_commentary_id, so.sample_ocr_run)
 
 
 def test_ocrcommentary():
@@ -28,11 +28,10 @@ def test_ocrcommentary():
 
         # test OcrCommentary.images
         assert all([isinstance(i, image.AjmcImage) for i in comm.images])
-        
 
         # Test OcrCommentary.groundtruth_pages
-        assert all([isinstance(p, ocr_classes.OcrPage) for p in comm.ocr_groundtruth_pages])
-        assert len(comm.ocr_groundtruth_pages) == len(
+        assert all([isinstance(p, ocr_classes.OcrPage) for p in comm.ocr_gt_pages])
+        assert len(comm.ocr_gt_pages) == len(
                 [f for f in os.listdir(so.sample_ocr_gt_dir) if comm.id in f])
 
         # See test_page() for regions, lines, words
@@ -70,6 +69,8 @@ def test_ocrcommentary_to_canonical():
 
         ocr_p.reset()
 
+
+# test_ocrcommentary_to_canonical()
 
 def test_ocrpage():
     page = ocr_classes.OcrPage(ocr_path=so.sample_ocr_page_path, page_id=so.sample_page_id,

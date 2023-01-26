@@ -6,10 +6,8 @@ from typing import List, Optional, Type, Union
 
 import cv2
 
-from ajmc.commons import variables as vs
+from ajmc.commons import variables as vs, image as ajmc_img
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.file_management import get_ocr_gt_spreadsheet
-from ajmc.commons.image import draw_textcontainers
 from ajmc.commons.miscellaneous import get_custom_logger, lazy_init, lazy_property, LazyObject
 from ajmc.olr.utils import get_olr_splits_page_ids
 
@@ -89,12 +87,6 @@ class Commentary:
         page_ids = get_olr_splits_page_ids(self.id)
         return [p for p in self.children.pages if p.id in page_ids]
 
-    @lazy_property
-    def ocr_gt_page_ids(self) -> List[str]:
-        """A list of page ids of the OLR groundtruth pages."""
-        ocr_gt = get_ocr_gt_spreadsheet()
-        return ocr_gt['page_id'][ocr_gt['commentary_id'] == self.id].tolist()
-
     def export_ocr_gt_file_pairs(self,
                                  output_dir: Optional[Union[str, Path]] = None,
                                  unicode_format: str = 'NFC'):
@@ -114,7 +106,7 @@ class Commentary:
         # Iterate over groundtruth pages
         for page in self.ocr_groundtruth_pages:
             for i, line in enumerate(page.children.lines):
-                line.image.write(str(output_dir / f'{page.id}_{i}.png'))
+                line.image.write(output_dir / f'{page.id}_{i}.png')
                 (output_dir / f'{page.id}_{i}.gt.txt').write_text(unicodedata.normalize(unicode_format, line.text),
                                                                   encoding='utf-8')
 
@@ -127,7 +119,7 @@ class Page:
         draw = self.image.matrix.copy()
 
         for type in tc_types:
-            draw = draw_textcontainers(draw, *getattr(self.children, type))
+            draw = ajmc_img.draw_textcontainers(draw, None, *getattr(self.children, type))
 
         if output_path is not None:
             cv2.imwrite(str(output_path), draw)

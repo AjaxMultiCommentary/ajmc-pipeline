@@ -37,13 +37,13 @@ def test_textcontainer(tc):
     assert isinstance(tc.text, str)
 
 
-
 @pytest.mark.parametrize('commentary', [so.sample_cancommentary,
-                                so.sample_cancommentary_from_json])
+                                        so.sample_cancommentary_from_json])
 def test_canonical_commentary(commentary):
     # test CanonicalCommentary.images
     assert all([isinstance(i, cc.AjmcImage) for i in commentary.images])
     assert len(commentary.images) == len(commentary.children.pages)
+
 
 @pytest.mark.parametrize('tc', [so.sample_cancommentary.children.pages[0],
                                 so.sample_cancommentary.children.regions[0],
@@ -54,19 +54,15 @@ def test_canonical_commentary(commentary):
                                 so.sample_cancommentary_from_json.children.lines[0],
                                 so.sample_cancommentary_from_json.children.words[0]])
 def test_canonical_textcontainer(tc):
-    assert tc in getattr(tc.parents.commentary.children, tc.type+'s')
+    assert tc in getattr(tc.parents.commentary.children, tc.type + 's')
 
     if tc.parents.page is not None:
-        assert tc in getattr(tc.parents.page.children, tc.type+'s')
+        assert tc in getattr(tc.parents.page.children, tc.type + 's')
 
     if tc.parents.region is not None:
-        assert tc in getattr(tc.parents.region.children, tc.type+'s')
+        assert tc in getattr(tc.parents.region.children, tc.type + 's')
 
     if tc.parents.line is not None:
-        assert tc in getattr(tc.parents.line.children, tc.type+'s')
+        assert tc in getattr(tc.parents.line.children, tc.type + 's')
 
     assert isinstance(tc.bbox, Shape)
-
-
-
-

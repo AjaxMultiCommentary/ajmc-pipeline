@@ -2,7 +2,7 @@ from typing import List, Optional, Dict
 
 from ajmc.commons import variables
 from ajmc.commons.arithmetic import compute_interval_overlap
-from ajmc.commons.file_management import get_olr_gt_spreasheet
+from ajmc.commons.file_management import get_olr_gt_spreadsheet
 
 
 def get_page_region_dicts_from_via(page_id: str, via_project: dict) -> List[dict]:
@@ -106,7 +106,7 @@ def get_olr_splits_page_ids(commentary_id: 'OcrCommentary',
                             splits: Optional[List[str]] = None) -> List[str]:
     """Gets the data from splits on the olr_gt sheet."""
 
-    olr_gt = get_olr_gt_spreasheet()
+    olr_gt = get_olr_gt_spreadsheet()
 
     if splits is not None:
         filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in

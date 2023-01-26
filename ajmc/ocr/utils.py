@@ -123,7 +123,7 @@ def get_kraken_command(commentary_id: str, model_path: Union[str, Path]) -> str:
 
 
 @docstring_formatter(**docstrings)
-def guess_ocr_format(ocr_path: str) -> str:
+def guess_ocr_format(ocr_path: Path) -> str:
     """Guesses the ocr-format of a file.
 
     Args:
@@ -133,11 +133,11 @@ def guess_ocr_format(ocr_path: str) -> str:
         The ocr-format of the file, either 'pagexml', 'krakenhocr' or 'tesshocr'.
     """
 
-    if ocr_path[-3:] == 'xml':
+    if ocr_path.suffix.endswith('xml'):
         return 'pagexml'
-    elif ocr_path[-4:] == 'html':
+    elif ocr_path.suffix == '.html':
         return 'krakenhocr'
-    elif ocr_path[-4:] == 'hocr':
+    elif ocr_path.suffix == '.hocr':
         return 'tesshocr'
     else:
         raise NotImplementedError("""The format could not be identified. It looks like the format is neither 

@@ -1,4 +1,5 @@
 import numpy as np
+
 import ajmc.commons.geometry as geo
 import tests.sample_objects as so
 

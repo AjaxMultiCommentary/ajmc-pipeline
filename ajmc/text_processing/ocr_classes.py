@@ -5,7 +5,6 @@ confidence in your changes.
 """
 
 import json
-import os
 import re
 from abc import abstractmethod
 from pathlib import Path
@@ -20,7 +19,7 @@ from ajmc.commons import variables as vs
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import adjust_bbox_to_included_contours, get_bbox_from_points, is_bbox_within_bbox, \
     is_bbox_within_bbox_with_threshold, Shape
-from ajmc.commons.image import AjmcImage, draw_textcontainers
+from ajmc.commons.image import AjmcImage
 from ajmc.commons.miscellaneous import get_custom_logger, lazy_property, LazyObject
 from ajmc.ocr.utils import guess_ocr_format
 from ajmc.olr.utils import get_page_region_dicts_from_via, sort_to_reading_order
@@ -62,8 +61,8 @@ class OcrCommentary(Commentary, TextContainer):
             ocr_gt_dir: {groundtruth_dir}
             ocr_run: {ocr_run}
         """
-        super().__init__(id=id, ocr_dir=ocr_dir, base_dir=base_dir, via_path=via_path, image_dir=img_dir,
-                         groundtruth_dir=ocr_gt_dir, ocr_run=ocr_run, **kwargs)
+        super().__init__(id=id, ocr_dir=ocr_dir, base_dir=base_dir, via_path=via_path, img_dir=img_dir,
+                         ocr_gt_dir=ocr_gt_dir, ocr_run=ocr_run, **kwargs)
 
     @classmethod
     @docstring_formatter(**docstrings)
@@ -93,7 +92,7 @@ class OcrCommentary(Commentary, TextContainer):
                    ocr_gt_dir=vs.get_comm_ocr_gt_dir(id),
                    ocr_run=ocr_run)
 
-    def to_canonical(self, include_ocr_groundtruth: bool = True) -> CanonicalCommentary:
+    def to_canonical(self, include_ocr_gt: bool = True) -> CanonicalCommentary:
         """Export the commentary to a `CanonicalCommentary` object.
 
         Note:
@@ -116,13 +115,13 @@ class OcrCommentary(Commentary, TextContainer):
         # We now populate the children and images
         children = {k: [] for k in vs.CHILD_TYPES}
         w_count = 0
-        if include_ocr_groundtruth:
+        if include_ocr_gt:
             gt_ids = [p.id for p in self.ocr_gt_pages]
 
         for i, p in enumerate(tqdm(self.children.pages, desc=f'Canonizing {can.id}')):
 
-            if include_ocr_groundtruth and p.id in gt_ids:
-                p = self.ocr_groundtruth_pages[gt_ids.index(p.id)]
+            if include_ocr_gt and p.id in gt_ids:
+                p = [p_ for p_ in self.ocr_gt_pages if p_.id == p.id][0]
 
             p.optimise()
             p_start = w_count
@@ -144,7 +143,7 @@ class OcrCommentary(Commentary, TextContainer):
             children['pages'].append(CanonicalPage(id=p.id, word_range=(p_start, w_count - 1), commentary=can))
 
             # Adding images
-            can.images.append(AjmcImage(id=p.id, path=Path(p.image_path), word_range=(p_start, w_count - 1)))
+            can.images.append(AjmcImage(id=p.id, path=Path(p.img_path), word_range=(p_start, w_count - 1)))
 
             # Adding entities
             for ent in p.children.entities:
@@ -209,13 +208,10 @@ class OcrCommentary(Commentary, TextContainer):
             return [tc for p in self.children.pages for tc in getattr(p.children, children_type)]
 
     @lazy_property
-    def ocr_groundtruth_pages(self) -> Union[List['OcrPage'], list]:
+    def ocr_gt_pages(self) -> Union[List['OcrPage'], list]:
         """The commentary's pages which have a groundtruth file in `self.paths['groundtruth']`."""
-
-        pages = [OcrPage(ocr_path=p, commentary=self) for p in self.ocr_gt_dir.glob('*.html')]
-        assert self.ocr_gt_page_ids() == [p.id for p in pages], 'OCR ground-truth in  pages do not match the OCR pages'
-
-        return sorted(pages, key=lambda x: x.id)
+        return sorted([OcrPage.from_ajmc_data(p, commentary=self) for p in self.ocr_gt_dir.glob('*.html')],
+                      key=lambda x: x.id)
 
     @lazy_property
     def via_project(self) -> dict:
@@ -232,14 +228,14 @@ class OcrPage(Page, TextContainer):
 
     def __init__(self, ocr_path: Path, page_id: Optional[str] = None, img_path: Optional[Path] = None,
                  commentary: Optional[OcrCommentary] = None, **kwargs):
-        super().__init__(ocr_path=ocr_path, id=page_id, image_path=img_path, commentary=commentary, **kwargs)
+        super().__init__(ocr_path=ocr_path, id=page_id, img_path=img_path, commentary=commentary, **kwargs)
 
     @classmethod
     def from_ajmc_data(cls, ocr_path: Path, commentary: OcrCommentary, **kwargs):
         """Initialises an OcrPage from an AJMC data file."""
         return cls(ocr_path=ocr_path,
                    page_id=ocr_path.stem,
-                   img_path=commentary.image_dir / f'{ocr_path.stem}{vs.DEFAULT_IMG_EXTENSION}',
+                   img_path=commentary.img_dir / f'{ocr_path.stem}{vs.DEFAULT_IMG_EXTENSION}',
                    commentary=commentary, **kwargs)
 
     def _get_children(self, children_type):
@@ -335,7 +331,7 @@ class OcrPage(Page, TextContainer):
         delattr(self, 'image')
         delattr(self, 'text')
 
-    def optimise(self, debug_dir: Optional[str] = None):
+    def optimise(self, debug_dir: Optional[Path] = None):
         """Optimises coordinates and reading order.
 
         Args:
@@ -349,8 +345,7 @@ class OcrPage(Page, TextContainer):
         """
 
         if debug_dir is not None:
-            _ = draw_textcontainers(self.image.matrix.copy(), self,
-                                    os.path.join(debug_dir, self.id + '_raw.png'))
+            _ = self.draw_textcontainers(output_path=debug_dir / f'{self.id}_raw.png')
 
         logger.warning("You are optimising a page, bboxes and children are going to be changed")
         self.reset()
@@ -419,12 +414,11 @@ class OcrPage(Page, TextContainer):
         self.children.words = [w for l in self.children.lines for w in l.children.words]
 
         if debug_dir:
-            _ = draw_textcontainers(self.image.matrix.copy(), self,
-                                    os.path.join(debug_dir, self.id + '_raw.png'))
+            _ = self.draw_textcontainers(output_path=debug_dir / f'{self.id}_optimised.png')
 
     @lazy_property
     def image(self) -> AjmcImage:
-        return AjmcImage(id=self.id, path=Path(self.image_path))
+        return AjmcImage(id=self.id, path=self.img_path)
 
     @lazy_property
     def markup(self) -> bs4.BeautifulSoup:
