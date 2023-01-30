@@ -128,6 +128,7 @@ More generally, pipeline-like functions should be avoided as much as possible. S
 def run_outputs_evaluation_and_convert_to_table(outputs_file, some_output_related_parameter, output_path, table_styling):
     # Do something
     # ...
+    return 
 ```
 is terrible in terms of flexibility and centrality. It does allow you to run your evaluation (or whatever you are doing) without having your outputs as files and `some_output_related_parameter`. In future usages however, you might not have your outputs it the same format, maybe even not as files, and maybe you won't need `table_styling` anymore. Which is a perfect transition to the next point.
 
@@ -150,7 +151,7 @@ As they constitute the backend of a dynamic platform, `ajmc`'s modules should be
 ✅ This is good practice:
 
 ```python
-class Image:
+class AjmcImage:
     def __init__(self, path_to_file:str):
         self.path = path_to_file
 
@@ -161,7 +162,7 @@ class Image:
 
 ❌ This should be avoided:
 ```python
-class Image:
+class AjmcImage:
     def __init__(self, path_to_file:str):
         self.path = path_to_file
         self.matrix = cv2.imread(self.path)

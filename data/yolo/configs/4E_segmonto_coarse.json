@@ -1,0 +1,192 @@
+{
+  "batch_size": 16,
+  "data": {
+    "eval": [
+      {
+        "id": "annalsoftacitusp00taci",
+        "run": "28o09e_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "pvergiliusmaroa00virggoog",
+        "run": "28o09d_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "thukydides02thuc",
+        "run": "28o09a_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "Colonna1975",
+        "run": "28qlZa_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "DeRomilly1976",
+        "run": "28q0aU_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "Ferrari1974",
+        "run": "28r0zj_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "Garvie1998",
+        "run": "28r0KM_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "Kamerbeek1953",
+        "run": "28qloZ_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "Paduano1982",
+        "run": "28qlSF_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "Untersteiner1934",
+        "run": "28r0XU_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "Wecklein1894",
+        "run": "28r1pY_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "bsb10234118",
+        "run": "28qloR_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "cu31924087948174",
+        "run": "28qmab_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "sophoclesplaysa05campgoog",
+        "run": "28qm8n_tess_base",
+        "split": "test"
+      },
+      {
+        "id": "sophokle1v3soph",
+        "run": "28r0iY_tess_base",
+        "split": "test"
+      }
+    ],
+    "train": [
+      {
+        "id": "annalsoftacitusp00taci",
+        "run": "28o09e_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "pvergiliusmaroa00virggoog",
+        "run": "28o09d_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "thukydides02thuc",
+        "run": "28o09a_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "Colonna1975",
+        "run": "28qlZa_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "DeRomilly1976",
+        "run": "28q0aU_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "Ferrari1974",
+        "run": "28r0zj_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "Garvie1998",
+        "run": "28r0KM_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "Kamerbeek1953",
+        "run": "28qloZ_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "Paduano1982",
+        "run": "28qlSF_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "Untersteiner1934",
+        "run": "28r0XU_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "Wecklein1894",
+        "run": "28r1pY_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "bsb10234118",
+        "run": "28qloR_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "cu31924087948174",
+        "run": "28qmab_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "sophoclesplaysa05campgoog",
+        "run": "28qm8n_tess_base",
+        "split": "train"
+      },
+      {
+        "id": "sophokle1v3soph",
+        "run": "28r0iY_tess_base",
+        "split": "train"
+      }
+    ]
+  },
+  "device_name": "cuda",
+  "epochs": 200,
+  "excluded_region_types": [
+    "line_number_commentary",
+    "handwritten_marginalia",
+    "undefined",
+    "line_region"
+  ],
+  "image_size": 1280,
+  "model_name_or_path": "yolov5m",
+  "region_types_to_labels": {
+    "commentary": "MainZone",
+    "primary_text": "MainZone",
+    "preface": "MainZone",
+    "translation": "MainZone",
+    "introduction": "MainZone",
+    "line_number_text": "NumberingZone",
+    "line_number_commentary": "",
+    "page_number": "NumberingZone",
+    "appendix": "MainZone",
+    "app_crit": "MarginTextZone",
+    "bibliography": "MainZone",
+    "footnote": "MarginTextZone",
+    "index_siglorum": "MainZone",
+    "running_header": "RunningTitleZone",
+    "table_of_contents": "MainZone",
+    "title": "TitlePageZone",
+    "printed_marginalia": "MarginTextZone",
+    "handwritten_marginalia": "MarginTextZone",
+    "other": "CustomZone",
+    "undefined": "CustomZone",
+    "line_region": "CustomZone"
+  }
+}

@@ -2,7 +2,7 @@ from typing import List, Optional, Dict
 
 from ajmc.commons import variables
 from ajmc.commons.arithmetic import compute_interval_overlap
-from ajmc.commons.miscellaneous import read_google_sheet
+from ajmc.commons.file_management import get_olr_gt_spreadsheet
 
 
 def get_page_region_dicts_from_via(page_id: str, via_project: dict) -> List[dict]:
@@ -81,8 +81,8 @@ def get_olr_region_counts(commentaries: List['CanonicalCommentary'],
         fine_to_coarse: A mapping from fine regions to coarse.
     """
     # Initialize the counts
-    region_types_counts = {(fine_to_coarse[rt] if fine_to_coarse else rt): 0 for rt in variables.ROIS+['pages', 'total']}
-
+    region_types_counts = {(fine_to_coarse[rt] if fine_to_coarse else rt): 0 for rt in
+                           variables.ROIS + ['pages', 'total']}
 
     for commentary in commentaries:
         # ⚠️ Get the list of groundtruth pages ONLY (remember that `commentary` zones are annotated on all pages !)
@@ -96,9 +96,8 @@ def get_olr_region_counts(commentaries: List['CanonicalCommentary'],
             for r in p.children.regions:
                 if r.info['region_type'] != 'line_region':
                     region_types_counts['total'] += 1
-                    region_types_counts[fine_to_coarse[r.info['region_type']] if fine_to_coarse else r.info['region_type']] += 1
-
-
+                    region_types_counts[
+                        fine_to_coarse[r.info['region_type']] if fine_to_coarse else r.info['region_type']] += 1
 
     return region_types_counts
 
@@ -107,7 +106,8 @@ def get_olr_splits_page_ids(commentary_id: 'OcrCommentary',
                             splits: Optional[List[str]] = None) -> List[str]:
     """Gets the data from splits on the olr_gt sheet."""
 
-    olr_gt = read_google_sheet(variables.SPREADSHEETS['olr_gt'], 'olr_gt')
+    olr_gt = get_olr_gt_spreadsheet()
+
     if splits is not None:
         filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
                    range(len(olr_gt['page_id']))]

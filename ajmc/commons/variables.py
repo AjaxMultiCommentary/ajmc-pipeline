@@ -1,61 +1,178 @@
+import platform
 import re
-from typing import Tuple
+from pathlib import Path
+from typing import Tuple, Optional, Union, Type
 
 # ======================================================================================================================
 #                                                 TYPES
 # ======================================================================================================================
 BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
+PageType = Union[Type['Page'], Type['CanonicalPage'], Type['OcrPage']]
 
 # ======================================================================================================================
 #                                                 PATHS
 # ======================================================================================================================
 
-# Todo change paths
-PATHS = {
-    'base_dir': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
-    'drive_base_dir': '/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data',
-    'cluster_base_dir': '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data',
-    'schema': 'data/templates/page.schema.json',
-    'groundtruth': 'ocr/groundtruth/evaluation',
-    'png': 'images/png',
-    'via_path': 'olr/via_project.json',
-    'json': 'canonical',
-    'xmi': 'ner/annotation',
-    'typesystem': 'data/templates/TypeSystem.xml',
-    'olr_initiation': 'olr/annotation/project_initiation',
-    'ocr': 'ocr/runs',
-    'canonical': 'canonical/v2',
-    'annotations': 'ner/entities',
-    'ajmc_ne_corpus': '/Users/sven/drive/_AJAX/AjaxMultiCommentary/data/AjMC-NE-corpus'
-}
+# PACKAGE-RELATIVE PATHS
+SCHEMA_PATH = Path('ajmc/data/templates/page.schema.json')
+TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
+
+# AJMC DATA DIR AND STRUCTURE
+EXEC_ENV = platform.uname().node
+
+_DRIVE_BASE_DIR: Optional[Path] = None  # Keep this to be able to determine a custom path for the data
+
+
+def get_drive_base_dir() -> Path:
+    cluster_drive_dir = Path('/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/')
+    local_drive_dir = Path('/Users/sven/drive/_AJAX/AjaxMultiCommentary/')
+
+    global _DRIVE_BASE_DIR
+    if _DRIVE_BASE_DIR is None:
+        if EXEC_ENV == 'iccluster040' or cluster_drive_dir.exists():
+            return cluster_drive_dir
+        elif EXEC_ENV.startswith('Sven') or local_drive_dir.exists():
+            return local_drive_dir
+        else:
+            return Path(input(
+                    'WARNING: Unknown execution environment!\nPlease enter the drive base directory below (e.g. `/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/`):\n(Note: you can change this permanently by setting `DRIVE_BASE_DIR` in `ajmc/commons/variables.py` to a custom `pathlib.Path`.)'))
+
+    else:
+        return _DRIVE_BASE_DIR
+
+
+DRIVE_BASE_DIR = get_drive_base_dir()
+DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
+COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries/commentaries_data'
+NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus'
+
+# RELATIVE PATHS
+COMM_IMG_REL_DIR = Path('images/png')
+COMM_OCR_RUNS_REL_DIR = Path('ocr/runs')
+COMM_OCR_GT_REL_DIR = Path('ocr/groundtruth')
+COMM_OCR_GT_PAIRS_REL_DIR = Path('ocr/gt_file_pairs')
+COMM_VIA_REL_PATH = Path('olr/via_project.json')
+COMM_XMI_REL_DIR = Path('ner/annotation')
+COMM_CANONICAL_REL_DIR = Path('canonical/v2')
+COMM_CANONICAL_V1_REL_DIR = Path('canonical')
+COMM_SECTIONS_REL_PATH = Path('sections.json')
+
+
+def get_comm_base_dir(comm_id: str) -> Path:
+    return COMMS_DATA_DIR / comm_id
+
+
+def get_comm_ocr_gt_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_OCR_GT_REL_DIR
+
+
+def get_comm_img_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_IMG_REL_DIR
+
+
+def get_comm_via_path(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_VIA_REL_PATH
+
+
+def get_comm_xmi_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_XMI_REL_DIR
+
+
+def get_comm_ocr_runs_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_OCR_RUNS_REL_DIR
+
+
+def get_comm_ocr_outputs_dir(comm_id: str, run_id: str) -> Path:
+    return get_comm_ocr_runs_dir(comm_id) / run_id / 'outputs'
+
+
+def get_comm_ocr_gt_pairs_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_OCR_GT_PAIRS_REL_DIR
+
+
+def get_comm_canonical_v1_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_CANONICAL_V1_REL_DIR
+
+
+def get_comm_canonical_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_CANONICAL_REL_DIR
+
+
+def get_comm_canonical_path(comm_id: str, run_id: str) -> Path:
+    return get_comm_canonical_dir(comm_id) / f'{run_id}.json'
+
+
+def get_comm_sections_path(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_SECTIONS_REL_PATH
+
 
 # Sheet names corresponds to the dictionary's keys
 SPREADSHEETS = {
     'metadata': '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE',
-    'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito'
+    'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito',
+    'ocr_gt': '1RsJQTgM4oO-ds0cK3rstx-iBxsvxjwCSVRWS63NvQrQ'
 }
 
-FOLDER_STRUCTURE_PATHS = {
-    # Only relative paths
-    # Placeholder pattern are between []
-    'ocr_outputs_dir': '[commentary_id]/ocr/runs/[ocr_run]/outputs',
-    'canonical_json': '[commentary_id]/canonical/v2/[json]'
-}
+# ======================================================================================================================
+#                                                 FORMATS AND EXTENSIONS
+# ======================================================================================================================
+
+OCR_OUTPUT_EXTENSIONS = ['.xml', '.hocr', '.html']
+
+DEFAULT_IMG_EXTENSION = '.png'
 
 # ======================================================================================================================
 #                                                 COMMENTARIES
 # ======================================================================================================================
 
-COMMENTARY_IDS = ['Colonna1975', 'DeRomilly1976', 'Ferrari1974', 'Finglass2011', 'Garvie1998', 'Kamerbeek1953',
-                  'Paduano1982', 'Untersteiner1934', 'Wecklein1894', 'bsb10234118', 'cu31924087948174',
-                  'lestragdiesdeso00tourgoog', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'thukydides02thuc',
-                  'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
+ALL_COMM_IDS = ['Colonna1975',
+                'DeRomilly1976',
+                'Ferrari1974',
+                'Finglass2011',
+                'Garvie1998',
+                'Hermann1851',
+                'Kamerbeek1953',
+                'Paduano1982',
+                'SchneidewinNauckRadermacher1913',
+                'Stanford1963',
+                'Untersteiner1934',
+                'Wecklein1894',
+                'annalsoftacitusp00taci',
+                'bsb10234118',
+                'cu31924087948174',
+                'lestragdiesdeso00tourgoog',
+                'pvergiliusmaroa00virggoog',
+                'sophoclesplaysa05campgoog',
+                'sophokle1v3soph',
+                'thukydides02thuc']
 
-PD_COMMENTARY_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894']
+EXTERNAL_COMM_IDS = ['thukydides02thuc', 'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
+
+PD_COMM_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894',
+               'SchneidewinNauckRadermacher1913']
 
 SAMPLE_PAGES = ['bsb10234118_0096', 'sophokle1v3soph_0126', 'cu31924087948174_0063', 'cu31924087948174_0063',
                 'Wecklein1894_0087']
 
+COMM_IDS_TO_LANG = {
+    'Colonna1975': 'ita',
+    'DeRomilly1976': 'fra',
+    'Ferrari1974': 'ita',
+    'Finglass2011': 'eng',
+    'Garvie1998': 'eng',
+    'Kamerbeek1953': 'eng',
+    'Paduano1982': 'ita',
+    'Untersteiner1934': 'ita',
+    'Wecklein1894': 'deu',
+    'bsb10234118': 'deu',
+    'cu31924087948174': 'eng',
+    'lestragdiesdeso00tourgoog': 'fra',
+    'sophoclesplaysa05campgoog': 'eng',
+    'sophokle1v3soph': 'deu',
+    'thukydides02thuc': 'deu',
+    'pvergiliusmaroa00virggoog': 'deu',
+    'annalsoftacitusp00taci': 'eng'
+}
 # ======================================================================================================================
 #                                                 LAYOUT
 # ======================================================================================================================
@@ -181,7 +298,7 @@ SEGMONTO_TO_VALUE_IDS = {
 # ======================================================================================================================
 
 TEXTCONTAINER_TYPES = ['commentary',
-                       # 'chapter',
+                       'section',
                        'page',
                        'region',
                        'sentence',
@@ -214,7 +331,40 @@ MINIREF_PAGES = [
     'sophokle1v3soph_0125',
 ]
 
-IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run_id used as a base in the annotation campaign.
+LINKAGE_MINIREF_PAGES = [
+    'annalsoftacitusp00taci_0210',
+    'annalsoftacitusp00taci_0211',
+    'bsb10234118_0090',
+    'bsb10234118_0115',
+    'cu31924087948174_0063',
+    'cu31924087948174_0152',
+    'DeRomilly1976_0032',
+    'DeRomilly1976_0088',
+    'Ferrari1974_0050',
+    'Ferrari1974_0115',
+    'Garvie1998_0224',
+    'Garvie1998_0257',
+    'Kamerbeek1953_0098',
+    'Kamerbeek1953_0099',
+    'lestragdiesdeso00tourgoog_0113',
+    'lestragdiesdeso00tourgoog_0120',
+    'Paduano1982_0195',
+    'Paduano1982_0214',
+    'pvergiliusmaroa00virggoog_0199',
+    'pvergiliusmaroa00virggoog_0200',
+    'sophoclesplaysa05campgoog_0094',
+    'sophoclesplaysa05campgoog_0095',
+    'sophokle1v3soph_0047',
+    'sophokle1v3soph_0062',
+    'thukydides02thuc_0009',
+    'thukydides02thuc_0011',
+    'Untersteiner1934_0104',
+    'Untersteiner1934_0105',
+    'Wecklein1894_0016',
+    'Wecklein1894_0024',
+]
+
+IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run used as a base in the annotation campaign.
     'cu31924087948174': '1bm0b3_tess_final',
     'lestragdiesdeso00tourgoog': '21i0dA_tess_hocr',
     'sophokle1v3soph': '1bm0b5_tess_final',

@@ -1,21 +1,29 @@
-import random
-import cv2
-from typing import List, Tuple, Optional, Union
-import numpy as np
+"""Basic operations and objects for image processing."""
+# CHECKED 2023-01-24
 
+import random
+from pathlib import Path
+from typing import List, Optional, Tuple, Union
+
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+from PIL import Image as PILImage, ImageDraw, ImageFont
+from skimage.util import random_noise
+
+from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
-from ajmc.commons.miscellaneous import lazy_property, get_custom_logger, lazy_init
-from ajmc.commons.variables import BoxType, COLORS, REGION_TYPES_TO_COLORS, TEXTCONTAINERS_TYPES_TO_COLORS
+from ajmc.commons.miscellaneous import get_custom_logger, lazy_init, lazy_property
 
 logger = get_custom_logger(__name__)
 
 
-class Image:
+class AjmcImage:
     """Default class for ajmc images.
 
     Note:
-          The center of `Image`-coordinates is the upper left corner, consistantly with cv2 and numpy. This implies
+          The center of `AjmcImage`-coordinates is the upper left corner, consistantly with cv2 and numpy. This implies
           that Y-coordinates are ascending towards the bottom of the image.
     """
 
@@ -23,7 +31,7 @@ class Image:
     @docstring_formatter(**docstrings)
     def __init__(self,
                  id: Optional[str] = None,
-                 path: Optional[str] = None,
+                 path: Optional[Path] = None,
                  matrix: Optional[np.ndarray] = None,
                  word_range: Optional[Tuple[int, int]] = None):
         """Default constructor.
@@ -34,12 +42,12 @@ class Image:
             matrix: an np.ndarray containing the image. Overrides self.matrix if not None.
             word_range: {word_range}
         """
-        pass
+
 
     @lazy_property
     def matrix(self) -> np.ndarray:
         """np.ndarray of the image image matrix. Its shape is (height, width, channels)."""
-        return cv2.imread(self.path)
+        return cv2.imread(str(self.path))
 
     @lazy_property
     def height(self) -> int:
@@ -54,8 +62,8 @@ class Image:
         return find_contours(self.matrix)
 
     def crop(self,
-             box: BoxType,
-             margin: int = 0) -> 'Image':
+             box: variables.BoxType,
+             margin: int = 0) -> 'AjmcImage':
         """Gets the slice of `self.matrix` corresponding to `box`.
 
         Args:
@@ -63,14 +71,14 @@ class Image:
             margin: The extra margin desired around `box`
 
         Returns:
-             A new `Image` containing the desired crop.
+             A new `AjmcImage` containing the desired crop.
         """
         cropped = self.matrix[box[0][1] - margin:box[1][1] + margin, box[0][0] - margin:box[1][0] + margin, :]
 
-        return Image(matrix=cropped)
+        return AjmcImage(matrix=cropped)
 
-    def write(self, output_path: str):
-        cv2.imwrite(output_path, self.matrix)
+    def write(self, output_path: Path):
+        cv2.imwrite(str(output_path), self.matrix)
 
     def show(self):
         cv2.imshow('image', self.matrix)
@@ -80,7 +88,7 @@ class Image:
 
 def binarize(img_matrix: np.ndarray,
              inverted: bool = False):
-    """Binarizes a cv2 `image`"""
+    """Binarizes an `img_matrix` using cv2 and Otsu's method."""
     binarization_type = (cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV) if inverted else (cv2.THRESH_OTSU | cv2.THRESH_BINARY)
     gray = cv2.cvtColor(img_matrix, cv2.COLOR_BGR2GRAY)
     return cv2.threshold(gray, 0, 255, type=binarization_type)[1]
@@ -91,7 +99,7 @@ def rgb_to_bgr(rgb: Tuple[int, int, int]) -> Tuple[int, int, int]:
     return rgb[2], rgb[1], rgb[0]
 
 
-def draw_box(box: BoxType,
+def draw_box(box: variables.BoxType,
              img_matrix: np.ndarray,
              stroke_color: Tuple[int, int, int] = (0, 0, 255),
              stroke_thickness: int = 1,
@@ -114,7 +122,7 @@ def draw_box(box: BoxType,
         text_thickness: The thickness of the text.
 
     Returns:
-        np.ndarray: The modified `matrix`
+        np.ndarray: The modified `img_matrix`
 
     """
 
@@ -156,7 +164,7 @@ def draw_box(box: BoxType,
     return img_matrix
 
 
-def draw_textcontainers(img_matrix, outfile: Optional[str] = None, *textcontainers):
+def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str, Path]] = None, *textcontainers):
     """Draws a list of `TextContainer`s on `img_matrix`."""
 
     # Get the set of textcontainer types
@@ -164,64 +172,73 @@ def draw_textcontainers(img_matrix, outfile: Optional[str] = None, *textcontaine
         if tc.type == 'region':
             img_matrix = draw_box(box=tc.bbox.bbox,
                                   img_matrix=img_matrix,
-                                  stroke_color=REGION_TYPES_TO_COLORS[tc.region_type],
+                                  stroke_color=variables.REGION_TYPES_TO_COLORS[tc.region_type],
                                   stroke_thickness=2,
-                                  fill_color=REGION_TYPES_TO_COLORS[tc.region_type],
+                                  fill_color=variables.REGION_TYPES_TO_COLORS[tc.region_type],
                                   fill_opacity=.3,
                                   text=tc.region_type)
 
         elif tc.type in ['entity', 'sentence', 'hyphenation']:
             for i, bbox in enumerate(tc.bboxes):
-                if i == len(tc.bboxes) - 1:  # We write the region label text only if it's the last bbox to avoid overlap
+                if i == len(
+                        tc.bboxes) - 1:  # We write the region label text only if it's the last bbox to avoid overlap
                     img_matrix = draw_box(box=bbox.bbox,
                                           img_matrix=img_matrix,
-                                          stroke_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                          stroke_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           stroke_thickness=2,
-                                          fill_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                          fill_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           fill_opacity=.3,
-                                          text=tc.entity_type if tc.type=='entity' else tc.type)
+                                          text=tc.label if tc.type == 'entity' else tc.type)
                 else:
                     img_matrix = draw_box(box=bbox.bbox,
                                           img_matrix=img_matrix,
-                                          stroke_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                          stroke_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           stroke_thickness=2,
-                                          fill_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                          fill_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           fill_opacity=.3)
 
 
         else:
             img_matrix = draw_box(box=tc.bbox.bbox,
                                   img_matrix=img_matrix,
-                                  stroke_color=TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                  stroke_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                   stroke_thickness=1,
                                   fill_color=None,
                                   text=tc.type.capitalize())
 
-    if outfile is not None:
-        cv2.imwrite(outfile, img_matrix)
+    if output_path is not None:
+        cv2.imwrite(str(output_path), img_matrix)
 
     return img_matrix
 
 
-def draw_reading_order(matrix: np.ndarray,
+def draw_reading_order(img_matrix: np.ndarray,
                        page: Union['OcrPage', 'CanonicalPage'],
-                       output_path: Optional[str] = None):
+                       output_path: Optional[Union[str, Path]] = None):
     # Compute word centers
     w_centers = [w.bbox.center for w in page.children.words]
-    matrix = cv2.polylines(img=matrix,
-                           pts=[np.array(w_centers, np.int32).reshape((-1, 1, 2))],
-                           isClosed=False,
-                           color=(255, 0, 0),
-                           thickness=4)
+    img_matrix = cv2.polylines(img=img_matrix,
+                               pts=[np.array(w_centers, np.int32).reshape((-1, 1, 2))],
+                               isClosed=False,
+                               color=(255, 0, 0),
+                               thickness=4)
     if output_path:
-        cv2.imwrite(output_path, matrix)
+        cv2.imwrite(output_path, img_matrix)
 
-    return matrix
+    return img_matrix
 
 
 def find_contours(img_matrix: np.ndarray,
                   binarize: bool = True) -> List[Shape]:
-    """Binarizes `img_matrix` and finds contours using `cv2.findContours`."""
+    """Finds contours using `cv2.findContours`, potentially binarizing the image first.
+
+    Args:
+        img_matrix (np.ndarray): The image matrix to find contours in.
+        binarize (bool): Whether to binarize the image first.
+
+    Returns:
+        List[Shape]: A list of `Shape`s representing the contours.
+    """
 
     # This has to be done in cv2. Using cv2.THRESH_BINARY_INV to avoid looking for the white background as a contour
     if binarize:
@@ -239,11 +256,14 @@ def find_contours(img_matrix: np.ndarray,
     return contours
 
 
-def draw_contours(image: Image, outfile: Optional[str] = None):
-    white = np.zeros([image.matrix.shape[0], image.matrix.shape[1], 3], dtype=np.uint8)
+def draw_contours(img_matrix: np.ndarray,
+                  contours: List[Shape],
+                  outfile: Optional[Union[str, Path]] = None):
+    """Draws the contours of an `img_matrix` on a white image."""
+    white = np.zeros([img_matrix.matrix.shape[0], img_matrix.matrix.shape[1], 3], dtype=np.uint8)
     white.fill(255)
 
-    for c in image.contours:
+    for c in contours:
         color = (random.randint(0, 255),
                  random.randint(0, 255),
                  random.randint(0, 255))
@@ -280,3 +300,73 @@ def resize_image(img: np.ndarray,
     dim = target_width, target_height
 
     return cv2.resize(src=img, dsize=dim, interpolation=cv2.INTER_AREA)
+
+
+def create_text_image(text: str,
+                      font_path: Path,
+                      padding: int,
+                      image_height: int,
+                      output_file: Optional[Path] = None) -> 'PIL.Image':
+    """Draws text on a white image with given font, padding and image height."""
+    # Todo come back here once tesseract experiments are done
+
+    # Get the font size
+    font_size = int(0.75*(image_height - 2 * padding))  # 0.75 for conversion from pixels to points
+
+    # Get the font
+    font = ImageFont.truetype(str(font_path), font_size)
+
+    # Get the text size
+    length = font.getlength(text)
+
+    # Create the image
+    image = PILImage.new('RGB', (int(length + 2 * padding), image_height), color='white')
+
+    # Draw the text
+    draw = ImageDraw.Draw(image)
+    draw.text((padding, 0), text, font=font, fill='black')
+
+    if output_file:
+        image.save(output_file)
+
+    return image
+
+    # lines = {
+    #     'modern_greek_line': 'Η Ελλάδα είναι μια χώρα στην Μεσόγειο, στην Ευρώπη',
+    #     'polytonic_greek_line': 'μῆνιν ἄειδε θεὰ Πηληϊάδεω Ἀχιλῆος',
+    #     'number_line': '1234567890',
+    #     'english_line': 'The quick brown fox jumps',
+    #     'mixed_line': '123. μῆνιν ἄειδε θεὰ — The quick brown fox jumps',
+    # }
+    #
+    # output_dir = Path('/Users/sven/Desktop/test/')
+    # for font in Path('data/greek_fonts').rglob('*.[ot]tf'):
+    #     for type_, line in lines.items():
+    #         create_text_image(text=line,
+    #                           font_path=font,
+    #                           padding=0,
+    #                           image_height=100,
+    #                           output_file=output_dir / f'{font.stem}_{type_}.png')
+
+
+def align_rgb_values(img):
+    # input is numpy array
+    mean = np.mean(img, axis=2, keepdims=True)
+    mean_img = np.tile(mean, (1,1,3))
+    return np.array(mean_img, dtype='uint8')
+
+
+def add_noise(img, noise_type, show_fig=True):
+    if noise_type.lower() in ["s&p"]:
+        # Add salt-and-pepper noise to the image.
+        noise_img = random_noise(img, mode='s&p',amount=0.4)
+    elif noise_type.lower() in ["gaussian"]:
+        noise_img = random_noise(img, mode='gaussian', clip=True, mean=0, var=0.2)
+    # The above function returns a floating-point image
+    # on the range [0, 1], thus we changed it to 'uint8'
+    # and from [0,255]
+    noise_img = align_rgb_values(255*noise_img)
+    if show_fig:
+        plt.imshow(noise_img)
+        plt.axis("off")
+    return noise_img

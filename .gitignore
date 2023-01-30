@@ -10,6 +10,10 @@ workbench*.py
 *.pyc
 ajmc/ocr/exps/*
 
+/data/greek_fonts
+/data/layout_lm
+/data/yolo
+
 
 # ==============================================================================================================
 #                   GITIGNORE GLOBAL TEMPLATE

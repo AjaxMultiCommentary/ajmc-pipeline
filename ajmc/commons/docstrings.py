@@ -54,16 +54,23 @@ docstrings['BatchEncoding'] = """The default ouput of HuggingFace's `TokenizerFa
         list of example, containing notably the offsets. Please note that not using a `TokenizerFast` (i.e. using a `Tokenizer` instead) can lead to the cumbersome
         situation in which `self.encodings` is set to `None`.""",
 
-docstrings['base_dir'] = """The base directory to commentary data. Use variables.PATHS['base_dir'] to access the default value."""
+docstrings[
+    'base_dir'] = """The base directory to commentaries data. Use variables.COMMS_DATA_DIR to access the default value."""
 
-docstrings['bbox'] = """A tuple of two (x, y) tuples representing upper-left and lower right coordinates."""
+docstrings['bbox'] = """A tuple of two (x, y) tuples representing upper-left and lower-right coordinates."""
 
 docstrings['children_type'] = """The type of children to get. Must be one of `pages`, `regions`, `lines` or `words`."""
+
+docstrings[
+    'commentary_id'] = """The id of the commentary (e.g. sophoclesplaysa05campgoog). Ids are listed in `ajmc.commons.variables.ALL_COMM_IDS`."""
 docstrings['coords_single'] = 'A `Shape` object representing the coordinates of the object.'
+
+docstrings[
+    'comm_base_dir'] = """The base directory a commentaries data, normally `variables.COMMS_DATA_DIR / [comm_id]`. Use `variables.get_comm_base_dir()` to retrieve it."""
 
 docstrings['custom_dataset'] = """A dataset inheriting from `torch.utils.data.Dataset`, implementing at least `__len__` and 
         `__getitem__()`, where each item is a dict alike `{{"model_input": tensor(), ...}}` corresponding
-        to a single example.""",
+        to a single example."""
 
 docstrings['dilation_kernel_size'] = """Dilation kernel size, preferably an odd number. Tweak
                         this parameter and `dilation_iterations` to improve
@@ -73,22 +80,30 @@ docstrings['dilation_iterations'] = 'Number of iterations in dilation, default 1
 
 docstrings['directory'] = 'The absolute path to the directory'
 
-docstrings['do_debug'] = """Whether break loops after the first iteration.""",
+docstrings['do_debug'] = """Whether break loops after the first iteration."""
 
 docstrings['groundtruth_dir'] = 'The absolute path to the directory containg groundtruth files.'
 
 docstrings['ids_to_labels'] = """A dict mapping the label numbers (int) used by the model 
-to the original label names (str), e.g. `{{0: "O", 1: "B-PERS", ...}}`""",
+to the original label names (str), e.g. `{{0: "O", 1: "B-PERS", ...}}`"""
 
 docstrings['image_dir'] = 'The absolute path to the directory containing the images.'
+
+docstrings['image_path'] = 'The absolute path to the image.'
+
+
+docstrings['image_format'] = 'The format of the image, e.g. "png" or "jpg". `.'
 
 docstrings['interval'] = 'A `Tuple[int, int]` defining the included boundaries of an interval, with start <= stop.'
 
 docstrings['kwargs_for_properties'] = 'Use **kwargs to manually set or override properties.'
-docstrings['labels_to_ids'] = 'A dict mapping label-names to their respective ids, e.g. `{{"cat":0, "dog":1, ...}}`.',
+docstrings['labels_to_ids'] = 'A dict mapping label-names to their respective ids, e.g. `{{"cat":0, "dog":1, ...}}`.'
 
 docstrings['ocr_dir'] = 'The absolute path to the directory containing OCR outputs.'
 docstrings['ocr_path'] = 'The absolute path to an ocr output file.'
+
+docstrings['ocr_run'] = """The id of an ocr-run, e.g. '28o09e_tess_base', (generally follow the pattern
+        '{get_62_based_datecode()}_{ocr_engine}_{ocr_model}')."""
 
 docstrings['olr_region_type'] = """The type of the Region (i.e. `'primary_text'` or `'commentary'`)."""
 
@@ -111,7 +126,9 @@ docstrings['transformers_model_inputs'] = """A mapping to between the names of t
 docstrings[
     'transformers_model_predictions'] = """`np.ndarray` containing the predicted labels, so in the shape (number of exs, length of an ex)."""
 
-docstrings['max_length'] = 'The maximum length of a sequence to be processed by the model.',
+docstrings['max_length'] = 'The maximum length of a sequence to be processed by the model.'
+
+docstrings['sections_path'] = 'The absolute path to the sections json-file.'
 
 docstrings['sheet_id'] = """The id of the spreadsheet, i.e. the part of the url after 'spreadsheets/d/'. 
 Check variables.SPREADSHEET_IDS for examples."""

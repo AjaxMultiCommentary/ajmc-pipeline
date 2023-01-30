@@ -3,16 +3,11 @@ This module contains all the functions to read OCR- and OLR-output, for all the
 formats (json, hocr, page-XML...)
 """
 
-import bs4
-from ajmc.commons.geometry import Shape
 from typing import List, Union
 
+import bs4
 
-# ===========================  GENERIC PARSER  ============================
-def parse_markup_file(path: str) -> bs4.BeautifulSoup:
-    """Generic parser which works for PageXML and HOCR files"""
-    with open(path, 'r', encoding="utf-8") as f:
-        return bs4.BeautifulSoup(f.read(), 'xml')
+from ajmc.commons.geometry import Shape
 
 
 # ===========================  COORDS EXTRACTERS  ============================
