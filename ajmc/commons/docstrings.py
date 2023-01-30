@@ -128,6 +128,8 @@ docstrings[
 
 docstrings['max_length'] = 'The maximum length of a sequence to be processed by the model.'
 
+docstrings['sections_path'] = 'The absolute path to the sections json-file.'
+
 docstrings['sheet_id'] = """The id of the spreadsheet, i.e. the part of the url after 'spreadsheets/d/'. 
 Check variables.SPREADSHEET_IDS for examples."""
 

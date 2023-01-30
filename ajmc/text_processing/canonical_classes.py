@@ -3,7 +3,7 @@
 import json
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
+from typing import Dict, Iterable, List, Optional, Tuple, Type, Union
 
 from jinja2 import Environment, PackageLoader
 
@@ -18,14 +18,15 @@ from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
 logger = get_custom_logger(__name__)
 
 
-class CanonicalCommentary(Commentary, TextContainer):
+class CanonicalCommentary(Commentary):
 
     @docstring_formatter(**docstrings)
     def __init__(self,
                  id: Optional[str],
                  children: Optional['LazyObject'],
                  images: Optional[List[AjmcImage]],
-                 info: Optional[Dict[str, Any]] = None,
+                 ocr_run: Optional[str] = None,
+                 ocr_gt_page_ids: Optional[List[str]] = None,
                  **kwargs):
         """Initialize a `CanonicalCommentary`.
 
@@ -40,7 +41,12 @@ class CanonicalCommentary(Commentary, TextContainer):
             Parameters `id`, `children`, and `images` are required, as they cannot be computed ex nihilo. They can
             however be set `None` and then be computed later on.
         """
-        super().__init__(id=id, children=children, images=images, info=info, **kwargs)
+        super().__init__(id=id,
+                         children=children,
+                         images=images,
+                         ocr_run=ocr_run,
+                         ocr_gt_page_ids=ocr_gt_page_ids,
+                         **kwargs)
 
     @classmethod
     def from_json(cls, json_path: Union[str, Path]):
@@ -51,32 +57,35 @@ class CanonicalCommentary(Commentary, TextContainer):
             ajmc folder structure.
         """
         json_path = Path(json_path)
-        assert json_path.match(f'{vs.get_comm_canonical_dir("*") / "*.json"}'), \
-            f"The provided `json_path` ({json_path}) is not compliant with ajmc's folder structure."
+        if not json_path.match(f'{vs.get_comm_canonical_dir("*") / "*.json"}'):
+            logger.warning(f"The provided `json_path` ({json_path}) is not compliant with ajmc's folder structure.")
 
         logger.debug(f'Importing canonical commentary from {json_path}')
         can_json = json.loads(json_path.read_text(encoding='utf-8'))
 
         # Create the (empty) commentary and populate its info
-        commentary = cls(id=can_json['metadata']['id'], children=None, images=None, info={**can_json['metadata']})
+        commentary = cls(id=can_json['id'],
+                         children=None,
+                         images=None,
+                         ocr_run=can_json['ocr_run'],
+                         ocr_gt_page_ids=can_json['ocr_gt_page_ids'])
 
         # Automatically determinates paths
-        commentary.info['base_dir'] = vs.get_comm_base_dir(commentary.id)
+        commentary.base_dir = vs.get_comm_base_dir(commentary.id)
         img_dir = vs.get_comm_img_dir(commentary.id)
 
         # Set its images
         commentary.images = [
-            AjmcImage(id=img['id'], path=img_dir / (img['id'] + vs.DEFAULT_IMG_EXTENSION),
-                      word_range=img['word_range'])
-            for img in can_json['textcontainers']['pages']]
+            AjmcImage(id=img['id'], path=img_dir / (img['id'] + vs.DEFAULT_IMG_EXTENSION), word_range=img['word_range'])
+            for img in can_json['children']['pages']
+        ]
 
         # Set its children
         commentary.children = LazyObject(
                 compute_function=lambda x: x,
                 constrained_attrs=vs.CHILD_TYPES,
                 **{tc_type: [get_tc_type_class(tc_type)(commentary=commentary, **tc)
-                             for tc in can_json['textcontainers'][tc_type]] if tc_type in can_json[
-                    'textcontainers'] else []
+                             for tc in can_json['children'][tc_type]]
                    for tc_type in vs.CHILD_TYPES})
 
         return commentary
@@ -91,14 +100,16 @@ class CanonicalCommentary(Commentary, TextContainer):
             The json as a dictionary
         """
 
-        data = {'metadata': {'id': self.id, 'ocr_run': self.info['ocr_run']},
-                'textcontainers': {tc_type: [tc.to_json() for tc in getattr(self.children, tc_type)]
-                                   for tc_type in vs.CHILD_TYPES}}
+        data = {'id': self.id,
+                'ocr_run': self.ocr_run,
+                'ocr_gt_page_ids': self.ocr_gt_page_ids,
+                'children': {child_type: [tc.to_json() for tc in getattr(self.children, child_type)]
+                             for child_type in vs.CHILD_TYPES}}
 
         if output_path is None:
-            output_path = vs.get_comm_canonical_path(self.id, self.info['ocr_run'])
+            output_path = vs.get_comm_canonical_path(self.id, self.ocr_run)
 
-        output_path.write_text(json.dumps(data, indent=4, ensure_ascii=False), encoding='utf-8')
+        output_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
 
         return data
 
@@ -112,10 +123,10 @@ class CanonicalCommentary(Commentary, TextContainer):
         raise NotImplementedError('`CanonicalCommentary.children` must be set at __init__.')
 
     @lazy_property
-    def ocr_groundtruth_pages(self) -> List['CanonicalPage']:
+    def ocr_gt_pages(self) -> List[Type['CanonicalPage']]:
         """A list of `CanonicalPage` objects containing the groundtruth of the OCR."""
 
-        return [p for p in self.children.pages if p.id in page_ids]
+        return [p for p in self.children.pages if p.id in self.ocr_gt_page_ids]
 
 
 class CanonicalTextContainer(TextContainer):
@@ -186,16 +197,19 @@ class CanonicalSection(CanonicalTextContainer):
 
     def __init__(self,
                  commentary,
-                 section_type,
+                 section_types,
                  section_title,
                  **kwargs):
         super().__init__(commentary=commentary,
-                         section_type=section_type,
+                         section_types=section_types,
                          section_title=section_title,
                          **kwargs)
 
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
-        return {'id': self.id, 'word_range': self.word_range}
+        return {'id': self.id,
+                'section_types': self.section_types,
+                'section_title': self.section_title,
+                'word_range': self.word_range}
 
 
 class CanonicalPage(Page, CanonicalTextContainer):
@@ -297,6 +311,10 @@ class CanonicalAnnotation(CanonicalTextContainer):
         return ' '.join(self.parents.commentary.children.words[
                         self.word_range[0] - window_size:self.word_range[1] + window_size + 1])
 
+    def bbox(self) -> None:
+        logger.warning('`CanonicalAnnotation`s have no bbox.')
+        return None
+
 
 class CanonicalEntity(CanonicalAnnotation):
 
@@ -320,6 +338,10 @@ class CanonicalEntity(CanonicalAnnotation):
                 'transcript': self.transcript,
                 'label': self.label,
                 'wikidata_id': self.wikidata_id}
+
+    def bbox(self) -> None:
+        logger.warning('`CanonicalEntity`s have no bbox.')
+        return None
 
 
 class CanonicalSentence(CanonicalAnnotation):
@@ -345,6 +367,10 @@ class CanonicalSentence(CanonicalAnnotation):
                 'incomplete_continuing': self.incomplete_continuing,
                 'incomplete_truncated': self.incomplete_truncated}
 
+    def bbox(self) -> None:
+        logger.warning('`CanonicalSentence`s have no bbox.')
+        return None
+
 
 class CanonicalHyphenation(CanonicalAnnotation):
 
@@ -359,3 +385,7 @@ class CanonicalHyphenation(CanonicalAnnotation):
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int], bool]]:
         return {'word_range': self.word_range,
                 'shifts': self.shifts}
+
+    def bbox(self) -> None:
+        logger.warning('`CanonicalHyphenation`s have no bbox.')
+        return None

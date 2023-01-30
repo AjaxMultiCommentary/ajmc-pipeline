@@ -8,36 +8,27 @@ from ajmc.commons import image, variables
 from ajmc.text_processing import ocr_classes
 from tests import sample_objects as so
 
-commentary_from_paths = ocr_classes.OcrCommentary(id=so.sample_commentary_id,
-                                                  ocr_dir=so.sample_ocr_run_outputs_dir,
-                                                  via_path=so.sample_via_path,
-                                                  img_dir=so.sample_img_dir,
-                                                  ocr_gt_dir=so.sample_ocr_gt_dir)
-
-commentary_from_structure = ocr_classes.OcrCommentary.from_ajmc_data(so.sample_commentary_id, so.sample_ocr_run)
-
 
 def test_ocrcommentary():
-    for comm in [commentary_from_paths, commentary_from_structure]:
-        # test OcrCommentary.children
-        assert all([isinstance(p, ocr_classes.OcrPage) for p in comm.children.pages])
-        assert len(comm.children.pages) == len([f for f in os.listdir(so.sample_ocr_run_outputs_dir) if comm.id in f])
-        assert all([isinstance(r, ocr_classes.OlrRegion) for r in comm.children.regions])
-        assert all([isinstance(l, ocr_classes.OcrLine) for l in comm.children.lines])
-        assert all([isinstance(w, ocr_classes.OcrWord) for w in comm.children.words])
+    # test OcrCommentary.children
+    assert all([isinstance(p, ocr_classes.OcrPage) for p in so.sample_ocrcommentary.children.pages])
+    assert len(so.sample_ocrcommentary.children.pages) == len(list(so.sample_ocr_run_outputs_dir.glob('*.hocr')))
+    assert all([isinstance(r, ocr_classes.OlrRegion) for r in so.sample_ocrcommentary.children.regions])
+    assert all([isinstance(l, ocr_classes.OcrLine) for l in so.sample_ocrcommentary.children.lines])
+    assert all([isinstance(w, ocr_classes.OcrWord) for w in so.sample_ocrcommentary.children.words])
 
-        # test OcrCommentary.images
-        assert all([isinstance(i, image.AjmcImage) for i in comm.images])
+    # test OcrCommentary.images
+    assert all([isinstance(i, image.AjmcImage) for i in so.sample_ocrcommentary.images])
 
-        # Test OcrCommentary.groundtruth_pages
-        assert all([isinstance(p, ocr_classes.OcrPage) for p in comm.ocr_gt_pages])
-        assert len(comm.ocr_gt_pages) == len(
-                [f for f in os.listdir(so.sample_ocr_gt_dir) if comm.id in f])
+    # Test OcrCommentary.groundtruth_pages
+    assert all([isinstance(p, ocr_classes.OcrPage) for p in so.sample_ocrcommentary.ocr_gt_pages])
+    assert len(so.sample_ocrcommentary.ocr_gt_pages) == len(
+            [f for f in os.listdir(so.sample_ocr_gt_dir) if so.sample_ocrcommentary.id in f])
 
-        # See test_page() for regions, lines, words
+    # See test_page() for regions, lines, words
 
-        # Test OcrCommentary.via_project
-        assert type(comm.via_project) == dict
+    # Test OcrCommentary.via_project
+    assert type(so.sample_ocrcommentary.via_project) == dict
 
 
 def test_ocrcommentary_to_canonical():
@@ -74,7 +65,7 @@ def test_ocrcommentary_to_canonical():
 
 def test_ocrpage():
     page = ocr_classes.OcrPage(ocr_path=so.sample_ocr_page_path, page_id=so.sample_page_id,
-                               img_path=so.sample_img_path, commentary=commentary_from_paths)
+                               img_path=so.sample_img_path, commentary=so.sample_ocrcommentary)
 
     assert isinstance(page.ocr_format, str)
 

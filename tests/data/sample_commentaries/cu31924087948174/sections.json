@@ -1,0 +1,19 @@
+[
+  {
+    "section_types": [
+      "introduction"
+    ],
+    "section_title": "PRAEFATIO",
+    "start": "0035",
+    "end": "0035"
+  },
+  {
+    "section_types": [
+      "commentary",
+      "primary_text"
+    ],
+    "section_title": "ΓΕΝΟΣ ΣΟΦΟΚΛΕΟΥΣ",
+    "start": "0040",
+    "end": "0103"
+  }
+]

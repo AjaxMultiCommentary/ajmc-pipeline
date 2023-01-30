@@ -16,7 +16,7 @@ logger = get_custom_logger(__name__)
 
 # @dataclass
 class TextContainer:
-    """Generic object for ocr and canonical representations of text containers."""
+    """Mother class for all text containers."""
 
     @lazy_init
     def __init__(self, **kwargs):
@@ -72,14 +72,24 @@ class TextContainer:
         return ' '.join([w.text for w in self.children.words])
 
 
-class Commentary:
+class Commentary(TextContainer):
 
-    def _get_parent(self, parent_type: str) -> Optional[Type['TextContainer']]:
-        return None  # A commentary has no parents
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _get_parent(self, parent_type: str) -> None:
+        return None  # A commentary has no parents, just here to implement abstractmethod
 
     def get_page(self, page_id: str) -> Optional[vs.PageType]:
         """A simple shortcut to get a page from its id."""
         return [p for p in self.children.pages if p.id == page_id][0]
+
+    def get_section(self, section_type: str) -> Optional[Type['TextContainer']]:
+        """A simple shortcut to get a section from its type."""
+        try:
+            return [s for s in self.children.sections if section_type in s.section_types][0]
+        except StopIteration:
+            return None
 
     @lazy_property
     def olr_groundtruth_pages(self) -> List[vs.PageType]:

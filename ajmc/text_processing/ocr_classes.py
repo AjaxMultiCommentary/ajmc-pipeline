@@ -32,7 +32,7 @@ from ajmc.text_processing.markup_processing import find_all_elements, get_elemen
 logger = get_custom_logger(__name__)
 
 
-class OcrCommentary(Commentary, TextContainer):
+class OcrCommentary(Commentary):
     """`OcrCommentary` objects reprensent a single ocr-run of on a commentary, i.e. a collection of page OCRed pages."""
 
     @docstring_formatter(**docstrings)
@@ -44,6 +44,7 @@ class OcrCommentary(Commentary, TextContainer):
                  img_dir: Optional[Path] = None,
                  ocr_gt_dir: Optional[Path] = None,
                  ocr_run: Optional[str] = None,
+                 sections_path: Optional[Path] = None,
                  **kwargs):
         """Default constructor, where custom paths can be provided.
 
@@ -60,9 +61,10 @@ class OcrCommentary(Commentary, TextContainer):
             img_dir: {image_dir}
             ocr_gt_dir: {groundtruth_dir}
             ocr_run: {ocr_run}
+            sections_path: {sections_path}
         """
         super().__init__(id=id, ocr_dir=ocr_dir, base_dir=base_dir, via_path=via_path, img_dir=img_dir,
-                         ocr_gt_dir=ocr_gt_dir, ocr_run=ocr_run, **kwargs)
+                         ocr_gt_dir=ocr_gt_dir, ocr_run=ocr_run, sections_path=sections_path, **kwargs)
 
     @classmethod
     @docstring_formatter(**docstrings)
@@ -90,7 +92,8 @@ class OcrCommentary(Commentary, TextContainer):
                    via_path=vs.get_comm_via_path(id),
                    img_dir=vs.get_comm_img_dir(id),
                    ocr_gt_dir=vs.get_comm_ocr_gt_dir(id),
-                   ocr_run=ocr_run)
+                   ocr_run=ocr_run,
+                   sections_path=vs.get_comm_sections_path(id))
 
     def to_canonical(self, include_ocr_gt: bool = True) -> CanonicalCommentary:
         """Export the commentary to a `CanonicalCommentary` object.
@@ -103,26 +106,25 @@ class OcrCommentary(Commentary, TextContainer):
         Returns:
             A `CanonicalCommentary` object.
         """
+        self.reset()
+
+        if include_ocr_gt:
+            self.children.pages = [
+                p if p.id not in self.ocr_gt_page_ids else self.ocr_gt_pages[self.ocr_gt_page_ids.index(p.id)]
+                for p in self.children.pages]
 
         # We start by creating an empty `CanonicalCommentary`
-        can = CanonicalCommentary(id=self.id, children=None, images=[], info={})
-
-        # We fill the metadata
-        if hasattr(self, 'ocr_run'):  # todo, why should this be an if ?
-            can.info['ocr_run'] = self.ocr_run
-            can.info['base_dir'] = self.base_dir
+        can = CanonicalCommentary(id=self.id,
+                                  children=None,
+                                  images=[],
+                                  ocr_run=self.ocr_run,
+                                  ocr_gt_page_ids=self.ocr_gt_page_ids)
 
         # We now populate the children and images
         children = {k: [] for k in vs.CHILD_TYPES}
         w_count = 0
-        if include_ocr_gt:
-            gt_ids = [p.id for p in self.ocr_gt_pages]
 
-        for i, p in enumerate(tqdm(self.children.pages, desc=f'Canonizing {can.id}')):
-
-            if include_ocr_gt and p.id in gt_ids:
-                p = [p_ for p_ in self.ocr_gt_pages if p_.id == p.id][0]
-
+        for i, p in enumerate(tqdm(self.children.pages, desc=f'Canonizing {can.id}...')):
             p.optimise()
             p_start = w_count
             for r in p.children.regions:
@@ -174,17 +176,25 @@ class OcrCommentary(Commentary, TextContainer):
                                                  commentary=can,
                                                  shifts=h.shifts))
 
-            p.reset()  # We reset the page to free up memory
+            # We reset the page to free up memory, only we keep the words.
+            del p.children.regions
+            del p.children.lines
+            del p.children.entities
+            del p.children.sentences
+            del p.children.hyphenations
+            del p.image
 
         # Adding sections
         for s in self.children.sections:
             children['sections'].append(
                     CanonicalSection(word_range=(s.children.words[0].index, s.children.words[-1].index),
                                      commentary=can,
-                                     section_type=s.section_type,
+                                     section_types=s.section_types,
                                      section_title=s.section_title))
 
         can.children = LazyObject((lambda x: x), constrained_attrs=vs.CHILD_TYPES, **children)
+
+        self.reset()
 
         return can
 
@@ -196,22 +206,22 @@ class OcrCommentary(Commentary, TextContainer):
 
             return sorted(pages, key=lambda x: x.id)
 
-        # Todo : not implemented yet
         elif children_type == 'sections':
-            # sections_path = Path(vs.COMMS_DATA_DIR) / self.id / 'sections.json'
-            # sections = json.loads(sections_path.read_text(encoding='utf-8'))
-            # return [RawSection(self, **s) for s in sections]
-            return []
+            sections = json.loads(self.sections_path.read_text(encoding='utf-8'))
+            return [RawSection(self, **s) for s in sections]
 
-
-        else:  # For other children, them from each page
+        else:  # For other children, retrieve them from each page
             return [tc for p in self.children.pages for tc in getattr(p.children, children_type)]
+
+    @lazy_property
+    def ocr_gt_page_ids(self) -> List[str]:
+        """The ids of the commentary's pages which have a groundtruth file in `self.ocr_gt_dir`."""
+        return sorted([p.stem for p in self.ocr_gt_dir.glob('*.html')])
 
     @lazy_property
     def ocr_gt_pages(self) -> Union[List['OcrPage'], list]:
         """The commentary's pages which have a groundtruth file in `self.paths['groundtruth']`."""
-        return sorted([OcrPage.from_ajmc_data(p, commentary=self) for p in self.ocr_gt_dir.glob('*.html')],
-                      key=lambda x: x.id)
+        return [OcrPage.from_ajmc_data(self.ocr_gt_dir / p_id, commentary=self) for p_id in self.ocr_gt_page_ids]
 
     @lazy_property
     def via_project(self) -> dict:
@@ -221,6 +231,15 @@ class OcrCommentary(Commentary, TextContainer):
     @lazy_property
     def images(self) -> List[AjmcImage]:
         return [p.image for p in self.children.pages]
+
+    def reset(self):
+        """Resets the commentary. Use this if your commentary has been modified"""
+        delattr(self, 'children')
+        delattr(self, 'images')
+        delattr(self, 'text')
+        delattr(self, 'via_project')
+        delattr(self, 'ocr_gt_page_ids')
+        delattr(self, 'ocr_gt_pages')
 
 
 class OcrPage(Page, TextContainer):
@@ -266,7 +285,7 @@ class OcrPage(Page, TextContainer):
             try:
                 rebuild = cas_utils.import_page_rebuild(self.id)
             except:
-                logger.warning(f'No rebuild file found for page {self.id}')
+                logger.debug(f'No rebuild file found for page {self.id}')
                 return []
             cas = cas_utils.import_page_cas(self.id)
             if cas is not None:
@@ -437,23 +456,18 @@ class RawSection(TextContainer):
 
     def __init__(self,
                  commentary,
-                 section_type: str,
+                 section_types: List[str],
                  section_title: str,
-                 start: int,
-                 end: int,
+                 start: Union[int, str],
+                 end: Union[int, str],
                  **kwargs):
 
         super().__init__(commentary=commentary,
-                         section_type=section_type,
+                         section_types=section_types,
                          section_title=section_title,
-                         start=start,
-                         end=end,
+                         start=int(start),
+                         end=int(end),
                          **kwargs)
-
-    @classmethod
-    def from_json(cls, json_dict: dict):
-
-        return cls(**json_dict)
 
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
         if children_type == 'pages':

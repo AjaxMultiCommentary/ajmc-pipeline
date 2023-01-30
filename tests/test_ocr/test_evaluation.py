@@ -1,4 +1,5 @@
-from ajmc.commons import variables as vs
+from pathlib import Path
+
 from ajmc.ocr import evaluation as ocr_eval
 from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
 
@@ -39,7 +40,7 @@ def test_bag_of_word_evaluation():
 
 
 def test_coord_based_page_evaluation():
-    base_dir = vs.DRIVE_BASE_DIR / 'evaluation_test_data'
+    base_dir = Path('data/sample_evaluation_data')
 
     # We first create a commentary because via is accessed via the commentary
     comm = OcrCommentary(via_path=base_dir / 'via_project.json', )

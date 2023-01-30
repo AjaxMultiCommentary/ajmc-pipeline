@@ -1,11 +1,39 @@
 {
-  "metadata": {
-    "id": "cu31924087948174",
-    "ocr_run": "tess_eng_grc"
-  },
-  "textcontainers": {
+  "id": "cu31924087948174",
+  "ocr_run": "tess_eng_grc",
+  "ocr_gt_page_ids": [
+    "cu31924087948174_0035",
+    "cu31924087948174_0051",
+    "cu31924087948174_0083",
+    "cu31924087948174_0102"
+  ],
+  "children": {
     "commentaries": [],
-    "sections": [],
+    "sections": [
+      {
+        "id": "section_0",
+        "section_types": [
+          "introduction"
+        ],
+        "section_title": "PRAEFATIO",
+        "word_range": [
+          0,
+          543
+        ]
+      },
+      {
+        "id": "section_1",
+        "section_types": [
+          "commentary",
+          "primary_text"
+        ],
+        "section_title": "ΓΕΝΟΣ ΣΟΦΟΚΛΕΟΥΣ",
+        "word_range": [
+          0,
+          543
+        ]
+      }
+    ],
     "pages": [
       {
         "id": "cu31924087948174_0035",
@@ -465,7 +493,827 @@
         "region_type": "commentary"
       }
     ],
-    "sentences": [],
+    "sentences": [
+      {
+        "word_range": [
+          2,
+          62
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": true,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          63,
+          93
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          94,
+          130
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          131,
+          164
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          165,
+          175
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          176,
+          193
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          194,
+          225
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          226,
+          240
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          254,
+          278
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          278,
+          299
+        ],
+        "shifts": [
+          3,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          300,
+          348
+        ],
+        "shifts": [
+          0,
+          -6
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          348,
+          365
+        ],
+        "shifts": [
+          1,
+          -2
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          365,
+          380
+        ],
+        "shifts": [
+          2,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          381,
+          427
+        ],
+        "shifts": [
+          0,
+          -2
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          427,
+          451
+        ],
+        "shifts": [
+          1,
+          -2
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          451,
+          462
+        ],
+        "shifts": [
+          2,
+          -4
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          462,
+          477
+        ],
+        "shifts": [
+          2,
+          -2
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          477,
+          484
+        ],
+        "shifts": [
+          2,
+          -1
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          484,
+          518
+        ],
+        "shifts": [
+          10,
+          -3
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          518,
+          518
+        ],
+        "shifts": [
+          1,
+          65
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": true
+      },
+      {
+        "word_range": [
+          675,
+          713
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": true,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          714,
+          717
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          718,
+          744
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          745,
+          763
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          764,
+          781
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          782,
+          806
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          807,
+          818
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          819,
+          844
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          845,
+          864
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          865,
+          879
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          880,
+          884
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          885,
+          894
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          895,
+          909
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          910,
+          917
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          918,
+          952
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          953,
+          962
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          963,
+          972
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          973,
+          978
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          979,
+          1010
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1172,
+          1184
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1185,
+          1199
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1200,
+          1208
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1209,
+          1218
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1219,
+          1231
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1232,
+          1245
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1246,
+          1266
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1267,
+          1286
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1287,
+          1293
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1294,
+          1308
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1309,
+          1319
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1320,
+          1344
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1345,
+          1355
+        ],
+        "shifts": [
+          1,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1356,
+          1364
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1365,
+          1379
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1380,
+          1383
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1384,
+          1387
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1388,
+          1422
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1423,
+          1443
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1444,
+          1454
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1455,
+          1461
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1462,
+          1473
+        ],
+        "shifts": [
+          0,
+          -2
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1473,
+          1492
+        ],
+        "shifts": [
+          1,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": false
+      },
+      {
+        "word_range": [
+          1493,
+          1509
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "corrupted": false,
+        "incomplete_continuing": false,
+        "incomplete_truncated": true
+      }
+    ],
     "lines": [
       {
         "word_range": [
@@ -2442,8 +3290,1446 @@
         ]
       }
     ],
-    "hyphenations": [],
-    "entities": [],
+    "hyphenations": [
+      {
+        "word_range": [
+          355,
+          357
+        ],
+        "shifts": [
+          0,
+          -6
+        ]
+      },
+      {
+        "word_range": [
+          428,
+          430
+        ],
+        "shifts": [
+          2,
+          -4
+        ]
+      },
+      {
+        "word_range": [
+          878,
+          879
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      },
+      {
+        "word_range": [
+          908,
+          909
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      },
+      {
+        "word_range": [
+          937,
+          938
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      },
+      {
+        "word_range": [
+          970,
+          971
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      },
+      {
+        "word_range": [
+          1177,
+          1178
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      },
+      {
+        "word_range": [
+          1213,
+          1214
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      },
+      {
+        "word_range": [
+          1292,
+          1293
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      },
+      {
+        "word_range": [
+          1402,
+          1403
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      },
+      {
+        "word_range": [
+          1410,
+          1411
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      }
+    ],
+    "entities": [
+      {
+        "word_range": [
+          2,
+          2
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q159666"
+      },
+      {
+        "word_range": [
+          4,
+          4
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q41746"
+      },
+      {
+        "word_range": [
+          8,
+          8
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q48305"
+      },
+      {
+        "word_range": [
+          19,
+          19
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q11950683"
+      },
+      {
+        "word_range": [
+          27,
+          27
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          36,
+          36
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q134270"
+      },
+      {
+        "word_range": [
+          40,
+          40
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q134929"
+      },
+      {
+        "word_range": [
+          49,
+          49
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q554683"
+      },
+      {
+        "word_range": [
+          55,
+          55
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q134929"
+      },
+      {
+        "word_range": [
+          55,
+          58
+        ],
+        "shifts": [
+          0,
+          -2
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          56,
+          56
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q19175126"
+      },
+      {
+        "word_range": [
+          57,
+          58
+        ],
+        "shifts": [
+          0,
+          -2
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          124,
+          124
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q11950683"
+      },
+      {
+        "word_range": [
+          135,
+          135
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          149,
+          149
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q11950683"
+      },
+      {
+        "word_range": [
+          163,
+          164
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q2087365"
+      },
+      {
+        "word_range": [
+          169,
+          169
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q37122"
+      },
+      {
+        "word_range": [
+          289,
+          289
+        ],
+        "shifts": [
+          1,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q47231"
+      },
+      {
+        "word_range": [
+          302,
+          303
+        ],
+        "shifts": [
+          0,
+          -9
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          400,
+          402
+        ],
+        "shifts": [
+          8,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q47231"
+      },
+      {
+        "word_range": [
+          410,
+          412
+        ],
+        "shifts": [
+          6,
+          -14
+        ],
+        "transcript": null,
+        "label": "loc",
+        "wikidata_id": "http://www.wikidata.org/entity/Q80344"
+      },
+      {
+        "word_range": [
+          432,
+          432
+        ],
+        "shifts": [
+          3,
+          -2
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q47231"
+      },
+      {
+        "word_range": [
+          436,
+          437
+        ],
+        "shifts": [
+          0,
+          -10
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          452,
+          453
+        ],
+        "shifts": [
+          13,
+          -4
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q10796858"
+      },
+      {
+        "word_range": [
+          467,
+          467
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q34201"
+      },
+      {
+        "word_range": [
+          475,
+          477
+        ],
+        "shifts": [
+          3,
+          -3
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q47231"
+      },
+      {
+        "word_range": [
+          479,
+          480
+        ],
+        "shifts": [
+          6,
+          -2
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          504,
+          505
+        ],
+        "shifts": [
+          0,
+          -3
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q34201"
+      },
+      {
+        "word_range": [
+          716,
+          716
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          716,
+          716
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          771,
+          771
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q134929"
+      },
+      {
+        "word_range": [
+          771,
+          774
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          772,
+          772
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": "Ol.",
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q18146776"
+      },
+      {
+        "word_range": [
+          773,
+          774
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          805,
+          806
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": "l. 84",
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          805,
+          806
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          812,
+          812
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q26825"
+      },
+      {
+        "word_range": [
+          812,
+          814
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          813,
+          814
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          842,
+          842
+        ],
+        "shifts": [
+          0,
+          -3
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          842,
+          844
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "secondary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          844,
+          844
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": "s. v.",
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          846,
+          846
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q37122"
+      },
+      {
+        "word_range": [
+          850,
+          850
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          867,
+          867
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          867,
+          868
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          868,
+          868
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          883,
+          884
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          883,
+          884
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          887,
+          887
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          910,
+          911
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          910,
+          911
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          916,
+          916
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          916,
+          916
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          918,
+          918
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          955,
+          956
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": "l. 92",
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          955,
+          956
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          990,
+          990
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q43353"
+      },
+      {
+        "word_range": [
+          990,
+          992
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          991,
+          991
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q868447"
+      },
+      {
+        "word_range": [
+          992,
+          992
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1187,
+          1187
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": "Il.",
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q8275"
+      },
+      {
+        "word_range": [
+          1187,
+          1189
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1188,
+          1189
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1191,
+          1191
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          1210,
+          1210
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1210,
+          1210
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1241,
+          1241
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1241,
+          1241
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1247,
+          1247
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": "Phil.",
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q1415903"
+      },
+      {
+        "word_range": [
+          1247,
+          1248
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1248,
+          1248
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": "972",
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1263,
+          1263
+        ],
+        "shifts": [
+          0,
+          -5
+        ],
+        "transcript": null,
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q945342"
+      },
+      {
+        "word_range": [
+          1263,
+          1263
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1263,
+          1263
+        ],
+        "shifts": [
+          6,
+          -1
+        ],
+        "transcript": "1117",
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1272,
+          1272
+        ],
+        "shifts": [
+          0,
+          -2
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q10796858"
+      },
+      {
+        "word_range": [
+          1281,
+          1281
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q19376"
+      },
+      {
+        "word_range": [
+          1283,
+          1283
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": "Il.",
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q8275"
+      },
+      {
+        "word_range": [
+          1283,
+          1286
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1284,
+          1286
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1315,
+          1315
+        ],
+        "shifts": [
+          0,
+          -2
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q10796858"
+      },
+      {
+        "word_range": [
+          1346,
+          1348
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "work.seclit",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1346,
+          1352
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "secondary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1349,
+          1352
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1358,
+          1358
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q294001"
+      },
+      {
+        "word_range": [
+          1358,
+          1359
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1359,
+          1359
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1370,
+          1370
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q134929"
+      },
+      {
+        "word_range": [
+          1370,
+          1372
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1371,
+          1371
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q19175126"
+      },
+      {
+        "word_range": [
+          1372,
+          1372
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1377,
+          1377
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.author",
+        "wikidata_id": "http://www.wikidata.org/entity/Q48305"
+      },
+      {
+        "word_range": [
+          1377,
+          1379
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-full",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1378,
+          1378
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": "El.",
+        "label": "work.primlit",
+        "wikidata_id": "http://www.wikidata.org/entity/Q540161"
+      },
+      {
+        "word_range": [
+          1379,
+          1379
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": "939",
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1391,
+          1391
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q172725"
+      },
+      {
+        "word_range": [
+          1396,
+          1396
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q10796858"
+      },
+      {
+        "word_range": [
+          1422,
+          1422
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": "950-3",
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1422,
+          1422
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1442,
+          1443
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": "589, 90",
+        "label": "scope",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1442,
+          1443
+        ],
+        "shifts": [
+          0,
+          -1
+        ],
+        "transcript": null,
+        "label": "primary-partial",
+        "wikidata_id": null
+      },
+      {
+        "word_range": [
+          1506,
+          1506
+        ],
+        "shifts": [
+          0,
+          0
+        ],
+        "transcript": null,
+        "label": "pers.myth",
+        "wikidata_id": "http://www.wikidata.org/entity/Q34201"
+      }
+    ],
     "words": [
       {
         "bbox": [

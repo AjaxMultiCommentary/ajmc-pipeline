@@ -21,7 +21,6 @@ TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
 EXEC_ENV = platform.uname().node
 
 _DRIVE_BASE_DIR: Optional[Path] = None  # Keep this to be able to determine a custom path for the data
-_DRIVE_BASE_DIR = Path('/Users/sven/packages/ajmc/tests/data')
 
 
 def get_drive_base_dir() -> Path:
@@ -45,7 +44,7 @@ def get_drive_base_dir() -> Path:
 DRIVE_BASE_DIR = get_drive_base_dir()
 DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
 COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries/commentaries_data'
-NE_CORPUS_DIR = DRIVE_DATA_DIR / 'data/AjMC-NE-corpus'
+NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus'
 
 # RELATIVE PATHS
 COMM_IMG_REL_DIR = Path('images/png')
@@ -56,6 +55,7 @@ COMM_VIA_REL_PATH = Path('olr/via_project.json')
 COMM_XMI_REL_DIR = Path('ner/annotation')
 COMM_CANONICAL_REL_DIR = Path('canonical/v2')
 COMM_CANONICAL_V1_REL_DIR = Path('canonical')
+COMM_SECTIONS_REL_PATH = Path('sections.json')
 
 
 def get_comm_base_dir(comm_id: str) -> Path:
@@ -100,6 +100,10 @@ def get_comm_canonical_dir(comm_id: str) -> Path:
 
 def get_comm_canonical_path(comm_id: str, run_id: str) -> Path:
     return get_comm_canonical_dir(comm_id) / f'{run_id}.json'
+
+
+def get_comm_sections_path(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_SECTIONS_REL_PATH
 
 
 # Sheet names corresponds to the dictionary's keys

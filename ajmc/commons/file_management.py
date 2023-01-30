@@ -166,14 +166,22 @@ def clean_all_ocr_runs_outputs_dirs():
                         os.system(command)
 
 
-def find_replace_in_all_via_projects(old_pattern: str, new_pattern: str):
+def find_replace_in_all_comm_dirs(file_rel_path: str,
+                                  old_pattern: str,
+                                  new_pattern: str,
+                                  check: bool = False):
     for dir_ in walk_dirs(vs.COMMS_DATA_DIR):
-        via_path = vs.get_comm_via_path(dir_.name)
-        if via_path.exists():
-            text = via_path.read_text(encoding='utf-8')
+        file_path = vs.get_comm_base_dir(dir_.name) / file_rel_path
+
+        if file_path.exists():
+            text = file_path.read_text(encoding='utf-8')
             text = text.replace(old_pattern, new_pattern)
-            print(f'Writing {via_path}')
-            via_path.write_text(text, encoding='utf-8')
+            if check:
+                print(f'Would write {file_path}, replacing {old_pattern} with {new_pattern}')
+                if input('Type enter to continue, or anything else to stop') != '':
+                    continue
+            print(f'Writing {file_path}')
+            file_path.write_text(text, encoding='utf-8')
 
 
 @docstring_formatter(**docstrings)
