@@ -258,7 +258,7 @@ REGION_TYPES_TO_SEGMONTO = {
     'app_crit': 'MarginTextZone:criticalApparatus',
     'bibliography': 'MainZone:bibliography',
     'footnote': 'MarginTextZone:footnote',
-    'index_siglorum': 'MainZone:index',
+    'index': 'MainZone:index',
     'running_header': 'RunningTitleZone',
     'table_of_contents': 'MainZone:ToC',
     'title': 'TitlePageZone',
