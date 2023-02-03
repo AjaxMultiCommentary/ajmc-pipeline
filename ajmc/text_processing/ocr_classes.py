@@ -341,7 +341,7 @@ class OcrPage(Page, TextContainer):
         """Validate `self.to_canonical_v1` and serializes it to json."""
         schema = json.loads(schema_path.read_text('utf-8'))
         jsonschema.validate(instance=self.to_canonical_v1(), schema=schema)
-        (output_dir / self.id + '.json').write_text(json.dumps(self.to_canonical_v1(), indent=4, ensure_ascii=False),
+        ((output_dir / self.id).with_suffix('.json')).write_text(json.dumps(self.to_canonical_v1(), indent=4, ensure_ascii=False),
                                                     encoding='utf-8')
 
     def reset(self):
