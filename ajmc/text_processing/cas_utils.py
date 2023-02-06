@@ -4,6 +4,7 @@ legacy but functional.
 """
 import json
 import os
+from time import strftime
 from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
 
@@ -128,6 +129,8 @@ def compute_image_links(page: dict,
 
 def rebuild_to_xmi(page: dict,
                    output_dir: Path,
+                   ocr_run_id : str,
+                   regions_considered : str,
                    typesystem_path: Path = vs.TYPESYSTEM_PATH,
                    iiif_mappings=None,
                    pct_coordinates=False):
@@ -156,7 +159,17 @@ def rebuild_to_xmi(page: dict,
     word = typesystem.get_type('de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token')
 
     img_link_type = 'webanno.custom.AjMCImages'
+    ajmc_metadata_type = 'webanno.custom.AjMCDocumentmetadata'
     image_link = typesystem.get_type(img_link_type)
+    ajmc_metadata = typesystem.get_type(ajmc_metadata_type)
+
+    # create metadata annotations
+    metadata = ajmc_metadata(
+        ocr_run_id=ocr_run_id,
+        regions_considered=regions_considered,
+        xmi_creation_date=strftime('%Y-%m-%d %H:%M:%S')
+    )
+    cas.add(metadata)
 
     # create sentence-level annotations
     for offsets in page['offsets']['lines']:
@@ -175,7 +188,7 @@ def rebuild_to_xmi(page: dict,
 
 
 # todo 👁️ This should rely on ocr outputs dirs
-def export_commentary_to_xmis(commentary: Type['Commentary'],
+def export_commentary_to_xmis(commentary: Type['OcrCommentary'],
                               make_jsons: bool,
                               make_xmis: bool,
                               json_dir: Optional[Path] = None,
@@ -205,7 +218,7 @@ def export_commentary_to_xmis(commentary: Type['Commentary'],
             page.to_json(output_dir=json_dir)
             rebuild = basic_rebuild(page.to_canonical_v1(), region_types)
             if len(rebuild['fulltext']) > 0:  # handles the empty-page case
-                rebuild_to_xmi(rebuild, xmi_dir)
+                rebuild_to_xmi(rebuild, xmi_dir, commentary.ocr_run, ",".join(region_types))
 
     elif make_jsons:
         json_dir.mkdir(parents=True, exist_ok=True)
@@ -222,12 +235,15 @@ def export_commentary_to_xmis(commentary: Type['Commentary'],
                     json_path.read_text(encoding='utf-8'))  # Why can't this be done directly from commentary ?
             rebuild = basic_rebuild(page, region_types)
             if len(rebuild['fulltext']) > 0:  # handles the empty-page case
-                rebuild_to_xmi(rebuild, xmi_dir)
+                rebuild_to_xmi(rebuild, xmi_dir, commentary.ocr_run, ",".join(region_types))
 
 
-def get_cas(xmi_path: Path, xml_path: Path) -> 'cassis.Cas':
-    typesystem = load_typesystem(xml_path)
-    cas = load_cas_from_xmi(xmi_path, typesystem=typesystem)
+def get_cas(xmi_path: Path, xml_path: Path) -> Cas:
+    # ⚠️ for some reason, passing to `load_cas_from_xmi()` the file object
+    # works just fine, while passing to it the path (`str`) raises an
+    # exception of empty XMI files (very strange!) 
+    with open(xmi_path, 'rb') as inputfile:
+        cas = load_cas_from_xmi(inputfile, typesystem=load_typesystem(xml_path))
     return cas
 
 
