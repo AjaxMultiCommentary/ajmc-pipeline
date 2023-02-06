@@ -1,3 +1,4 @@
+import os
 import platform
 import re
 from pathlib import Path
@@ -15,12 +16,13 @@ PageType = Union[Type['Page'], Type['CanonicalPage'], Type['OcrPage']]
 
 # PACKAGE-RELATIVE PATHS
 SCHEMA_PATH = Path('ajmc/data/templates/page.schema.json')
-TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
+#TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
+TYPESYSTEM_PATH = Path('ajmc/data/templates/NewTypeSystem.xml')
 
 # AJMC DATA DIR AND STRUCTURE
 EXEC_ENV = platform.uname().node
 
-_DRIVE_BASE_DIR: Optional[Path] = None  # Keep this to be able to determine a custom path for the data
+_DRIVE_BASE_DIR: Optional[Path] = Path(os.getenv('AJMC_GDRIVE_BASE_DIR')) if os.getenv('AJMC_GDRIVE_BASE_DIR') else None
 
 
 def get_drive_base_dir() -> Path:
@@ -52,7 +54,7 @@ COMM_OCR_RUNS_REL_DIR = Path('ocr/runs')
 COMM_OCR_GT_REL_DIR = Path('ocr/groundtruth')
 COMM_OCR_GT_PAIRS_REL_DIR = Path('ocr/gt_file_pairs')
 COMM_VIA_REL_PATH = Path('olr/via_project.json')
-COMM_XMI_REL_DIR = Path('ner/annotation')
+COMM_XMI_REL_DIR = Path('ner/annotation/xmi')
 COMM_CANONICAL_REL_DIR = Path('canonical/v2')
 COMM_CANONICAL_V1_REL_DIR = Path('canonical')
 COMM_SECTIONS_REL_PATH = Path('sections.json')
