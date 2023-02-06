@@ -173,16 +173,16 @@ def rebuild_to_xmi(page: dict,
 
     # create sentence-level annotations
     for offsets in page['offsets']['lines']:
-        cas.add_annotation(sentence(begin=offsets[0], end=offsets[1]))
+        cas.add(sentence(begin=offsets[0], end=offsets[1]))
 
     for offsets in page['offsets']['words']:
-        cas.add_annotation(word(begin=offsets[0], end=offsets[1]))
+        cas.add(word(begin=offsets[0], end=offsets[1]))
 
     iiif_links = compute_image_links(page, iiif_links=iiif_mappings, pct=pct_coordinates)
 
     # inject the IIIF links into
     for iiif_link, start, end in iiif_links:
-        cas.add_annotation(image_link(begin=start, end=end, link=iiif_link))
+        cas.add(image_link(begin=start, end=end, link=iiif_link))
 
     cas.to_xmi((output_dir / f'{page["id"]}.xmi'), pretty_print=True)
 
