@@ -52,11 +52,11 @@ for comm in commentaries:
     can_path = variables.get_comm_canonical_v1_dir(comm['id']) / (comm['run'] + '.json')
     can_comm = CanonicalCommentary.from_json(can_path)
 
-    for gt_page in can_comm.olr_groundtruth_pages:
+    for gt_page in can_comm.olr_gt_pages:
         regions = [{'label': variables.REGION_TYPES_TO_SEGMONTO[r.region_type],
                     'bbox': r.bbox.bbox}
                    for r in gt_page.children.regions
                    if r.region_type in variables.ROIS]
 
-        (comm_export_dir / f'{gt_page.id}.json').write_text(json.dumps(regions, indent=2, ensure_ascii=False, encoding='utf-8'))
-
+        (comm_export_dir / f'{gt_page.id}.json').write_text(
+            json.dumps(regions, indent=2, ensure_ascii=False, encoding='utf-8'))

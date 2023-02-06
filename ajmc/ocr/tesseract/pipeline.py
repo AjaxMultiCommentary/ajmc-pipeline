@@ -40,8 +40,6 @@ if __name__ == '__main__':
         logger.info('Making models')
         make_models(models_ids=args.model_ids, overwrite=args.overwrite)
 
-
     if args.make_experiments:
         logger.info('Making experiments')
         make_experiments(experiment_ids=args.experiment_ids, overwrite=args.overwrite)
-

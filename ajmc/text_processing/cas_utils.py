@@ -4,8 +4,8 @@ legacy but functional.
 """
 import json
 import os
-from time import strftime
 from pathlib import Path
+from time import strftime
 from typing import Dict, List, Optional, Type, Union
 
 from cassis import Cas, load_cas_from_xmi, load_typesystem
@@ -208,7 +208,7 @@ def export_commentary_to_xmis(commentary: Type['OcrCommentary'],
 
     # Create paths
     json_dir = json_dir if json_dir else vs.COMMS_DATA_DIR / commentary.id / 'canonical' / commentary.ocr_run
-    xmi_dir = xmi_dir if xmi_dir else vs.get_comm_xmi_dir(commentary.id) / commentary.ocr_run
+    xmi_dir = xmi_dir if xmi_dir else vs.get_comm_ner_xmi_dir(commentary.id) / commentary.ocr_run
 
     if make_jsons and make_xmis:
         json_dir.mkdir(parents=True, exist_ok=True)

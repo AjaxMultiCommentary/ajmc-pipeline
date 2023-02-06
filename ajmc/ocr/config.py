@@ -9,7 +9,7 @@ from typing import Dict
 
 import pandas as pd
 
-from ajmc.ocr import variables as ocr_vars
+from ajmc.ocr import variables as ocr_vs
 
 
 def row_to_dataset_config(row: 'pd.Series'):
@@ -19,8 +19,8 @@ def row_to_dataset_config(row: 'pd.Series'):
     config = {'id': raw_config['id'],  # id and source are str and list[str]
               'source': raw_config['source'].split('-'),
               'sampling': {k: v.split('-') if type(v) == str else v
-                           for k, v in raw_config.items() if k in ocr_vars.SAMPLING_TYPES},
-              'transform': {k: v for k, v in raw_config.items() if k in ocr_vars.TRANSFORM_OPERATIONS}}
+                           for k, v in raw_config.items() if k in ocr_vs.SAMPLING_TYPES},
+              'transform': {k: v for k, v in raw_config.items() if k in ocr_vs.TRANSFORM_OPERATIONS}}
 
     return config
 
@@ -51,10 +51,10 @@ def config_to_tesstrain_config(config):
     return {
         'MODEL_NAME': config['id'],
         'START_MODEL': config['source'],
-        'GROUND_TRUTH_DIR': str(ocr_vars.get_dataset_dir(config['train_dataset'])),
-        'LANGDATA_DIR': str(ocr_vars.LANGDATA_DIR),
-        'TESSDATA': ocr_vars.get_traineddata_dir(config['source']),
-        'DATA_DIR': str(ocr_vars.get_model_train_dir(config['id'])),
+        'GROUND_TRUTH_DIR': str(ocr_vs.get_dataset_dir(config['train_dataset'])),
+        'LANGDATA_DIR': str(ocr_vs.LANGDATA_DIR),
+        'TESSDATA': ocr_vs.get_traineddata_dir(config['source']),
+        'DATA_DIR': str(ocr_vs.get_model_train_dir(config['id'])),
         'CORES': config['train_cores'],
         'EPOCHS': config['epochs'],
         'LEARNING_RATE': config['learning_rate'],
@@ -64,7 +64,7 @@ def config_to_tesstrain_config(config):
     }
 
 
-def get_all_configs(xl_path: Path = ocr_vars.CONFIGS_PATH) -> Dict[str, Dict[str, dict]]:
+def get_all_configs(xl_path: Path = ocr_vs.CONFIGS_PATH) -> Dict[str, Dict[str, dict]]:
     configs = {}
 
     for config_type in ['experiments', 'datasets', 'models']:

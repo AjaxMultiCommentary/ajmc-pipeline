@@ -19,6 +19,7 @@ from ajmc.commons import variables as vs
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import are_bboxes_overlapping_with_threshold, is_bbox_within_bbox
 from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.utils import count_chars_by_charset, harmonise_unicode
 from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
 
@@ -163,9 +164,9 @@ def write_error_counts(bow_error_counts: dict,
     df.to_csv(os.path.join(output_dir, 'evaluation_results.tsv'), index=False, sep='\t')
 
 
-def write_editops_record(editops_record, output_dir):
+def write_editops_record(editops_record: dict, output_dir: Path):
     editops_record = {k: v for k, v in sorted(editops_record.items(), key=lambda item: item[1], reverse=True)}
-    with open(os.path.join(output_dir, "editops.tsv"), 'w', encoding="utf-8") as csv_file:
+    with open((output_dir / "editops.tsv"), 'w', encoding="utf-8") as csv_file:
         spamwriter = csv.writer(csv_file, delimiter='\t', quotechar='"')
         spamwriter.writerow(['Operation', 'From', 'To', 'Count'])
         for k, v in editops_record.items():
@@ -418,7 +419,7 @@ def commentary_evaluation(commentary: 'OcrCommentary',
                       encoding="utf-8") as html_file:
                 html_file.write(str(soup))
 
-        write_editops_record(editops_record=editops, output_dir=output_dir)
+        write_editops_record(editops_record=editops, output_dir=Path(output_dir))
         write_error_counts(bow_error_counts, coord_error_counts, output_dir)
 
     return bow_error_counts, coord_error_counts, editops
@@ -426,11 +427,11 @@ def commentary_evaluation(commentary: 'OcrCommentary',
 
 def line_by_line_evaluation(gt_dir: Path,
                             ocr_dir: Path,
-                            gt_suffix: str = '.gt.txt',
-                            ocr_suffix: str = '.txt',
+                            gt_suffix: str = ocr_vs.GT_TEXT_EXTENSION,
+                            ocr_suffix: str = ocr_vs.PRED_TEXT_EXTENSION,
                             error_record: dict = None,
                             editops_record: dict = None,
-                            write_to_file: bool = True,
+                            output_dir: Optional[Path] = None,
                             normalize: bool = True) -> Tuple[dict, dict]:
     """Evaluates all the text files in `ocr_dir` against the corresponding text files in `gt_dir`.
 
@@ -441,7 +442,7 @@ def line_by_line_evaluation(gt_dir: Path,
         ocr_suffix: The suffix of the OCR files.
         error_record: The error record to update (pass only if you want to aggregate multiple evaluations).
         editops_record: The editops record to update (pass only if you want to aggregate multiple evaluations).
-        write_to_file: Whether to write the error record and editops record to file.
+        output_dir: If given, the evaluation files will be written to this directory.
         normalize: Whether to harmonise the unicode of the groundtruth and OCR files.
     """
 
@@ -452,8 +453,8 @@ def line_by_line_evaluation(gt_dir: Path,
 
     for ocr_path in ocr_dir.glob(f'*{ocr_suffix}'):
         gt_path = gt_dir / ocr_path.with_suffix(gt_suffix).name
-        gt_text = gt_path.read_text(encoding='utf-8')
-        ocr_text = ocr_path.read_text(encoding='utf-8')
+        gt_text = gt_path.read_text('utf-8')
+        ocr_text = ocr_path.read_text('utf-8')
 
         # Postprocess the OCR text
         if normalize:
@@ -485,20 +486,15 @@ def line_by_line_evaluation(gt_dir: Path,
     logger.info(f'Word Error Rate: {wer}')
 
     # Write files
-    if write_to_file:
-        eval_dir = ocr_dir.parent / 'evaluation'
-        eval_dir.mkdir(parents=True, exist_ok=True)
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
 
         editops_record = {k: v for k, v in sorted(editops_record.items(), key=lambda item: item[1], reverse=True)}
-        write_editops_record(editops_record=editops_record, output_dir=eval_dir)
+        write_editops_record(editops_record=editops_record, output_dir=output_dir)
 
-        pd.DataFrame.from_dict(error_record, orient='columns').to_csv(os.path.join(eval_dir, 'error_record.tsv'),
-                                                                      sep='\t',
+        pd.DataFrame.from_dict(error_record, orient='columns').to_csv((output_dir / 'error_record.tsv'), sep='\t',
                                                                       index=False)
 
-        with open(os.path.join(eval_dir, 'results.txt'), 'w') as f:
-            f.write(f'cer\twer\n{cer}\t{wer}')
+        (output_dir / 'results.txt').write_text(f'cer\twer\n{cer}\t{wer}', encoding='utf-8')
 
     return error_record, editops_record
-
-

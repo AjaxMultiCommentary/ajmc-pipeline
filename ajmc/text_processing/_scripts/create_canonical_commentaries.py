@@ -1,36 +1,39 @@
 """Use this script to bulk convert ocr runs to canonical commentary"""
+import argparse
+
 from tqdm import tqdm
 
-from ajmc.commons import variables
+from ajmc.commons import variables as vs
 from ajmc.commons.miscellaneous import stream_handler
 from ajmc.text_processing.ocr_classes import OcrCommentary
 
-stream_handler.setLevel(20)
 
-DESIRED_COMMENTARIES = [
-    # 'annalsoftacitusp00taci',
-    # 'bsb10234118',
-    # 'Colonna1975',
-    # 'DeRomilly1976',
-    # 'Ferrari1974',
-    # 'Finglass2011',
-    # 'Garvie1998',
-    # 'Hermann1851',
-    # 'Kamerbeek1953',
-    # 'Paduano1982',
-    # 'pvergiliusmaroa00virggoog',
-    # 'Schneidewin_Nauck_Radermacher1913',
-    'Stanford1963',
-    # 'thukydides02thuc',
-    # 'Untersteiner1934',
-]
+parser = argparse.ArgumentParser()
+parser.add_argument('--commentary_ids', nargs='+', help='Commentaries to process', default=vs.ALL_COMM_IDS)
+parser.add_argument('--ocr_run_pattern', type=str, help='OCR run pattern to process, eg. *_tess_base',
+                    default='*_tess_base')
+parser.add_argument('--ocr_gt_comms_only', action='store_true', help='Process only commentaries with OCR ground truth')
+parser.add_argument('--non_ocr_gt_comms_only', action='store_true',
+                    help='Process only commentaries with OCR ground truth')
+parser.add_argument('--stream_handler_level', type=str, help='Stream handler level', default='ERROR')
+args = parser.parse_args()
 
+stream_handler.setLevel(args.stream_handler_level)
 
-for comm_id in tqdm(DESIRED_COMMENTARIES, desc='Processing commentaries'):
+for comm_id in tqdm(args.commentary_ids, desc='Processing commentaries'):
 
-    try:
-        ocr_outputs_dir = next(variables.get_comm_ocr_runs_dir(comm_id).glob('*_tess_base')) / 'outputs'
-    except StopIteration:
+    comm = OcrCommentary.from_ajmc_data(id=comm_id, ocr_run=args.ocr_run_pattern)
+
+    comm_can_path = vs.get_comm_canonical_path(comm_id, ocr_run=comm.ocr_run)
+
+    # if comm_can_path.exists():
+    #     if str(datetime.fromtimestamp(comm_can_path.stat().st_mtime)).startswith('2023-01-31'):
+    #         print(f'******* ALREADY CONVERTED {comm_id}')
+    #         continue
+
+    if args.ocr_gt_comms_only and not comm.ocr_gt_page_ids:
         continue
 
-    OcrCommentary.from_ajmc_data(id=comm_id).to_canonical().to_json()
+    if args.non_ocr_gt_comms_only and comm.ocr_gt_page_ids:
+        continue
+    comm.to_canonical().to_json()

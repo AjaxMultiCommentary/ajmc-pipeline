@@ -88,11 +88,11 @@ class Commentary(TextContainer):
         """A simple shortcut to get a section from its type."""
         try:
             return [s for s in self.children.sections if section_type in s.section_types][0]
-        except StopIteration:
+        except IndexError:
             return None
 
     @lazy_property
-    def olr_groundtruth_pages(self) -> List[vs.PageType]:
+    def olr_gt_pages(self) -> List[vs.PageType]:
         """A list of `CanonicalPage` objects containing the groundtruth of the OLR."""
         page_ids = get_olr_splits_page_ids(self.id)
         return [p for p in self.children.pages if p.id in page_ids]
@@ -114,7 +114,7 @@ class Commentary(TextContainer):
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Iterate over groundtruth pages
-        for page in self.ocr_groundtruth_pages:
+        for page in self.ocr_gt_pages:
             for i, line in enumerate(page.children.lines):
                 line.image.write(output_dir / f'{page.id}_{i}.png')
                 (output_dir / f'{page.id}_{i}.gt.txt').write_text(unicodedata.normalize(unicode_format, line.text),

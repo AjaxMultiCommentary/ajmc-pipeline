@@ -53,7 +53,8 @@ COMM_OCR_RUNS_REL_DIR = Path('ocr/runs')
 COMM_OCR_GT_REL_DIR = Path('ocr/groundtruth')
 COMM_OCR_GT_PAIRS_REL_DIR = Path('ocr/gt_file_pairs')
 COMM_VIA_REL_PATH = Path('olr/via_project.json')
-COMM_XMI_REL_DIR = Path('ner/annotation/xmi')
+COMM_NER_XMI_REL_DIR = Path('ner/annotation/xmi')
+COMM_LEMLINK_XMI_REL_DIR = Path('lemlink/annotation/xmi')
 COMM_CANONICAL_REL_DIR = Path('canonical/v2')
 COMM_CANONICAL_V1_REL_DIR = Path('canonical')
 COMM_SECTIONS_REL_PATH = Path('sections.json')
@@ -75,16 +76,16 @@ def get_comm_via_path(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_VIA_REL_PATH
 
 
-def get_comm_xmi_dir(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_XMI_REL_DIR
+def get_comm_ner_xmi_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_NER_XMI_REL_DIR
 
 
 def get_comm_ocr_runs_dir(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_OCR_RUNS_REL_DIR
 
 
-def get_comm_ocr_outputs_dir(comm_id: str, run_id: str) -> Path:
-    return get_comm_ocr_runs_dir(comm_id) / run_id / 'outputs'
+def get_comm_ocr_outputs_dir(comm_id: str, ocr_run: str) -> Path:
+    return get_comm_ocr_runs_dir(comm_id) / ocr_run / 'outputs'
 
 
 def get_comm_ocr_gt_pairs_dir(comm_id: str) -> Path:
@@ -99,8 +100,8 @@ def get_comm_canonical_dir(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_CANONICAL_REL_DIR
 
 
-def get_comm_canonical_path(comm_id: str, run_id: str) -> Path:
-    return get_comm_canonical_dir(comm_id) / f'{run_id}.json'
+def get_comm_canonical_path(comm_id: str, ocr_run: str) -> Path:
+    return get_comm_canonical_dir(comm_id) / f'{ocr_run}.json'
 
 
 def get_comm_sections_path(comm_id: str) -> Path:
@@ -365,6 +366,7 @@ LINKAGE_MINIREF_PAGES = [
     'Wecklein1894_0024',
 ]
 
+# 'sophoclesplaysa05campgoog': '1bm0b4_tess_final', FOR LEMMA LINKAGE
 IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run used as a base in the annotation campaign.
     'cu31924087948174': '1bm0b3_tess_final',
     'lestragdiesdeso00tourgoog': '21i0dA_tess_hocr',

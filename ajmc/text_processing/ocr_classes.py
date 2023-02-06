@@ -221,12 +221,12 @@ class OcrCommentary(Commentary):
     @lazy_property
     def ocr_gt_pages(self) -> Union[List['OcrPage'], list]:
         """The commentary's pages which have a groundtruth file in `self.paths['groundtruth']`."""
-        return [OcrPage.from_ajmc_data(self.ocr_gt_dir / p_id, commentary=self) for p_id in self.ocr_gt_page_ids]
+        return [OcrPage.from_ajmc_data(self.ocr_gt_dir / f'{p_id}.html', commentary=self) for p_id in
+                self.ocr_gt_page_ids]
 
     @lazy_property
     def via_project(self) -> dict:
-        with open(self.via_path, 'r') as file:
-            return json.load(file)
+        return json.loads(self.via_path.read_text(encoding='utf-8'))
 
     @lazy_property
     def images(self) -> List[AjmcImage]:
@@ -472,7 +472,7 @@ class RawSection(TextContainer):
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
         if children_type == 'pages':
             return [p for p in self.parents.commentary.children.pages
-                    if self.start >= p.number <= self.end]
+                    if self.start <= p.number <= self.end]
 
         else:
             return [child for p in self.children.pages for child in getattr(p.children, children_type)]

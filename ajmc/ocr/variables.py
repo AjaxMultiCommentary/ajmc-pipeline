@@ -12,7 +12,7 @@ SEPARATOR = '-'
 # ======================================================================================================================
 #                                PATHS AND DIRS
 # ======================================================================================================================
-LOCAL = True if vs.EXEC_ENV == 'local' else False
+LOCAL = False if vs.EXEC_ENV == 'iccluster040' else True
 XP_DIR = Path('/Users/sven/Desktop/tess_xps') if LOCAL else Path('/scratch/sven/ocr_exp/')
 CONDA_INSTALL_DIR = Path('/Users/sven/opt/anaconda3/') if LOCAL else Path('/scratch/sven/anaconda3')
 LD_LIBRARY_PATH = CONDA_INSTALL_DIR / 'lib'
@@ -24,19 +24,22 @@ MODELS_DIR = XP_DIR / 'models'
 DATASETS_DIR = XP_DIR / 'datasets'
 EXPERIMENTS_DIR = XP_DIR / 'experiments'
 CONFIGS_PATH = XP_DIR / 'configs.xlsx'
-POG_SOURCE_DIR = None if LOCAL else Path('mnt/ajmcdata1/data/pogretra-v1.0')
+POG_SOURCE_DIR = XP_DIR / 'data/pogretra-v1.0/Data' if LOCAL else Path('/mnt/ajmcdata1/data/pogretra-v1.0/Data')
 
 LINES_PER_TESTSET = 120
 
-TEXT_FILES_EXTENSION = '.gt.txt'
-IMG_FILES_EXTENSION = '.png'
+GT_TEXT_EXTENSION = '.gt.txt'
+PRED_TEXT_EXTENSION = '.txt'
+IMG_EXTENSION = '.png'
 
 
 def get_dataset_dir(dataset_name: str) -> Path:
     return DATASETS_DIR / dataset_name
 
+
 def get_dataset_config_path(dataset_name: str) -> Path:
     return get_dataset_dir(dataset_name) / 'config.json'
+
 
 def get_dataset_metadata_path(dataset_name: str) -> Path:
     return get_dataset_dir(dataset_name) / 'metadata.tsv'
