@@ -16,8 +16,7 @@ PageType = Union[Type['Page'], Type['CanonicalPage'], Type['OcrPage']]
 
 # PACKAGE-RELATIVE PATHS
 SCHEMA_PATH = Path('ajmc/data/templates/page.schema.json')
-#TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
-TYPESYSTEM_PATH = Path('ajmc/data/templates/NewTypeSystem.xml')
+TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
 
 # AJMC DATA DIR AND STRUCTURE
 EXEC_ENV = platform.uname().node
