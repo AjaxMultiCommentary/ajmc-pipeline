@@ -15,7 +15,7 @@ from ajmc.commons import variables as vs
 from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.config import CONFIGS
-from ajmc.ocr.utils import count_chars_by_charset, is_greek_string, is_latin_string, is_number_string
+from ajmc.ocr.utils import count_chars_by_charset, is_greek_string, is_latin_string, is_numeral_string
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
 logger = get_custom_logger(__name__)
@@ -130,7 +130,7 @@ def compute_dataset_metadata(dts_dir: Path) -> pd.DataFrame:
 
         script = 'grc' if is_greek_string(text, 1) else \
             'lat' if is_latin_string(text, 1) else \
-                'num' if is_number_string(text, 1) else \
+                'num' if is_numeral_string(text, 1) else \
                     'mix' if (count_chars_by_charset(text, charset='greek') > 0 and
                               count_chars_by_charset(text, charset='latin') > 0) else 'unk'
         metadata['script'].append(script)

@@ -35,9 +35,9 @@ def is_punctuation_char(char: str) -> bool:
     return bool(re.match(vs.CHARSETS['punctuation'], char))
 
 
-def is_number_char(char: str) -> bool:
+def is_numeral_char(char: str) -> bool:
     """Returns True if char is a number character, False otherwise."""
-    return bool(re.match(vs.CHARSETS['numbers'], char))
+    return bool(re.match(vs.CHARSETS['numeral'], char))
 
 
 def count_chars_by_charset(string: str, charset: str) -> int:
@@ -49,7 +49,7 @@ def count_chars_by_charset(string: str, charset: str) -> int:
 
     Args:
         string: self explanatory
-        charset: should be `'greek'`, `'latin'`, `'numbers'`, `'punctuation'` or a valid `re`-pattern,
+        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'` or a valid `re`-pattern,
                  for instance `r'([\u00F4-\u00FF])'`
 
     Returns:
@@ -92,11 +92,11 @@ def is_punctuation_string(text: str, threshold: float = 0.5) -> bool:
         return False
 
 
-def is_number_string(text: str, threshold: float = 0.5) -> bool:
+def is_numeral_string(text: str, threshold: float = 0.5) -> bool:
     """Returns True if more than `threshold` of chars in strin are numbers, False otherwise."""
     alphanum_text = "".join([c for c in text if c.isalnum()])  # cleaning the text from non-alphabetical characters
     if alphanum_text:
-        proportion_numbers = count_chars_by_charset(string=alphanum_text, charset='numbers') / len(alphanum_text)
+        proportion_numbers = count_chars_by_charset(string=alphanum_text, charset='numeral') / len(alphanum_text)
         return proportion_numbers >= threshold
     else:
         return False

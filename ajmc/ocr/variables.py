@@ -54,7 +54,7 @@ def get_traineddata_dir(traineddata_name: str) -> Path:
 
 def get_trainneddata_path(traineddata_name: str) -> Path:
     """Get the path to a traineddata file"""
-    return get_traineddata_dir(traineddata_name) / (traineddata_name + '.traineddata')
+    return get_traineddata_dir(traineddata_name) / f'{traineddata_name}.traineddata'
 
 
 def get_traineddata_unpacked_dir(traineddata_name: str) -> Path:

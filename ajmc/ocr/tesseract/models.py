@@ -1,5 +1,6 @@
 import json
 import subprocess
+import sys
 from pathlib import Path
 from typing import List, Optional
 
@@ -98,17 +99,22 @@ def train(model_config: dict):
 
     # Creates the logging files
     log_path = train_dir / 'train_log.txt'
-    logger.info(f"Starting training... See {log_path} for the training output.")
+    # logger.info(f"Starting training... See {log_path} for the training output.")
 
     command = get_training_command(model_config)
     command_path.write_text(command, encoding='utf-8')
 
     log_to_file(command, log_path)
     bash_command = command.encode('ascii')
-    output = subprocess.run(['bash '], input=bash_command, shell=True, capture_output=True)
+    output = subprocess.run(['bash '], input=bash_command,
+                            stdout=sys.stdout,
+                            stderr=sys.stdout,
+                            shell=True,
+                            # capture_output=True
+                            )
 
     # Write the log
-    log_to_file(output.stdout.decode('ascii'), log_path)
+    # log_to_file(output.stdout.decode('ascii'), log_path)
 
 
 def run(img_dir: Path,

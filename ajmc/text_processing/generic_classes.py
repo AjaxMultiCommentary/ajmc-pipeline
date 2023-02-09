@@ -140,34 +140,3 @@ class Page:
     def number(self) -> int:
         """The page number."""
         return int(self.id.split('_')[-1])
-
-    # def to_canonical_v1(self) -> Dict[str, Any]:
-    #     """Creates canonical data, as used for INCEpTION. """
-    #     logger.warning(
-    #         'You are creating a canonical data version 1. For version 2, use `OcrCommentary.to_canonical()`.')
-    #     data = {'id': self.id,
-    #             'iiif': 'None',
-    #             'cdate': strftime('%Y-%m-%d %H:%M:%S'),
-    #             'regions': []}
-    #
-    #     for r in self.children.regions:
-    #         r_dict = {'region_type': r.region_type,
-    #                   'bbox': list(r.bbox.xywh),
-    #                   'lines': [
-    #                       {
-    #                           'bbox': list(l.bbox.xywh),
-    #                           'words': [
-    #                               {
-    #                                   'bbox': list(w.bbox.xywh),
-    #                                   'text': w.text
-    #                               } for w in l.children.words
-    #                           ]
-    #
-    #                       } for l in r.children.lines
-    #                   ]
-    #                   }
-    #         data['regions'].append(r_dict)
-    #
-    #     return data
-
-    # def to_xmi_json(self):

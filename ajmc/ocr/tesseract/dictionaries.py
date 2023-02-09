@@ -17,7 +17,7 @@ import pandas as pd
 from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.tesseract.tesseract_utils import run_tess_command
-from ajmc.ocr.utils import is_greek_string, is_latin_string, is_number_string
+from ajmc.ocr.utils import is_greek_string, is_latin_string, is_numeral_string
 
 logger = get_custom_logger(__name__)
 
@@ -60,7 +60,7 @@ def get_mr_abbr_wordlist(langs: List[str]) -> List[str]:
     abbreviations = list(set(' '.join(abbreviations).split()))
 
     # Delete numbers
-    abbreviations = [x for x in abbreviations if not is_number_string(x, threshold=0.9)]
+    abbreviations = [x for x in abbreviations if not is_numeral_string(x, threshold=0.9)]
 
     return abbreviations
 

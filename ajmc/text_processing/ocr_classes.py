@@ -43,7 +43,7 @@ class OcrCommentary(Commentary):
                  via_path: Optional[Path] = None,
                  img_dir: Optional[Path] = None,
                  ocr_gt_dir: Optional[Path] = None,
-                 ocr_run: Optional[str] = None,
+                 ocr_run_id: Optional[str] = None,
                  sections_path: Optional[Path] = None,
                  **kwargs):
         """Default constructor, where custom paths can be provided.
@@ -60,31 +60,31 @@ class OcrCommentary(Commentary):
             via_path: {via_path}
             img_dir: {image_dir}
             ocr_gt_dir: {groundtruth_dir}
-            ocr_run: {ocr_run}
+            ocr_run_id: {ocr_run_id}
             sections_path: {sections_path}
         """
         super().__init__(id=id, ocr_dir=ocr_dir, base_dir=base_dir, via_path=via_path, img_dir=img_dir,
-                         ocr_gt_dir=ocr_gt_dir, ocr_run=ocr_run, sections_path=sections_path, **kwargs)
+                         ocr_gt_dir=ocr_gt_dir, ocr_run_id=ocr_run_id, sections_path=sections_path, **kwargs)
 
     @classmethod
     @docstring_formatter(**docstrings)
-    def from_ajmc_data(cls, id: str, ocr_run: str = '*_tess_base'):
+    def from_ajmc_data(cls, id: str, ocr_run_id: str = '*_tess_base'):
         """Use this method to construct a `OcrCommentary`-object using ajmc's data folder structure.
 
         Args:
             id: {commentary_id}
-            ocr_run: {ocr_run} Note `ocr_run` can be a *-wildcard. For instance '*_tess_base' will return
+            ocr_run_id: {ocr_run_id} Note `ocr_run_id` can be a *-wildcard. For instance '*_tess_base' will return
                 the first ocr-run directory that matches the pattern.
         """
 
-        if '*' in ocr_run:
+        if '*' in ocr_run_id:
             comm_ocr_runs_dir = vs.get_comm_ocr_runs_dir(id)
             try:
-                ocr_run = next(comm_ocr_runs_dir.glob(ocr_run)).name
+                ocr_run_id = next(comm_ocr_runs_dir.glob(ocr_run_id)).name
             except StopIteration:
-                raise FileNotFoundError(f'No ocr run found for {comm_ocr_runs_dir} matching {ocr_run}')
+                raise FileNotFoundError(f'No ocr run found for {comm_ocr_runs_dir} matching {ocr_run_id}')
 
-        ocr_outputs_dir = vs.get_comm_ocr_outputs_dir(id, ocr_run)
+        ocr_outputs_dir = vs.get_comm_ocr_outputs_dir(id, ocr_run_id)
 
         return cls(id=id,
                    ocr_dir=ocr_outputs_dir,
@@ -92,7 +92,7 @@ class OcrCommentary(Commentary):
                    via_path=vs.get_comm_via_path(id),
                    img_dir=vs.get_comm_img_dir(id),
                    ocr_gt_dir=vs.get_comm_ocr_gt_dir(id),
-                   ocr_run=ocr_run,
+                   ocr_run_id=ocr_run_id,
                    sections_path=vs.get_comm_sections_path(id))
 
     def to_canonical(self, include_ocr_gt: bool = True) -> CanonicalCommentary:
@@ -117,7 +117,7 @@ class OcrCommentary(Commentary):
         can = CanonicalCommentary(id=self.id,
                                   children=None,
                                   images=[],
-                                  ocr_run=self.ocr_run,
+                                  ocr_run_id=self.ocr_run_id,
                                   ocr_gt_page_ids=self.ocr_gt_page_ids)
 
         # We now populate the children and images
@@ -299,6 +299,9 @@ class OcrPage(Page, TextContainer):
                 elif children_type == 'hyphenations':
                     return [RawHyphenation.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
 
+            elif children_type == 'anchors':
+                raise NotImplementedError('Anchors are not yet implemented')
+
             else:  # page has no CAS
                 return []
 
@@ -308,12 +311,10 @@ class OcrPage(Page, TextContainer):
     def _get_parent(self, parent_type):
         raise NotImplementedError('OcrPage.parents must be set at __init__ or manually.')
 
-    def to_canonical_v1(self) -> Dict[str, Any]:
+    def to_inception_dict(self) -> Dict[str, Any]:
         """Creates canonical data, as used for INCEpTION. """
-        logger.warning(
-                'You are creating a canonical data version 1. For version 2, use `OcrCommentary.to_canonical()`.')
-        data = {'id': self.id,
-                'iiif': 'None',
+        data = {'iiif': 'None',
+                'id': self.id,
                 'cdate': strftime('%Y-%m-%d %H:%M:%S'),
                 'regions': []}
 
@@ -337,12 +338,13 @@ class OcrPage(Page, TextContainer):
 
         return data
 
-    def to_json(self, output_dir: Path, schema_path: Path = vs.SCHEMA_PATH):
-        """Validate `self.to_canonical_v1` and serializes it to json."""
+    def to_inception_json(self, output_dir: Path, schema_path: Path = vs.SCHEMA_PATH):
+        """Validate `self.to_inception_dict` and serializes it to json."""
+        inception_dict = self.to_inception_dict()
         schema = json.loads(schema_path.read_text('utf-8'))
-        jsonschema.validate(instance=self.to_canonical_v1(), schema=schema)
-        ((output_dir / self.id).with_suffix('.json')).write_text(json.dumps(self.to_canonical_v1(), indent=4, ensure_ascii=False),
-                                                    encoding='utf-8')
+        jsonschema.validate(instance=inception_dict, schema=schema)
+        ((output_dir / self.id).with_suffix('.json')).write_text(
+            json.dumps(inception_dict, indent=4, ensure_ascii=False), encoding='utf-8')
 
     def reset(self):
         """Resets the page to free up memory."""

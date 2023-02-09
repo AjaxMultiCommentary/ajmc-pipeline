@@ -49,7 +49,7 @@ export_dir = Path('/Users/sven/Desktop/json_export')
 for comm in commentaries:
     comm_export_dir = export_dir / comm['id']
     comm_export_dir.mkdir(exist_ok=True, parents=True)
-    can_path = variables.get_comm_canonical_v1_dir(comm['id']) / (comm['run'] + '.json')
+    can_path = variables.get_comm_ner_jsons_dir(comm['id']) / (comm['run'] + '.json')
     can_comm = CanonicalCommentary.from_json(can_path)
 
     for gt_page in can_comm.olr_gt_pages:

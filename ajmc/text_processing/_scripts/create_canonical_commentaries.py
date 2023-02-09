@@ -22,9 +22,9 @@ stream_handler.setLevel(args.stream_handler_level)
 
 for comm_id in tqdm(args.commentary_ids, desc='Processing commentaries'):
 
-    comm = OcrCommentary.from_ajmc_data(id=comm_id, ocr_run=args.ocr_run_pattern)
+    comm = OcrCommentary.from_ajmc_data(id=comm_id, ocr_run_id=args.ocr_run_pattern)
 
-    comm_can_path = vs.get_comm_canonical_path(comm_id, ocr_run=comm.ocr_run)
+    comm_can_path = vs.get_comm_canonical_path(comm_id, ocr_run_id=comm.ocr_run_id)
 
     # if comm_can_path.exists():
     #     if str(datetime.fromtimestamp(comm_can_path.stat().st_mtime)).startswith('2023-01-31'):

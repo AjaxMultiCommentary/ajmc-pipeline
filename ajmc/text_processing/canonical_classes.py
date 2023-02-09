@@ -25,7 +25,7 @@ class CanonicalCommentary(Commentary):
                  id: Optional[str],
                  children: Optional['LazyObject'],
                  images: Optional[List[AjmcImage]],
-                 ocr_run: Optional[str] = None,
+                 ocr_run_id: Optional[str] = None,
                  ocr_gt_page_ids: Optional[List[str]] = None,
                  **kwargs):
         """Initialize a `CanonicalCommentary`.
@@ -44,7 +44,7 @@ class CanonicalCommentary(Commentary):
         super().__init__(id=id,
                          children=children,
                          images=images,
-                         ocr_run=ocr_run,
+                         ocr_run_id=ocr_run_id,
                          ocr_gt_page_ids=ocr_gt_page_ids,
                          **kwargs)
 
@@ -67,7 +67,7 @@ class CanonicalCommentary(Commentary):
         commentary = cls(id=can_json['id'],
                          children=None,
                          images=None,
-                         ocr_run=can_json['ocr_run'],
+                         ocr_run_id=can_json['ocr_run_id'],
                          ocr_gt_page_ids=can_json['ocr_gt_page_ids'])
 
         # Automatically determinates paths
@@ -101,13 +101,13 @@ class CanonicalCommentary(Commentary):
         """
 
         data = {'id': self.id,
-                'ocr_run': self.ocr_run,
+                'ocr_run_id': self.ocr_run_id,
                 'ocr_gt_page_ids': self.ocr_gt_page_ids,
                 'children': {child_type: [tc.to_json() for tc in getattr(self.children, child_type)]
                              for child_type in vs.CHILD_TYPES}}
 
         if output_path is None:
-            output_path = vs.get_comm_canonical_path(self.id, self.ocr_run)
+            output_path = vs.get_comm_canonical_path(self.id, self.ocr_run_id)
 
         output_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
 

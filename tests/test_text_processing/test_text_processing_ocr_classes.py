@@ -1,6 +1,5 @@
 import json
 import os
-from pathlib import Path
 
 import jsonschema
 
@@ -76,6 +75,6 @@ def test_ocrpage():
     assert all([isinstance(w, ocr_classes.OcrWord) for w in page.children.words])
 
     # Validate page.json
-    schema_path = Path('..') / variables.SCHEMA_PATH
+    schema_path = variables.SCHEMA_PATH
     schema = json.loads(schema_path.read_text('utf-8'))
-    jsonschema.validate(instance=page.to_canonical_v1(), schema=schema)
+    jsonschema.validate(instance=page.to_inception_dict(), schema=schema)

@@ -308,7 +308,7 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
     """
 
     soup = initialize_soup(img_width=gt_page.image.width, img_height=gt_page.image.height)  # Initialize html output
-    charsets = ['latin', 'greek', 'punctuation', 'numbers']
+    charsets = ['latin', 'greek', 'punctuation', 'numeral']
     pred_words_ = pred_page.children.words.copy()
 
     if not error_counts:
@@ -448,6 +448,10 @@ def line_by_line_evaluation(gt_dir: Path,
 
     error_record = error_record if error_record else {k: [] for k in ['id', 'gt', 'ocr',
                                                                       'chars', 'chars_distance',
+                                                                      'greek_chars', 'greek_chars_distance',
+                                                                      'latin_chars', 'latin_chars_distance',
+                                                                      'numeral_chars', 'numeral_chars_distance',
+                                                                      'punctuation_chars', 'punctuation_chars_distance',
                                                                       'words', 'words_distance']}
     editops_record = editops_record if editops_record else {}
 
@@ -473,17 +477,21 @@ def line_by_line_evaluation(gt_dir: Path,
         error_record['words'].append(len(gt_text.split(' ')))
         error_record['words_distance'].append(Levenshtein.distance(gt_text.split(), ocr_text.split()))
 
+        for charset in vs.CHARSETS.keys():
+            error_record[f'{charset}_chars'].append(count_chars_by_charset(gt_text, charset))
+            error_record[f'{charset}_chars_distance'].append(count_errors_by_charset(gt_text, ocr_text, charset))
+
         # Record edit operations
         editops_record = record_editops(gt_word=gt_text,
                                         ocr_word=ocr_text,
                                         editops=Levenshtein.editops(ocr_text, gt_text),
                                         editops_record=editops_record)
 
-    cer = round(safe_divide(sum(error_record['chars_distance']), sum(error_record['chars'])), 3)
-    wer = round(safe_divide(sum(error_record['words_distance']), sum(error_record['words'])), 3)
+    results = {f'{x}_ER': round(safe_divide(sum(error_record[f'{x}_distance']), sum(error_record[x])), 3)
+               for x in ['chars', 'words', 'greek_chars', 'latin_chars', 'numeral_chars', 'punctuation_chars']}
 
-    logger.info(f'Character Error Rate: {cer}')
-    logger.info(f'Word Error Rate: {wer}')
+    logger.info(f'Character Error Rate: {results["chars_ER"]}')
+    logger.info(f'Word Error Rate: {results["words_ER"]}')
 
     # Write files
     if output_dir is not None:
@@ -495,6 +503,11 @@ def line_by_line_evaluation(gt_dir: Path,
         pd.DataFrame.from_dict(error_record, orient='columns').to_csv((output_dir / 'error_record.tsv'), sep='\t',
                                                                       index=False)
 
-        (output_dir / 'results.txt').write_text(f'cer\twer\n{cer}\t{wer}', encoding='utf-8')
+        header, values = '', ''
+        for k, v in results.items():
+            header += f'{k}\t'
+            values += f'{v}\t'
+
+        (output_dir / 'results.tsv').write_text(f'{header}\n{values}')
 
     return error_record, editops_record

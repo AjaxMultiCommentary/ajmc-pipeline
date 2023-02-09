@@ -40,7 +40,7 @@ def test_bag_of_word_evaluation():
 
 
 def test_coord_based_page_evaluation():
-    base_dir = Path('data/sample_evaluation_data')
+    base_dir = Path('tests/data/sample_evaluation_data')
 
     # We first create a commentary because via is accessed via the commentary
     comm = OcrCommentary(via_path=base_dir / 'via_project.json', )
