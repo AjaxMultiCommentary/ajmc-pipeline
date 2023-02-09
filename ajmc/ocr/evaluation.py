@@ -432,7 +432,7 @@ def line_by_line_evaluation(gt_dir: Path,
                             error_record: dict = None,
                             editops_record: dict = None,
                             output_dir: Optional[Path] = None,
-                            normalize: bool = True) -> Tuple[dict, dict]:
+                            normalize: bool = True) -> Tuple[dict, dict, dict]:
     """Evaluates all the text files in `ocr_dir` against the corresponding text files in `gt_dir`.
 
     Args:
@@ -489,6 +489,9 @@ def line_by_line_evaluation(gt_dir: Path,
 
     results = {f'{x}_ER': round(safe_divide(sum(error_record[f'{x}_distance']), sum(error_record[x])), 3)
                for x in ['chars', 'words', 'greek_chars', 'latin_chars', 'numeral_chars', 'punctuation_chars']}
+    # counts = {f'{x}_count': sum(error_record[x]) for x in ['chars', 'words', 'greek_chars', 'latin_chars',
+    #                                                        'numeral_chars', 'punctuation_chars']}
+    # results.update(counts)
 
     logger.info(f'Character Error Rate: {results["chars_ER"]}')
     logger.info(f'Word Error Rate: {results["words_ER"]}')
@@ -500,14 +503,8 @@ def line_by_line_evaluation(gt_dir: Path,
         editops_record = {k: v for k, v in sorted(editops_record.items(), key=lambda item: item[1], reverse=True)}
         write_editops_record(editops_record=editops_record, output_dir=output_dir)
 
-        pd.DataFrame.from_dict(error_record, orient='columns').to_csv((output_dir / 'error_record.tsv'), sep='\t',
-                                                                      index=False)
+        pd.DataFrame.from_dict(error_record).to_csv((output_dir / 'error_record.tsv'), sep='\t', index=False)
 
-        header, values = '', ''
-        for k, v in results.items():
-            header += f'{k}\t'
-            values += f'{v}\t'
+        pd.DataFrame.from_dict({k: [v] for k, v in results.items()}).to_csv((output_dir / 'results.tsv'), sep='\t', index=False)
 
-        (output_dir / 'results.tsv').write_text(f'{header}\n{values}')
-
-    return error_record, editops_record
+    return error_record, editops_record, results

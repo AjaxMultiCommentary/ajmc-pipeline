@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import bs4.element
 import jsonschema
+from lazy_objects.lazy_objects import lazy_property, LazyObject
 from tqdm import tqdm
 
 from ajmc.commons import variables as vs
@@ -20,7 +21,7 @@ from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import adjust_bbox_to_included_contours, get_bbox_from_points, is_bbox_within_bbox, \
     is_bbox_within_bbox_with_threshold, Shape
 from ajmc.commons.image import AjmcImage
-from ajmc.commons.miscellaneous import get_custom_logger, lazy_property, LazyObject
+from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.ocr.utils import guess_ocr_format
 from ajmc.olr.utils import get_page_region_dicts_from_via, sort_to_reading_order
 from ajmc.text_processing import cas_utils

@@ -2,7 +2,10 @@
 import json
 from typing import List, Optional
 
+import pandas as pd
+
 import ajmc.ocr.evaluation as ocr_eval
+from ajmc.commons.file_management import walk_dirs
 from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.config import CONFIGS
@@ -19,8 +22,8 @@ def make_experiment_dir(experiment_id: str):
     ocr_vs.get_experiment_models_dir(experiment_id).mkdir(parents=True, exist_ok=True)
 
 
-def make_experiment(xp_config: dict,
-                    overwrite: bool = False):
+def make_experiment(xp_config: dict, overwrite_xps: bool = False, overwrite_models: bool = False,
+                    overwrite_datasets: bool = False) -> None:
     """Creates the experiment repo"""
 
     logger.info(f"Making experiment {xp_config['id']}")
@@ -31,7 +34,7 @@ def make_experiment(xp_config: dict,
     xp_config_path = ocr_vs.get_experiment_config_path(xp_config['id'])
 
     # Check if the experiment already exists
-    if xp_config_path.is_file() and not overwrite:  # if the config file exists
+    if xp_config_path.is_file() and not overwrite_xps:  # if the config file exists
         existing_xp_config = json.loads(xp_config_path.read_text(encoding='utf-8'))
         assert xp_config == existing_xp_config, f"""An experiment with id {xp_config['id']} already exists but its model_config is different. Please check manually."""
 
@@ -41,13 +44,13 @@ def make_experiment(xp_config: dict,
     # Get the required test datasets exist, else create it
     test_dataset_config = CONFIGS['datasets'][xp_config['test_dataset']]
     test_dataset_dir = ocr_vs.get_dataset_dir(test_dataset_config['id'])
-    data_preparation.make_dataset(test_dataset_config, overwrite=overwrite)
+    data_preparation.make_dataset(test_dataset_config, overwrite=overwrite_datasets)
 
     # Check if the required models exists, build if not
     for model_id in xp_config['models']:
         model_config = CONFIGS['models'][model_id]
         model_path = ocr_vs.get_trainneddata_path(model_config['id'])
-        make_model(model_config, overwrite=overwrite)
+        make_model(model_config, overwrite_models=overwrite_models, overwrite_datasets=overwrite_datasets)
         # copy the traineddata file to the experiment's models directory
         (xp_models_dir / model_path.name).write_bytes(model_path.read_bytes())
 
@@ -67,8 +70,26 @@ def make_experiment(xp_config: dict,
     xp_config_path.write_text(json.dumps(xp_config, indent=4), encoding='utf-8')
 
 
-def make_experiments(experiment_ids: Optional[List[str]] = None, overwrite: bool = False):
+def make_general_results_table():
+    """Makes a table with the general results of the experiments"""
+    xps_results = pd.DataFrame()
+    for xp_dir in walk_dirs(ocr_vs.EXPERIMENTS_DIR):
+        xp_config = pd.DataFrame.from_dict(CONFIGS['experiments'][xp_dir.name], )
+        xp_results = pd.read_csv((xp_dir / 'results.tsv'), sep='\t')
+        xp_results = pd.concat([xp_config, xp_results], axis=1)
+        xps_results = pd.concat([xps_results, xp_results], axis=0)
+
+    xps_results.to_csv(ocr_vs.EXPERIMENTS_DIR / 'general_results.tsv', sep='\t', index=False)
+
+
+def make_experiments(experiment_ids: Optional[List[str]] = None,
+                     overwrite_xps: bool = False,
+                     overwrite_datasets: bool = False,
+                     overwrite_models: bool = False):
     """Makes the experiments"""
     for xp_id, xp_config in CONFIGS['experiments'].items():
         if experiment_ids is None or xp_id in experiment_ids:
-            make_experiment(xp_config, overwrite=overwrite)
+            make_experiment(xp_config, overwrite_xps=overwrite_xps, overwrite_models=overwrite_models,
+                            overwrite_datasets=overwrite_datasets)
+
+    make_general_results_table()

@@ -5,10 +5,11 @@ from pathlib import Path
 from typing import List, Optional, Type, Union
 
 import cv2
+from lazy_objects.lazy_objects import lazy_property, lazy_init, LazyObject
 
 from ajmc.commons import variables as vs, image as ajmc_img
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.miscellaneous import get_custom_logger, lazy_init, lazy_property, LazyObject
+from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.olr.utils import get_olr_splits_page_ids
 
 logger = get_custom_logger(__name__)

@@ -20,7 +20,9 @@ def make_model_dirs(model_id: str):
     ocr_vs.get_model_train_dir(model_id).mkdir(parents=True, exist_ok=True)
 
 
-def make_model(model_config: dict, overwrite: bool = False) -> None:
+def make_model(model_config: dict,
+               overwrite_models: bool = False,
+               overwrite_datasets: bool = False) -> None:
     """Creates the model repo"""
 
     # Get the model's paths
@@ -28,7 +30,7 @@ def make_model(model_config: dict, overwrite: bool = False) -> None:
     config_path = ocr_vs.get_model_config_path(model_config['id'])
 
     # Check if the model already exists
-    if model_path.is_file() and config_path.is_file() and not overwrite:
+    if model_path.is_file() and config_path.is_file() and not overwrite_models:
         existing_model_config = json.loads(config_path.read_text(encoding='utf-8'))
         assert model_config == existing_model_config, f"""A model with id {model_config['id']} already exists but its model_config is different. Please check manually."""
         return None
@@ -48,7 +50,7 @@ def make_model(model_config: dict, overwrite: bool = False) -> None:
         logger.info(f"Building model {model_config['id']} from its model_config.")
         source_model_config = CONFIGS['models'][model_config['source']]
         source_model_path = ocr_vs.get_trainneddata_path(source_model_config['id'])
-        make_model(source_model_config, overwrite=overwrite)  # Gets the source model recursively
+        make_model(source_model_config, overwrite_models=overwrite_models)  # Gets the source model recursively
         model_path.write_bytes(source_model_path.read_bytes())
 
         # Change the wordlist if necessary
@@ -61,7 +63,7 @@ def make_model(model_config: dict, overwrite: bool = False) -> None:
         # train the model ?
         if model_config['train_dataset'] is not None:
             train_dataset_config = CONFIGS['datasets'][model_config['train_dataset']]
-            make_dataset(train_dataset_config, overwrite=overwrite)
+            make_dataset(train_dataset_config, overwrite=overwrite_datasets)
             train(model_config)
 
     # Write the config file
@@ -168,16 +170,17 @@ done;"""
     subprocess.run(['bash'], input=bash_command, shell=True)
 
 
-def make_models(models_ids: Optional[List[str]] = None, overwrite: bool = False):
+def make_models(models_ids: Optional[List[str]] = None,
+                overwrite_models: bool = False,
+                overwrite_datasets: bool = False):
     """Creates datasets.
 
     Args:
         models_ids: The list of models to create. If None, creates all models.
-        overwrite: Wheter to overwrite existing models. Note that this function calls on `get_or_make_trainneddata_path``,
-        which is recursive. If `overwrite` is True, all required models will be overwritten
-        (i.e. also each models's source-model).
+        overwrite_models: Wheter to overwrite existing models.
+        overwrite_datasets: Wheter to overwrite existing datasets.
     """
 
     for model_id, model_config in CONFIGS['models'].items():
         if models_ids is None or model_id in models_ids:
-            make_model(model_config, overwrite=overwrite)
+            make_model(model_config, overwrite_models=overwrite_models, overwrite_datasets=overwrite_datasets)

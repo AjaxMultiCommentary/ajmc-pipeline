@@ -6,13 +6,14 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple, Type, Union
 
 from jinja2 import Environment, PackageLoader
+from lazy_objects.lazy_objects import lazy_property, LazyObject
 
 from ajmc.commons import variables as vs
 from ajmc.commons.arithmetic import is_interval_within_interval
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import get_bbox_from_points, Shape
 from ajmc.commons.image import AjmcImage
-from ajmc.commons.miscellaneous import get_custom_logger, lazy_property, LazyObject
+from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
 
 logger = get_custom_logger(__name__)

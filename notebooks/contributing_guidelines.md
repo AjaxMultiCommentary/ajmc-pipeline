@@ -146,7 +146,8 @@ As they constitute the backend of a dynamic platform, `ajmc`'s modules should be
 
 2. Object instantiation should be lazy.
 
-`ajmc.commons.miscellaneous` provides two main utilities for lazyness: `lazy_property` and `LazyObject`. The former allows properties to be computed and then stored only when they are called.
+`lazy_objects` provides two main utilities for lazyness: `lazy_property` and `LazyObject`. The former allows properties
+to be computed and then stored only when they are called.
 
 ✅ This is good practice:
 

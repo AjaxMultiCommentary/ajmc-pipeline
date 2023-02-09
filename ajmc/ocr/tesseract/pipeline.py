@@ -26,7 +26,9 @@ parser.add_argument('--make_experiments', action='store_true')
 parser.add_argument('--experiment_ids', nargs='+', type=str, default=None,
                     help='The ids of the experiments to make, leave empty to make all experiments')
 
-parser.add_argument('--overwrite', action='store_true')
+parser.add_argument('--overwrite_xps', action='store_true')
+parser.add_argument('--overwrite_models', action='store_true')
+parser.add_argument('--overwrite_datasets', action='store_true')
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -34,12 +36,18 @@ if __name__ == '__main__':
 
     if args.make_datasets:
         logger.info('Making datasets')
-        data_preparation.make_datasets(dts_ids=args.dataset_ids)
+        data_preparation.make_datasets(dts_ids=args.dataset_ids,
+                                       overwrite=args.overwrite_datasets)
 
     if args.make_models:
         logger.info('Making models')
-        make_models(models_ids=args.model_ids, overwrite=args.overwrite)
+        make_models(models_ids=args.model_ids,
+                    overwrite_models=args.overwrite_models,
+                    overwrite_datasets=args.overwrite_datasets)
 
     if args.make_experiments:
         logger.info('Making experiments')
-        make_experiments(experiment_ids=args.experiment_ids, overwrite=args.overwrite)
+        make_experiments(experiment_ids=args.experiment_ids,
+                         overwrite_xps=args.overwrite_xps,
+                         overwrite_models=args.overwrite_models,
+                         overwrite_datasets=args.overwrite_datasets)
