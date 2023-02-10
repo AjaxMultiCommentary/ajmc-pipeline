@@ -1,5 +1,5 @@
 """Miscellaneous helpers and utilities."""
-# CHECKED 2023-01-24
+
 import json
 import logging
 import timeit

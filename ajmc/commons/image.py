@@ -1,5 +1,4 @@
 """Basic operations and objects for image processing."""
-# CHECKED 2023-01-24
 
 import random
 from pathlib import Path

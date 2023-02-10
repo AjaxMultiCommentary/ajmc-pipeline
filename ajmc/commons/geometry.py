@@ -1,5 +1,4 @@
 """Basic geometrical operations and objects."""
-# CHECKED 2023-01-24
 
 from typing import Iterable, List, Tuple, Union
 
