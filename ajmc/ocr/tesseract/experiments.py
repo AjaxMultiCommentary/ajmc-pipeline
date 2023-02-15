@@ -37,6 +37,7 @@ def make_experiment(xp_config: dict, overwrite_xps: bool = False, overwrite_mode
     if xp_config_path.is_file() and not overwrite_xps:  # if the config file exists
         existing_xp_config = json.loads(xp_config_path.read_text(encoding='utf-8'))
         assert xp_config == existing_xp_config, f"""An experiment with id {xp_config['id']} already exists but its model_config is different. Please check manually."""
+        return None
 
     # If the experiment does not already exist
     make_experiment_dir(xp_config['id'])  # Create the experiment's repository
@@ -74,7 +75,7 @@ def make_general_results_table():
     """Makes a table with the general results of the experiments"""
     xps_results = pd.DataFrame()
     for xp_dir in walk_dirs(ocr_vs.EXPERIMENTS_DIR):
-        xp_config = pd.DataFrame.from_dict(CONFIGS['experiments'][xp_dir.name], )
+        xp_config = pd.DataFrame.from_dict(CONFIGS['experiments'][xp_dir.name])
         xp_results = pd.read_csv((xp_dir / 'results.tsv'), sep='\t')
         xp_results = pd.concat([xp_config, xp_results], axis=1)
         xps_results = pd.concat([xps_results, xp_results], axis=0)
