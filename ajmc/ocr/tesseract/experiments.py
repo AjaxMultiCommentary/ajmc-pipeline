@@ -75,9 +75,26 @@ def make_general_results_table():
     """Makes a table with the general results of the experiments"""
     xps_results = pd.DataFrame()
     for xp_dir in walk_dirs(ocr_vs.EXPERIMENTS_DIR):
-        xp_config = pd.DataFrame.from_dict(CONFIGS['experiments'][xp_dir.name])
+        # Get the experiment's config
+        xp_config = {k: [v] if k != 'models' else ['+'.join(v)] for k, v in CONFIGS['experiments'][xp_dir.name].items()}
+        xp_config = pd.DataFrame.from_dict(xp_config)
+
+        # Get the test set's config
+        test_set_config = {}
+        for k, v in CONFIGS['datasets'][xp_config['test_dataset'][0]].items():
+            if k == 'source':
+                test_set_config[f'test_set_{k}'] = [','.join(v)]
+            elif k in ['sampling', 'transform']:
+                for k2, v2 in v.items():
+                    test_set_config[f'test_set_{k2}'] = [','.join(v2)] if type(v2) == list else [v2]
+
+        test_set_config = pd.DataFrame.from_dict(test_set_config)
+
+        model_config = {k: [v] if type(v) != list else [','.join(v)] for k, v in CONFIGS['models'][xp_config['models'][0].split('+')[0]].items()}
+        model_config = pd.DataFrame.from_dict(model_config)
+
         xp_results = pd.read_csv((xp_dir / 'results.tsv'), sep='\t')
-        xp_results = pd.concat([xp_config, xp_results], axis=1)
+        xp_results = pd.concat([xp_config, test_set_config, model_config, xp_results], axis=1)
         xps_results = pd.concat([xps_results, xp_results], axis=0)
 
     xps_results.to_csv(ocr_vs.EXPERIMENTS_DIR / 'general_results.tsv', sep='\t', index=False)
