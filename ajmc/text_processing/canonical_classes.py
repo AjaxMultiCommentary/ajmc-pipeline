@@ -67,7 +67,7 @@ class CanonicalCommentary(Commentary):
         commentary = cls(id=can_json['id'],
                          children=None,
                          images=None,
-                         ocr_run=can_json['ocr_run'],
+                         ocr_run=can_json['ocr_run_id'],
                          ocr_gt_page_ids=can_json['ocr_gt_page_ids'])
 
         # Automatically determinates paths
