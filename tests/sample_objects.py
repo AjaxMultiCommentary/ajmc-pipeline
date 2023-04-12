@@ -1,9 +1,8 @@
 """This module contains sample objects which are sent to `sample_objects.json` and used as fixtures elsewhere."""
-import os
-from pathlib import Path
 
 from ajmc.commons import geometry, image, variables as vs
 from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.variables import PACKAGE_DIR
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from ajmc.text_processing.ocr_classes import OcrCommentary
 
@@ -34,8 +33,7 @@ sample_points = {'base': [(0, 0), (2, 0), (1, 1), (2, 2), (0, 2)],
 sample_bboxes = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.items()}
 
 # Commentaries, OCR, path and via
-sample_comm_base_dir = Path('data/sample_commentaries/cu31924087948174') if os.getcwd().endswith('tests') else Path(
-        'tests/data/sample_commentaries/cu31924087948174')
+sample_comm_base_dir = PACKAGE_DIR / 'tests/data/sample_commentaries/cu31924087948174'
 
 sample_commentary_id = 'cu31924087948174'
 sample_page_id = sample_commentary_id + '_0083'

@@ -18,8 +18,7 @@ def test_split_list():
 
 @pytest.mark.parametrize('sheet_name', ['sheet_1', 'sheet_2'])
 def test_read_google_sheet(sheet_name):
-    df = ajmc.commons.file_management.read_google_sheet(sheet_id='1qABQgkQeQJPDn9SkJPtyXFwe9bUhgID6xWM6adRS3vc',
-                                                        # sheet_id='1Ao9zSzmvdwvn7OAAtq7gwLbrJQg21TARg0roO1-CoHg',
+    df = ajmc.commons.file_management.read_google_sheet(sheet_id='1exFGuU_dDcbbiacvpu1jz13JIvOQ0fTArPP27XUpLNk',
                                                         sheet_name=sheet_name)
     assert df['test_int'][0] == 108
     assert df['test_str'][1] == 'coucou'

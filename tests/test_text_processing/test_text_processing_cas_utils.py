@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+import ajmc.commons.variables
 from ajmc.commons import variables as vs
 from ajmc.text_processing import cas_utils as casu
 from tests import sample_objects as so
@@ -23,7 +24,8 @@ def test_export_commentary_to_xmis(ocr_commentary):
             make_xmis=True,
             region_types=['commentary', 'app_crit'],
             xmis_dir=output_xmi_dir,
-            jsons_dir=output_json_dir
+            jsons_dir=output_json_dir,
+            overwrite=True
     )
 
     # given that we're exporting to XMI appCrit and commentary
@@ -33,8 +35,7 @@ def test_export_commentary_to_xmis(ocr_commentary):
 
 
 def test_get_cas():
-    test_xmi_path = Path(
-        "tests/data/sample_commentaries/cu31924087948174/ner/annotation/xmi/1bm0b3_tess_final/cu31924087948174_0102.xmi")
+    test_xmi_path = ajmc.commons.variables.PACKAGE_DIR / 'tests/data/sample_commentaries/cu31924087948174/ner/annotation/xmi/1bm0b3_tess_final/cu31924087948174_0102.xmi'
     cas = casu.get_cas(test_xmi_path, vs.TYPESYSTEM_PATH)
 
     ajmc_metadata_type = 'webanno.custom.AjMCDocumentmetadata'

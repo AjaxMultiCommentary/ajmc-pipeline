@@ -1,5 +1,4 @@
-from pathlib import Path
-
+import ajmc.commons.variables
 from ajmc.ocr import evaluation as ocr_eval
 from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
 
@@ -8,7 +7,7 @@ def test_count_chars_by_charset():
     string = 'abdεθ-:123ξ,'
     assert ocr_eval.count_chars_by_charset(string, 'latin') == 3
     assert ocr_eval.count_chars_by_charset(string, 'greek') == 3
-    assert ocr_eval.count_chars_by_charset(string, 'numbers') == 3
+    assert ocr_eval.count_chars_by_charset(string, 'numeral') == 3
     assert ocr_eval.count_chars_by_charset(string, 'punctuation') == 3
 
 
@@ -17,7 +16,7 @@ def test_count_errors_by_charset():
     ts_string = 'aaedεx-x1x3ξ,'
     assert ocr_eval.count_errors_by_charset(gt_string, ts_string, 'latin') == 2
     assert ocr_eval.count_errors_by_charset(gt_string, ts_string, 'greek') == 1
-    assert ocr_eval.count_errors_by_charset(gt_string, ts_string, 'numbers') == 1
+    assert ocr_eval.count_errors_by_charset(gt_string, ts_string, 'numeral') == 1
     assert ocr_eval.count_errors_by_charset(gt_string, ts_string, 'punctuation') == 1
 
 
@@ -40,8 +39,7 @@ def test_bag_of_word_evaluation():
 
 
 def test_coord_based_page_evaluation():
-    base_dir = Path('tests/data/sample_evaluation_data')
-
+    base_dir = ajmc.commons.variables.PACKAGE_DIR / 'tests/data/sample_evaluation_data'
     # We first create a commentary because via is accessed via the commentary
     comm = OcrCommentary(via_path=base_dir / 'via_project.json', )
 
@@ -67,4 +65,4 @@ def test_coord_based_page_evaluation():
 
     assert error_counts['global']['greek']['false'] == 18  # 21 - 3 insertion of greek chars in latin words ;-)
     assert error_counts['global']['latin']['false'] == 12
-    assert error_counts['global']['numbers']['false'] == 6
+    assert error_counts['global']['numeral']['false'] == 6
