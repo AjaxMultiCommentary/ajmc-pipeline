@@ -1,4 +1,9 @@
-"""Train or evaluate tesseract"""
+"""Train or evaluate tesseract
+
+Usage:
+    >>> /scratch/sven/anaconda3/envs/ajmc/bin/python ajmc/ocr/tesseract/pipeline.py --make_experiments
+"""
+
 import argparse
 
 from ajmc.commons.miscellaneous import get_custom_logger

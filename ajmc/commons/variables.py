@@ -156,18 +156,21 @@ COMM_IDS_TO_LANG = {
     'Ferrari1974': 'ita',
     'Finglass2011': 'eng',
     'Garvie1998': 'eng',
+    'Hermann1851': 'lat',
     'Kamerbeek1953': 'eng',
     'Paduano1982': 'ita',
+    'SchneidewinNauckRadermacher1913': 'deu',
+    'Stanford1963': 'eng',
     'Untersteiner1934': 'ita',
     'Wecklein1894': 'deu',
+    'annalsoftacitusp00taci': 'eng',
     'bsb10234118': 'deu',
     'cu31924087948174': 'eng',
     'lestragdiesdeso00tourgoog': 'fra',
+    'pvergiliusmaroa00virggoog': 'deu',
     'sophoclesplaysa05campgoog': 'eng',
     'sophokle1v3soph': 'deu',
-    'thukydides02thuc': 'deu',
-    'pvergiliusmaroa00virggoog': 'deu',
-    'annalsoftacitusp00taci': 'eng'
+    'thukydides02thuc': 'deu'
 }
 # ======================================================================================================================
 #                                                 LAYOUT

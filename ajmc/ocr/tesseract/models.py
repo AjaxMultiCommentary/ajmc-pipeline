@@ -124,7 +124,7 @@ def run(img_dir: Path,
         langs: str,
         config: dict = None,
         psm: int = 3,
-        img_suffix: str = '.png',
+        img_suffix: str = 'png',
         tessdata_prefix: Path = ocr_vs.TESSDATA_DIR,
         ):
     """Runs tesseract on images in `img_dir`.
@@ -150,7 +150,7 @@ def run(img_dir: Path,
 
     command = f"""\
 cd {img_dir}; export TESSDATA_PREFIX={tessdata_prefix}; \
-for i in *{img_suffix} ; \
+for i in *.{img_suffix} ; \
 do tesseract "$i" "{output_dir}/${{i::${{#i}}-4}}" \
 -l {langs} \
 --psm {psm} \
