@@ -1,5 +1,4 @@
 """Basic operations and objects for image processing."""
-# CHECKED 2023-01-24
 
 import random
 from pathlib import Path
@@ -7,6 +6,7 @@ from typing import List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
+from lazy_objects.lazy_objects import lazy_property, lazy_init
 from matplotlib import pyplot as plt
 from PIL import Image as PILImage, ImageDraw, ImageFont
 from skimage.util import random_noise
@@ -14,7 +14,7 @@ from skimage.util import random_noise
 from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
-from ajmc.commons.miscellaneous import get_custom_logger, lazy_init, lazy_property
+from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
 

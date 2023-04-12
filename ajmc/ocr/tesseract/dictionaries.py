@@ -15,9 +15,9 @@ from typing import List, Optional
 import pandas as pd
 
 from ajmc.commons.miscellaneous import get_custom_logger
-from ajmc.ocr import variables as ocr_vars
+from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.tesseract.tesseract_utils import run_tess_command
-from ajmc.ocr.utils import is_greek_string, is_latin_string, is_number_string
+from ajmc.ocr.utils import is_greek_string, is_latin_string, is_numeral_string
 
 logger = get_custom_logger(__name__)
 
@@ -37,9 +37,9 @@ def get_mr_abbr_wordlist(langs: List[str]) -> List[str]:
     langs += ['default', 'abbr']
 
     # Get MR abbreviation dictionary
-    dfa = pd.read_csv(ocr_vars.DICTIONARIES_DIR / 'mr_authors.tsv', encoding='utf-8', sep='\t',
+    dfa = pd.read_csv(ocr_vs.DICTIONARIES_DIR / 'mr_authors.tsv', encoding='utf-8', sep='\t',
                       keep_default_na=False)
-    dfw = pd.read_csv(ocr_vars.DICTIONARIES_DIR / 'mr_works.tsv', encoding='utf-8', sep='\t',
+    dfw = pd.read_csv(ocr_vs.DICTIONARIES_DIR / 'mr_works.tsv', encoding='utf-8', sep='\t',
                       keep_default_na=False)
     df = pd.concat([dfa, dfw], axis=0)
 
@@ -60,7 +60,7 @@ def get_mr_abbr_wordlist(langs: List[str]) -> List[str]:
     abbreviations = list(set(' '.join(abbreviations).split()))
 
     # Delete numbers
-    abbreviations = [x for x in abbreviations if not is_number_string(x, threshold=0.9)]
+    abbreviations = [x for x in abbreviations if not is_numeral_string(x, threshold=0.9)]
 
     return abbreviations
 
@@ -69,7 +69,7 @@ def write_mr_abbr_wordlist(langs: List[str]):
     """Write the wordlist of the MR abbreviation dictionary"""
     wordlist = get_mr_abbr_wordlist(langs)
     file_name = f'mr{langs[0]}.txt'
-    (ocr_vars.DICTIONARIES_DIR / file_name).write_text('\n'.join(wordlist), encoding='utf-8')
+    (ocr_vs.DICTIONARIES_DIR / file_name).write_text('\n'.join(wordlist), encoding='utf-8')
 
 
 def write_all_wordlists():
@@ -82,21 +82,21 @@ def write_all_wordlists():
     write_mr_abbr_wordlist(['ger'])
     write_mr_abbr_wordlist(['spa'])
 
-    for path in ocr_vars.MODELS_DIR.rglob('*.traineddata'):
+    for path in ocr_vs.MODELS_DIR.rglob('*.traineddata'):
         wordlist = get_traineddata_wordlist(path.stem)
         file_name = f'{path.stem}.txt'
-        (ocr_vars.DICTIONARIES_DIR / file_name).write_text('\n'.join(wordlist), encoding='utf-8')
+        (ocr_vs.DICTIONARIES_DIR / file_name).write_text('\n'.join(wordlist), encoding='utf-8')
 
 
 def get_traineddata_wordlist(traineddata_name) -> List[str]:
     """Get the wordlist of a traineddata file"""
 
-    write_unpacked_traineddata(ocr_vars.get_trainneddata_path(traineddata_name))
-    unpacked_dir = ocr_vars.get_traineddata_unpacked_dir(traineddata_name)
+    write_unpacked_traineddata(ocr_vs.get_trainneddata_path(traineddata_name))
+    unpacked_dir = ocr_vs.get_traineddata_unpacked_dir(traineddata_name)
     # Get wordlist
     dawg_path = unpacked_dir / f'{traineddata_name}.lstm-word-dawg'
     unicharset_path = unpacked_dir / f'{traineddata_name}.lstm-unicharset'
-    wordlist_path = ocr_vars.DICTIONARIES_DIR / f'{traineddata_name}.txt'
+    wordlist_path = ocr_vs.DICTIONARIES_DIR / f'{traineddata_name}.txt'
     command = f'dawg2wordlist {unicharset_path} {dawg_path} {wordlist_path}'
     run_tess_command(command)
 
@@ -106,11 +106,11 @@ def get_traineddata_wordlist(traineddata_name) -> List[str]:
 def get_or_create_wordlist_path(wordlist_name: str) -> Path:
     """Gets the path to wordlist.txt file, creating it if it doesn't exist"""
 
-    wordlist_path = ocr_vars.get_wordlist_path(wordlist_name)
+    wordlist_path = ocr_vs.get_wordlist_path(wordlist_name)
     if not wordlist_path.is_file():
         final_list = merge_wordlists(
-                [(ocr_vars.DICTIONARIES_DIR / (l + '.txt')).read_text(encoding='utf-8').splitlines()
-                 for l in wordlist_name.split(ocr_vars.SEPARATOR)])
+                [(ocr_vs.DICTIONARIES_DIR / (l + '.txt')).read_text(encoding='utf-8').splitlines()
+                 for l in wordlist_name.split(ocr_vs.SEPARATOR)])
         wordlist_path.write_text('\n'.join(final_list), encoding='utf-8')
 
     return wordlist_path
@@ -119,11 +119,11 @@ def get_or_create_wordlist_path(wordlist_name: str) -> Path:
 def change_traineddata_wordlist(traineddata_name: str, wordlist_name: str):
     """Change the wordlist of a traineddata file"""
 
-    traineddata_path = ocr_vars.get_trainneddata_path(traineddata_name)
+    traineddata_path = ocr_vs.get_trainneddata_path(traineddata_name)
     write_unpacked_traineddata(traineddata_path)
 
     # Get the path to the unpacked directory
-    unpacked_dir = ocr_vars.get_traineddata_unpacked_dir(traineddata_name)
+    unpacked_dir = ocr_vs.get_traineddata_unpacked_dir(traineddata_name)
     wordlist_path = get_or_create_wordlist_path(wordlist_name)
 
     # Copy the wordlist
@@ -149,11 +149,11 @@ def create_traineddata_with_wordlist(source_traineddata_name,
         output_model_name = (source_traineddata_name + '_' + ','.join(wordlist_names))
 
     # Create the models repo
-    output_model_dir = Path(ocr_vars.MODELS_DIR / output_model_name)
+    output_model_dir = Path(ocr_vs.MODELS_DIR / output_model_name)
     output_model_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ocr_vars.get_trainneddata_path(source_traineddata_name), output_model_dir)
+    shutil.copy2(ocr_vs.get_trainneddata_path(source_traineddata_name), output_model_dir)
 
-    wordlists = [(ocr_vars.DICTIONARIES_DIR / f'{wordlist_name}.txt').read_text('utf-8').splitlines()
+    wordlists = [(ocr_vs.DICTIONARIES_DIR / f'{wordlist_name}.txt').read_text('utf-8').splitlines()
                  for wordlist_name in wordlist_names]
 
     # merge the two list
@@ -161,8 +161,8 @@ def create_traineddata_with_wordlist(source_traineddata_name,
 
     # write the new wordlist
     merged_wordlist_name = ','.join(wordlist_names)
-    (ocr_vars.DICTIONARIES_DIR / f'{merged_wordlist_name}.txt').write_text('\n'.join(merged_wordlist),
-                                                                           encoding='utf-8')
+    (ocr_vs.DICTIONARIES_DIR / f'{merged_wordlist_name}.txt').write_text('\n'.join(merged_wordlist),
+                                                                         encoding='utf-8')
 
     # Change the traineddata's wordlist
     change_traineddata_wordlist(traineddata_name=output_model_name,
@@ -175,7 +175,7 @@ def write_unpacked_traineddata(traineddata_path: Path,
 
     # Set path to custom data
     if unpacked_dir is None:
-        unpacked_dir = ocr_vars.get_traineddata_unpacked_dir(traineddata_path.stem)
+        unpacked_dir = ocr_vs.get_traineddata_unpacked_dir(traineddata_path.stem)
 
     unpacked_dir.mkdir(parents=True, exist_ok=True)
 
@@ -186,8 +186,8 @@ def write_unpacked_traineddata(traineddata_path: Path,
 
 def write_combined_wordlists():
     for list_names in [('grc', 'br'), ('eng', 'mr-eng')]:
-        lists = [(ocr_vars.DICTIONARIES_DIR / f'{n}.txt').read_text(encoding='utf-8').splitlines()
+        lists = [(ocr_vs.DICTIONARIES_DIR / f'{n}.txt').read_text(encoding='utf-8').splitlines()
                  for n in list_names]
         lists = merge_wordlists(*lists)
-        new_name = ocr_vars.SEPARATOR.join(list_names)
-        (ocr_vars.DICTIONARIES_DIR / f'{new_name}.txt').write_text('\n'.join(lists), encoding='utf-8')
+        new_name = ocr_vs.SEPARATOR.join(list_names)
+        (ocr_vs.DICTIONARIES_DIR / f'{new_name}.txt').write_text('\n'.join(lists), encoding='utf-8')

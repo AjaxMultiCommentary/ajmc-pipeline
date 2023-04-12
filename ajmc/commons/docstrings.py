@@ -102,7 +102,7 @@ docstrings['labels_to_ids'] = 'A dict mapping label-names to their respective id
 docstrings['ocr_dir'] = 'The absolute path to the directory containing OCR outputs.'
 docstrings['ocr_path'] = 'The absolute path to an ocr output file.'
 
-docstrings['ocr_run'] = """The id of an ocr-run, e.g. '28o09e_tess_base', (generally follow the pattern
+docstrings['ocr_run_id'] = """The id of an ocr-run, e.g. '28o09e_tess_base', (generally follow the pattern
         '{get_62_based_datecode()}_{ocr_engine}_{ocr_model}')."""
 
 docstrings['olr_region_type'] = """The type of the Region (i.e. `'primary_text'` or `'commentary'`)."""

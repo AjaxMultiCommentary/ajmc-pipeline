@@ -1,7 +1,5 @@
 """File management tools and utilities, such as moving/renaming/replacing files, get paths..."""
 
-# CHECKED 2023-01-24
-
 import json
 import os
 import shutil

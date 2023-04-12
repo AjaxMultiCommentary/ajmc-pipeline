@@ -1,5 +1,4 @@
 """Basic arithmetic operations."""
-# CHECKED 2023-01-24
 from typing import List, Tuple
 
 import numpy as np

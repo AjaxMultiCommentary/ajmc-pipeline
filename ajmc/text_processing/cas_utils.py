@@ -4,9 +4,9 @@ legacy but functional.
 """
 import json
 import os
-from time import strftime
 from pathlib import Path
-from typing import Dict, List, Optional, Type, Union
+from time import strftime
+from typing import Dict, List, Type
 
 from cassis import Cas, load_cas_from_xmi, load_typesystem
 from cassis.typesystem import FeatureStructure
@@ -20,7 +20,7 @@ logger = get_custom_logger(__name__)
 
 
 def basic_rebuild(page: dict,
-                  region_types: Union[List[str], str] = 'all',
+                  region_types: List[str],
                   string: str = '') -> dict:
     # todo 👁️ a light version of this function computing only what you actually need
     """Basic rebuild function"""
@@ -31,7 +31,7 @@ def basic_rebuild(page: dict,
 
     for region in page['regions']:
 
-        if region_types == 'all' or region['region_type'] in region_types:
+        if region['region_type'] in region_types:
 
             region_text = ''
             region_offsets = [len(string)]
@@ -129,8 +129,8 @@ def compute_image_links(page: dict,
 
 def rebuild_to_xmi(page: dict,
                    output_dir: Path,
-                   ocr_run_id : str,
-                   regions_considered : str,
+                   ocr_run_id: str,
+                   region_types: List[str],
                    typesystem_path: Path = vs.TYPESYSTEM_PATH,
                    iiif_mappings=None,
                    pct_coordinates=False):
@@ -143,6 +143,8 @@ def rebuild_to_xmi(page: dict,
     Args:
         page (dict): a page dict as returned by `basic_rebuild`
         output_dir (Path): path to the output directory
+        ocr_run_id (str): OCR run ID
+        region_types: regions considered
         typesystem_path (Path): path to the typesystem file
         iiif_mappings (dict): a dict mapping page IDs to IIIF manifest URIs
         pct_coordinates (bool): if True, coordinates are expressed in percentage
@@ -164,11 +166,9 @@ def rebuild_to_xmi(page: dict,
     ajmc_metadata = typesystem.get_type(ajmc_metadata_type)
 
     # create metadata annotations
-    metadata = ajmc_metadata(
-        ocr_run_id=ocr_run_id,
-        regions_considered=regions_considered,
-        xmi_creation_date=strftime('%Y-%m-%d %H:%M:%S')
-    )
+    metadata = ajmc_metadata(ocr_run_id=ocr_run_id,
+                             region_types=','.join(region_types),
+                             xmi_creation_date=strftime('%Y-%m-%d %H:%M:%S'))
     cas.add(metadata)
 
     # create sentence-level annotations
@@ -187,55 +187,51 @@ def rebuild_to_xmi(page: dict,
     cas.to_xmi((output_dir / f'{page["id"]}.xmi'), pretty_print=True)
 
 
-# todo 👁️ This should rely on ocr outputs dirs
 def export_commentary_to_xmis(commentary: Type['OcrCommentary'],
                               make_jsons: bool,
                               make_xmis: bool,
-                              json_dir: Optional[Path] = None,
-                              xmi_dir: Optional[Path] = None,
-                              region_types: Union[List[str], str] = 'all'):
+                              jsons_dir: Path,
+                              xmis_dir: Path,
+                              region_types: List[str],
+                              overwrite: bool = False):
     """
     Main function for the pipeline.
     
     Args:
-        commentary:
-        json_dir: Absolute path to the directory in which to write the json files or take them from.
-        xmi_dir: Absolute path to the directory in which to write the xmi files.
+        commentary: The commentary to convert to xmis, should be an OcrCommentary object (not a canonical commentary).
+        jsons_dir: Absolute path to the directory in which to write the json files or take them from.
+        xmis_dir: Absolute path to the directory in which to write the xmi files.
         make_jsons: Whether to create canonical jsons. If false, jsons are grepped from json_dir.
         make_xmis: Whether to create xmis.
-        region_types: The desired regions to convert to xmis, eg `introduction, preface, commentary, footnote`.   
+        region_types: The desired regions to convert to xmis, eg `introduction, preface, commentary, footnote`.
+        overwrite: Whether to overwrite existing files.
     """
 
-    # Create paths
-    json_dir = json_dir if json_dir else vs.COMMS_DATA_DIR / commentary.id / 'canonical' / commentary.ocr_run
-    xmi_dir = xmi_dir if xmi_dir else vs.get_comm_xmi_dir(commentary.id) / commentary.ocr_run
-
     if make_jsons and make_xmis:
-        json_dir.mkdir(parents=True, exist_ok=True)
-        xmi_dir.mkdir(parents=True, exist_ok=True)
+        jsons_dir.mkdir(parents=True, exist_ok=overwrite)
+        xmis_dir.mkdir(parents=True, exist_ok=overwrite)
 
         for page in tqdm(commentary.children.pages, desc=f'Building jsons and xmis for {commentary.id}'):
-            page.to_json(output_dir=json_dir)
-            rebuild = basic_rebuild(page.to_canonical_v1(), region_types)
+            page.to_inception_json(output_dir=jsons_dir)
+            rebuild = basic_rebuild(page.to_inception_dict(), region_types)
             if len(rebuild['fulltext']) > 0:  # handles the empty-page case
-                rebuild_to_xmi(rebuild, xmi_dir, commentary.ocr_run, ",".join(region_types))
+                rebuild_to_xmi(rebuild, xmis_dir, commentary.ocr_run_id, region_types)
 
     elif make_jsons:
-        json_dir.mkdir(parents=True, exist_ok=True)
+        jsons_dir.mkdir(parents=True, exist_ok=overwrite)
         for page in tqdm(commentary.children.pages, desc=f'Creating jsons for {commentary.id}'):
             logger.debug('Canonizing page  ' + page.id)
-            page.to_json(output_dir=json_dir)
+            page.to_inception_json(output_dir=jsons_dir)
 
     elif make_xmis:
-        xmi_dir.mkdir(parents=True, exist_ok=True)
+        xmis_dir.mkdir(parents=True, exist_ok=overwrite)
 
-        for json_path in tqdm(json_dir.glob('*.json'), desc=f'Building xmis for {commentary.id}'):
+        for json_path in tqdm(jsons_dir.glob('*.json'), desc=f'Building xmis for {commentary.id}'):
+            page = json.loads(json_path.read_text(encoding='utf-8'))
             logger.debug('Xmi-ing page  ' + page['id'])
-            page = json.loads(
-                    json_path.read_text(encoding='utf-8'))  # Why can't this be done directly from commentary ?
             rebuild = basic_rebuild(page, region_types)
             if len(rebuild['fulltext']) > 0:  # handles the empty-page case
-                rebuild_to_xmi(rebuild, xmi_dir, commentary.ocr_run, ",".join(region_types))
+                rebuild_to_xmi(rebuild, xmis_dir, commentary.ocr_run_id, region_types)
 
 
 def get_cas(xmi_path: Path, xml_path: Path) -> Cas:
@@ -278,14 +274,30 @@ def align_cas_annotation(cas_annotation, rebuild, verbose: bool = False):
     return bboxes, shifts, text_window, warnings
 
 
-def import_page_rebuild(page_id: str):
-    comm_id = page_id.split('_')[0]
-    rebuild_path = vs.get_comm_canonical_v1_dir(comm_id) / vs.IDS_TO_RUNS[comm_id] / (page_id + '.json')
-    if comm_id == 'sophoclesplaysa05campgoog' and page_id in vs.MINIREF_PAGES:
-        rebuild_path = vs.get_comm_canonical_v1_dir(comm_id) / '1bm0b4_tess_final' / (page_id + '.json')
+def import_page_rebuild(page_id: str, annotation_type: str = 'ner'):
+    """Finds and rebuild the inception json of the fgiven `page_id`.
 
-    return basic_rebuild(page=json.loads(rebuild_path.read_text('utf-8')),
-                         region_types=vs.IDS_TO_REGIONS[comm_id])
+    Args:
+        page_id: The id of the page to rebuild.
+        annotation_type: The type of annotation to rebuild, either `ner` or `lemlink`.
+    """
+    comm_id = page_id.split('_')[0]
+
+    if annotation_type == 'ner':
+
+        rebuild_path = vs.get_comm_ner_jsons_dir(comm_id, vs.IDS_TO_RUNS[comm_id]) / (page_id + '.json')
+        if comm_id == 'sophoclesplaysa05campgoog' and page_id in vs.MINIREF_PAGES:
+            rebuild_path = vs.get_comm_ner_jsons_dir(comm_id, '1bm0b4_tess_final') / (page_id + '.json')
+        return basic_rebuild(page=json.loads(rebuild_path.read_text('utf-8')),
+                             region_types=vs.IDS_TO_REGIONS[comm_id])
+
+    elif annotation_type == 'lemlink':
+        run_dir = next((vs.get_comm_base_dir(comm_id) / vs.COMM_LEMLINK_ANN_REL_DIR).glob('*'))
+        rebuild_path = run_dir / 'jsons' / (page_id + '.json')
+        metadata = json.loads((run_dir / 'xmis' / 'metadata.json').read_text('utf-8'))
+
+        return basic_rebuild(page=json.loads(rebuild_path.read_text('utf-8')),
+                             region_types=metadata['region_types'])
 
 
 def import_page_cas(page_id: str, ajmc_ne_corpus_path: Path = vs.NE_CORPUS_DIR):

@@ -1,14 +1,13 @@
 """Basic geometrical operations and objects."""
-# CHECKED 2023-01-24
 
 from typing import Iterable, List, Tuple, Union
 
 import numpy as np
+from lazy_objects.lazy_objects import lazy_property
 
 from ajmc.commons import variables
 from ajmc.commons.arithmetic import compute_interval_overlap
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.miscellaneous import lazy_property
 
 
 class Shape:

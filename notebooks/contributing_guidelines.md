@@ -146,7 +146,8 @@ As they constitute the backend of a dynamic platform, `ajmc`'s modules should be
 
 2. Object instantiation should be lazy.
 
-`ajmc.commons.miscellaneous` provides two main utilities for lazyness: `lazy_property` and `LazyObject`. The former allows properties to be computed and then stored only when they are called.
+`lazy_objects` provides two main utilities for lazyness: `lazy_property` and `LazyObject`. The former allows properties
+to be computed and then stored only when they are called.
 
 ✅ This is good practice:
 
@@ -206,8 +207,9 @@ def find_divisors(dividend):
 **Note**. A few tolerated extremely common abbreviations are:
 - `img` for image
 - `dir_` for directory
--  `gt` for ground_truth
+- `gt` for ground_truth
 - `char` for character
+- `vs` for variables
 - If they can easily be understood from context (e.g. In loops and comprehensions : `[w for w in words]`)
 
 
@@ -257,7 +259,17 @@ Also adding to the readability of the code is its simplicity. Unless optimisatio
 
 ## Other specific rules
 
-1. Docstrings are written in [Google Style Formats](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
+1. Docstrings are written
+   in [Google Style Formats](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
 2. Architecture:
-    - ⚠️ **scripts should be in scripts** ⚠️ Script files (i.e. files that actually do something when run) should always be located in each directory's dedicated `scripts` directory, which should not be a python package itself (i.e. has no `__init__.py`).
-    - `commons` should not import anything from task other dirs. `text_processing` can import only from commons. Task-specific dirs can import from everywhere.
+    - ⚠️ **scripts should be in scripts** ⚠️ Script files (i.e. files that actually do something when run) should always
+      be located in each directory's dedicated `_scripts` directory, which should not be a python package itself (i.e.
+      has no `__init__.py`).
+    - `commons` should not import anything from task other dirs. `text_processing` can import only from commons.
+      Task-specific dirs can import from everywhere.
+
+3. Path management:
+    - With the only exception of entrypoint function, paths are to be handled with `pathlib.Path` objects. "Entrypoints"
+      are function that can be directly call by the API in a main pipeline; they should accept `Union[str, Path]` as
+      input.
+    - Path management is centralized in `ajmc.commons.variables`

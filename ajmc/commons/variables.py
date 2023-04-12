@@ -2,7 +2,7 @@ import os
 import platform
 import re
 from pathlib import Path
-from typing import Tuple, Optional, Union, Type
+from typing import Tuple, Union, Type
 
 # ======================================================================================================================
 #                                                 TYPES
@@ -21,28 +21,14 @@ TYPESYSTEM_PATH = Path('ajmc/data/templates/TypeSystem.xml')
 # AJMC DATA DIR AND STRUCTURE
 EXEC_ENV = platform.uname().node
 
-_DRIVE_BASE_DIR: Optional[Path] = Path(os.getenv('AJMC_GDRIVE_BASE_DIR')) if os.getenv('AJMC_GDRIVE_BASE_DIR') else None
+if os.getenv('AJMC_GDRIVE_BASE_DIR'):
+    DRIVE_BASE_DIR = Path(os.getenv('AJMC_GDRIVE_BASE_DIR'))
+else:
+    DRIVE_BASE_DIR = Path(input("""WARNING: Unknown execution environment!
+    Please enter the drive base directory below (e.g. `/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/`):
+    (Note: you can change this permanently by adding `export AJMC_GDRIVE_BASE_DIR="/your/drive/base/dir"` 
+    in your .bashrc."""))
 
-
-def get_drive_base_dir() -> Path:
-    cluster_drive_dir = Path('/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/')
-    local_drive_dir = Path('/Users/sven/drive/_AJAX/AjaxMultiCommentary/')
-
-    global _DRIVE_BASE_DIR
-    if _DRIVE_BASE_DIR is None:
-        if EXEC_ENV == 'iccluster040' or cluster_drive_dir.exists():
-            return cluster_drive_dir
-        elif EXEC_ENV.startswith('Sven') or local_drive_dir.exists():
-            return local_drive_dir
-        else:
-            return Path(input(
-                    'WARNING: Unknown execution environment!\nPlease enter the drive base directory below (e.g. `/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/`):\n(Note: you can change this permanently by setting `DRIVE_BASE_DIR` in `ajmc/commons/variables.py` to a custom `pathlib.Path`.)'))
-
-    else:
-        return _DRIVE_BASE_DIR
-
-
-DRIVE_BASE_DIR = get_drive_base_dir()
 DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
 COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries/commentaries_data'
 NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus'
@@ -53,10 +39,11 @@ COMM_OCR_RUNS_REL_DIR = Path('ocr/runs')
 COMM_OCR_GT_REL_DIR = Path('ocr/groundtruth')
 COMM_OCR_GT_PAIRS_REL_DIR = Path('ocr/gt_file_pairs')
 COMM_VIA_REL_PATH = Path('olr/via_project.json')
-COMM_XMI_REL_DIR = Path('ner/annotation/xmi')
-COMM_CANONICAL_REL_DIR = Path('canonical/v2')
+COMM_CANONICAL_REL_DIR = Path('canonical')
 COMM_CANONICAL_V1_REL_DIR = Path('canonical')
 COMM_SECTIONS_REL_PATH = Path('sections.json')
+COMM_NER_ANN_REL_DIR = Path('ner/annotation')
+COMM_LEMLINK_ANN_REL_DIR = Path('lemlink/annotation')
 
 
 def get_comm_base_dir(comm_id: str) -> Path:
@@ -75,32 +62,40 @@ def get_comm_via_path(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_VIA_REL_PATH
 
 
-def get_comm_xmi_dir(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_XMI_REL_DIR
-
-
 def get_comm_ocr_runs_dir(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_OCR_RUNS_REL_DIR
 
 
-def get_comm_ocr_outputs_dir(comm_id: str, run_id: str) -> Path:
-    return get_comm_ocr_runs_dir(comm_id) / run_id / 'outputs'
+def get_comm_ocr_outputs_dir(comm_id: str, ocr_run_id: str) -> Path:
+    return get_comm_ocr_runs_dir(comm_id) / ocr_run_id / 'outputs'
 
 
 def get_comm_ocr_gt_pairs_dir(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_OCR_GT_PAIRS_REL_DIR
 
 
-def get_comm_canonical_v1_dir(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_CANONICAL_V1_REL_DIR
+def get_comm_ner_jsons_dir(comm_id: str, ocr_run_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_NER_ANN_REL_DIR / ocr_run_id / 'jsons'
+
+
+def get_comm_ner_xmis_dir(comm_id: str, ocr_run_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_NER_ANN_REL_DIR / ocr_run_id / 'xmis'
+
+
+def get_comm_lemlink_jsons_dir(comm_id: str, ocr_run_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_LEMLINK_ANN_REL_DIR / ocr_run_id / 'jsons'
+
+
+def get_comm_lemlink_xmis_dir(comm_id: str, ocr_run_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / COMM_LEMLINK_ANN_REL_DIR / ocr_run_id / 'xmis'
 
 
 def get_comm_canonical_dir(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_CANONICAL_REL_DIR
 
 
-def get_comm_canonical_path(comm_id: str, run_id: str) -> Path:
-    return get_comm_canonical_dir(comm_id) / f'{run_id}.json'
+def get_comm_canonical_path(comm_id: str, ocr_run_id: str) -> Path:
+    return get_comm_canonical_dir(comm_id) / f'{ocr_run_id}.json'
 
 
 def get_comm_sections_path(comm_id: str) -> Path:
@@ -161,18 +156,21 @@ COMM_IDS_TO_LANG = {
     'Ferrari1974': 'ita',
     'Finglass2011': 'eng',
     'Garvie1998': 'eng',
+    'Hermann1851': 'lat',
     'Kamerbeek1953': 'eng',
     'Paduano1982': 'ita',
+    'SchneidewinNauckRadermacher1913': 'deu',
+    'Stanford1963': 'eng',
     'Untersteiner1934': 'ita',
     'Wecklein1894': 'deu',
+    'annalsoftacitusp00taci': 'eng',
     'bsb10234118': 'deu',
     'cu31924087948174': 'eng',
     'lestragdiesdeso00tourgoog': 'fra',
+    'pvergiliusmaroa00virggoog': 'deu',
     'sophoclesplaysa05campgoog': 'eng',
     'sophokle1v3soph': 'deu',
-    'thukydides02thuc': 'deu',
-    'pvergiliusmaroa00virggoog': 'deu',
-    'annalsoftacitusp00taci': 'eng'
+    'thukydides02thuc': 'deu'
 }
 # ======================================================================================================================
 #                                                 LAYOUT
@@ -365,7 +363,7 @@ LINKAGE_MINIREF_PAGES = [
     'Wecklein1894_0024',
 ]
 
-IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run used as a base in the annotation campaign.
+IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run_id used as a base in the annotation campaign.
     'cu31924087948174': '1bm0b3_tess_final',
     'lestragdiesdeso00tourgoog': '21i0dA_tess_hocr',
     'sophokle1v3soph': '1bm0b5_tess_final',
@@ -452,7 +450,7 @@ CHARSETS = {
     'latin': re.compile(r'([A-Za-z]|[\u00C0-\u00FF]|\u0152|\u0153)', re.UNICODE),
     'greek': re.compile(r'([\u0373-\u03FF]|[\u1F00-\u1FFF]|\u0300|\u0301|\u0313|\u0314|\u0345|\u0342|\u0308)',
                         re.UNICODE),
-    'numbers': re.compile(r'([0-9])', re.UNICODE),
+    'numeral': re.compile(r'([0-9])', re.UNICODE),
     'punctuation': re.compile(r'([\u0020-\u002F]|[\u003A-\u003F]|[\u005B-\u0060]|[\u007B-\u007E]|\u00A8|\u00B7)',
                               re.UNICODE)
 }

@@ -11,11 +11,11 @@ import pandas as pd
 from PIL import Image as PILImage, ImageFilter
 from tqdm import tqdm
 
-from ajmc.commons import variables
+from ajmc.commons import variables as vs
 from ajmc.commons.miscellaneous import get_custom_logger
-from ajmc.ocr import variables as ocr_vars
+from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.config import CONFIGS
-from ajmc.ocr.utils import count_chars_by_charset, is_greek_string, is_latin_string, is_number_string
+from ajmc.ocr.utils import count_chars_by_charset, is_greek_string, is_latin_string, is_numeral_string
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
 logger = get_custom_logger(__name__)
@@ -23,7 +23,7 @@ logger = get_custom_logger(__name__)
 
 def get_root_dataset_id(dts_id: str) -> str:
     """Returns the root dataset (e.g. ajmc, pog...) from a line id."""
-    return 'ajmc' if dts_id.split('_')[0] in variables.ALL_COMM_IDS else 'pog'
+    return 'ajmc' if dts_id.split('_')[0] in vs.ALL_COMM_IDS else 'pog'
 
 
 def split_root_dataset_metadata(metadata: pd.DataFrame) -> pd.DataFrame:
@@ -35,15 +35,15 @@ def split_root_dataset_metadata(metadata: pd.DataFrame) -> pd.DataFrame:
 
     def get_custom_split_ratio(group_name: Tuple[str, str], group_df: pd.DataFrame):
         df_len = len(group_df)
-        # For ajmc, we keep a `ocr_vars.LINES_PER_TESTSET` lines per subset
+        # For ajmc, we keep a `ocr_vs.LINES_PER_TESTSET` lines per subset
         if group_name[0] == 'ajmc' and group_name[1] in ['grc', 'lat', 'mix']:
-            return [('test', ocr_vars.LINES_PER_TESTSET / df_len),
-                    ('train', (df_len - ocr_vars.LINES_PER_TESTSET) / df_len)]
+            return [('test', ocr_vs.LINES_PER_TESTSET / df_len),
+                    ('train', (df_len - ocr_vs.LINES_PER_TESTSET) / df_len)]
 
-        # For pog, we keep only ocr_vars.LINES_PER_TESTSET for the fully greek and give the whole rest to training
+        # For pog, we keep only ocr_vs.LINES_PER_TESTSET for the fully greek and give the whole rest to training
         elif group_name in [('pog', 'grc')]:
-            return [('test', ocr_vars.LINES_PER_TESTSET / df_len),
-                    ('train', (df_len - ocr_vars.LINES_PER_TESTSET) / df_len)]
+            return [('test', ocr_vs.LINES_PER_TESTSET / df_len),
+                    ('train', (df_len - ocr_vs.LINES_PER_TESTSET) / df_len)]
         else:
             return [('train', 1.00)]
 
@@ -61,21 +61,21 @@ def split_root_dataset_metadata(metadata: pd.DataFrame) -> pd.DataFrame:
 
 def write_dataset_metadata(metadata: pd.DataFrame, dataset_dir: Path):
     """Writes the metadata to a tsv file."""
-    metadata_path = ocr_vars.get_dataset_metadata_path(dataset_dir.name)
+    metadata_path = ocr_vs.get_dataset_metadata_path(dataset_dir.name)
     metadata.to_csv(metadata_path, sep='\t', index=False, encoding='utf-8')
 
 
 def import_dataset_metadata(dts_dir: Path) -> pd.DataFrame:
     """Imports a dataset metadata file."""
-    metadata_path = ocr_vars.get_dataset_metadata_path(dts_dir.name)
+    metadata_path = ocr_vs.get_dataset_metadata_path(dts_dir.name)
     return pd.read_csv(metadata_path, sep='\t', encoding='utf-8', index_col=False)
 
 
 def safe_check_dataset(dts_config: dict) -> bool:
     """Checks if a dataset is valid."""
-    dts_dir = ocr_vars.get_dataset_dir(dts_config['id'])
-    dts_metadata_path = ocr_vars.get_dataset_metadata_path(dts_config['id'])
-    dts_config_path = ocr_vars.get_dataset_config_path(dts_config['id'])
+    dts_dir = ocr_vs.get_dataset_dir(dts_config['id'])
+    dts_metadata_path = ocr_vs.get_dataset_metadata_path(dts_config['id'])
+    dts_config_path = ocr_vs.get_dataset_config_path(dts_config['id'])
 
     # First check the required files exist
     if not (dts_dir.exists() and dts_metadata_path.is_file() and dts_config_path.is_file()):
@@ -83,7 +83,7 @@ def safe_check_dataset(dts_config: dict) -> bool:
 
     # Then check the metadata is valid
     dts_metadata = import_dataset_metadata(dts_dir)
-    if set(dts_metadata['path']) != set([str(p) for p in dts_dir.glob(f'*{ocr_vars.IMG_FILES_EXTENSION}')]) or len(
+    if set(dts_metadata['path']) != set([str(p) for p in dts_dir.glob(f'*{ocr_vs.IMG_EXTENSION}')]) or len(
             dts_metadata) == 0:
         return False
 
@@ -95,7 +95,7 @@ def safe_check_dataset(dts_config: dict) -> bool:
     return True
 
 
-def make_dataset_metadata(dts_dir: Path) -> pd.DataFrame:
+def compute_dataset_metadata(dts_dir: Path) -> pd.DataFrame:
     """Returns a DataFrame containing the length of each txt and its proportion of Greek characters.
 
     Args:
@@ -109,51 +109,50 @@ def make_dataset_metadata(dts_dir: Path) -> pd.DataFrame:
                                 'script', 'language', 'font',
                                 'text']}
 
-    for img_path in dts_dir.glob(f'*{ocr_vars.IMG_FILES_EXTENSION}'):
-        if img_path.is_file():  # Pogretra's simlinks....
-            work_id = img_path.stem.split('_')[0]
-            metadata['work_id'].append(work_id)  # Commentary id or pogretra family id
-            metadata['root_dataset'].append(get_root_dataset_id(img_path.stem))
-            metadata['img_id'].append(img_path.stem)  # line image id
+    for img_path in dts_dir.glob(f'*{ocr_vs.IMG_EXTENSION}'):
+        work_id = img_path.stem.split('_')[0]
+        metadata['work_id'].append(work_id)  # Commentary id or pogretra family id
+        metadata['root_dataset'].append(get_root_dataset_id(img_path.stem))
+        metadata['img_id'].append(img_path.stem)  # line image id
 
-            # Image stats
-            img = PILImage.open(img_path)
-            metadata['image_height'].append(img.height)
-            metadata['image_width'].append(img.width)
+        # Image stats
+        img = PILImage.open(img_path)
+        metadata['image_height'].append(img.height)
+        metadata['image_width'].append(img.width)
 
-            # Text stats
-            text = img_path.with_suffix(ocr_vars.TEXT_FILES_EXTENSION).read_text(encoding='utf-8')
-            metadata['total_chars'].append(len(text))
-            metadata['total_words'].append(len(text.split()))
-            metadata['grc_chars'].append(count_chars_by_charset(text, charset='greek'))
-            metadata['lat_chars'].append(count_chars_by_charset(text, charset='latin'))
-            metadata['num_chars'].append(count_chars_by_charset(text, charset='numbers'))
+        # Text stats
+        text = img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION).read_text(encoding='utf-8')
+        metadata['total_chars'].append(len(text))
+        metadata['total_words'].append(len(text.split()))
+        metadata['grc_chars'].append(count_chars_by_charset(text, charset='greek'))
+        metadata['lat_chars'].append(count_chars_by_charset(text, charset='latin'))
+        metadata['num_chars'].append(count_chars_by_charset(text, charset='numbers'))
 
-            script = 'grc' if is_greek_string(text, 1) else \
-                'lat' if is_latin_string(text, 1) else \
-                    'num' if is_number_string(text, 1) else \
-                        'mix' if (count_chars_by_charset(text, charset='greek') > 0 and
-                                  count_chars_by_charset(text, charset='latin') > 0) else 'unk'
-            metadata['script'].append(script)
+        script = 'grc' if is_greek_string(text, 1) else \
+            'lat' if is_latin_string(text, 1) else \
+                'num' if is_numeral_string(text, 1) else \
+                    'mix' if (count_chars_by_charset(text, charset='greek') > 0 and
+                              count_chars_by_charset(text, charset='latin') > 0) else 'unk'
+        metadata['script'].append(script)
 
-            # Language
-            if script in ['grc', 'num']:
-                metadata['language'].append(script[:3])
-            else:
-                if work_id in variables.ALL_COMM_IDS:
-                    if script == 'lat':
-                        metadata['language'].append(variables.COMM_IDS_TO_LANG[work_id])
-                    elif script == 'mix':
-                        metadata['language'].append('gre' + variables.COMM_IDS_TO_LANG[work_id])
-                    else:
-                        metadata['language'].append('unk')
+        # Language
+        if script in ['grc', 'num']:
+            metadata['language'].append(script[:3])
+        else:
+            if work_id in vs.ALL_COMM_IDS:
+                if script == 'lat':
+                    metadata['language'].append(vs.COMM_IDS_TO_LANG[work_id])
+                elif script == 'mix':
+                    metadata['language'].append('gre' + vs.COMM_IDS_TO_LANG[work_id])
                 else:
                     metadata['language'].append('unk')
+            else:
+                metadata['language'].append('unk')
 
-            # Font
-            metadata['font'].append('unk')
-            metadata['text'].append(text)
-            metadata['path'].append(str(img_path))
+        # Font
+        metadata['font'].append('unk')
+        metadata['text'].append(text)
+        metadata['path'].append(str(img_path))
 
     metadata = pd.DataFrame(metadata)
 
@@ -192,29 +191,28 @@ def clean_dataset(dts_dir: Union[Path, str],
 
     missing_pairs, empty_txts, double_height_lines = 0, 0, 0
 
-    # Get rid of simlinks and empty txt files, centralize all images in output_dir
-    for img_path in tqdm(dts_dir.rglob(f'*{ocr_vars.IMG_FILES_EXTENSION}'),
+    # Get rid of symlinks and empty txt files, centralize all images in output_dir
+    for img_path in tqdm(dts_dir.rglob(f'*{ocr_vs.IMG_EXTENSION}'),
                          desc=f'Cleaning dataset in {dts_dir.name} and exporting to {output_dir.name}'):
-        text_path = img_path.with_suffix(ocr_vars.TEXT_FILES_EXTENSION)
-        if img_path.is_file() and text_path.is_file():
-            text = text_path.read_text(encoding='utf-8')
-            if re.sub(r'[\s+]', '', text) != '':
-                (output_dir / img_path.name).write_bytes(img_path.read_bytes())
-
-                # Harmonize the txt
-                text = text.strip('\n').strip()
-                text = unicodedata.normalize(unicode_form, text)
-                (output_dir / text_path.name).write_text(text, encoding='utf-8')
+        if img_path.is_file():
+            text_path = img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION)
+            if text_path.is_file():
+                text = text_path.read_text(encoding='utf-8')
+                if re.sub(r'[\s+]', '', text) != '':
+                    (output_dir / img_path.name).write_bytes(img_path.read_bytes())
+                    # Harmonize the txt
+                    text = text.strip('\n').strip()
+                    text = unicodedata.normalize(unicode_form, text)
+                    (output_dir / text_path.name).write_text(text, encoding='utf-8')
+                else:
+                    empty_txts += 1
             else:
-                empty_txts += 1
-        else:
-            missing_pairs += 1
+                missing_pairs += 1
 
     # Remove double-height lines
-    metadata = make_dataset_metadata(output_dir)
+    metadata = compute_dataset_metadata(output_dir)
 
-    for img_id in tqdm(metadata[metadata['initial_normalized_height'] >= double_line_threshold]['img_id'],
-                       desc=f'Removing double-height lines in dataset...'):
+    for img_id in metadata[metadata['initial_normalized_height'] >= double_line_threshold]['img_id']:
         (output_dir / f'{img_id}.png').unlink()
         (output_dir / f'{img_id}.gt.txt').unlink()
         double_height_lines += 1
@@ -223,10 +221,10 @@ def clean_dataset(dts_dir: Union[Path, str],
             f'Cleaning done. Removed {missing_pairs} missing pairs, {empty_txts} empty txts and {double_height_lines} double-height lines.')
 
 
-def make_clean_ajmc_dataset(output_dir: Path = ocr_vars.get_dataset_dir('ajmc'),
-                            comm_ids: List[str] = variables.ALL_COMM_IDS,
+def make_clean_ajmc_dataset(output_dir: Path = ocr_vs.get_dataset_dir('ajmc'),
+                            comm_ids: List[str] = vs.ALL_COMM_IDS,
                             unicode_format: str = 'NFC',
-                            base_dir=Path(variables.COMMS_DATA_DIR)):
+                            base_dir=Path(vs.COMMS_DATA_DIR)):
     """Uses`CanonicalCommentary.export_gt_file_pairs` to export an ocr dataset for given commentary ids."""
 
     temp_dir = output_dir / 'temp'
@@ -243,8 +241,8 @@ def make_clean_ajmc_dataset(output_dir: Path = ocr_vars.get_dataset_dir('ajmc'),
     shutil.rmtree(temp_dir)
 
 
-def make_clean_pogretra_dataset(output_dir: Path = ocr_vars.get_dataset_dir('pog'),
-                                pogretra_source_dir: Optional[Path] = ocr_vars.POG_SOURCE_DIR,
+def make_clean_pogretra_dataset(output_dir: Path = ocr_vs.get_dataset_dir('pog'),
+                                pogretra_source_dir: Optional[Path] = ocr_vs.POG_SOURCE_DIR,
                                 url: str = 'https://zenodo.org/record/4774201/files/pogretra-v1.0.tar.gz'):
     """Creates a cleaned dataset from the Pogretra dataset.
 
@@ -279,7 +277,7 @@ def make_clean_pogretra_dataset(output_dir: Path = ocr_vars.get_dataset_dir('pog
 
     # remove the files which are already in ajmc
     for file_path in output_dir.glob('*'):
-        if file_path.stem.split('_')[0] in variables.ALL_COMM_IDS:
+        if file_path.stem.split('_')[0] in vs.ALL_COMM_IDS:
             file_path.unlink()
 
 
@@ -362,11 +360,11 @@ def gather_and_transform_dataset(dts_config: dict,
         The updated dataset metadata
     """
 
-    dts_dir = ocr_vars.get_dataset_dir(dts_config['id'])
+    dts_dir = ocr_vs.get_dataset_dir(dts_config['id'])
 
     for src_img_path in dts_metadata['path']:
         src_img_path = Path(src_img_path)
-        src_text_path = src_img_path.with_suffix(ocr_vars.TEXT_FILES_EXTENSION)
+        src_text_path = src_img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION)
 
         img = PILImage.open(src_img_path)
         img_id = src_img_path.stem
@@ -377,7 +375,8 @@ def gather_and_transform_dataset(dts_config: dict,
             img_id += f"_res{dts_config['transform']['resize']}"
 
         if dts_config['transform']['rotate'] is not None:
-            img = img.rotate(angle=dts_config['transform']['rotate'], expand=True, fillcolor=(255, 255, 255))
+            img = img.rotate(angle=dts_config['transform']['rotate'], expand=True,
+                             fillcolor=tuple([255] * len(img.getbands())))
             img_id += f"_rot{dts_config['transform']['rotate']}"
 
         if dts_config['transform']['blur'] is not None:
@@ -393,11 +392,11 @@ def gather_and_transform_dataset(dts_config: dict,
             img_id += f"_dil{dts_config['transform']['dilate']}"
 
         # rename image name and write it
-        dst_img_path = dts_dir / (img_id + ocr_vars.IMG_FILES_EXTENSION)
+        dst_img_path = dts_dir / (img_id + ocr_vs.IMG_EXTENSION)
         img.save(dst_img_path)
 
         # Deal with the corresponding .gt.txt
-        dst_text_path = dts_dir / (img_id + ocr_vars.TEXT_FILES_EXTENSION)
+        dst_text_path = dts_dir / (img_id + ocr_vs.GT_TEXT_EXTENSION)
         dst_text_path.write_bytes(src_text_path.read_bytes())
 
         # Update the metadata
@@ -413,28 +412,28 @@ def make_dataset(dts_config: dict, overwrite: bool = False) -> None:
     """Returns the path to a dataset's dir, creating the dataset if it doesn't exist"""
 
     if safe_check_dataset(dts_config) and not overwrite:
-        return
+        return None
 
     logger.info(f'Making dataset {dts_config["id"]}')
-    dts_dir = ocr_vars.get_dataset_dir(dts_config['id'])
-    dts_config_path = ocr_vars.get_dataset_config_path(dts_config['id'])
+    dts_dir = ocr_vs.get_dataset_dir(dts_config['id'])
+    dts_config_path = ocr_vs.get_dataset_config_path(dts_config['id'])
     dts_dir.mkdir(parents=True, exist_ok=True)
 
     if dts_config['id'] == 'ajmc':  # Special methods for root datasets
         make_clean_ajmc_dataset(output_dir=dts_dir)
-        dts_metadata = make_dataset_metadata(dts_dir=dts_dir)
+        dts_metadata = compute_dataset_metadata(dts_dir=dts_dir)
         dts_metadata = split_root_dataset_metadata(dts_metadata)
 
     elif dts_config['id'] == 'pog':
         make_clean_pogretra_dataset(output_dir=dts_dir)
-        dts_metadata = make_dataset_metadata(dts_dir=dts_dir)
+        dts_metadata = compute_dataset_metadata(dts_dir=dts_dir)
         dts_metadata = split_root_dataset_metadata(dts_metadata)
 
     else:
         dts_metadata = pd.DataFrame()  # Merge the sources' metadatas to get the final metadata
         for source in dts_config['source']:
             source_config = CONFIGS['datasets'][source]
-            source_dir = ocr_vars.get_dataset_dir(source_config['id'])
+            source_dir = ocr_vs.get_dataset_dir(source_config['id'])
             make_dataset(dts_config=source_config)
             dts_metadata = pd.concat([dts_metadata, import_dataset_metadata(source_dir)], axis=0)
 
@@ -460,4 +459,3 @@ def make_datasets(dts_ids: Optional[List[str]] = None, overwrite: bool = False):
     for dts_id, dts_config in tqdm(CONFIGS['datasets'].items(), desc='Making datasets...'):
         if dts_ids is None or dts_id in dts_ids:
             make_dataset(dts_config, overwrite=overwrite)
-

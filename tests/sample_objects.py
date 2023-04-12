@@ -35,15 +35,15 @@ sample_bboxes = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.i
 
 # Commentaries, OCR, path and via
 sample_comm_base_dir = Path('data/sample_commentaries/cu31924087948174') if os.getcwd().endswith('tests') else Path(
-    'tests/data/sample_commentaries/cu31924087948174')
+        'tests/data/sample_commentaries/cu31924087948174')
 
 sample_commentary_id = 'cu31924087948174'
 sample_page_id = sample_commentary_id + '_0083'
 
 sample_via_path = sample_comm_base_dir / vs.COMM_VIA_REL_PATH
 
-sample_ocr_run = 'tess_eng_grc'
-sample_ocr_run_outputs_dir = sample_comm_base_dir / vs.COMM_OCR_RUNS_REL_DIR / sample_ocr_run / 'outputs'
+sample_ocr_run_id = 'tess_eng_grc'
+sample_ocr_run_outputs_dir = sample_comm_base_dir / vs.COMM_OCR_RUNS_REL_DIR / sample_ocr_run_id / 'outputs'
 sample_ocr_page_path = sample_ocr_run_outputs_dir / (sample_page_id + '.hocr')
 
 sample_ocr_gt_dir = sample_comm_base_dir / vs.COMM_OCR_GT_REL_DIR
@@ -58,7 +58,7 @@ sample_ocrcommentary = OcrCommentary(id=sample_commentary_id,
                                      base_dir=sample_comm_base_dir,
                                      via_path=sample_via_path,
                                      img_dir=sample_img_dir,
-                                     ocr_run=sample_ocr_run,
+                                     ocr_run_id=sample_ocr_run_id,
                                      ocr_gt_dir=sample_ocr_gt_dir,
                                      sections_path=sample_sections_path)
 
@@ -67,7 +67,7 @@ sample_raw_entities = sample_ocr_page.children.entities
 
 sample_cancommentary = sample_ocrcommentary.to_canonical(include_ocr_gt=False)
 
-sample_canonical_path = sample_comm_base_dir / vs.COMM_CANONICAL_REL_DIR / (sample_ocr_run + '.json')
+sample_canonical_path = sample_comm_base_dir / vs.COMM_CANONICAL_REL_DIR / (sample_ocr_run_id + '.json')
 sample_cancommentary.to_json(sample_canonical_path)
 
 sample_cancommentary_from_json = CanonicalCommentary.from_json(sample_canonical_path)

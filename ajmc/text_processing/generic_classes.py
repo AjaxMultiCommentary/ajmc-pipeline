@@ -5,10 +5,11 @@ from pathlib import Path
 from typing import List, Optional, Type, Union
 
 import cv2
+from lazy_objects.lazy_objects import lazy_property, lazy_init, LazyObject
 
 from ajmc.commons import variables as vs, image as ajmc_img
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.miscellaneous import get_custom_logger, lazy_init, lazy_property, LazyObject
+from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.olr.utils import get_olr_splits_page_ids
 
 logger = get_custom_logger(__name__)
@@ -88,11 +89,11 @@ class Commentary(TextContainer):
         """A simple shortcut to get a section from its type."""
         try:
             return [s for s in self.children.sections if section_type in s.section_types][0]
-        except StopIteration:
+        except IndexError:
             return None
 
     @lazy_property
-    def olr_groundtruth_pages(self) -> List[vs.PageType]:
+    def olr_gt_pages(self) -> List[vs.PageType]:
         """A list of `CanonicalPage` objects containing the groundtruth of the OLR."""
         page_ids = get_olr_splits_page_ids(self.id)
         return [p for p in self.children.pages if p.id in page_ids]
@@ -114,7 +115,7 @@ class Commentary(TextContainer):
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Iterate over groundtruth pages
-        for page in self.ocr_groundtruth_pages:
+        for page in self.ocr_gt_pages:
             for i, line in enumerate(page.children.lines):
                 line.image.write(output_dir / f'{page.id}_{i}.png')
                 (output_dir / f'{page.id}_{i}.gt.txt').write_text(unicodedata.normalize(unicode_format, line.text),
@@ -140,34 +141,3 @@ class Page:
     def number(self) -> int:
         """The page number."""
         return int(self.id.split('_')[-1])
-
-    # def to_canonical_v1(self) -> Dict[str, Any]:
-    #     """Creates canonical data, as used for INCEpTION. """
-    #     logger.warning(
-    #         'You are creating a canonical data version 1. For version 2, use `OcrCommentary.to_canonical()`.')
-    #     data = {'id': self.id,
-    #             'iiif': 'None',
-    #             'cdate': strftime('%Y-%m-%d %H:%M:%S'),
-    #             'regions': []}
-    #
-    #     for r in self.children.regions:
-    #         r_dict = {'region_type': r.region_type,
-    #                   'bbox': list(r.bbox.xywh),
-    #                   'lines': [
-    #                       {
-    #                           'bbox': list(l.bbox.xywh),
-    #                           'words': [
-    #                               {
-    #                                   'bbox': list(w.bbox.xywh),
-    #                                   'text': w.text
-    #                               } for w in l.children.words
-    #                           ]
-    #
-    #                       } for l in r.children.lines
-    #                   ]
-    #                   }
-    #         data['regions'].append(r_dict)
-    #
-    #     return data
-
-    # def to_xmi_json(self):

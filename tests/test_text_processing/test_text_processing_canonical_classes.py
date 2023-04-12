@@ -1,7 +1,7 @@
 import pytest
+from lazy_objects.lazy_objects import LazyObject
 
 from ajmc.commons import variables as vs
-from ajmc.commons.miscellaneous import LazyObject
 from ajmc.text_processing import canonical_classes as cc
 from tests import sample_objects as so
 

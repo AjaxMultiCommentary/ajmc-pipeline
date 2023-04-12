@@ -25,7 +25,7 @@
         "description": "Page region.",
         "properties": {
           "region_type": {
-            "type":"string",
+            "type": "string",
             "description": "The type of olr region, (e.g. commentary, primary_text,...)"
           },
           "bbox": {
