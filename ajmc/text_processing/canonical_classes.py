@@ -108,17 +108,45 @@ class CanonicalCommentary(Commentary):
                              for child_type in vs.CHILD_TYPES}}
 
         if output_path is None:
-            output_path = vs.get_comm_canonical_path(self.id, self.ocr_run_id)
+            output_path = vs.get_comm_canonical_default_path(self.id, self.ocr_run_id)
 
         output_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
 
         return data
 
-    def to_alto(self, children_types: List[str], output_dir: Union[str, Path]):
-        """A wrapper to export self.children.pages to alto."""
+    def to_alto(self,
+                output_dir: Union[str, Path],
+                children_types: List[str],
+                region_types_mapping: Dict[str, str],
+                region_types_ids: Dict[str, str],
+                ocr_gt_only: bool = False,
+                olr_gt_only: bool = False,
+                copy_images: bool = False,
+                region_types: List[str] = vs.ROIS):
+        """A wrapper to export self.children.pages to alto.
+
+        Args:
+            output_dir: The directory to which the alto files should be exported.
+            children_types: The types of children to export.
+            region_types_mapping: A dictionary mapping the region types to the alto types, e.g. vs.REGION_TYPES_TO_SEGMONTO.
+            region_types_ids: A dictionary mapping the region types to the alto ids, e.g. vs.SEGMONTO_TO_VALUE_IDS.
+            ocr_gt_only: If True, only the ocr_gt pages will be exported. Notice that ocr_gt is a subset of olr_gt.
+            olr_gt_only: If True, only the olr_gt pages will be exported.
+            copy_images: If True, the images will be copied to the output directory.
+            region_types: The types of regions to export.
+        """
         output_dir = Path(output_dir)
-        for p in self.children.pages:
-            p.to_alto(children_types=children_types, output_path=output_dir / (p.id + '.xml'))
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        selected_pages = self.olr_gt_pages if olr_gt_only else self.ocr_gt_pages if ocr_gt_only else self.children.pages
+        for p in selected_pages:
+            p.to_alto(output_path=output_dir / (p.id + '.xml'),
+                      children_types=children_types,
+                      region_types_mapping=region_types_mapping,
+                      region_types_ids=region_types_ids,
+                      regions_types=region_types)
+            if copy_images:
+                p.image.write(output_dir / (p.image.id + vs.DEFAULT_IMG_EXTENSION))
 
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
         raise NotImplementedError('`CanonicalCommentary.children` must be set at __init__.')
@@ -186,7 +214,10 @@ class CanonicalTextContainer(TextContainer):
     @lazy_property
     def bbox(self) -> Shape:
         """Generic method to get a `CanonicalTextContainer`'s bbox."""
-        return Shape(get_bbox_from_points([xy for w in self.children.words for xy in w.bbox.bbox]))
+        if len(self.children.words) == 0:
+            return Shape([(0, 0), (0, 0)])
+        else:
+            return Shape(get_bbox_from_points([xy for w in self.children.words for xy in w.bbox.bbox]))
 
     @lazy_property
     def image(self) -> AjmcImage:
@@ -222,18 +253,18 @@ class CanonicalPage(Page, CanonicalTextContainer):
         return {'id': self.id, 'word_range': self.word_range}
 
     def to_alto(self,
+                output_path: Path,
                 children_types: List[str],
                 region_types_mapping: Dict[str, str],
                 region_types_ids: Dict[str, str],
-                output_path: Path,
                 regions_types: List[str] = vs.ROIS):
         """Exports a page to ALTO-xml.
 
         Args:
+            output_path: self-explanatory.
             children_types: The types of children to be exported. Must be a subset of ['regions', 'lines', 'words'].
             region_types_mapping: A dictionary mapping the types of regions to the types of regions in the ALTO-xml, for instance variables.REGION_TYPES_TO_SEGMONTO
             region_types_ids: A dictionary mapping the values of `region_types_mapping` to the ids of regions in the ALTO-xml, for instance variables.REGION_TYPES_TO_SEGMONTO_ID
-            output_path: self-explanatory.
             regions_types: The types of regions to be exported, for instance variables.ROIS. This allows for filtering only the regions of interested, excluded regions types like 'undefined'.
         """
         env = Environment(loader=PackageLoader('ajmc', 'data/templates'),

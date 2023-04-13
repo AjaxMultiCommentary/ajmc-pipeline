@@ -41,7 +41,6 @@ COMM_OCR_GT_REL_DIR = Path('ocr/groundtruth')
 COMM_OCR_GT_PAIRS_REL_DIR = Path('ocr/gt_file_pairs')
 COMM_VIA_REL_PATH = Path('olr/via_project.json')
 COMM_CANONICAL_REL_DIR = Path('canonical')
-COMM_CANONICAL_V1_REL_DIR = Path('canonical')
 COMM_SECTIONS_REL_PATH = Path('sections.json')
 COMM_NER_ANN_REL_DIR = Path('ner/annotation')
 COMM_LEMLINK_ANN_REL_DIR = Path('lemlink/annotation')
@@ -94,8 +93,15 @@ def get_comm_lemlink_xmis_dir(comm_id: str, ocr_run_id: str) -> Path:
 def get_comm_canonical_dir(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_CANONICAL_REL_DIR
 
+def get_comm_canonical_path_from_pattern(comm_id: str, ocr_run_pattern: str) -> Path:
+    canonical_dir = get_comm_canonical_dir(comm_id)
+    try:
+        return next(canonical_dir.glob(f'{ocr_run_pattern}.json'))
+    except StopIteration:
+        raise FileNotFoundError(f'No canonical file found for comm_id={comm_id} and ocr_run_pattern={ocr_run_pattern}')
 
-def get_comm_canonical_path(comm_id: str, ocr_run_id: str) -> Path:
+
+def get_comm_canonical_default_path(comm_id: str, ocr_run_id: str) -> Path:
     return get_comm_canonical_dir(comm_id) / f'{ocr_run_id}.json'
 
 
