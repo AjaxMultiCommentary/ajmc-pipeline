@@ -1,6 +1,5 @@
 import os
 import platform
-import re
 from pathlib import Path
 from typing import Tuple, Union, Type
 
@@ -453,11 +452,3 @@ PARAMETERS = {
     'entity_inclusion_threshold': 0.8,
 }
 
-CHARSETS = {
-    'latin': re.compile(r'([A-Za-z]|[\u00C0-\u00FF]|\u0152|\u0153)', re.UNICODE),
-    'greek': re.compile(r'([\u0373-\u03FF]|[\u1F00-\u1FFF]|\u0300|\u0301|\u0313|\u0314|\u0345|\u0342|\u0308)',
-                        re.UNICODE),
-    'numeral': re.compile(r'([0-9])', re.UNICODE),
-    'punctuation': re.compile(r'([\u0020-\u002F]|[\u003A-\u003F]|[\u005B-\u0060]|[\u007B-\u007E]|\u00A8|\u00B7)',
-                              re.UNICODE)
-}

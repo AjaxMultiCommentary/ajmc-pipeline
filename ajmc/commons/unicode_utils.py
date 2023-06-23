@@ -3,8 +3,6 @@
 import re
 from typing import List, Tuple, Callable
 
-import unicodedata
-
 import ajmc.commons
 from ajmc.commons.arithmetic import safe_divide
 
@@ -120,17 +118,14 @@ def harmonise_miscellaneous_symbols(text: str) -> str:
     return text
 
 
-def harmonise_unicode(text: str,
-                      harmonise_functions: Tuple[Callable[[str], str]] = (harmonise_punctuation,
-                                                                          harmonise_miscellaneous_symbols,
-                                                                          harmonise_ligatures),
-                      harmonise_space_chars: bool = True,
-                      unicode_normalisation: str = 'NFC') -> str:
+def harmonise_unicode(text: str, harmonise_functions: Tuple[Callable[[str], str]] = (harmonise_punctuation,
+                                                                                     harmonise_miscellaneous_symbols,
+                                                                                     harmonise_ligatures), harmonise_space_chars: bool = True) -> str:
     for function in harmonise_functions:
         text = function(text)
-    if harmonise_spaces:
+    if harmonise_space_chars:
         text = harmonise_spaces(text)
-    return unicodedata.normalize(unicode_normalisation, text)
+    return text
 
 
 def get_all_chars_from_range(start: str, end: str) -> str:

@@ -44,6 +44,7 @@ TESSDATA_DIR = Path('/Users/sven/packages/tesseract_/tessdata') if LOCAL else XP
 LANGDATA_DIR = None if LOCAL else XP_DIR / 'lib/langdata_lstm'
 DICTIONARIES_DIR = XP_DIR / 'utils/dictionaries'
 MODELS_DIR = XP_DIR / 'models'
+SOURCE_DATASETS_DIR = XP_DIR / 'source_datasets'
 DATASETS_DIR = XP_DIR / 'datasets'
 EXPERIMENTS_DIR = XP_DIR / 'experiments'
 CONFIGS_PATH = XP_DIR / 'configs.xlsx'
@@ -51,9 +52,14 @@ POG_SOURCE_DIR = XP_DIR / 'data/pogretra-v1.0/Data' if LOCAL else Path('/mnt/ajm
 
 LINES_PER_TESTSET = 120
 
-GT_TEXT_EXTENSION = '.gt.txt'
+GT_TEXT_EXTENSION = '.txt'
 PRED_TEXT_EXTENSION = '.txt'
 IMG_EXTENSION = '.png'
+UNICODE_FORM = 'NFC'
+
+
+def get_source_dataset_dir(dataset_name: str) -> Path:
+    return SOURCE_DATASETS_DIR / dataset_name
 
 
 def get_dataset_dir(dataset_name: str) -> Path:
