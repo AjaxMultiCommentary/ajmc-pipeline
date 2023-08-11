@@ -1,19 +1,74 @@
 import math
 import re
+import time
 from pathlib import Path
 from typing import List, Tuple
 
 import torch
+from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
 from torchvision.io import read_image, ImageReadMode
 
 from ajmc.ocr import variables as ocr_vs
 
 
+class OcrLine:
+    """A custom class for OCR lines.
+
+    Note:
+        - A line corresponds both to a txt and an img if in train mode, only an image if not.
+        - img : the image of the line
+            - img_width: The width of the original image
+            - img_height: The height of the original image
+            - img_padding_length: The length of padding added to the image to make it divisible by `chunks_count`
+        - Chunks : the chunks of the image of the line
+            - chunks_width: The widths of chunks
+            - chunks_height = img height
+            - chunks_count = The number of chunks
+        - text : the text corresponding to the image.
+            - text_length: The length of the text
+
+    """
+
+    # Todo test this for speed
+    def __init__(self,
+                 path: Path,
+                 img_height: int,
+                 chunk_overlap: int,
+                 chunk_width: int,
+                 ):
+        start_time = time.time()
+        img_tensor = read_image(str(path), mode=ImageReadMode.GRAY)
+        self.img_width = img_tensor.shape
+        tensor = prepare_img_tensor(img_tensor,
+                                    img_height=img_height)
+        self.chunks, self.img_padding = chunk_img_tensor_with_overlap(tensor, chunk_width, chunk_overlap)
+        self.len_chunks = len(self.chunks)
+        self.text = path.with_suffix('.gt.txt').read_text(encoding='utf-8')  # Todo change txt
+        self.txt_tensor = None
+
+        print('Img initialized in : {:.2f}s'.format(time.time() - start_time))
+
+
+class OcrBatch:
+
+    def __init__(self):
+        self.ocr_lines: List[OcrLine] = []
+
+        self.chunks = torch.cat([img.chunks for img in self.ocr_lines], dim=0)
+        self.mappings = [l.len_chunks for l in self.ocr_lines]
+        self.txt_lengths = [len(l.txt_tensor) for l in self.ocr_lines]
+        self.txt_batch_tensor = pad_sequence([img.txt_tensor for img in self.ocr_lines], batch_first=True, )
+        self.img_widths = [l.img_width for l in self.ocr_lines]
+
+
+# Ce qu'on veut in fine comme batch c'est
+#
+
 def detect_spaces(img_tensor: torch.Tensor,
                   height_space_ratio: float = 0.3,
                   height_noise_ratio: float = 0.05) -> list[tuple[int, int]]:
-    """Detects spaces in an binary, white-on-black line image tensor.
+    """Detects spaces in a binary, white-on-black line image tensor.
 
     This function first finds the columns with only zeros (black pixels), using torch.any. If there are more than
     image height x `height_space_ratio` consecutive zeros columns, then they are considered a space.
@@ -211,7 +266,7 @@ def compute_padding(img_tensor,
 
 def chunk_img_tensor_with_overlap(img_tensor,
                                   chunk_width: int,
-                                  chunk_overlap: int) -> torch.Tensor:
+                                  chunk_overlap: int) -> Tuple[torch.Tensor, int]:
     n_chunks = compute_n_chunks(img_tensor, chunk_width, chunk_overlap)
     padding = compute_padding(img_tensor, n_chunks, chunk_width, chunk_overlap)
 
@@ -223,17 +278,31 @@ def chunk_img_tensor_with_overlap(img_tensor,
     for i in range(n_chunks):
         chunks.append(img_tensor[:, :, i * (chunk_width - chunk_overlap):i * (chunk_width - chunk_overlap) + chunk_width])
 
-    return torch.stack(chunks, dim=0)
+    return torch.stack(chunks, dim=0), padding
+
+
+def prepare_img_tensor(img_tensor: torch.Tensor,
+                       img_height: int) -> torch.Tensor:
+    """Prepares an image tensor for training."""
+
+    img_tensor = invert_image_tensor(img_tensor)
+
+    img_tensor = transforms.Resize(img_height)(img_tensor)
+    img_tensor = crop_image_tensor_to_nonzero(img_tensor)
+    img_tensor = normalize_image_tensor(img_tensor)
+
+    return img_tensor
 
 
 def prepare_files_for_torch(dataset_dir: Path,
                             output_dir: Path,
                             img_height: int,
-                            chunking_width: int,
-                            chunking_overlap: int,
+                            chunks_width: int,
+                            chunks_overlap: int,
                             invert: bool = True,
                             img_extension: str = ocr_vs.IMG_EXTENSION,
-                            txt_extension: str = ocr_vs.GT_TEXT_EXTENSION):
+                            txt_extension: str = ocr_vs.GT_TEXT_EXTENSION,
+                            debug: bool = False):
     """Prepares """
 
     for img_path in dataset_dir.glob('*' + img_extension):
@@ -246,13 +315,23 @@ def prepare_files_for_torch(dataset_dir: Path,
         img_tensor = crop_image_tensor_to_nonzero(img_tensor)
         img_tensor = normalize_image_tensor(img_tensor)
 
-        chunks_tensor = chunk_img_tensor_with_overlap(img_tensor=img_tensor,
-                                                      chunk_width=chunking_width,
-                                                      chunk_overlap=chunking_overlap)
+        chunks_tensor, padding = chunk_img_tensor_with_overlap(img_tensor=img_tensor,
+                                                               chunk_width=chunks_width,
+                                                               chunk_overlap=chunks_overlap)
 
         # save
         torch.save(chunks_tensor, (output_dir / (img_path.stem + '.pt')))
         (output_dir / (img_path.stem + txt_extension)).write_text(img_path.with_suffix(txt_extension).read_text(encoding='utf-8'), encoding='utf-8')
+
+        if debug:
+            print(img_path)
+            transforms.ToPILImage()(img_tensor).show()
+
+            for chunk in chunks_tensor:
+                print('chunk')
+                transforms.ToPILImage()(chunk).show()
+            if input() == 'q':
+                break
 
 
 def reassemble_chunks(chunks: torch.Tensor,
@@ -260,21 +339,23 @@ def reassemble_chunks(chunks: torch.Tensor,
     """Reassembles chunks of an image tensor into a single image tensor.
 
     Args:
-        chunks: The chunks to reassemble, in shape (n_chunks, 1, height, width).
+        chunks: The chunks to reassemble, in shape (n_chunks, width, height). Note that the channels dimension is not
+            present, as the chunks are grayscale images. processed by the encoder.
         chunk_overlap: The overlap between the chunks.
 
     Returns:
-        The reassembled image tensor, in shape (1, height, width).
+        The reassembled image tensor, in shape (width, height).
     """
 
-    reassembled_img = chunks[0][:, :, :-int(chunk_overlap / 2)]
+    reassembled_img = chunks[0][:-int(chunk_overlap / 2), :]  # take the first chunk, remove the overlap
     for i in range(1, len(chunks)):
-        if i == len(chunks) - 1:
-            reassembled_img = torch.cat([reassembled_img, chunks[-1][:, :, int(chunk_overlap / 2):]], dim=2)
-        else:
-            reassembled_img = torch.cat([reassembled_img, chunks[i][:, :, int(chunk_overlap / 2):-int(chunk_overlap / 2)]], dim=2)
+        if i == len(chunks) - 1:  # for the last chunk, we dont cut the end overlap as there is none
+            reassembled_img = torch.cat([reassembled_img, chunks[i][int(chunk_overlap / 2):, :]], dim=0)
+        else:  # for the other chunks, we cut the begin and end overlap
+            reassembled_img = torch.cat([reassembled_img, chunks[i][int(chunk_overlap / 2):-int(chunk_overlap / 2), :]], dim=0)
 
     # Todo 👁️ the end of this tensor could be chunked to non-zero values to recut the introduced padding
+    # This will have to be done somehow, imgs offsets requires it.
     return reassembled_img
 
 
@@ -300,15 +381,17 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
 
     def __init__(self,
                  data_dir: Path,
-                 classes: List[str],
+                 classes: str,
                  max_batch_size: int,
                  blank: str = '@',
-                 txt_ext: str = '.txt'):
+                 txt_ext: str = '.txt',
+                 is_training: bool = True):
         self.data_dir = data_dir
-        self.classes = [blank] + classes
+        self.classes = blank + classes
         self.max_batch_size = max_batch_size
         self.pt_paths = sorted(self.data_dir.rglob('*.pt'), key=lambda x: x.stem)
         self.txt_ext = txt_ext
+        self.is_training = is_training  # Todo see how we handle this
 
 
     @staticmethod
@@ -336,7 +419,7 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
                         ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
 
         img_batch = torch.cat([batch_tuple[0], torch.load(pt_path)], dim=0)
-        labels_batch = torch.cat([batch_tuple[1], self.get_labels_from_pt_path(pt_path)], dim=0)
+        labels_batch = torch.stack([batch_tuple[1], self.get_labels_from_pt_path(pt_path)], dim=0)
         labels_to_img_map = torch.cat([batch_tuple[2], torch.tensor([self.get_chunk_size(pt_path)])], dim=0)
 
         return img_batch, labels_batch, labels_to_img_map
