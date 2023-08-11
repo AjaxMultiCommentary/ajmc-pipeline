@@ -1,9 +1,9 @@
 """This file contains unicode variables and functions which serve processing unicode characters."""
 
 import re
+import unicodedata
 from typing import List, Tuple, Callable
 
-import ajmc.commons
 from ajmc.commons.arithmetic import safe_divide
 
 
@@ -51,6 +51,17 @@ def harmonise_punctuation(text: str) -> str:
     text = text.replace('ˊ', "'")
     text = text.replace('ˋ', "'")
     text = text.replace('ˌ', ",")
+    text = text.replace('\x92', "'")
+    return text
+
+
+def harmonise_non_printable(text: str) -> str:
+    text = text.replace('\x92', "'")
+    text = text.replace('', 'ï')
+    text = text.replace('', 'ï')
+    text = text.replace('', 'ï')
+    text = text.replace('­', '-')
+    text = text.replace('­', '-')
     return text
 
 
@@ -112,15 +123,18 @@ def harmonise_miscellaneous_symbols(text: str) -> str:
     text = text.replace('⸢', '[')
     text = text.replace('⸣', ']')
     text = text.replace('⸤', '[')
+    text = text.replace('⌋', ']')
+    text = text.replace('⌈', '[')
     text = text.replace('⸥', ']')
     text = text.replace('⁄', '/')
     text = text.replace('µ', 'μ')
     return text
 
 
-def harmonise_unicode(text: str, harmonise_functions: Tuple[Callable[[str], str]] = (harmonise_punctuation,
-                                                                                     harmonise_miscellaneous_symbols,
-                                                                                     harmonise_ligatures), harmonise_space_chars: bool = True) -> str:
+def harmonise_unicode(text: str,
+                      harmonise_functions: Tuple[Callable[[str], str]] = (
+                              harmonise_punctuation, harmonise_miscellaneous_symbols, harmonise_ligatures),
+                      harmonise_space_chars: bool = True) -> str:
     for function in harmonise_functions:
         text = function(text)
     if harmonise_space_chars:
@@ -168,9 +182,11 @@ CHARSETS_RANGES = {
                     ('\u00B7', '\u00B7')]
 }
 
-CHARSETS_CHARS = {charset: get_all_chars_from_ranges(ranges) for charset, ranges in CHARSETS_RANGES.items()}
+CHARSETS_CHARS_NFC = {charset: get_all_chars_from_ranges(ranges) for charset, ranges in CHARSETS_RANGES.items()}
 
-CHARSETS_PATTERNS = {charset: re.compile(rf'[{charset_chars}]', re.UNICODE) for charset, charset_chars in CHARSETS_CHARS.items()}
+CHARSETS_CHARS_NFD = {charset: ''.join(set(unicodedata.normalize('NFD', charset_chars))) for charset, charset_chars in CHARSETS_CHARS_NFC.items()}
+
+CHARSETS_PATTERNS = {charset: re.compile(rf'[{charset_chars}]', re.UNICODE) for charset, charset_chars in CHARSETS_CHARS_NFC.items()}
 
 
 def chunk_string_by_charsets(string: str, fallback: str = 'latin'):
@@ -206,30 +222,10 @@ def chunk_string_by_charsets(string: str, fallback: str = 'latin'):
     return chunks
 
 
-def is_greek_char(char: str) -> bool:
-    """Returns True if char is a Greek character, False otherwise."""
-    return bool(re.match(CHARSETS_PATTERNS['greek'], char))
-
-
-def is_latin_char(char: str) -> bool:
-    """Returns True if char is a Latin character, False otherwise."""
-    return bool(re.match(CHARSETS_PATTERNS['latin'], char))
-
-
-def is_punctuation_char(char: str) -> bool:
-    """Returns True if char is a punctuation character, False otherwise."""
-    return bool(re.match(CHARSETS_PATTERNS['punctuation'], char))
-
-
-def is_numeral_char(char: str) -> bool:
-    """Returns True if char is a number character, False otherwise."""
-    return bool(re.match(CHARSETS_PATTERNS['numeral'], char))
-
-
 def get_char_charset(char: str, fallback: str = 'fallback') -> str:
     """Returns the charset of a character, if any, `fallback` otherwise."""
-    for charset_name, charset_pattern in CHARSETS_PATTERNS.items():
-        if bool(re.match(charset_pattern, char)):
+    for charset_name, charset_chars in CHARSETS_CHARS_NFC.items():
+        if char in charset_chars:
             return charset_name
     else:
         return fallback
@@ -243,55 +239,77 @@ def count_chars_by_charset(string: str, charset: str) -> int:
         chars in `string`.
 
     Args:
-        string: self explanatory
-        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'` or a valid `re`-pattern,
-                 for instance `r'([\u00F4-\u00FF])'`
+        string: a NFC-normalized string (default). For NFD-normalized strings, use `count_chars_by_charset_nfd`.
+        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'`.
 
     Returns:
         int: the number of charset-matching characters in `string`.
     """
+    return sum([c in CHARSETS_CHARS_NFC[charset] for c in string])
+
+
+def count_chars_by_charset_nfd(string: str, charset: str) -> int:
+    """Counts the number of chars by unicode characters set.
+
+    Example:
+        `count_chars_by_charset('γεια σας, world', 'greek')` returns `7` as there are 7 greek
+        chars in `string`.
+
+    Args:
+        string: a NFD-normalized string. For NFC-normalized strings, use `count_chars_by_charset`.
+        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'`.
+
+    Returns:
+        int: the number of charset-matching characters in `string`.
+    """
+    return sum([c in CHARSETS_CHARS_NFD[charset] for c in string])
+
+
+def is_charset_string(string: str,
+                      charset: str,
+                      threshold: float = 0.5,
+                      strict: bool = True) -> bool:
+    """Returns True if more than `threshold` of chars in string are in `charset`, False otherwise.
+
+    Args:
+        string: self explanatory
+        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'` or a valid `re`-pattern,
+                    for instance `r'([\u00F4-\u00FF])'`
+        threshold: the threshold above which the function returns True
+        strict: if True, only chars in `charset` are considered, if False, chars in `charset`, `'numeral'` and
+                `'punctuation'` are considered.
+    """
+
+    if strict:
+        return safe_divide(count_chars_by_charset(string=string, charset=charset), len(string)) >= threshold
+    else:
+        return safe_divide(sum(count_chars_by_charset(string, charset_) for charset_ in [charset, 'numeral', 'punctuation']),
+                           len(string)) >= threshold
+
+
+def is_charset_string_nfd(string: str,
+                          charset: str,
+                          threshold: float = 0.5,
+                          strict: bool = True) -> bool:
+    """Returns True if more than `threshold` of chars in string are in `charset`, False otherwise.
+
+    Args:
+        string: a NFD-normalized string. For NFC-normalized strings, use `is_charset_string`.
+        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'`.
+        threshold: the threshold above which the function returns True
+        strict: if True, only chars in `charset` are considered, if False, chars in `charset`, `'numeral'` and
+                `'punctuation'` are considered.
+    """
+
+    if strict:
+        return count_chars_by_charset_nfd(string=string, charset=charset) / len(string) >= threshold
+    else:
+        return sum(count_chars_by_charset_nfd(string, charset_) for charset_ in [charset, 'numeral', 'punctuation']) / len(string) >= threshold
+
+
+def get_char_unicode_name(char: str) -> str:
+    """Returns the unicode name of a character."""
     try:
-        pattern = ajmc.commons.unicode.CHARSETS_PATTERNS[charset]
-    except KeyError:
-        pattern = re.compile(charset, flags=re.UNICODE)
-
-    return len(re.findall(pattern, string))
-
-
-def is_greek_string(text: str, threshold: float = 0.5) -> bool:
-    """Returns True if more than `threshold` of alphabet chars in strin are Greek, False otherwise."""
-    alpha_text = "".join([c for c in text if c.isalpha()])  # cleaning the text from non-alphabetical characters
-    if alpha_text:
-        proportion_greek_chars = count_chars_by_charset(string=alpha_text, charset='greek') / len(alpha_text)
-        return proportion_greek_chars >= threshold
-    else:
-        return False
-
-
-def is_latin_string(text: str, threshold: float = 0.5) -> bool:
-    """Returns True if more than `threshold` of alphabet chars in strin are Latin, False otherwise."""
-    alpha_text = "".join([c for c in text if c.isalpha()])  # cleaning the text from non-alphabetical characters
-    if alpha_text:
-        proportion_latin_chars = count_chars_by_charset(string=alpha_text, charset='latin') / len(alpha_text)
-        return proportion_latin_chars >= threshold
-    else:
-        return False
-
-
-def is_punctuation_string(text: str, threshold: float = 0.5) -> bool:
-    """Returns True if more than `threshold` of chars in strin are punctuation, False otherwise."""
-    if text:
-        proportion_punctuation_chars = safe_divide(count_chars_by_charset(string=text, charset='punctuation'), len(text))
-        return proportion_punctuation_chars >= threshold
-    else:
-        return False
-
-
-def is_numeral_string(text: str, threshold: float = 0.5) -> bool:
-    """Returns True if more than `threshold` of chars in strin are numbers, False otherwise."""
-    alphanum_text = "".join([c for c in text if c.isalnum()])  # cleaning the text from non-alphabetical characters
-    if alphanum_text:
-        proportion_numbers = count_chars_by_charset(string=alphanum_text, charset='numeral') / len(alphanum_text)
-        return proportion_numbers >= threshold
-    else:
-        return False
+        return unicodedata.name(char)
+    except:
+        return ''

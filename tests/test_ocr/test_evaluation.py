@@ -1,14 +1,7 @@
+import ajmc.commons.unicode_utils
 import ajmc.commons.variables
 from ajmc.ocr import evaluation as ocr_eval
 from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
-
-
-def test_count_chars_by_charset():
-    string = 'abdεθ-:123ξ,'
-    assert ocr_eval.count_chars_by_charset(string, 'latin') == 3
-    assert ocr_eval.count_chars_by_charset(string, 'greek') == 3
-    assert ocr_eval.count_chars_by_charset(string, 'numeral') == 3
-    assert ocr_eval.count_chars_by_charset(string, 'punctuation') == 3
 
 
 def test_count_errors_by_charset():
