@@ -24,10 +24,8 @@ from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.commons.unicode_utils import get_char_charset
 from ajmc.ocr.font_utils import Font, walk_through_font_dir
 
-logger = get_custom_logger(__name__, level=logging.DEBUG)
+logger = get_custom_logger(__name__, level=logging.INFO)
 
-
-# Todo kraken function could be tested a bit before usage
 def pil2array(im: Image.Image, alpha: int = 0) -> np.ndarray:
     """Kraken linegen code."""
     if im.mode == '1':
@@ -55,15 +53,15 @@ def degrade_line(im, eta=0.0, alpha=1.5, beta=1.5, alpha_0=1.0, beta_0=1.0):
     """
     Degrades a line image by adding noise.
 
-    For parameter meanings consult [1].
+    For parameter meanings consult "A statistical, nonparametric methodology for document degradation model validation" (2000) by Tanugo et al.
 
     Args:
         im (PIL.Image): Input image
-        eta (float):
-        alpha (float):
-        beta (float):
-        alpha_0 (float):
-        beta_0 (float):
+        eta (float): Between 0 and 1. And jitters to image. Recommend staying to max 0.05
+        alpha (float): Seems to be the concentration of the noise around letters. The higher the more concentrated.Go between 0.1 and 3.
+        beta (float): the amount of holes in letters. Try a few 0.1, 0.3 and default.
+        alpha_0 (float): No clue what these do, leave default or see paper.
+        beta_0 (float): No clue what these do, leave default or see paper.
 
     Returns:
         PIL.Image in mode '1'
@@ -107,9 +105,9 @@ def distort_line(im, distort=3.0, sigma=10, eps=0.03, delta=0.3):
 
     Args:
         im (PIL.Image): Input image
-        distort (float):
-        sigma (float):
-        eps (float):
+        distort (float): Distorting of the image set between 1.5 and 4.0, with majority around 2.5
+        sigma (float): distorting of the strokes, set between 0.5, 1.5 for 5% of image, else default
+        eps (float): set default to 80%, else random between 0.01 and 0.1
         delta (float):
 
     Returns:
@@ -720,6 +718,7 @@ def check_file_count():
 
 
 #%%
+
 # shutil.rmtree(BASE_OUTPUT_DIR, ignore_errors=True)
 # BASE_OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 # random.seed(0)
@@ -732,6 +731,12 @@ def check_file_count():
 
 #%%
 if __name__ == '__main__':
+    # all_purpose(10): 3300 images --> 1000 = 300000
+    # latin(10): 5400 images --> 550 = 300000
+    # greek(10): 800 images --> 3750 = 300000
+    # mixed(10): 9000 images --> 333 = 300000
+    # capitals(10): 500 images --> 1000 = 50000
+    # gibberish(1): 1200 images --> 30 = 35000
     parser = argparse.ArgumentParser()
     parser.add_argument('--all_purpose', action='store_true')
     parser.add_argument('--latin', action='store_true')  #
@@ -749,7 +754,7 @@ if __name__ == '__main__':
     if args.latin:
         do_latin_fonts(550)
     if args.greek:
-        do_greek_fonts(3750)
+        do_greek_fonts(1250)
     if args.mixed:
         do_mixed_fonts(300)
     if args.capitals:
@@ -757,13 +762,3 @@ if __name__ == '__main__':
     if args.gibberish:
         do_gibberish(60)
 
-# EXPECTED NUMBERS
-# all_purpose(10): 3300 images --> 1000 = 300000
-# latin(10): 5400 images --> 550 = 300000
-# greek(10): 800 images --> 3750 = 300000
-# mixed(10): 9000 images --> 333 = 300000
-# capitals(10): 500 images --> 1000 = 50000
-# gibberish(1): 1200 images --> 30 = 35000
-
-
-#%%
