@@ -7,9 +7,6 @@ from typing import List, Optional, Tuple, Union
 import cv2
 import numpy as np
 from lazy_objects.lazy_objects import lazy_property, lazy_init
-from matplotlib import pyplot as plt
-from PIL import Image as PILImage, ImageDraw, ImageFont
-from skimage.util import random_noise
 
 from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
@@ -302,71 +299,8 @@ def resize_image(img: np.ndarray,
     return cv2.resize(src=img, dsize=dim, interpolation=cv2.INTER_AREA)
 
 
-def create_text_image(text: str,
-                      font_path: Path,
-                      padding: int,
-                      image_height: int,
-                      output_file: Optional[Path] = None) -> 'PIL.Image':
-    """Draws text on a white image with given font, padding and image height."""
-    # Todo come back here once tesseract experiments are done
-
-    # Get the font size
-    font_size = int(0.75*(image_height - 2 * padding))  # 0.75 for conversion from pixels to points
-
-    # Get the font
-    font = ImageFont.truetype(str(font_path), font_size)
-
-    # Get the text size
-    length = font.getlength(text)
-
-    # Create the image
-    image = PILImage.new('RGB', (int(length + 2 * padding), image_height), color='white')
-
-    # Draw the text
-    draw = ImageDraw.Draw(image)
-    draw.text((padding, 0), text, font=font, fill='black')
-
-    if output_file:
-        image.save(output_file)
-
-    return image
-
-    # lines = {
-    #     'modern_greek_line': 'Η Ελλάδα είναι μια χώρα στην Μεσόγειο, στην Ευρώπη',
-    #     'polytonic_greek_line': 'μῆνιν ἄειδε θεὰ Πηληϊάδεω Ἀχιλῆος',
-    #     'number_line': '1234567890',
-    #     'english_line': 'The quick brown fox jumps',
-    #     'mixed_line': '123. μῆνιν ἄειδε θεὰ — The quick brown fox jumps',
-    # }
-    #
-    # output_dir = Path('/Users/sven/Desktop/test/')
-    # for font in Path('data/greek_fonts').rglob('*.[ot]tf'):
-    #     for type_, line in lines.items():
-    #         create_text_image(text=line,
-    #                           font_path=font,
-    #                           padding=0,
-    #                           image_height=100,
-    #                           output_file=output_dir / f'{font.stem}_{type_}.png')
-
-
 def align_rgb_values(img):
     # input is numpy array
     mean = np.mean(img, axis=2, keepdims=True)
     mean_img = np.tile(mean, (1,1,3))
     return np.array(mean_img, dtype='uint8')
-
-
-def add_noise(img, noise_type, show_fig=True):
-    if noise_type.lower() in ["s&p"]:
-        # Add salt-and-pepper noise to the image.
-        noise_img = random_noise(img, mode='s&p',amount=0.4)
-    elif noise_type.lower() in ["gaussian"]:
-        noise_img = random_noise(img, mode='gaussian', clip=True, mean=0, var=0.2)
-    # The above function returns a floating-point image
-    # on the range [0, 1], thus we changed it to 'uint8'
-    # and from [0,255]
-    noise_img = align_rgb_values(255*noise_img)
-    if show_fig:
-        plt.imshow(noise_img)
-        plt.axis("off")
-    return noise_img
