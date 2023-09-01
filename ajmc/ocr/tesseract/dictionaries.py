@@ -15,9 +15,9 @@ from typing import List, Optional
 import pandas as pd
 
 from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.unicode_utils import is_charset_string
 from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.tesseract.tesseract_utils import run_tess_command
-from ajmc.ocr.utils import is_greek_string, is_latin_string, is_numeral_string
 
 logger = get_custom_logger(__name__)
 
@@ -46,9 +46,9 @@ def get_mr_abbr_wordlist(langs: List[str]) -> List[str]:
     # Define a filter
     def filter_func(x):
         if "gre" in langs:
-            return x['TYPE'] in langs and is_greek_string(x['TEXT'], threshold=0.9)
+            return x['TYPE'] in langs and is_charset_string(x['TEXT'], charset='greek', threshold=0.9, strict=False)
         else:
-            return x['TYPE'] in langs and is_latin_string(x['TEXT'], threshold=0.9)
+            return x['TYPE'] in langs and is_charset_string(x['TEXT'], charset='latin', threshold=0.9, strict=False)
 
     # Creates the Filter
     filter_ = df.apply(filter_func, axis=1)
@@ -60,7 +60,7 @@ def get_mr_abbr_wordlist(langs: List[str]) -> List[str]:
     abbreviations = list(set(' '.join(abbreviations).split()))
 
     # Delete numbers
-    abbreviations = [x for x in abbreviations if not is_numeral_string(x, threshold=0.9)]
+    abbreviations = [x for x in abbreviations if not is_charset_string(x, charset='numeral', threshold=0.9)]
 
     return abbreviations
 

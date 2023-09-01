@@ -17,11 +17,11 @@ from PIL import Image, ImageDraw, ImageOps
 from scipy.ndimage import gaussian_filter, distance_transform_cdt, binary_closing, affine_transform, geometric_transform
 from tqdm import tqdm
 
-from ajmc.ajmc_corpora.corpora_classes import Corpus
 from ajmc.commons import unicode_utils
 from ajmc.commons.file_management import int_to_x_based_code
 from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.commons.unicode_utils import get_char_charset
+from ajmc.corpora.corpora_classes import Corpus
 from ajmc.ocr.font_utils import Font, walk_through_font_dir
 
 logger = get_custom_logger(__name__, level=logging.INFO)

@@ -3,7 +3,7 @@ import re
 import requests
 from tqdm import tqdm
 
-from ajmc.ajmc_corpora import variables as vs
+from ajmc.corpora import variables as vs
 
 metadata_dir = vs.BASE_SCRAPE_DIR / 'propylaeum_BOOKS/metadata'
 output_dir = vs.BASE_SCRAPE_DIR / 'propylaeum_BOOKS/data'

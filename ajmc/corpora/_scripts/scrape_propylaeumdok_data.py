@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-from ajmc.ajmc_corpora import variables as vs
+from ajmc.corpora import variables as vs
 
 oai_files_dir = vs.BASE_SCRAPE_DIR / 'propylaeum_DOK/metadata/oai_files'
 json_output_path = vs.BASE_SCRAPE_DIR / 'propylaeum_DOK/metadata/metadata.json'

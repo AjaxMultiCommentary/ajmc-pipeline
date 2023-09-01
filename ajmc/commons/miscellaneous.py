@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 import timeit
 from pathlib import Path
 from typing import Generator, Iterable, List, Type
@@ -29,7 +30,7 @@ def timer(iterations: int = 3, number: int = 1_000):
             statement = lambda: func(*args, **kwargs)
             for i in range(iterations):
                 print(
-                    f"""Func: {func.__name__}, Iteration {i}. Elapsed time for {number} executions :   {timeit.timeit(statement, number=number)}""")
+                        f"""Func: {func.__name__}, Iteration {i}. Elapsed time for {number} executions :   {timeit.timeit(statement, number=number)}""")
             return statement()
 
         return inner
@@ -114,3 +115,24 @@ def log_to_file(log_message: str, log_file: Path):
     """Appends `log_message` to `log_file`"""
     with open(log_file, "a+") as tmp_file:
         tmp_file.write(log_message)
+
+
+def get_imports(output_file: Path = None):
+    """Get all imports from the package."""
+
+    imports = []
+    for pyfile in vs.PACKAGE_DIR.rglob('*.py'):
+        text = pyfile.read_text(encoding='utf-8')
+        imports += re.findall(r'\nfrom .+? import .*\n', text)
+        imports += re.findall(r'\nimport .+?\n', text)
+
+    imports = [imp for imp in imports if 'ajmc' not in imp]
+    imports = [re.sub(r'\nfrom (.+?) import .*?\n', r'\1', imp) for imp in imports]
+    imports = [re.sub(r'\nimport (.+?)[ \n]', r'\1', imp) for imp in imports]
+    imports = [re.sub(r'(.+?)\..+', r'\1', imp) for imp in imports]
+    imports = set(imports)
+
+    if output_file:
+        output_file.write_text('\n'.join(sorted(imports)), encoding='utf-8')
+
+    return imports

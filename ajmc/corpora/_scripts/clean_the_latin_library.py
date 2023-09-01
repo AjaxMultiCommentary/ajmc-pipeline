@@ -1,7 +1,7 @@
 import re
 from collections import Counter
 
-from ajmc.ajmc_corpora import variables as vs
+from ajmc.corpora import variables as vs
 
 raw_path = vs.BASE_STORING_DIR / 'the_latin_library/data/corpus_cleaned.txt'
 cleaned_path = raw_path.parent / 'corpus_cleaned.txt'

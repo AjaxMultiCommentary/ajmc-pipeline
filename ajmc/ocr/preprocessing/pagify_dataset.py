@@ -48,7 +48,7 @@ def pagify_dataset(dataset_dir: Path,
 
     for img_path in dataset_dir.glob(f'*{ocr_vs.IMG_EXTENSION}'):
         page_img_lines.append(cv2.imread(str(img_path)))
-        page_txt_lines.append(img_path.with_suffix('.gt.txt').read_text(encoding='utf-8'))
+        page_txt_lines.append(img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION).read_text(encoding='utf-8'))
         comm_id = img_path.name.split('_')[0]
 
         if len(page_img_lines) > 0 and \
@@ -60,7 +60,7 @@ def pagify_dataset(dataset_dir: Path,
             # Write the resulting image and text
             new_img_path = output_dir / f'{previous_comm_id}_{page_number}{ocr_vs.IMG_EXTENSION}'
             cv2.imwrite(str(new_img_path), page_img)
-            new_img_path.with_suffix('.gt.txt').write_text('\n'.join(page_txt_lines), encoding='utf-8')
+            new_img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION).write_text('\n'.join(page_txt_lines), encoding='utf-8')
 
             page_img_lines = []
             page_txt_lines = []

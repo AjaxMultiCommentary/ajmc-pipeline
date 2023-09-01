@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from ajmc.ajmc_corpora.cleaning_utils import basic_clean
+from ajmc.corpora.cleaning_utils import basic_clean
 
 logeion_dir = Path('/home/najem/logeion')
 

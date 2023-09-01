@@ -7,9 +7,9 @@ from pathlib import Path
 import beta_code
 from bs4 import BeautifulSoup
 
-from ajmc.ajmc_corpora import variables as vs
-from ajmc.ajmc_corpora.cleaning_utils import harmonise_linebreaks
 from ajmc.commons.unicode_utils import is_charset_string
+from ajmc.corpora import variables as vs
+from ajmc.corpora.cleaning_utils import harmonise_linebreaks
 
 
 class Corpus(ABC):

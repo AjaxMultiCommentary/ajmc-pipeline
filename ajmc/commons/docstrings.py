@@ -1,7 +1,6 @@
 """This file contains generic docstring chunks to be formatted using `docstring_formatter`."""
 
 
-# 💡 One could also add automatic typing, if necessary (i.e. taking type hints directly from params).
 def docstring_formatter(**kwargs):
     """Decorator with arguments used to format the docstring of a functions.
 

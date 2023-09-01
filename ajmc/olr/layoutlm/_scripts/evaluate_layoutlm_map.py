@@ -35,7 +35,7 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
     # Retrieve the eval pages
     pages = []
     for dict_ in config['data']['eval']:
-        commentary = CanonicalCommentary.from_json(vs.get_comm_canonical_dir(dict_['id']) / dict_['run'] + '.json')
+        commentary = CanonicalCommentary.from_json(vs.get_comm_canonical_dir(dict_['corpus_id']) / dict_['run'] + '.json')
         page_ids = get_olr_splits_page_ids(commentary.id, [dict_['split']])
         pages += [p for p in commentary.children.pages
                   if p.id in page_ids]

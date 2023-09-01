@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ajmc.ajmc_corpora.scraping_utils import scrape_resumptiontoken_oai
+from ajmc.corpora.scraping_utils import scrape_resumptiontoken_oai
 
 PERSEE_AJMC_COLL_IDS = ['crai', 'jds', 'mesav', 'piot', 'reg', 'vita', 'bude', 'camed', 'scrip', 'ccgg', 'nauti',
                         'rht', 'bec', 'bch', 'bch', 'mefr', 'efr', 'metis', 'gaia', 'cehm', 'thlou', 'dha', 'anata',

@@ -1,15 +1,16 @@
 import re
-import unicodedata
 from abc import abstractmethod
 from pathlib import Path
 from typing import List, Optional, Type, Union
 
 import cv2
+import unicodedata
 from lazy_objects.lazy_objects import lazy_property, lazy_init, LazyObject
 
 from ajmc.commons import variables as vs, image as ajmc_img
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.ocr import variables as ocr_vs
 from ajmc.olr.utils import get_olr_splits_page_ids
 
 logger = get_custom_logger(__name__)
@@ -117,9 +118,9 @@ class Commentary(TextContainer):
         # Iterate over groundtruth pages
         for page in self.ocr_gt_pages:
             for i, line in enumerate(page.children.lines):
-                line.image.write(output_dir / f'{page.id}_{i}.png')
-                (output_dir / f'{page.id}_{i}.gt.txt').write_text(unicodedata.normalize(unicode_format, line.text),
-                                                                  encoding='utf-8')
+                line.image.write(output_dir / f'{page.id}_{i}{ocr_vs.IMG_EXTENSION}')
+                (output_dir / f'{page.id}_{i}{ocr_vs.GT_TEXT_EXTENSION}').write_text(unicodedata.normalize(unicode_format, line.text),
+                                                                                     encoding='utf-8')
 
 
 class Page:

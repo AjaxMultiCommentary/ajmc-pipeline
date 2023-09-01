@@ -3,19 +3,15 @@ from ajmc.text_processing import cas_utils
 from ajmc.text_processing.ocr_classes import OcrCommentary
 
 comm_ids = [
-    # 'Finglass2011',
-    'Hermann1851',
-    # 'lestragdiesdeso00tourgoog',
-    'SchneidewinNauckRadermacher1913',
-    # 'cu31924087948174',
-    # 'sophokle1v3soph',
-    # 'sophoclesplaysa05campgoog',
-    # 'Wecklein1894',
-    'Stanford1963',
-
+    'Ferrari1974',
+    'Garvie1998',
+    'lestragdiesdeso00tourgoog',
+    'Paduano1982',
+    'pvergiliusmaroa00virggoog',
+    'thukydides02thuc',
+    'Untersteiner1934',
 ]
 
-skiped = []
 for comm_id in comm_ids:
     comm = OcrCommentary.from_ajmc_data(id=comm_id, ocr_run_id='*tess_base')
 

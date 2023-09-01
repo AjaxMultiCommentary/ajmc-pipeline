@@ -19,8 +19,8 @@ from ajmc.commons import variables as vs
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import are_bboxes_overlapping_with_threshold, is_bbox_within_bbox
 from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.unicode_utils import harmonise_unicode, count_chars_by_charset, CHARSETS_PATTERNS
 from ajmc.ocr import variables as ocr_vs
-from ajmc.ocr.utils import count_chars_by_charset, harmonise_unicode
 from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
 
 logger = get_custom_logger(__name__)
@@ -133,7 +133,7 @@ def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> i
     """
 
     try:
-        pattern = vs.CHARSETS[charset]
+        pattern = CHARSETS_PATTERNS[charset]
     except KeyError:
         pattern = re.compile(charset, re.UNICODE)
 
@@ -425,14 +425,14 @@ def commentary_evaluation(commentary: 'OcrCommentary',
     return bow_error_counts, coord_error_counts, editops
 
 
-def line_by_line_evaluation(gt_dir: Path,
-                            ocr_dir: Path,
-                            gt_suffix: str = ocr_vs.GT_TEXT_EXTENSION,
-                            ocr_suffix: str = ocr_vs.PRED_TEXT_EXTENSION,
-                            error_record: dict = None,
-                            editops_record: dict = None,
-                            output_dir: Optional[Path] = None,
-                            normalize: bool = True) -> Tuple[dict, dict, dict]:
+def directory_evaluation(gt_dir: Path,
+                         ocr_dir: Path,
+                         gt_suffix: str = ocr_vs.GT_TEXT_EXTENSION,
+                         ocr_suffix: str = ocr_vs.PRED_TEXT_EXTENSION,
+                         error_record: dict = None,
+                         editops_record: dict = None,
+                         output_dir: Optional[Path] = None,
+                         normalize: bool = True) -> Tuple[dict, dict, dict]:
     """Evaluates all the text files in `ocr_dir` against the corresponding text files in `gt_dir`.
 
     Args:
@@ -477,7 +477,7 @@ def line_by_line_evaluation(gt_dir: Path,
         error_record['words'].append(len(gt_text.split(' ')))
         error_record['words_distance'].append(Levenshtein.distance(gt_text.split(), ocr_text.split()))
 
-        for charset in vs.CHARSETS.keys():
+        for charset in CHARSETS_PATTERNS.keys():
             error_record[f'{charset}_chars'].append(count_chars_by_charset(gt_text, charset))
             error_record[f'{charset}_chars_distance'].append(count_errors_by_charset(gt_text, ocr_text, charset))
 
@@ -495,6 +495,85 @@ def line_by_line_evaluation(gt_dir: Path,
 
     logger.info(f'Character Error Rate: {results["chars_ER"]}')
     logger.info(f'Word Error Rate: {results["words_ER"]}')
+
+    # Write files
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        editops_record = {k: v for k, v in sorted(editops_record.items(), key=lambda item: item[1], reverse=True)}
+        write_editops_record(editops_record=editops_record, output_dir=output_dir)
+
+        pd.DataFrame.from_dict(error_record).to_csv((output_dir / 'error_record.tsv'), sep='\t', index=False)
+
+        pd.DataFrame.from_dict({k: [v] for k, v in results.items()}).to_csv((output_dir / 'results.tsv'), sep='\t', index=False)
+
+    return error_record, editops_record, results
+
+
+def line_based_evaluation(gt_lines: List[str],
+                          ocr_lines: List[str],
+                          error_record: dict = None,
+                          editops_record: dict = None,
+                          output_dir: Optional[Path] = None,
+                          normalize: bool = True) -> Tuple[dict, dict, dict]:
+    """Evaluates all the text files in `ocr_dir` against the corresponding text files in `gt_dir`.
+
+    Args:
+        gt_lines: The list of groundtruth lines.
+        ocr_lines: The list of OCR lines.
+        error_record: The error record to update (pass only if you want to aggregate multiple evaluations).
+        editops_record: The editops record to update (pass only if you want to aggregate multiple evaluations).
+        output_dir: If given, the evaluation files will be written to this directory.
+        normalize: Whether to harmonise the unicode of the groundtruth and OCR files.
+    """
+
+    error_record = error_record if error_record else {k: [] for k in ['id', 'gt', 'ocr',
+                                                                      'chars', 'chars_distance',
+                                                                      'greek_chars', 'greek_chars_distance',
+                                                                      'latin_chars', 'latin_chars_distance',
+                                                                      'numeral_chars', 'numeral_chars_distance',
+                                                                      'punctuation_chars', 'punctuation_chars_distance',
+                                                                      'words', 'words_distance']}
+    editops_record = editops_record if editops_record else {}
+
+    for i, (ocr_text, gt_text) in enumerate(zip(ocr_lines, gt_lines)):
+
+        # Postprocess the OCR text
+        if normalize:
+            ocr_text = re.sub(r'\s+', ' ', ocr_text)
+            ocr_text = ocr_text.strip()
+            ocr_text = harmonise_unicode(ocr_text)
+
+        # compute distance
+        error_record['id'].append('#')
+        error_record['gt'].append(gt_text)
+        error_record['ocr'].append(ocr_text)
+        error_record['chars'].append(len(gt_text))
+        error_record['chars_distance'].append(Levenshtein.distance(gt_text, ocr_text))
+        error_record['words'].append(len(gt_text.split(' ')))
+        error_record['words_distance'].append(Levenshtein.distance(gt_text.split(), ocr_text.split()))
+
+        for charset in CHARSETS_PATTERNS.keys():
+            error_record[f'{charset}_chars'].append(count_chars_by_charset(gt_text, charset))
+            error_record[f'{charset}_chars_distance'].append(count_errors_by_charset(gt_text, ocr_text, charset))
+
+        # Record edit operations
+        editops_record = record_editops(gt_word=gt_text,
+                                        ocr_word=ocr_text,
+                                        editops=Levenshtein.editops(ocr_text, gt_text),
+                                        editops_record=editops_record)
+
+    results = {f'{x}_ER': round(safe_divide(sum(error_record[f'{x}_distance']), sum(error_record[x])), 3)
+               for x in ['chars', 'words', 'greek_chars', 'latin_chars', 'numeral_chars', 'punctuation_chars']}
+    # counts = {f'{x}_count': sum(error_record[x]) for x in ['chars', 'words', 'greek_chars', 'latin_chars',
+    #                                                        'numeral_chars', 'punctuation_chars']}
+    # results.update(counts)
+
+    logger.info(f'Character Error Rate: {results["chars_ER"]}')
+    logger.info(f'Word Error Rate: {results["words_ER"]}')
+    logger.info(f'Greek Character Error Rate: {results["greek_chars_ER"]}')
+    logger.info(f'Latin Character Error Rate: {results["latin_chars_ER"]}')
+    logger.info(f'Numeral Character Error Rate: {results["numeral_chars_ER"]}')
 
     # Write files
     if output_dir is not None:

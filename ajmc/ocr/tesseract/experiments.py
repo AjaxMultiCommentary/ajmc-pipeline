@@ -63,9 +63,9 @@ def make_experiment(xp_config: dict, overwrite_xps: bool = False, overwrite_mode
         tessdata_prefix=xp_models_dir)
 
     # Evaluate the outputs
-    ocr_eval.line_by_line_evaluation(gt_dir=test_dataset_dir,
-                                     ocr_dir=xp_model_outputs_dir,
-                                     output_dir=xp_model_outputs_dir.parent, )
+    ocr_eval.directory_evaluation(gt_dir=test_dataset_dir,
+                                  ocr_dir=xp_model_outputs_dir,
+                                  output_dir=xp_model_outputs_dir.parent, )
 
     # Save the config file
     xp_config_path.write_text(json.dumps(xp_config, indent=4), encoding='utf-8')
