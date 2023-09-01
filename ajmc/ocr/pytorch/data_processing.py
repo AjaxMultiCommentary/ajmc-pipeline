@@ -1,9 +1,9 @@
+import math
 import random
 import time
 from pathlib import Path
 from typing import List, Dict
 
-import math
 import torch
 from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
@@ -147,6 +147,17 @@ def compute_padding(img_tensor,
 def chunk_img_tensor(img_tensor,
                      chunk_width: int,
                      chunk_overlap: int) -> torch.Tensor:
+    """Chunks an image tensor of shape (1, height, width) into chunks of shape (N_chunks, height, chunk_width).
+
+    Args:
+        img_tensor: The image tensor to chunk, of shape (1, height, width).
+        chunk_width: The desired width of the chunks.
+        chunk_overlap: The desired overlap between the chunks.
+
+    Returns:
+        The image tensor chunked into chunks of shape (N_chunks, 1,  height, chunk_width).
+    """
+
     n_chunks = compute_n_chunks(img_tensor, chunk_width, chunk_overlap)
     padding = compute_padding(img_tensor, n_chunks, chunk_width, chunk_overlap)
 
@@ -163,7 +174,15 @@ def chunk_img_tensor(img_tensor,
 
 def prepare_img(img_path: Path,
                 img_height: int) -> torch.Tensor:
-    """Prepares an image tensor for training."""
+    """Prepares an image tensor for training.
+
+    Args:
+        img_path: The path to a grayscale image of shape (1, initial_height, initial_width).
+        img_height: The height to which to resize the image.
+
+    Returns:
+        The prepared image tensor, in shape (1, img_height, resized_width).
+    """
 
     img_tensor = read_image(str(img_path), mode=ImageReadMode.GRAY)
     img_tensor = invert_image_tensor(img_tensor)
@@ -187,7 +206,8 @@ def recompose_chunks(chunks: torch.Tensor,
         The reassembled image tensor, in shape (width, height).
     """
 
-    reassembled_img = chunks[0][:-int(chunk_overlap / 2), :]  # take the first chunk, remove the overlap
+    # take the first chunk, remove the overlap
+    reassembled_img = chunks[0][:-int(chunk_overlap / 2), :].squeeze(0)
     for i in range(1, len(chunks)):
         if i == len(chunks) - 1:  # for the last chunk, we dont cut the end overlap as there is none
             reassembled_img = torch.cat([reassembled_img, chunks[i][int(chunk_overlap / 2):, :]], dim=0)
@@ -199,9 +219,12 @@ def recompose_chunks(chunks: torch.Tensor,
     return reassembled_img
 
 
-# Todo see if works with gpu:
 def recompose_batched_chunks(batched_chunks: torch.Tensor, mapping: List[int], chunk_overlap: int) -> torch.Tensor:
     """Apply `recompose_chunks` to a batch of chunks.
+
+    Warning:
+        This function is to be applied on a processed batch of chunks, with the shape
+        (n_chunks, chunk_width, chunk_height [or num_classes if performed after decoder).
 
     Args:
         batched_chunks: The batch of chunks, in shape (n_chunks, chunk_width, chunk_height [or num_classes if performed after decoder).

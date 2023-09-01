@@ -68,7 +68,6 @@ class OcrTorchModel(nn.Module):
         Returns:
             A list of strings representing the predicted text.
         """
-        # Todo: make this work with gpu
         with torch.no_grad():
             outputs = self.forward(x)
 
@@ -76,7 +75,7 @@ class OcrTorchModel(nn.Module):
                                            mapping=chunks_to_img_mapping,
                                            chunk_overlap=self.chunk_overlap)  # Weird to store this here
 
-        outputs = torch.nn.functional.log_softmax(outputs, dim=2)  # Todo see if works with gpu
+        outputs = torch.nn.functional.log_softmax(outputs, dim=2)
 
         strings, offsets = self.ctc_decoder.decode(outputs)
 

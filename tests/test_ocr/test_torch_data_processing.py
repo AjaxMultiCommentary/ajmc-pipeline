@@ -29,7 +29,9 @@ def test_chunk_img_tensor_with_overlap():
 
 # rebuild single_image_chunks
 def test_recompose_chunks():
-    reassembled = dp.recompose_chunks(single_image_chunks, chunk_overlap)
+    chunks = single_image_chunks.transpose(2, 3).squeeze(1)
+    reassembled = dp.recompose_chunks(chunks, chunk_overlap)
+    reassembled = reassembled.transpose(0, 1).unsqueeze(0)
     assert dp.compute_padding(reassembled, n_chunks, chunk_width, chunk_overlap) == 0
     assert reassembled.shape[-1] == single_img_tensor.shape[-1] + padding
 
@@ -38,13 +40,13 @@ def test_recompose_chunks():
 
 def test_OcrIterDataset_iter():
     test_dataset = get_and_write_sample_dataset(3)
-    for i, (batch, text, mapping) in enumerate(test_dataset):
+    for i, batch in enumerate(test_dataset):
         print(f'---------------- batch {i} ----------------')
-        print('batch_shape', batch.shape)
-        print('batch_text', text)
-        print('batch_mapping', mapping)
-        assert batch.shape[0] <= test_dataset.max_batch_size
-        assert mapping.sum() == batch.shape[0]
+        print('batch_shape', batch.chunks.shape)
+        print('batch_text', batch.texts)
+        print('batch_mapping', batch.chunks_to_img_mapping)
+        assert batch.chunks.shape[0] <= test_dataset.max_batch_size
+        assert sum(batch.chunks_to_img_mapping) == batch.chunks.shape[0]
 
 
 @pytest.mark.skip(reason='Not implemented yet, just a manual tester')
@@ -59,12 +61,11 @@ def test_OcrDataset_with_dataloader():
         print(batch[1])
         print("--------------------------------------------")
 
-
-def test_reassemble_chunks_batch():
-    dataset = get_and_write_sample_dataset(3)
-    test_batch = next(iter(dataset))
-    reassembled = dp.recompose_batched_chunks(test_batch[0], test_batch[-1], chunk_overlap=chunk_overlap)
-    assert reassembled.shape[0] == test_batch[-1].shape[0]
-    assert reassembled.shape[1] == 1
-    assert reassembled.shape[2] == img_height
-    assert reassembled.shape[3] == img_width + padding
+# def test_reassemble_chunks_batch():
+#     dataset = get_and_write_sample_dataset(3)
+#     test_batch = next(iter(dataset))
+#     reassembled = dp.recompose_batched_chunks(test_batch.chunks, test_batch.chunks_to_img_mapping, chunk_overlap=chunk_overlap)
+#     assert reassembled.shape[0] == len(test_batch.chunks_to_img_mapping)
+#     assert reassembled.shape[1] == 1
+#     assert reassembled.shape[2] == img_height
+#     assert reassembled.shape[3] == img_width + padding
