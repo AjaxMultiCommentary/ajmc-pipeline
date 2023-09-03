@@ -29,18 +29,18 @@ class CanonicalCommentary(Commentary):
                  ocr_run_id: Optional[str] = None,
                  ocr_gt_page_ids: Optional[List[str]] = None,
                  **kwargs):
-        """Initialize a `CanonicalCommentary`.
+        """Initialize a ``CanonicalCommentary``.
 
         Args:
             id: The id of the commentary.
-            children: A `LazyObject` containing the children of the commentary. Can be manually set after init.
-            images: A list of `AjmcImage` objects. Can be instantiated after init.
+            children: A ``LazyObject`` containing the children of the commentary. Can be manually set after init.
+            images: A list of ``AjmcImage`` objects. Can be instantiated after init.
             info: A dictionary containing additional information about the commentary.
             kwargs: {kwargs_for_properties}
 
         Note:
-            Parameters `id`, `children`, and `images` are required, as they cannot be computed ex nihilo. They can
-            however be set `None` and then be computed later on.
+            Parameters ``id``, ``children``, and ``images`` are required, as they cannot be computed ex nihilo. They can
+            however be set ``None`` and then be computed later on.
         """
         super().__init__(id=id,
                          children=children,
@@ -51,7 +51,7 @@ class CanonicalCommentary(Commentary):
 
     @classmethod
     def from_json(cls, json_path: Union[str, Path]):
-        """Instantiate a `CanonicalCommentary` from a json file.
+        """Instantiate a ``CanonicalCommentary`` from a json file.
 
         Args:
             json_path: The path to a canonical/v2 json file containing a commentary and respecting the
@@ -59,7 +59,7 @@ class CanonicalCommentary(Commentary):
         """
         json_path = Path(json_path)
         if not json_path.match(f'{vs.get_comm_canonical_dir("*") / "*.json"}'):
-            logger.warning(f"The provided `json_path` ({json_path}) is not compliant with ajmc's folder structure.")
+            logger.warning(f"The provided ``json_path`` ({json_path}) is not compliant with ajmc's folder structure.")
 
         logger.debug(f'Importing canonical commentary from {json_path}')
         can_json = json.loads(json_path.read_text(encoding='utf-8'))
@@ -149,11 +149,11 @@ class CanonicalCommentary(Commentary):
                 p.image.write(output_dir / (p.image.id + vs.DEFAULT_IMG_EXTENSION))
 
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
-        raise NotImplementedError('`CanonicalCommentary.children` must be set at __init__.')
+        raise NotImplementedError('``CanonicalCommentary.children`` must be set at __init__.')
 
     @lazy_property
     def ocr_gt_pages(self) -> List[Type['CanonicalPage']]:
-        """A list of `CanonicalPage` objects containing the groundtruth of the OCR."""
+        """A list of ``CanonicalPage`` objects containing the groundtruth of the OCR."""
 
         return [p for p in self.children.pages if p.id in self.ocr_gt_page_ids]
 
@@ -168,11 +168,11 @@ class CanonicalTextContainer(TextContainer):
         pass
 
     def _get_children(self, children_type: str) -> List[Optional[Type['CanonicalTextContainer']]]:
-        """Fetches the `TextContainers` in the parent commentary  which are included in `self.text_container`.
+        """Fetches the ``TextContainers`` in the parent commentary  which are included in ``self.text_container``.
 
         Note:
             - This methods works with word ranges, NOT with coordinates.
-            - This methods does retrieve elements which overlap only partially with `self`.
+            - This methods does retrieve elements which overlap only partially with ``self``.
         """
 
         if self.type == 'word':  # Special efficiency hack for words
@@ -189,7 +189,7 @@ class CanonicalTextContainer(TextContainer):
     def _get_parent(self, parent_type: str) -> Optional[Type['CanonicalTextContainer']]:
 
         if parent_type == 'commentary':
-            raise AttributeError('`parents.commentary` cannot be computed ex nihilo. It must be set manually.')
+            raise AttributeError('``parents.commentary`` cannot be computed ex nihilo. It must be set manually.')
 
         parents = [tc for tc in getattr(self.parents.commentary.children, vs.TC_TYPES_TO_CHILD_TYPES[parent_type])
                    if is_interval_within_interval(contained=self.word_range, container=tc.word_range)
@@ -199,12 +199,12 @@ class CanonicalTextContainer(TextContainer):
 
     @lazy_property
     def id(self) -> str:
-        """Generic method to create a `CanonicalTextContainer`'s id."""
+        """Generic method to create a ``CanonicalTextContainer``'s id."""
         return self.type + '_' + str(self.index)
 
     @lazy_property
     def index(self) -> int:
-        """Generic method to get a `CanonicalTextContainer`'s index in its parent commentary's children list."""
+        """Generic method to get a ``CanonicalTextContainer``'s index in its parent commentary's children list."""
         return getattr(self.parents.commentary.children, vs.TC_TYPES_TO_CHILD_TYPES[self.type]).index(self)
 
     @lazy_property
@@ -213,7 +213,7 @@ class CanonicalTextContainer(TextContainer):
 
     @lazy_property
     def bbox(self) -> Shape:
-        """Generic method to get a `CanonicalTextContainer`'s bbox."""
+        """Generic method to get a ``CanonicalTextContainer``'s bbox."""
         if len(self.children.words) == 0:
             return Shape([(0, 0), (0, 0)])
         else:
@@ -221,7 +221,7 @@ class CanonicalTextContainer(TextContainer):
 
     @lazy_property
     def image(self) -> AjmcImage:
-        """Generic method to create a `CanonicalTextContainer`'s image."""
+        """Generic method to create a ``CanonicalTextContainer``'s image."""
         return self.parents.page.image.crop(self.bbox.bbox)
 
 
@@ -264,7 +264,7 @@ class CanonicalPage(Page, CanonicalTextContainer):
             output_path: self-explanatory.
             children_types: The types of children to be exported. Must be a subset of ['regions', 'lines', 'words'].
             region_types_mapping: A dictionary mapping the types of regions to the types of regions in the ALTO-xml, for instance variables.REGION_TYPES_TO_SEGMONTO
-            region_types_ids: A dictionary mapping the values of `region_types_mapping` to the ids of regions in the ALTO-xml, for instance variables.REGION_TYPES_TO_SEGMONTO_ID
+            region_types_ids: A dictionary mapping the values of ``region_types_mapping`` to the ids of regions in the ALTO-xml, for instance variables.REGION_TYPES_TO_SEGMONTO_ID
             regions_types: The types of regions to be exported, for instance variables.ROIS. This allows for filtering only the regions of interested, excluded regions types like 'undefined'.
         """
         env = Environment(loader=PackageLoader('ajmc', 'data/templates'),
@@ -344,7 +344,7 @@ class CanonicalAnnotation(CanonicalTextContainer):
                         self.word_range[0] - window_size:self.word_range[1] + window_size + 1])
 
     def bbox(self) -> None:
-        logger.warning('`CanonicalAnnotation`s have no bbox.')
+        logger.warning('``CanonicalAnnotation``s have no bbox.')
         return None
 
 
@@ -372,7 +372,7 @@ class CanonicalEntity(CanonicalAnnotation):
                 'wikidata_id': self.wikidata_id}
 
     def bbox(self) -> None:
-        logger.warning('`CanonicalEntity`s have no bbox.')
+        logger.warning('``CanonicalEntity``s have no bbox.')
         return None
 
 
@@ -400,7 +400,7 @@ class CanonicalSentence(CanonicalAnnotation):
                 'incomplete_truncated': self.incomplete_truncated}
 
     def bbox(self) -> None:
-        logger.warning('`CanonicalSentence`s have no bbox.')
+        logger.warning('``CanonicalSentence``s have no bbox.')
         return None
 
 
@@ -419,5 +419,5 @@ class CanonicalHyphenation(CanonicalAnnotation):
                 'shifts': self.shifts}
 
     def bbox(self) -> None:
-        logger.warning('`CanonicalHyphenation`s have no bbox.')
+        logger.warning('``CanonicalHyphenation``s have no bbox.')
         return None

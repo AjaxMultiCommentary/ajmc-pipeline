@@ -1,7 +1,8 @@
 """Train or evaluate tesseract
 
-Usage:
-    >>> /scratch/sven/anaconda3/envs/ajmc/bin/python ajmc/ocr/tesseract/pipeline.py --make_experiments
+..  admonition:: Usage:
+
+    ``$ /scratch/sven/anaconda3/envs/ajmc/bin/python ajmc/ocr/tesseract/pipeline.py --make_experiments``
 """
 
 import argparse

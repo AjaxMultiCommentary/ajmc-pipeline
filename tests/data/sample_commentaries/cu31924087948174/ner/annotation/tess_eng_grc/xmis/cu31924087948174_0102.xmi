@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <xmi:XMI xmlns:xmi="http://www.omg.org/XMI" xmlns:cas="http:///uima/cas.ecore" xmlns:custom="http:///webanno/custom.ecore" xmlns:type="http:///de/tudarmstadt/ukp/dkpro/core/api/segmentation/type.ecore" xmi:version="2.0">
   <cas:NULL xmi:id="0"/>
-  <custom:AjMCDocumentmetadata xmi:id="2" ocr_run_id="tess_eng_grc" region_types="commentary,app_crit" xmi_creation_date="2023-04-12 20:15:22" sofa="1"/>
+  <custom:AjMCDocumentmetadata xmi:id="2" ocr_run_id="tess_eng_grc" region_types="commentary,app_crit" xmi_creation_date="2023-09-02 16:25:48" sofa="1"/>
   <type:Sentence xmi:id="3" begin="0" end="33" sofa="1"/>
   <type:Sentence xmi:id="4" begin="34" end="73" sofa="1"/>
   <type:Sentence xmi:id="5" begin="74" end="112" sofa="1"/>

@@ -1,5 +1,5 @@
-"""This scripts contains function for generating synthetic data. `pil2array`, `array2pil`,
-`ocropy_degrade`, `degrade_line` and `distort_line` are directly copied from kraken to avoid
+"""This scripts contains function for generating synthetic data. ``pil2array``, ``array2pil``,
+``ocropy_degrade``, ``degrade_line`` and ``distort_line`` are directly copied from kraken to avoid
 import issues. """
 
 import argparse
@@ -8,11 +8,11 @@ import logging
 import random
 import re
 import shutil
+import unicodedata
 from pathlib import Path
 from typing import Tuple, List, Dict, Optional, Generator
 
 import numpy as np
-import unicodedata
 from PIL import Image, ImageDraw, ImageOps
 from scipy.ndimage import gaussian_filter, distance_transform_cdt, binary_closing, affine_transform, geometric_transform
 from tqdm import tqdm
@@ -164,11 +164,11 @@ def draw_textline(textline: str,
             'numeral': ajmc.ocr.font_utils.Font,
             'punctuation': ajmc.ocr.font_utils.Font,
             'fallback': [ajmc.ocr.font_utils.Font]}`.
-            Notice that `'fallback'` must be a list of `Font`.
+            Notice that ``'fallback'`` must be a list of ``Font``.
         fallback_fonts (list): A list of fallback fonts to use when a can't be printed with the main font.
         target_height (int): The desired height of the output image, in pixels.
         font_variants (list): A list of size len(text) containing the font variant to use for each character,
-            eg. `['Regular', 'Bold', 'Italic', 'Regular']`.
+            eg. ``['Regular', 'Bold', 'Italic', 'Regular']``.
         kerning (int): The kerning to apply to the text, in pixels.
         default_charset (str): The default font to use when a character doesn't belong to any charset.
         output_file (Path): The path to save the image to.
@@ -253,7 +253,7 @@ def pad_image(image: Image,
         image (PILImage): The image to pad.
         padding (tuple): The padding to apply, in the form (top, right, bottom, left).
         target_height (int): The desired height of the output image, in pixels.
-        If specified, `image` will be resized so that its height is `target_height` after padding.
+        If specified, ``image`` will be resized so that its height is ``target_height`` after padding.
         background_color (str): The color of the background.
 
     Returns:
@@ -347,49 +347,6 @@ def get_textline_generators(corpus_ids: List[str],
     logger.debug('Got textline generators')
 
     return textline_generators
-
-
-# Get the distributions for line length, kerning and fonts
-LINE_LENGTH_DISTRIBUTION = json.loads(Path('./data/fonts/glyphs/data_generation_config/line_length_distribution.json').read_text())
-LINE_LENGTH_DISTRIBUTION = {int(k): v for k, v in LINE_LENGTH_DISTRIBUTION.items()}
-
-KERNING_DISTRIBUTION = json.loads(Path('./data/fonts/glyphs/data_generation_config/kerning_distribution.json').read_text())
-KERNING_DISTRIBUTION = {int(k): v for k, v in KERNING_DISTRIBUTION.items()}
-
-FONTS_DISTRIBUTION = json.loads(Path('./data/fonts/glyphs/data_generation_config/fonts_distribution.json').read_text())
-
-TARGET_HEIGHT = 80
-
-ALL_AJMC_CHARS_NFD = Path('./data/fonts/glyphs/ajmc_final_glyphs.json').read_text(encoding='utf-8')
-ALL_AJMC_CHARS_NFD = ''.join(json.loads(ALL_AJMC_CHARS_NFD).keys())  # This is NFD
-
-# BASE_OUTPUT_DIR = Path('/Users/sven/Desktop/coucou')
-BASE_OUTPUT_DIR = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data')
-
-FONTS_DIR = Path('./data/fonts/fonts')
-FONTS = [Font(font_path, font_variant='Regular') for font_path in walk_through_font_dir(FONTS_DIR)]
-
-GREEK_CAPITAL_FONTS_NAMES = ["GFSIgnacio-Regular.otf",
-                             "GFSGaraldus-Regular.otf",
-                             "GFSAmbrosia-Regular.otf",
-                             "GFSEustace-Regular.otf",
-                             "GFSFleischman-Regular.otf",
-                             "GFSJackson-Regular.otf",
-                             "GFSNicefore-Regular.otf",
-                             "Porson-Regular.otf",
-                             ]
-
-LATIN_CAPITAL_FONTS_NAMES = ["EBGaramond-Regular.otf",
-                             "Didot-Regular.otf",
-                             "TimesNewRoman-Regular.ttf", ]
-
-FONTS_GROUPS = {'all_purpose': [font for font in FONTS if font.has_charset_glyphs('latin', 20) and font.has_charset_glyphs('greek', 20)],
-                'latin': [font for font in FONTS if font.has_charset_glyphs('latin', 20) and not font.has_charset_glyphs('greek', 20)],
-                'greek': [font for font in FONTS if font.has_charset_glyphs('greek', 30) and not font.has_charset_glyphs('latin', 20)],
-                'greek_capitals': [font for font in FONTS if font.path.name in GREEK_CAPITAL_FONTS_NAMES],
-                'latin_capitals': [font for font in FONTS if font.path.name in LATIN_CAPITAL_FONTS_NAMES],
-                'fallback': [Font(Path('./data/fonts/fonts/NotoSans-Regular.ttf'), font_variant='Regular'),
-                             Font(Path('./data/fonts/fonts/Cardo-Regular.ttf'), font_variant='Regular'), ]}
 
 
 def inner_loop(line_count_per_font: int,
@@ -737,6 +694,48 @@ if __name__ == '__main__':
     # mixed(10): 9000 images --> 333 = 300000
     # capitals(10): 500 images --> 1000 = 50000
     # gibberish(1): 1200 images --> 30 = 35000
+    # Get the distributions for line length, kerning and fonts
+    LINE_LENGTH_DISTRIBUTION = json.loads(Path('./data/fonts/glyphs/data_generation_config/line_length_distribution.json').read_text())
+    LINE_LENGTH_DISTRIBUTION = {int(k): v for k, v in LINE_LENGTH_DISTRIBUTION.items()}
+
+    KERNING_DISTRIBUTION = json.loads(Path('./data/fonts/glyphs/data_generation_config/kerning_distribution.json').read_text())
+    KERNING_DISTRIBUTION = {int(k): v for k, v in KERNING_DISTRIBUTION.items()}
+
+    FONTS_DISTRIBUTION = json.loads(Path('./data/fonts/glyphs/data_generation_config/fonts_distribution.json').read_text())
+
+    TARGET_HEIGHT = 80
+
+    ALL_AJMC_CHARS_NFD = Path('./data/fonts/glyphs/ajmc_final_glyphs.json').read_text(encoding='utf-8')
+    ALL_AJMC_CHARS_NFD = ''.join(json.loads(ALL_AJMC_CHARS_NFD).keys())  # This is NFD
+
+    # BASE_OUTPUT_DIR = Path('/Users/sven/Desktop/coucou')
+    BASE_OUTPUT_DIR = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data')
+
+    FONTS_DIR = Path('./data/fonts/fonts')
+    FONTS = [Font(font_path, font_variant='Regular') for font_path in walk_through_font_dir(FONTS_DIR)]
+
+    GREEK_CAPITAL_FONTS_NAMES = ["GFSIgnacio-Regular.otf",
+                                 "GFSGaraldus-Regular.otf",
+                                 "GFSAmbrosia-Regular.otf",
+                                 "GFSEustace-Regular.otf",
+                                 "GFSFleischman-Regular.otf",
+                                 "GFSJackson-Regular.otf",
+                                 "GFSNicefore-Regular.otf",
+                                 "Porson-Regular.otf",
+                                 ]
+
+    LATIN_CAPITAL_FONTS_NAMES = ["EBGaramond-Regular.otf",
+                                 "Didot-Regular.otf",
+                                 "TimesNewRoman-Regular.ttf", ]
+
+    FONTS_GROUPS = {'all_purpose': [font for font in FONTS if font.has_charset_glyphs('latin', 20) and font.has_charset_glyphs('greek', 20)],
+                    'latin': [font for font in FONTS if font.has_charset_glyphs('latin', 20) and not font.has_charset_glyphs('greek', 20)],
+                    'greek': [font for font in FONTS if font.has_charset_glyphs('greek', 30) and not font.has_charset_glyphs('latin', 20)],
+                    'greek_capitals': [font for font in FONTS if font.path.name in GREEK_CAPITAL_FONTS_NAMES],
+                    'latin_capitals': [font for font in FONTS if font.path.name in LATIN_CAPITAL_FONTS_NAMES],
+                    'fallback': [Font(Path('./data/fonts/fonts/NotoSans-Regular.ttf'), font_variant='Regular'),
+                                 Font(Path('./data/fonts/fonts/Cardo-Regular.ttf'), font_variant='Regular'), ]}
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--all_purpose', action='store_true')
     parser.add_argument('--latin', action='store_true')  #

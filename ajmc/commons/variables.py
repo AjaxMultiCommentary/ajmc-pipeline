@@ -25,8 +25,8 @@ if os.getenv('AJMC_GDRIVE_BASE_DIR'):
     DRIVE_BASE_DIR = Path(os.getenv('AJMC_GDRIVE_BASE_DIR'))
 else:
     DRIVE_BASE_DIR = Path(input("""WARNING: Unknown execution environment!
-    Please enter the drive base directory below (e.g. `/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/`):
-    (Note: you can change this permanently by adding `export AJMC_GDRIVE_BASE_DIR="/your/drive/base/dir"` 
+    Please enter the drive base directory below (e.g. ``/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/``):
+    (Note: you can change this permanently by adding ``export AJMC_GDRIVE_BASE_DIR="/your/drive/base/dir"`` 
     in your .bashrc."""))
 
 DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'

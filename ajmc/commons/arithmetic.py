@@ -1,4 +1,5 @@
-"""Basic arithmetic operations."""
+"""This module contains basic arithmetic functions."""
+
 from typing import List, Tuple
 
 import numpy as np
@@ -21,7 +22,7 @@ def compute_interval_overlap(i1: Tuple[int, int], i2: Tuple[int, int]):
 
 @docstring_formatter(**docstrings)
 def is_interval_within_interval(contained: Tuple[int, int], container: Tuple[int, int]) -> bool:
-    """Checks if the `contained` interval is included in the `container` interval.
+    """Checks if the ``contained``, interval is included in the ``container`` interval.
 
     Args:
         container: {interval}
@@ -32,18 +33,18 @@ def is_interval_within_interval(contained: Tuple[int, int], container: Tuple[int
 
 @docstring_formatter(**docstrings)
 def are_intervals_within_intervals(contained: List[Tuple[int, int]], container: List[Tuple[int, int]]) -> bool:
-    """Applies `is_interval_within_interval` on a list of intervals, making sure that all the contained intervals
+    """Applies ``is_interval_within_interval`` on a list of intervals, making sure that all the contained intervals
     are contained in one of the container intervals."""
 
     # todo 👁️ deal with overlapping TCs (e.g. chapter spanning over several pages but not entirely included in them.
     return all(
-        [
-            any([is_interval_within_interval(contained_i, container_i) for container_i in container])
-            for contained_i in contained
-        ]
+            [
+                any([is_interval_within_interval(contained_i, container_i) for container_i in container])
+                for contained_i in contained
+            ]
     )
 
 
 def safe_divide(dividend, divisor):
-    """Simple division which return `np.nan` if `divisor` equals zero."""
+    """Simple division which return ``np.nan`` if ``divisor`` equals zero."""
     return dividend / divisor if divisor != 0 else np.nan

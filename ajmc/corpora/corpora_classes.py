@@ -13,7 +13,7 @@ from ajmc.corpora.cleaning_utils import harmonise_linebreaks
 
 
 class Corpus(ABC):
-    """Mother class for all Corpus-objects. Can be used to instantiate child-object via `auto_init`"""
+    """Mother class for all Corpus-objects. Can be used to instantiate child-object via ``auto_init``"""
 
     def __init__(self, corpus_id: str):
         self.id = corpus_id
@@ -55,7 +55,7 @@ class Corpus(ABC):
 
 
     def get_chunks(self, chunk_size: int, unit: str = 'word') -> typing.List[str]:
-        """Chunks the corpus into string `chunk-size` units.
+        """Chunks the corpus into string ``chunk-size`` units.
 
         Args:
             chunk_size: The size of the chunks

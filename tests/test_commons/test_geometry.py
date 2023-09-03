@@ -9,9 +9,9 @@ bboxes = so.sample_bboxes
 
 def test_shape():
     shape = geo.Shape(points['base'])
-    # Test `width` and `height` attributes
+    # Test ``width`` and ``height`` attributes
     assert shape.width == shape.height == 3
-    # Test `xywh` and `area` attributes
+    # Test ``xywh`` and ``area`` attributes
     assert shape.xywh[2] * shape.xywh[3] == shape.area == 9
 
 

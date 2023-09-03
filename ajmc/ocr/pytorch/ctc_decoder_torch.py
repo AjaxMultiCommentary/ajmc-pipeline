@@ -88,12 +88,12 @@ class BeamCTCDecoder(Decoder):
         return results
 
     def decode(self, probs, sizes=None):
-        """
-        Decodes probability output using ctcdecode package.
-        Arguments:
-            probs: Tensor of character probabilities, where probs[c,t]
-                            is the probability of character c at time t
+        """Decodes probability output using ctcdecode package.
+
+        Args:
+            probs: Tensor of character probabilities, where probs[c,t] is the probability of character c at time t
             sizes: Size of each sequence in the mini-batch
+
         Returns:
             string: sequences of the model's best guess for the transcription
         """

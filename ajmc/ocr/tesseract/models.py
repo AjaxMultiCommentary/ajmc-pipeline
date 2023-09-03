@@ -40,7 +40,7 @@ def make_model(model_config: dict,
 
     # if the desired model is a tess native model
     if model_config['id'] in [p.stem for p in ocr_vs.TESSDATA_DIR.glob('*.traineddata')]:
-        # Copy the `.traineddata` file
+        # Copy the ``.traineddata`` file
         model_path.write_bytes((ocr_vs.TESSDATA_DIR / (model_config['id'] + '.traineddata')).read_bytes())
         # Give the model a model_config
         ocr_vs.get_model_config_path(model_config['id']).write_text(json.dumps(model_config, indent=2),
@@ -127,7 +127,7 @@ def run(img_dir: Path,
         img_suffix: str = 'png',
         tessdata_prefix: Path = ocr_vs.TESSDATA_DIR,
         ):
-    """Runs tesseract on images in `img_dir`.
+    """Runs tesseract on images in ``img_dir``.
 
     Note:
         assumes tesseract is installed.

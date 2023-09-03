@@ -1,9 +1,11 @@
 """This module handles the configs"""
 
 import json
+from typing import Dict, Any
+
 import torch
 from transformers import TrainingArguments
-from typing import Dict, Any
+
 from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
@@ -21,7 +23,7 @@ def create_default_config() -> Dict[str, Any]:
     config[
         'output_dir']: str = None  # Absolute path to the directory in which outputs are to be stored # Required: False
     config[
-        'hipe_script_path']: str = None  # The path the CLEF-HIPE-evaluation script. This parameter is required if `do_hipe_eval` is True # Required: False
+        'hipe_script_path']: str = None  # The path the CLEF-HIPE-evaluation script. This parameter is required if ``do_hipe_eval`` is True # Required: False
     config[
         'config_path']: str = None  # The path to a config json file from which to extract config. Overwrites other specified config # Required: False
     config['predict_paths']: list = []  # A list of tsv files to predict # Required: False
@@ -38,13 +40,13 @@ def create_default_config() -> Dict[str, Any]:
 
     # =================== ACTIONS ======================================================================================
     config['do_train']: bool = False  # whether to train. Leave to false if you just want to evaluate
-    config['do_eval']: bool = False  # Performs CLEF-HIPE evaluation, alone or at the end of training if `do_train`.
-    config['do_predict']: bool = False  # Predicts on `predict_urls` or/and `predict_paths`
+    config['do_eval']: bool = False  # Performs CLEF-HIPE evaluation, alone or at the end of training if ``do_train``.
+    config['do_predict']: bool = False  # Predicts on ``predict_urls`` or/and ``predict_paths``
     config['evaluate_during_training']: bool = False  # Whether to evaluate during training.
     config['do_debug']: bool = False  # Breaks all loops after a single iteration for debugging
     config['overwrite_output_dir']: bool = False  # Whether to overwrite the output dir
     config[
-        'do_early_stopping']: bool = False  # Breaks stops training after `early_stopping_patience` epochs without improvement.
+        'do_early_stopping']: bool = False  # Breaks stops training after ``early_stopping_patience`` epochs without improvement.
 
     # =============================== TRAINING PARAMETERS ==============================================================
     config['device_name']: str = "cuda:0"  # Device in the format 'cuda:1', 'cpu'
@@ -64,7 +66,7 @@ def create_default_config() -> Dict[str, Any]:
 def parse_config_from_json(json_path: str) -> Dict[str, Any]:
     """Parses config from a json file.
 
-    Also transforms `config['device_name']` to `torch.device(config['device_name'])`, raising an error if `cuda[:#]`
+    Also transforms ``config['device_name']`` to ``torch.device(config['device_name'])``, raising an error if ``cuda[:#]``
     is set but not available.
     """
 
@@ -75,7 +77,7 @@ def parse_config_from_json(json_path: str) -> Dict[str, Any]:
     config.update(**{arg: json_args[arg] for arg in json_args.keys()})
 
     if config['device_name'].startswith("cuda") and not torch.cuda.is_available():
-        logger.error("You set `device_name` to {} but cuda is not available, setting device to cpu.".format(config['device_name']))
+        logger.error("You set ``device_name`` to {} but cuda is not available, setting device to cpu.".format(config['device_name']))
         config['device'] = torch.device('cpu')
 
     else:

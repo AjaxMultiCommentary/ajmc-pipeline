@@ -1,10 +1,7 @@
 """Utils to handle tesseract dictionaries, BR and MR's dictionaries and combine them with tesseract's dictionaries
 to create new models.
 
-Architecture should be:
-```
-XP_DIR / models / model_name / model_name.traineddata
-```
+Architecture should be: ``XP_DIR / models / model_name / model_name.traineddata``
 """
 
 import shutil

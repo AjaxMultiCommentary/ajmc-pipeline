@@ -34,7 +34,7 @@ logger = get_custom_logger(__name__)
 
 
 class OcrCommentary(Commentary):
-    """`OcrCommentary` objects reprensent a single ocr-run of on a commentary, i.e. a collection of page OCRed pages."""
+    """``OcrCommentary`` objects reprensent a single ocr-run of on a commentary, i.e. a collection of page OCRed pages."""
 
     @docstring_formatter(**docstrings)
     def __init__(self,
@@ -49,10 +49,10 @@ class OcrCommentary(Commentary):
                  **kwargs):
         """Default constructor, where custom paths can be provided.
 
-        This is usefull when you want to instantiate a `OcrCommentary` without using `ajmc`'s folder structure. Note that
+        This is usefull when you want to instantiate a ``OcrCommentary`` without using ``ajmc``'s folder structure. Note that
         only the requested paths must be provided. For instance, the object will be created if you do not provided the
         path to the images. But logically, you won't be able to access fonctionnalities that requires it (for instance
-        `OcrCommentary.children.pages[0].image`).
+        ``OcrCommentary.children.pages[0].image``).
 
         Args:
             id: {commentary_id}
@@ -70,11 +70,11 @@ class OcrCommentary(Commentary):
     @classmethod
     @docstring_formatter(**docstrings)
     def from_ajmc_data(cls, id: str, ocr_run_id: str = '*_tess_base'):
-        """Use this method to construct a `OcrCommentary`-object using ajmc's data folder structure.
+        """Use this method to construct a ``OcrCommentary``-object using ajmc's data folder structure.
 
         Args:
             id: {commentary_id}
-            ocr_run_id: {ocr_run_id} Note `ocr_run_id` can be a *-wildcard. For instance '*_tess_base' will return
+            ocr_run_id: {ocr_run_id} Note that ``ocr_run_id`` can be a ``*`` -wildcard. For instance, ``'*_tess_base'`` will return
                 the first ocr-run directory that matches the pattern.
         """
 
@@ -97,7 +97,7 @@ class OcrCommentary(Commentary):
                    sections_path=vs.get_comm_sections_path(id))
 
     def to_canonical(self, include_ocr_gt: bool = True) -> CanonicalCommentary:
-        """Export the commentary to a `CanonicalCommentary` object.
+        """Export the commentary to a ``CanonicalCommentary`` object.
 
         Note:
             This pipeline must cope with the fact that the OCR may not be perfect. For instance, it may happen that a word
@@ -105,7 +105,7 @@ class OcrCommentary(Commentary):
             is far from elegant, I wouldn't recommend touching it unless you are 100% sure of what you are doing.
 
         Returns:
-            A `CanonicalCommentary` object.
+            A ``CanonicalCommentary`` object.
         """
         self.reset()
 
@@ -114,7 +114,7 @@ class OcrCommentary(Commentary):
                 p if p.id not in self.ocr_gt_page_ids else self.ocr_gt_pages[self.ocr_gt_page_ids.index(p.id)]
                 for p in self.children.pages]
 
-        # We start by creating an empty `CanonicalCommentary`
+        # We start by creating an empty ``CanonicalCommentary``
         can = CanonicalCommentary(id=self.id,
                                   children=None,
                                   images=[],
@@ -216,12 +216,12 @@ class OcrCommentary(Commentary):
 
     @lazy_property
     def ocr_gt_page_ids(self) -> List[str]:
-        """The ids of the commentary's pages which have a groundtruth file in `self.ocr_gt_dir`."""
+        """The ids of the commentary's pages which have a groundtruth file in ``self.ocr_gt_dir``."""
         return sorted([p.stem for p in self.ocr_gt_dir.glob('*.html')])
 
     @lazy_property
     def ocr_gt_pages(self) -> Union[List['OcrPage'], list]:
-        """The commentary's pages which have a groundtruth file in `self.paths['groundtruth']`."""
+        """The commentary's pages which have a groundtruth file in ``self.paths['groundtruth']``."""
         return [OcrPage.from_ajmc_data(self.ocr_gt_dir / f'{p_id}.html', commentary=self) for p_id in
                 self.ocr_gt_page_ids]
 
@@ -340,7 +340,7 @@ class OcrPage(Page, TextContainer):
         return data
 
     def to_inception_json(self, output_dir: Path, schema_path: Path = vs.SCHEMA_PATH):
-        """Validate `self.to_inception_dict` and serializes it to json."""
+        """Validate ``self.to_inception_dict`` and serializes it to json."""
         inception_dict = self.to_inception_dict()
         schema = json.loads(schema_path.read_text('utf-8'))
         jsonschema.validate(instance=inception_dict, schema=schema)
@@ -356,14 +356,18 @@ class OcrPage(Page, TextContainer):
     def optimise(self, debug_dir: Optional[Path] = None):
         """Optimises coordinates and reading order.
 
+        Warning:
+            This function changes the page in place.
+
+        Warning:
+            Like ``OcrCommentary.to_canonical``, this function must cope with the vagaries of the OCR output. Though its
+            code is far from slick, I wouldn't recommend trying to improve it unless you are 100% sure that you know what
+            you are doing.
+
         Args:
             debug_dir: If given, the page will be saved to this directory for debugging purposes.
 
-        Note:
-            - This function changes the page in place.
-            - Like `OcrCommentary.to_canonical`, this function must cope with the vagaries of the OCR output. Though its
-            code is far from slick, I wouldn't recommend trying to improve it unless you are 100% sure that you know what
-            you are doing.
+
         """
 
         if debug_dir is not None:
@@ -490,7 +494,7 @@ class RawSection(TextContainer):
 class OcrTextContainer(TextContainer):
 
     def __init__(self, **kwargs):
-        """Initialize a `OcrTextContainer` with provided kwargs
+        """Initialize a ``OcrTextContainer`` with provided kwargs
 
         Args:
             **kwargs: Use kwargs to pass any desired attribute or to manually set the values of properties.
@@ -509,8 +513,8 @@ class OcrTextContainer(TextContainer):
 
     def _get_parent(self, parent_type):
         if parent_type not in ['commentary', 'page']:  # else: is provided in init
-            raise NotImplementedError(f'`OcrTextContainer.parents` only supports `commentary` and `page`, '
-                                      f'not {parent_type}. Build `CanonicalTextContainer.parents` instead.')
+            raise NotImplementedError(f'``OcrTextContainer.parents`` only supports ``commentary`` and ``page``, '
+                                      f'not {parent_type}. Build ``CanonicalTextContainer.parents`` instead.')
 
     def adjust_bbox(self):
         words_points = [xy for w in self.children.words for xy in w.bbox.bbox]
@@ -553,7 +557,7 @@ class OlrRegion(OcrTextContainer):
     @classmethod
     @docstring_formatter(**docstrings)
     def from_via(cls, via_dict: Dict[str, dict], page: 'OcrPage'):
-        """Constructs a region directly from its corresponding `via_dict`.
+        """Constructs a region directly from its corresponding ``via_dict``.
 
         Args:
             via_dict: {via_dict}
@@ -622,13 +626,13 @@ class RawAnnotation(TextContainer):
                  ):
         """Default constructor for annotation.
 
-        Though it can be used directly, it is usually called via `from_cas_annotation` class method instead.
-        `kwargs` are used to pass any desired attribute or to manually set the values of properties and to
-        pass subclass-specific attributes, such as label for entities or `corrputed` for gold sentences.
+        Though it can be used directly, it is usually called via ``from_cas_annotation`` class method instead.
+        ``kwargs`` are used to pass any desired attribute or to manually set the values of properties and to
+        pass subclass-specific attributes, such as label for entities or ``corrputed`` for gold sentences.
 
         Args:
             page: {parent_page}
-            bboxes: A list of `Shape` objects representing the bounding boxes of the annotation.
+            bboxes: A list of ``Shape`` objects representing the bounding boxes of the annotation.
             shifts: A tuple of two integers representing the shifts of the annotation wrt its word.
             text_window: A string representing the text window of the annotation.
             warnings: A list of strings representing the warnings of the annotation.

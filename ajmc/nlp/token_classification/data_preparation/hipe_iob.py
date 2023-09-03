@@ -1,8 +1,10 @@
-from hipe_commons.helpers.tsv import tsv_to_dict
 from typing import List, Optional
+
 import torch
-from ajmc.commons.miscellaneous import get_unique_elements
+from hipe_commons.helpers.tsv import tsv_to_dict
+
 from ajmc.commons.docstrings import docstrings, docstring_formatter
+from ajmc.commons.miscellaneous import get_unique_elements
 from ajmc.nlp.token_classification.data_preparation.utils import sort_ner_labels, align_labels_to_tokenized, align_to_tokenized
 
 
@@ -76,7 +78,7 @@ def prepare_datasets(config: 'argparse.Namespace', tokenizer):
 
 
 def create_prediction_dataset(tokenizer, path: Optional[str] = None, url: Optional[str] = None):
-    """Creates a `HipeDataset` for prediction (i.e. without labels) from a `path` or an `url`."""
+    """Creates a ``HipeDataset`` for prediction (i.e. without labels) from a ``path`` or an ``url``."""
     data = tsv_to_dict(path=path, url=url)
     data['batchencoding'] = tokenizer(data['TOKEN'],
                                       padding=True,

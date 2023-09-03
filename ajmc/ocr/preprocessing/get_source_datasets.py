@@ -1,11 +1,11 @@
 import os
 import re
 import shutil
+import unicodedata
 from pathlib import Path
 from typing import List, Optional, Dict, Union
 
 import pandas as pd
-import unicodedata
 from PIL import Image as PILImage
 from tqdm import tqdm
 
@@ -211,7 +211,7 @@ def make_clean_ajmc_dataset(output_dir: Path = ocr_vs.get_dataset_dir('ajmc'),
                             unicode_form: str = ocr_vs.UNICODE_FORM,
                             base_dir=Path(vs.COMMS_DATA_DIR),
                             overwrite=False):
-    """Uses`CanonicalCommentary.export_gt_file_pairs` to export an ocr dataset for given commentary ids."""
+    """Uses``CanonicalCommentary.export_gt_file_pairs`` to export an ocr dataset for given commentary ids."""
 
     controle_overwrite(output_dir, overwrite=overwrite)
 
@@ -324,7 +324,7 @@ def make_clean_pogretra_dataset(output_dir: Path = ocr_vs.get_dataset_dir('pog')
     Args:
         output_dir: Path to directory where the cleaned dataset will be exported.
         pogretra_source_dir: Path to directory containing the Pogretra git repository. If none, the repository will be
-        downloaded from `url`.
+        downloaded from ``url``.
         url: URL to download the Pogretra git repository from.
     """
 

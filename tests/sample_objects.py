@@ -1,4 +1,4 @@
-"""This module contains sample objects which are sent to `sample_objects.json` and used as fixtures elsewhere."""
+"""This module contains sample objects which are sent to ``sample_objects.json`` and used as fixtures elsewhere."""
 
 from ajmc.commons import geometry, image, variables as vs
 from ajmc.commons.miscellaneous import get_custom_logger

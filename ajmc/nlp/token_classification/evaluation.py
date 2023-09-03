@@ -1,5 +1,6 @@
 import os
 from typing import List, Union, Dict
+
 import datasets
 import numpy as np
 import pandas as pd
@@ -7,11 +8,11 @@ import torch
 import transformers
 from hipe_commons.helpers.tsv import get_tsv_data
 from torch.utils.data import DataLoader, SequentialSampler
-from ajmc.commons.docstrings import docstrings, docstring_formatter
-from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
 
-from ajmc.nlp.token_classification.model import predict, predict_dataset
+from ajmc.commons.docstrings import docstrings, docstring_formatter
 from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
+from ajmc.nlp.token_classification.model import predict, predict_dataset
 
 logger = get_custom_logger(__name__)
 
@@ -82,8 +83,8 @@ def evaluate_dataset(dataset: torch.utils.data.Dataset,
 def evaluate_iob_files(output_dir: str, groundtruth_path: str, preds_path: str, method: str,
                        hipe_script_path: str = None, output_suffix: str = None, task: str = 'nerc_coarse'):
     """Evaluates CLEF-HIPE compliant files.
-     If `method` is set to `'hipe'`, runs run CLEF-HIPE-evaluation within `os.system`. Else if `method` is set to
-     `'seqeval`, imports the files as dfs."""
+     If ``method`` is set to ``'hipe'``, runs run CLEF-HIPE-evaluation within ``os.system``. Else if ``method`` is set to
+     ``'seqeval``, imports the files as dfs."""
 
     if method == 'hipe':
         os.system(
@@ -123,16 +124,20 @@ def evaluate_iob_files(output_dir: str, groundtruth_path: str, preds_path: str, 
 
 def seqeval_to_df(seqeval_output: Dict[str, Union[Dict[str, float], float]],
                   do_debug: bool = False) -> pd.DataFrame:
-    """Transforms `seqeval_output` to a MultiIndex pd.DataFrame.
+    """Transforms ``seqeval_output`` to a MultiIndex ``pd.DataFrame``.
 
-    :param seqeval_output: A dict containing:
-        - A dict of metrics for each entity type
-        - A pair "overall_metric":value for each overall metric.
-        Looks like `{'ent_type1': {'precision':float, 'recall':float}, ... , 'overall_recall':float,...}
+    Args:
+        seqeval_output: A dict containing:
 
-    :param do_debug: Fills empty entity types with 0.
+                        * A dict of metrics for each entity type
+                        * A pair ``{'overall_metric': value}`` for each overall metric.
 
-    :return: {(ent_type,metric):value}
+                        Looks like ``{'ent_type1': {'precision':float, 'recall':float}, ... , 'overall_recall':float,...}``.
+
+        do_debug: Fills empty entity types with 0.
+
+    Returns:
+        A ``pd.DataFrame`` with a MultiIndex. The first level is the entity type, the second level is the metric.
     """
 
     abbreviations = {"precision": "P", "recall": "R", "f1": "F1", "accuracy": "A", "number": "N"}

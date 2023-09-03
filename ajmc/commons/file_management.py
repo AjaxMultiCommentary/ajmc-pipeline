@@ -23,6 +23,12 @@ def int_to_x_based_code(number: int,
                         symbols: str = '0123456789' + ascii_letters) -> str:
     """Converts an integer to an x-based code.
 
+    Examples:
+        >>> int_to_x_based_code(3,base=2,symbols='01') # Binary code for 3
+        '11'
+        >>> int_to_x_based_code(11, base=12, symbols='0123456789AB', fixed_min_len=3) # Base 12 code for 11
+        '00B'
+
     Args:
         number: The number to be converted
         base: The base of the code (default: 62)
@@ -32,12 +38,6 @@ def int_to_x_based_code(number: int,
 
     Returns:
         The x-based code as a string.
-
-    Examples:
-        >>> int_to_x_based_code(3,base=2,symbols='01') # Binary code for 3
-        '11'
-        >>> int_to_x_based_code(11, base=12, symbols='0123456789AB', fixed_min_len=3) # Base 12 code for 11
-        '00B'
     """
 
     # Start the by getting the highest power of 62 that is smaller or equal to the number
@@ -65,14 +65,20 @@ def int_to_x_based_code(number: int,
 def get_62_based_datecode(date: Optional[datetime] = None) -> str:
     """Returns a 62-based code based on the date and time.
 
+    Examples:
+        >>> get_62_based_datecode(datetime(year=2021,month=1, day=1, hour=1, minute=1, second=1))
+        "111111"
+        >>> get_62_based_datecode(datetime(year=2021,month=12, day=31, hour=23, minute=59, second=59))
+        "1cvnXX"
+
     This function is mainly used to generate a unique id for each OCR run, based on the date and time. It takes the form of a
     6 digits numbers, where each digit is a letter or a number.
-        - The first digit correspond to the last number of the year (e.g. 1 for 2021).
-        - The second digit correspond to the month (e.g. 1 for January, B for december).
-        - The third digit correspond to the day of the month (e.g. 1 for the 1st, A for 11, K for 21...).
-        - The fourth digit correspond to the hour (e.g. 1 for 1am, A for 10am... etc).
-        - The fifth digit correspond to the minute (e.g. 1 for 1min, B for 11min... etc).
-        - The sixth digit correspond to the second (e.g. 1 for 1sec, C for 12sec... etc).
+    * The first digit correspond to the last number of the year (e.g. 1 for 2021).
+    * The second digit correspond to the month (e.g. 1 for January, B for december).
+    * The third digit correspond to the day of the month (e.g. 1 for the 1st, A for 11, K for 21...).
+    * The fourth digit correspond to the hour (e.g. 1 for 1am, A for 10am... etc).
+    * The fifth digit correspond to the minute (e.g. 1 for 1min, B for 11min... etc).
+    * The sixth digit correspond to the second (e.g. 1 for 1sec, C for 12sec... etc).
 
     Note:
         Base 62 is set to default, as it allows for displaying hours, minutes and seconds in a single digit.
@@ -83,12 +89,6 @@ def get_62_based_datecode(date: Optional[datetime] = None) -> str:
 
     Returns:
         The 62-based code as a string.
-
-    Examples:
-        >>> get_62_based_datecode(datetime(year=2021,month=1, day=1, hour=1, minute=1, second=1))
-        "111111"
-        >>> get_62_based_datecode(datetime(year=2021,month=12, day=31, hour=23, minute=59, second=59))
-        "1cvnXX"
     """
     date = datetime.now() if date is None else date
 
@@ -110,8 +110,8 @@ def move_files_in_each_commentary_dir(relative_src_path: Union[str, Path],
     """Moves/rename files/folders in the folder structure.
 
     Args:
-        relative_src_path: relative path of the source file/folder, from commentary base_dir (e.g. `'ocr/groundtruth'`)
-        relative_dst_path: relative path of the destination file/folder,  from commentary base_dir (e.g. `'ocr/groundtruth'`)
+        relative_src_path: relative path of the source file/folder, from commentary base_dir (e.g. ``'ocr/groundtruth'``)
+        relative_dst_path: relative path of the destination file/folder,  from commentary base_dir (e.g. ``'ocr/groundtruth'``)
         base_dir: {base_dir}
     """
 
@@ -185,7 +185,7 @@ def find_replace_in_all_comm_dirs(file_rel_path: str,
 @docstring_formatter(**docstrings)
 def check_via_spreadsheet_conformity(comm_id: str,
                                      check_comm_only: bool = False) -> Tuple[Set[str], Set[str]]:
-    """Verifies that `via_project` actually contains the page ids listed in `sheet_page_ids` and vice-versa.
+    """Verifies that ``via_project`` actually contains the page ids listed in ``sheet_page_ids`` and vice-versa.
 
     This function is used to make sure that the pages marked as groundtruth in spreadsheets are actually present in the
     respective via_project and vice-versa. If there are differences between the sets of via and spreadsheet pages,
@@ -308,7 +308,7 @@ def data_sanity_check():
 
 @docstring_formatter(**docstrings)
 def read_google_sheet(sheet_id: str, sheet_name: str, **kwargs) -> pd.DataFrame:
-    """A simple function to read a google sheet in a `pd.DataFrame`.
+    """A simple function to read a google sheet in a ``pd.DataFrame``.
 
     Works at 2022-09-29. See https://towardsdatascience.com/read-data-from-google-sheets-into-pandas-without-the-google-sheets-api-5c468536550
     for more info.
@@ -316,6 +316,9 @@ def read_google_sheet(sheet_id: str, sheet_name: str, **kwargs) -> pd.DataFrame:
     Args:
         sheet_id: {sheet_id}
         sheet_name: {sheet_name}
+
+    Returns:
+        The sheet as a ``pd.DataFrame``.
     """
 
     url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
@@ -326,7 +329,7 @@ _OLR_GT_SPREADSHEET = None
 
 
 def get_olr_gt_spreadsheet() -> pd.DataFrame:
-    """Returns the OLR spreadsheet as a `pd.DataFrame`."""
+    """Returns the OLR spreadsheet as a ``pd.DataFrame``."""
 
     global _OLR_GT_SPREADSHEET
     if _OLR_GT_SPREADSHEET is None:
@@ -338,7 +341,7 @@ _OCR_GT_SPREADSHEET = None
 
 
 def get_ocr_gt_spreadsheet() -> pd.DataFrame:
-    """Returns the OCR spreadsheet as a `pd.DataFrame`."""
+    """Returns the OCR spreadsheet as a ``pd.DataFrame``."""
 
     global _OCR_GT_SPREADSHEET
     if _OCR_GT_SPREADSHEET is None:
@@ -350,7 +353,7 @@ _METADATA_SPREADSHEET = None
 
 
 def get_metadata_spreadsheet() -> pd.DataFrame:
-    """Returns the metadata spreadsheet as a `pd.DataFrame`."""
+    """Returns the metadata spreadsheet as a ``pd.DataFrame``."""
 
     global _METADATA_SPREADSHEET
     if _METADATA_SPREADSHEET is None:

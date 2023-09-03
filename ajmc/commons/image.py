@@ -20,7 +20,7 @@ class AjmcImage:
     """Default class for ajmc images.
 
     Note:
-          The center of `AjmcImage`-coordinates is the upper left corner, consistantly with cv2 and numpy. This implies
+          The center of ``AjmcImage``-coordinates is the upper left corner, consistantly with cv2 and numpy. This implies
           that Y-coordinates are ascending towards the bottom of the image.
     """
 
@@ -61,14 +61,14 @@ class AjmcImage:
     def crop(self,
              box: variables.BoxType,
              margin: int = 0) -> 'AjmcImage':
-        """Gets the slice of `self.matrix` corresponding to `box`.
+        """Gets the slice of ``self.matrix`` corresponding to ``box``.
 
         Args:
             box: The bbox delimiting the desired crop
-            margin: The extra margin desired around `box`
+            margin: The extra margin desired around ``box``
 
         Returns:
-             A new `AjmcImage` containing the desired crop.
+             A new ``AjmcImage`` containing the desired crop.
         """
         cropped = self.matrix[box[0][1] - margin:box[1][1] + margin, box[0][0] - margin:box[1][0] + margin, :]
 
@@ -85,7 +85,7 @@ class AjmcImage:
 
 def binarize(img_matrix: np.ndarray,
              inverted: bool = False):
-    """Binarizes an `img_matrix` using cv2 and Otsu's method."""
+    """Binarizes an ``img_matrix`` using cv2 and Otsu's method."""
     binarization_type = (cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV) if inverted else (cv2.THRESH_OTSU | cv2.THRESH_BINARY)
     gray = cv2.cvtColor(img_matrix, cv2.COLOR_BGR2GRAY)
     return cv2.threshold(gray, 0, 255, type=binarization_type)[1]
@@ -105,7 +105,7 @@ def draw_box(box: variables.BoxType,
              text: str = None,
              text_size: float = .8,
              text_thickness: int = 2):
-    """Draws a box on `img_matrix`.
+    """Draws a box on ``img_matrix``.
 
     Args:
         box: A list of bboxes.
@@ -119,7 +119,7 @@ def draw_box(box: variables.BoxType,
         text_thickness: The thickness of the text.
 
     Returns:
-        np.ndarray: The modified `img_matrix`
+        np.ndarray: The modified ``img_matrix``
 
     """
 
@@ -162,7 +162,7 @@ def draw_box(box: variables.BoxType,
 
 
 def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str, Path]] = None, *textcontainers):
-    """Draws a list of `TextContainer`s on `img_matrix`."""
+    """Draws a list of ``TextContainer``s on ``img_matrix``."""
 
     # Get the set of textcontainer types
     for tc in textcontainers:
@@ -227,14 +227,14 @@ def draw_reading_order(img_matrix: np.ndarray,
 
 def find_contours(img_matrix: np.ndarray,
                   binarize: bool = True) -> List[Shape]:
-    """Finds contours using `cv2.findContours`, potentially binarizing the image first.
+    """Finds contours using ``cv2.findContours``, potentially binarizing the image first.
 
     Args:
         img_matrix (np.ndarray): The image matrix to find contours in.
         binarize (bool): Whether to binarize the image first.
 
     Returns:
-        List[Shape]: A list of `Shape`s representing the contours.
+        List[Shape]: A list of ``Shape`` s representing the contours.
     """
 
     # This has to be done in cv2. Using cv2.THRESH_BINARY_INV to avoid looking for the white background as a contour
@@ -256,7 +256,7 @@ def find_contours(img_matrix: np.ndarray,
 def draw_contours(img_matrix: np.ndarray,
                   contours: List[Shape],
                   outfile: Optional[Union[str, Path]] = None):
-    """Draws the contours of an `img_matrix` on a white image."""
+    """Draws the contours of an ``img_matrix`` on a white image."""
     white = np.zeros([img_matrix.matrix.shape[0], img_matrix.matrix.shape[1], 3], dtype=np.uint8)
     white.fill(255)
 
@@ -280,7 +280,7 @@ def draw_contours(img_matrix: np.ndarray,
 
 def remove_artifacts_from_contours(contours: List[Shape],
                                    artifact_perimeter_threshold: float) -> List[Shape]:
-    """Removes contours if the perimeter of their bounding box is inferior to `artifact_perimeter_threshold`"""
+    """Removes contours if the perimeter of their bounding box is inferior to ``artifact_perimeter_threshold``"""
 
     contours_ = [c for c in contours if (2 * (c.width + c.height)) > artifact_perimeter_threshold]
     logger.info(f"""Removed {len(contours) - len(contours_)} artifacts""")

@@ -21,7 +21,7 @@ stream_handler.setFormatter(formatter)
 def timer(iterations: int = 3, number: int = 1_000):
     """Decorator with arguments. Computes the execution time of a function.
 
-    `timer` is a decorator with arguments, which means that it takes any set of `iterations` and `number` as arguments
+    ``timer`` is a decorator with arguments, which means that it takes any set of ``iterations`` and ``number`` as arguments
     and returns a decorator. It should therefore always be called with parentheses (unlike traditional decorators).
     """
 
@@ -39,7 +39,7 @@ def timer(iterations: int = 3, number: int = 1_000):
 
 
 def recursive_iterator(iterable: Iterable, iterable_types: Iterable[Type[Iterable]] = (list, tuple)) -> Generator:
-    """Iterates recursively through an iterable potentially containing iterables of `iterable_types`."""
+    """Iterates recursively through an iterable potentially containing iterables of ``iterable_types``."""
     for x in iterable:
         if any([isinstance(x, iterable_type) for iterable_type in iterable_types]):
             for y in recursive_iterator(x):
@@ -54,7 +54,7 @@ def get_unique_elements(iterable: Iterable, iterable_types: Iterable[Type[Iterab
 
 
 def validate_json_schema(schema_path: Path = vs.SCHEMA_PATH):
-    """Validates a json schema against `Draft6Validator`"""
+    """Validates a json schema against ``Draft6Validator``"""
     Draft6Validator.check_schema(json.loads(schema_path.read_text(encoding='utf-8')))
 
 
@@ -70,12 +70,12 @@ def get_custom_logger(name: str,
 
 
 def split_list(list_: list, n: int, pad: object = False) -> List[List[object]]:
-    """Divides a list into lists with n elements, pads the last chunk with `pad` if the latter is not `False`.
+    """Divides a list into lists with n elements, pads the last chunk with ``pad`` if the latter is not ``False``.
 
     Args:
         list_: the list to split
         n: the number of elements in each chunk
-        pad: the object to pad the last chunk with. If `False`, no padding is performed.
+        pad: the object to pad the last chunk with. If ``False``, no padding is performed.
     """
     chunks = []
     for x in range(0, len(list_), n):
@@ -90,7 +90,7 @@ def split_list(list_: list, n: int, pad: object = False) -> List[List[object]]:
 
 
 def aligned_print(*args, **kwargs):
-    """Prints `args`, respecting custom spaces between each arg. Used to print aligned rows in a for loop.
+    """Prints ``args``, respecting custom spaces between each arg. Used to print aligned rows in a for loop.
 
     Args:
         kwargs: should contain space : List[int] : the list of space between each arg.
@@ -112,7 +112,7 @@ def prefix_command_with_conda_env(command: str,
 
 
 def log_to_file(log_message: str, log_file: Path):
-    """Appends `log_message` to `log_file`"""
+    """Appends ``log_message`` to ``log_file``"""
     with open(log_file, "a+") as tmp_file:
         tmp_file.write(log_message)
 

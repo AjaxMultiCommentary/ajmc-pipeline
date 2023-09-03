@@ -1,14 +1,14 @@
 import os
 from typing import Dict, Union, List, Optional
+
 import numpy as np
 import torch
 import transformers
-from ajmc.commons.docstrings import docstrings, docstring_formatter
-from torch.utils.data import DataLoader
-from torch.utils.data import DataLoader, SequentialSampler
+from torch.utils.data import DataLoader, DataLoader, SequentialSampler
 
-from ajmc.nlp.token_classification.data_preparation.hipe_iob import create_prediction_dataset
+from ajmc.commons.docstrings import docstrings, docstring_formatter
 from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.nlp.token_classification.data_preparation.hipe_iob import create_prediction_dataset
 from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
 
 logger = get_custom_logger(__name__)
@@ -37,7 +37,7 @@ def predict(model_inputs: Dict[str, torch.tensor],
 def predict_batches(batches: Union[torch.utils.data.dataloader.DataLoader, List[Dict[str, torch.tensor]]],
                     model: transformers.PreTrainedModel,
                     do_debug: bool = False) -> np.ndarray:
-    """Runs `predict` on a collection of batches."""
+    """Runs ``predict`` on a collection of batches."""
 
     predictions = None
 
@@ -59,7 +59,7 @@ def predict_dataset(dataset: torch.utils.data.Dataset,
                     do_debug: bool = False,
                     batch_size: int = 8,
                     ) -> np.ndarray:
-    """Runs `predict` on a dataset.
+    """Runs ``predict`` on a dataset.
 
     Args:
         dataset: {custom_dataset}

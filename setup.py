@@ -96,14 +96,14 @@ setup(
         # larger catalog.
         keywords="ocr, olr, nlp, digital-humanities",  # Optional
         # When your source code is in a subdirectory under the project root, e.g.
-        # `src/`, it is necessary to specify the `package_dir` argument.
+        # ``src/``, it is necessary to specify the ``package_dir`` argument.
         # package_dir={"": "ajmc"},  # Optional
         # You can just specify package directories manually here if your project is
         # simple. Or you can use find_packages().
         #
         # Alternatively, if you just want to distribute a single Python file, use
-        # the `py_modules` argument instead as follows, which will expect a file
-        # called `my_module.py` to exist:
+        # the ``py_modules`` argument instead as follows, which will expect a file
+        # called ``my_module.py`` to exist:
         #
         #   py_modules=["my_module"],
         #
@@ -149,7 +149,7 @@ setup(
         #
         #   $ pip install sampleproject[dev]
         #
-        # Similar to `install_requires` above, these must be valid existing
+        # Similar to ``install_requires`` above, these must be valid existing
         # projects.
         extras_require={  # Optional
             'dev': [
@@ -186,11 +186,11 @@ setup(
 
         # To provide executable scripts, use entry points in preference to the
         # "scripts" keyword. Entry points provide cross-platform support and allow
-        # `pip` to create the appropriate form of executable for the target
+        # ``pip`` to create the appropriate form of executable for the target
         # platform.
         #
-        # For example, the following would provide a command called `sample` which
-        # executes the function `main` from this package when invoked:
+        # For example, the following would provide a command called ``sample`` which
+        # executes the function ``main`` from this package when invoked:
         entry_points={  # Optional
             "console_scripts": [
                 "sample=sample:main",

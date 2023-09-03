@@ -48,4 +48,4 @@ def guess_ocr_format(ocr_path: Path) -> str:
         return 'tesshocr'
     else:
         raise NotImplementedError("""The format could not be identified. It looks like the format is neither 
-        `tesshocr`, nor `krakenhocr` nor `pagexml`, which are the only formats this module deals with.""")
+        ``tesshocr``, nor ``krakenhocr`` nor ``pagexml``, which are the only formats this module deals with.""")

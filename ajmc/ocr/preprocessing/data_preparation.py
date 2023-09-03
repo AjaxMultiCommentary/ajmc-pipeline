@@ -24,7 +24,7 @@ def split_root_dataset_metadata(metadata: pd.DataFrame) -> pd.DataFrame:
 
     def get_custom_split_ratio(group_name: Tuple[str, str], group_df: pd.DataFrame):
         df_len = len(group_df)
-        # For ajmc, we keep a `ocr_vs.LINES_PER_TESTSET` lines per subset
+        # For ajmc, we keep a ``ocr_vs.LINES_PER_TESTSET`` lines per subset
         if group_name[0] == 'ajmc' and group_name[1] in ['grc', 'lat', 'mix']:
             return [('test', ocr_vs.LINES_PER_TESTSET / df_len),
                     ('train', (df_len - ocr_vs.LINES_PER_TESTSET) / df_len)]
@@ -219,8 +219,8 @@ def make_datasets(dts_ids: Optional[List[str]] = None, overwrite: bool = False):
 
     Args:
         dts_ids: The list of dataset ids to create. If none, creates all datasets in the config.
-        overwrite: Wheter to overwrite existing datasets. Note that this function calls on `make_dataset`,
-        which is recursive. If `overwrite` is True, all required datasets will be overwritten
+        overwrite: Wheter to overwrite existing datasets. Note that this function calls on ``make_dataset``,
+        which is recursive. If ``overwrite`` is True, all required datasets will be overwritten
         (i.e. also each dataset's source-dataset).
     """
 

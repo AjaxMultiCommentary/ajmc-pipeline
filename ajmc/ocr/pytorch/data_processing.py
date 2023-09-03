@@ -220,7 +220,7 @@ def recompose_chunks(chunks: torch.Tensor,
 
 
 def recompose_batched_chunks(batched_chunks: torch.Tensor, mapping: List[int], chunk_overlap: int) -> torch.Tensor:
-    """Apply `recompose_chunks` to a batch of chunks.
+    """Apply ``recompose_chunks`` to a batch of chunks.
 
     Warning:
         This function is to be applied on a processed batch of chunks, with the shape

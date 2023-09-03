@@ -6,7 +6,7 @@ Here is a brief vademecum on how to install tesseract with training tools on a l
 # Linux install with training tools
 
 1) Install Conda in your local dir
-2) Install all dependencies with conda, so that bin, lib and include are respectively in `$CONDA_DIR`
+2) Install all dependencies with conda, so that bin, lib and include are respectively in ``$CONDA_DIR``
 	- Cairo, pango, icu, leptonica
 
 3) Git clone tesseract

@@ -27,8 +27,8 @@ class Font:
 
         Args:
             path (Path): The path to the font file.
-            size (int, optional): The size of the font, as used by `PIL.ImageFont.truetype()`.
-            font_variant (str, optional): For a `.ttc` collection, the font variant to use. One of 'Bold', 'Italic', 'Regular'.
+            size (int, optional): The size of the font, as used by ``PIL.ImageFont.truetype()``.
+            font_variant (str, optional): For a``.ttc`` collection, the font variant to use. One of 'Bold', 'Italic', 'Regular'.
         """
 
         self.path = path

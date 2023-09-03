@@ -13,8 +13,8 @@ from ajmc.commons.docstrings import docstring_formatter, docstrings
 class Shape:
     """The basic class for contours, bounding boxes and coordinates.
 
-    `Shape` objects can be instanciated directly from points. Other constructors are `Shape.from_numpy_array()`,
-    `Shape.from_center_w_h()`and `Shape.from_xywh()`.
+    ``Shape`` objects can be instanciated directly from points. Other constructors are ``Shape.from_numpy_array()``,
+    ``Shape.from_center_w_h()``and ``Shape.from_xywh()``.
     """
 
     @docstring_formatter(**docstrings)
@@ -42,14 +42,14 @@ class Shape:
 
     @classmethod
     def from_xywh(cls, x: int, y: int, w: int, h: int):
-        """Creates a Shape from `x`, `y`, `w`, `h`, where `x` and `y` are the coordinates of the upper left corner,
-        while `w` and `h` represent width and height respectively."""
+        """Creates a Shape from ``x``, ``y``, ``w``, ``h``, where ``x`` and ``y`` are the coordinates of the upper left corner,
+        while ``w`` and ``h`` represent width and height respectively."""
         return cls([(x, y), (x + w, y + h)])
 
     @classmethod
     def from_center_w_h(cls, center_x: int, center_y: int, w: int, h: int):
-        """Creates a Shape from `center_x`, `center_y`, `w`, `h`, where `center_x` and `center_y` are the coordinates
-        of the center and `w` and `h` represent width and height respectively."""
+        """Creates a Shape from ``center_x``, ``center_y``, ``w``, ``h``, where ``center_x`` and ``center_y`` are the coordinates
+        of the center and ``w`` and ``h`` represent width and height respectively."""
         x = center_x - int(w / 2)
         y = center_y - int(h / 2)
         return cls.from_xywh(x, y, w, h)
@@ -67,7 +67,7 @@ class Shape:
 
     @lazy_property
     def xywh(self) -> Tuple[int, int, int, int]:
-        """Gets the bounding box in `[x,y,w,h]` format, where `x` and `y` are the coordinates of the upper-left
+        """Gets the bounding box in ``[x,y,w,h]`` format, where ``x`` and ``y`` are the coordinates of the upper-left
         corner."""
         return self.bbox[0][0], self.bbox[0][1], self.width, self.height
 
@@ -123,7 +123,7 @@ def compute_bbox_area(bbox: variables.BoxType) -> int:
 @docstring_formatter(**docstrings)
 def is_point_within_bbox(point: Union[Iterable[int], np.ndarray],
                          bbox: variables.BoxType) -> bool:
-    """Checks wheter a `point` is contained within a `bbox`.
+    """Checks wheter a ``point`` is contained within a ``bbox``.
 
     Note:
         Included means included or equal, not strictly included.
@@ -141,11 +141,11 @@ def is_point_within_bbox(point: Union[Iterable[int], np.ndarray],
 @docstring_formatter(**docstrings)
 def is_bbox_within_bbox(contained: variables.BoxType,
                         container: variables.BoxType) -> bool:
-    """Checks whether the `contained` bbox is entirely contained within the `container` bbox.
+    """Checks whether the ``contained`` bbox is entirely contained within the ``container`` bbox.
 
     Note:
-        Included means included or equal, not strictly included. For any bbox `r`, we have
-        `is_bbox_within_bbox(r, r) == True`.
+        Included means included or equal, not strictly included. For any bbox ``r``, we have
+        ``is_bbox_within_bbox(r, r) == True``.
 
     Args:
         contained: {bbox}
@@ -192,13 +192,13 @@ def are_bboxes_overlapping(bbox1: variables.BoxType,
 def is_bbox_within_bbox_with_threshold(contained: variables.BoxType,
                                        container: variables.BoxType,
                                        threshold: float) -> bool:
-    """Asserts more than `threshold` of `contained`'s area is within `container`. Is not merged with
-    `are_bboxes_overlapping` for effisciency purposes.
+    """Asserts more than ``threshold`` of ``contained``'s area is within ``container``. Is not merged with
+    ``are_bboxes_overlapping`` for effisciency purposes.
 
     Args:
         contained: {bbox}
         container: {bbox}
-        threshold: The minimal proportional of `contained` which should be included in `container`.
+        threshold: The minimal proportional of ``contained`` which should be included in ``container``.
     """
     contained_area = compute_bbox_area(contained)
     return compute_bbox_overlap_area(contained, container) > threshold * contained_area
@@ -208,7 +208,7 @@ def is_bbox_within_bbox_with_threshold(contained: variables.BoxType,
 def are_bboxes_overlapping_with_threshold(bbox1: variables.BoxType,
                                           bbox2: variables.BoxType,
                                           threshold: float) -> bool:
-    """Checks whether the overlapping (intersection) area of two bboxes is higher than `threshold`* union area
+    """Checks whether the overlapping (intersection) area of two bboxes is higher than ``threshold`` x union area.
 
     Args:
         bbox1: {bbox}
@@ -223,11 +223,11 @@ def are_bboxes_overlapping_with_threshold(bbox1: variables.BoxType,
 @docstring_formatter(**docstrings)
 def adjust_bbox_to_included_contours(bbox: variables.BoxType,
                                      contours: List[Shape]) -> Shape:
-    """Finds the contours included in `bbox` and returns a shape objects that minimally contains them.
+    """Finds the contours included in ``bbox`` and returns a shape objects that minimally contains them.
 
     Note:
         This function is mainly used to resize word-boxes. It therefore discards the contours that would make
-        `bbox` taller (i.e. longer on the Y-axis). This is helpful to avoid line-overlapping word-boxes.
+        ``bbox`` taller (i.e. longer on the Y-axis). This is helpful to avoid line-overlapping word-boxes.
 
     Args:
         bbox: {bbox}

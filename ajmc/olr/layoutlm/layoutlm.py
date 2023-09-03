@@ -1,10 +1,12 @@
 import json
 import os
 import random
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 from PIL import Image
 
+from ajmc.commons import variables as vs
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.nlp.token_classification.config import parse_config_from_json
 from ajmc.nlp.token_classification.data_preparation.utils import align_from_tokenized, align_labels_to_tokenized, \
@@ -18,6 +20,7 @@ V3 = True
 
 if V3:
     from transformers import LayoutLMv3TokenizerFast, LayoutLMv3ForTokenClassification, LayoutLMv3FeatureExtractor
+
     MODEL_INPUTS = ['input_ids',
                     'bbox',
                     'attention_mask',
@@ -25,6 +28,7 @@ if V3:
 
 else:
     from transformers import LayoutLMv2TokenizerFast, LayoutLMv2ForTokenClassification, LayoutLMv2FeatureExtractor
+
     MODEL_INPUTS = ['input_ids',
                     'bbox',
                     'token_type_ids',
@@ -36,15 +40,14 @@ ROBERTA_MODEL_INPUTS = ['input_ids', 'attention_mask']
 
 def create_olr_config(json_path: Path,
                       prefix: str):
-
-    config = parse_config_from_json(json_path=json_path)
+    config = parse_config_from_json(json_path=str(json_path))
 
     for set_, data_list in config['data'].items():
         for dict_ in data_list:
-            dict_['path'] = os.path.join(prefix, dict_['id'], PATHS['canonical'], dict_['run']+'.json')
+            dict_['path'] = os.path.join(prefix, dict_['id'], vs.PATHS['canonical'], dict_['run'] + '.json')
 
-    config['rois'] = [rt for rt in ORDERED_OLR_REGION_TYPES if rt not in config['excluded_region_types']]
-    region_types_to_labels = {k:l for k,l in config['region_types_to_labels'].items() if k in config['rois']}
+    config['rois'] = [rt for rt in vs.ORDERED_OLR_REGION_TYPES if rt not in config['excluded_region_types']]
+    region_types_to_labels = {k: l for k, l in config['region_types_to_labels'].items() if k in config['rois']}
     config['labels_to_ids'] = {l: i for i, l in enumerate(sorted(set(region_types_to_labels.values())))}
     config['ids_to_labels'] = {l: i for i, l in config['labels_to_ids'].items()}
     config['num_labels'] = len(list(config['labels_to_ids'].keys()))
@@ -53,8 +56,9 @@ def create_olr_config(json_path: Path,
 
     return config
 
+
 # Functions
-def normalize_bounding_box(bbox: BoxType, img_width: int, img_height: int, ):
+def normalize_bounding_box(bbox: vs.BoxType, img_width: int, img_height: int, ):
     return [
         int(1000 * (bbox[0][0] / img_width)),
         int(1000 * (bbox[0][1] / img_height)),
@@ -67,8 +71,8 @@ def get_data_dict_pages(data_dict: Dict[str, List[Dict[str, str]]],
                         sampling: Optional[Dict[str, float]] = None) -> Dict[str, List['CanonicalPage']]:
     """
     Args:
-        data_dict: A dict of format `{'set': [{'id': 'comm_id_1', 'run':..., 'path': ...}, ...] }
-        sampling: A dict of format `{'set': sample_size}` with 0>sample_size>1.
+        data_dict: A dict of format ``{'set': [{'id': 'comm_id_1', 'run':..., 'path': ...}, ...] }``
+        sampling: A dict of format ``{'set': sample_size}`` with 0>sample_size>1.
     """
 
     set_pages = {}
@@ -175,7 +179,7 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
     """Prepares data for LayoutLMV2.
 
     Args:
-        page_sets: A dict containing a list of `OcrPage`s per split.
+        page_sets: A dict containing a list of ``OcrPage``\ s per split.
         labels_to_ids: {labels_to_ids}
         regions_to_coarse_labels:
         rois: The regions to focus on
@@ -248,7 +252,7 @@ def align_predicted_page(page: 'Page',
                                            text_only=text_only)
 
     words = [w for r in page.children.regions if r.info['region_type'] in rois for w in
-             r.children.words]  # this is the way words are selected in `page_to_layoutlm_encodings`
+             r.children.words]  # this is the way words are selected in ``page_to_layoutlm_encodings``
 
     if text_only:
         dataset = CustomDataset(encodings=encodings, model_inputs_names=ROBERTA_MODEL_INPUTS)
@@ -287,7 +291,7 @@ def draw_pages(pages,
     from ajmc.olr.layoutlm.draw import draw_page_labels, draw_caption
 
     labels_to_colors = {l: c + tuple([127]) for l, c in
-                        zip(labels_to_ids.keys(), list(COLORS['distinct'].values()) + list(COLORS['hues'].values()))}
+                        zip(labels_to_ids.keys(), list(vs.COLORS['distinct'].values()) + list(vs.COLORS['hues'].values()))}
 
     for page in pages:
         page_words, page_labels = align_predicted_page(page,
@@ -371,11 +375,10 @@ def main(config):
                    text_only=config['text_only'])
 
 
-
 if __name__ == '__main__':
     config = create_olr_config(
-        # json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json',
-        json_path='/Users/sven/packages/ajmc/data/layoutlm/configs/1E_jebb_text_only.json',
-        prefix=COMMS_DATA_DIR
+            # json_path='/Users/sven/packages/ajmc/data/layoutlm/simple_config_local.json',
+            json_path='/Users/sven/packages/ajmc/data/layoutlm/configs/1E_jebb_text_only.json',
+            prefix=vs.COMMS_DATA_DIR
     )
     main(config)

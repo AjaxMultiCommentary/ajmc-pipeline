@@ -6,7 +6,7 @@ from ajmc.commons.file_management import get_olr_gt_spreadsheet
 
 
 def get_page_region_dicts_from_via(page_id: str, via_project: dict) -> List[dict]:
-    """Extract region-dicts of a page from`via_project`."""
+    """Extract region-dicts of a page from``via_project``."""
     regions = []
     for key in via_project["_via_img_metadata"].keys():
         if page_id in key:
@@ -60,7 +60,7 @@ def sort_to_reading_order(elements: list,
                                                      rest[0].bbox.bbox[1][1]),
                                                  i2=(r.bbox.bbox[0][1],
                                                      r.bbox.bbox[1][1]))
-            # If the y-overlap are above `overlap_threshold`, append the element to the `overlapping_candidates`
+            # If the y-overlap are above ``overlap_threshold``, append the element to the ``overlapping_candidates``
             if y_overlap > overlap_thresh * rest[0].bbox.height \
                     or y_overlap > overlap_thresh * r.bbox.height:
                 overlapping_candidates.append(r)
@@ -77,7 +77,7 @@ def get_olr_region_counts(commentaries: List['CanonicalCommentary'],
 
      Args:
         commentaries: A canonical commentary object
-        splits: The desired splits, eg `['train', 'test']`.
+        splits: The desired splits, eg ``['train', 'test']``.
         fine_to_coarse: A mapping from fine regions to coarse.
     """
     # Initialize the counts
@@ -85,7 +85,7 @@ def get_olr_region_counts(commentaries: List['CanonicalCommentary'],
                            variables.ROIS + ['pages', 'total']}
 
     for commentary in commentaries:
-        # ⚠️ Get the list of groundtruth pages ONLY (remember that `commentary` zones are annotated on all pages !)
+        # ⚠️ Get the list of groundtruth pages ONLY (remember that ``commentary`` zones are annotated on all pages !)
         gt_pages_ids = get_olr_splits_page_ids(commentary.id, splits)
         gt_pages = [p for p in commentary.children.pages if p.id in gt_pages_ids]
 

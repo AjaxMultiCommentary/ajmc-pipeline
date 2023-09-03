@@ -1,0 +1,39 @@
+.. ajmc documentation master file, created by
+sphinx-quickstart on Sun Sep  3 12:47:29 2023.
+You can adapt this file completely to your liking, but it should at least
+contain the root `toctree` directive.
+
+Welcome to ajmc's documentation!
+================================
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Contents:
+
+   modules
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Introduction:
+
+   other_pages/base_functionalities
+   other_pages/commentary_importation_pipeline
+   other_pages/data_organisation
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contributing:
+
+   other_pages/introduction_to_code
+   other_pages/contributing_guidelines
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+

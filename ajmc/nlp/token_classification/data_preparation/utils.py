@@ -2,6 +2,7 @@ from typing import List, Dict, Union, Any, Iterable
 
 import torch
 from hipe_commons.helpers.tsv import get_tsv_data
+
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.miscellaneous import get_custom_logger, split_list
 
@@ -11,12 +12,12 @@ logger = get_custom_logger(__name__)
 def nerify_labels(labels: Iterable[str],
                   add_i: bool = True,
                   add_o: bool = True) -> List[str]:
-    """A simple function to NERify labels, adding `'B-'`s, `'I-'`s and `'O'` labels, making them CoLLN-compliant.
+    """A simple function to NERify labels, adding ``'B-'``s, ``'I-'``s and ``'O'`` labels, making them CoLLN-compliant.
 
     Args:
         labels: The iterable of unique labels to NERify.
-        add_i: If false, does not add `'I-'` labels.
-        add_o: If false, does not add `'O'` label.
+        add_i: If false, does not add ``'I-'`` labels.
+        add_o: If false, does not add ``'O'`` label.
 
     Returns:
         The list of nerified labels
@@ -35,7 +36,7 @@ def sort_ner_labels(labels: Iterable[str]):
 
     Args:
         labels: The iterable of unique labels to sort. Each label should be in the form
-                `'B-classname'`, `'I-classname'` or `'O'`.
+                ``'B-classname'``, ``'I-classname'`` or ``'O'``.
 
     Returns:
         The sorted list of labels
@@ -53,15 +54,13 @@ def align_labels_to_tokenized(tokens_to_words_offsets: List[Union[None, int]],
                               labels_to_ids: Dict[str, int],
                               label_all_tokens: bool = False,
                               null_label: object = -100) -> List[int]:
-    """`align_labels_to_tokenized` is a special case of `align_to_tokenized`, dealing with labels specificities.
+    """``align_labels_to_tokenized`` is a special case of ``align_to_tokenized``, dealing with labels specificities.
 
     As such, it will:
-        - Change `labels` to their corresponding ids
-        - Label all the sub-tokens (with a single `'B-'` label) if `label_all_tokens` is True.
-        - Append `null_label` instead of `None` if the token offset is None.
+        - Change ``labels`` to their corresponding ids
+        - Label all the sub-tokens (with a single ``'B-'`` label) if ``label_all_tokens`` is True.
+        - Append ``null_label`` instead of ``None`` if the token offset is None.
     """
-
-
 
     previous_token_index = None
     aligned_labels = []
@@ -78,7 +77,7 @@ def align_labels_to_tokenized(tokens_to_words_offsets: List[Union[None, int]],
                 aligned_labels.append(null_label)
             else:
                 aligned_labels.append(
-                    labels_to_ids['I' + labels[token_index][1:] if labels[token_index] != 'O' else 'O'])
+                        labels_to_ids['I' + labels[token_index][1:] if labels[token_index] != 'O' else 'O'])
 
         previous_token_index = token_index
 
@@ -87,16 +86,15 @@ def align_labels_to_tokenized(tokens_to_words_offsets: List[Union[None, int]],
 
 def align_to_tokenized(tokens_to_words_offsets: List[Union[None, int]],
                        to_align: List[Any]) -> List[Any]:
-    """Align `to_align` to a list of offsets, appending `None` if the offset is None.
+    """Align ``to_align`` to a list of offsets, appending ``None`` if the offset is None.
 
     This is used to align a list of elements to their tokenized equivalent, for instance to align words
-    to tokens. Example :
+    to tokens.
 
-        ```python
+    Example::
         words = ['Hello', 'world']
         tokens = ['he', '#llo', 'w', '#o', '#rld']
         # aligned words would be ['Hello', None, 'world', None, None]
-        ```
     """
 
     previous_token_index = None
@@ -118,20 +116,28 @@ def align_to_tokenized(tokens_to_words_offsets: List[Union[None, int]],
 
 def align_from_tokenized(tokens_to_words_offsets: List[Union[None, int]],
                          to_align: List[object]) -> List[object]:
-    """Returns the elements of `to_align` if the corresponding element in `tokens_to_words_offsets` is not and is
+    """Returns the elements of ``to_align`` if the corresponding element in ``tokens_to_words_offsets`` is not and is
     different from the previous one.
 
     This is used to align a list of tokenized elements to their untokenized equivalent, for instance to align labels
-    to word. It does the contrary to `align_to_tokenized`. Example :
+    to word. It does the contrary to ``align_to_tokenized``.
 
-        ```python
-        tokens = ['he', '#llo', 'w', '#o', '#rld']
-        offsets= [ 0,    0,      1,   1,    1    ]
-        labels = [ 0,    1,      2,   3,    2    ]
-        words =  ['Hello',      'world'          ]
+    Example:
 
-        # aligned labels would be [0, 2]
-        ```
+        .. code-block:: python
+
+            tokens = ['he', '#llo', 'w', '#o', '#rld']
+            offsets= [ 0,    0,      1,   1,    1    ]
+            labels = [ 0,    1,      2,   3,    2    ]
+            words =  ['Hello',      'world'          ]
+            # aligned labels would be [0, 2]
+
+    Args:
+        tokens_to_words_offsets: The list of offsets to align to.
+        to_align: The list of elements to align.
+
+    Returns:
+        The aligned elements.
     """
     previous_token_index = None
     aligned_elements = []
@@ -155,9 +161,9 @@ def write_predictions_to_tsv(words: List[List[Union[str, None]]],
                              labels_column: str,
                              tsv_path: str = None,
                              tsv_url: str = None, ):
-    """Get the source tsv, replaces its labels with predicted labels and write a new file to `output`.
+    """Get the source tsv, replaces its labels with predicted labels and write a new file to ``output``.
 
-    `words`, `labels` and `tsv_line_numbers` should be three alined list, so as in HipeDataset.
+    ``words``, ``labels`` and ``tsv_line_numbers`` should be three alined list, so as in HipeDataset.
     """
 
     logger.info(f'Writing predictions to {output_file}')
@@ -175,24 +181,15 @@ def write_predictions_to_tsv(words: List[List[Union[str, None]]],
 
 
 # LEGACY.
-@docstring_formatter(max_length=docstrings['max_length'], special_tokens=docstrings['special_tokens'])
+@docstring_formatter(**docstrings)
 def manual_truncation(tokens, inputs: Dict[str, list], special_tokens: Dict[str, Dict[str, Any]], max_length):
     """Manually truncates and pads model inputs.
 
     Args:
-        inputs: Dict-like outputs of the tokenizer, containing the **untruncated** model's features (e.g.
-            'inputs_ids', 'attention_mask'...).
+        inputs: Dict-like outputs of the tokenizer, containing the **untruncated** model's features (e.g. 'inputs_ids', 'attention_mask'...).
         special_tokens: {special_tokens}
         max_length: {max_length}
     """
-
-    # LEGACY. FOR LAYOUTLM. Note : special tokens are attributes of the tokenizer, find them there.
-    # special_tokens = {
-    #     'start': {'input_ids': 101, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 1},
-    #     'end': {'input_ids': 102, 'bbox': [1000, 1000, 1000, 1000], 'token_type_ids': 0, 'labels': -100,
-    #             'attention_mask': 1},
-    #     'pad': {'input_ids': 0, 'bbox': [0, 0, 0, 0], 'token_type_ids': 0, 'labels': -100, 'attention_mask': 0},
-    # }
 
     for k in inputs.keys():
         inputs[k] = inputs[k][1:-1]  # We start by triming the first and last tokens
@@ -204,7 +201,7 @@ def manual_truncation(tokens, inputs: Dict[str, list], special_tokens: Dict[str,
 
 
 class CustomDataset(torch.utils.data.Dataset):
-    """A custom dataset to wrap a transformers `BatchEncoding` resulting from a TokenizerFast, i.e. """
+    """A custom dataset to wrap a transformers ``BatchEncoding`` resulting from a TokenizerFast, i.e. """
 
     @docstring_formatter(**docstrings)
     def __init__(self,
@@ -216,8 +213,8 @@ class CustomDataset(torch.utils.data.Dataset):
             encodings: {BatchEncoding}
             model_inputs_names: {transformers_model_inputs_names}
         """
-        assert encodings.encodings is not None, """The provided `BatchEncoding` as `self.encodings` set to `None`. 
-        Please use a `TokenizerFast` to avoid this."""
+        assert encodings.encodings is not None, """The provided ``BatchEncoding`` as ``self.encodings`` set to ``None``. 
+        Please use a ``TokenizerFast`` to avoid this."""
 
         self.encodings = encodings
         self.model_inputs = model_inputs_names

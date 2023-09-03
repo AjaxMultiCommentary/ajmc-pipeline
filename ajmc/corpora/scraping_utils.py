@@ -17,7 +17,7 @@ def scrape_page(url):
     # get the html of the page
     request = requests.get(url)
     request.encoding = 'utf-8'
-    # parse the html using beautiful soup and store in variable `soup`
+    # parse the html using beautiful soup and store in variable ``soup``
     soup = BeautifulSoup(request.text, features="xml", )
     return soup
 

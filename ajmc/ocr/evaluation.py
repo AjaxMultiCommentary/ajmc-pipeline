@@ -1,5 +1,5 @@
 """
-`ocr/evaluation` performs a double evaluation of ocr outputs against given groundtruth data.
+``ocr/evaluation`` performs a double evaluation of ocr outputs against given groundtruth data.
 
 1. **Bag-of-word evaluation**: computes errors by matching words which have the minimal edit distance in a bag of groundtruth and in a a bag of predicted word.
 2. **Coordinate based evaluation**: computes errors by matching words with overlapping coordinates.
@@ -60,9 +60,9 @@ def initialize_soup(img_width: int, img_height: int) -> "BeautifulSoup":
 
 
 def insert_text_in_soup(soup: "BeautifulSoup", word: 'OcrWord', is_gt: bool, is_false: bool) -> "BeautifulSoup":
-    """Adds content to `soup` object.
+    """Adds content to ``soup`` object.
 
-    This function is used to add single words to the `soup` object initialized by `initialize_soup`, thereby
+    This function is used to add single words to the ``soup`` object initialized by ``initialize_soup``, thereby
     reconstructing both the groundtruth and the preds page, with false words in red.
 
     Args:
@@ -119,17 +119,17 @@ def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> i
     """Counts the number of errors among the character comprised in an unicode character set.
 
     Example:
-        `count_errors_by_charset('Hεll_ World1', 'ηειι- world', 'greek')` returns `3` as among the 4 greek
-        chars in `gt`, 3 are misrecognized.
+        ``count_errors_by_charset('Hεll_ World1', 'ηειι- world', 'greek')`` returns ``3`` as among the 4 greek
+        chars in ``gt``, 3 are misrecognized.
 
     Args:
         pred_string: prediction/source string
         gt_string: groundtruth/destination string
-        charset: should be `'greek'`, `'l‹atin'`, `'numbers'`, `'punctuation'` or a valid `re`-pattern,
-                 for instance `r'([\u00F4-\u00FF])'`
+        charset: should be ``'greek'``, ``'latin'``, ``'numbers'``, ``'punctuation'`` or a valid ``re``\ -pattern,
+                 for instance ``r'([\u00F4-\u00FF])'``
 
     Returns:
-        int: the number of errors on selected caracters in `pred_string`
+        int: the number of errors on selected caracters in ``pred_string``
     """
 
     try:
@@ -182,7 +182,7 @@ def bag_of_word_evaluation(gt_bag: List[str],
                            pred_bag: List[str],
                            error_counts: Optional[Dict[str, Union[int, float]]] = None,
                            ) -> Dict[str, Union[int, float]]:
-    """Performs a bag-of-word evaluation of `pred_bag` against `groundtruth_bag`.
+    """Performs a bag-of-word evaluation of ``pred_bag`` against ``groundtruth_bag``.
 
     Args:
         gt_bag: The list of groundtruth words
@@ -205,22 +205,22 @@ def bag_of_word_evaluation(gt_bag: List[str],
 
     for gt_word in gt_bag:  # iterate over w in gt_string
 
-        if pred_bag_:  # If there are still words in `ocr_bag_`...
+        if pred_bag_:  # If there are still words in ``ocr_bag_``...
 
             distances = [Levenshtein.distance(pred_word, gt_word) for pred_word in pred_bag_]
 
             min_distance = min(distances)
 
-            # Records `min_distance` and removes word
+            # Records ``min_distance`` and removes word
             if min_distance == 0:
                 error_counts['true_words'] += 1
             error_counts['distance'] += min_distance
             del pred_bag_[distances.index(min_distance)]
 
-        else:  # If `ocr_bag_` is empty, add the distance of unrecognized gt_words
+        else:  # If ``ocr_bag_`` is empty, add the distance of unrecognized gt_words
             error_counts['distance'] += len(gt_word)
 
-    if pred_bag_:  # If `ocr_bag_` still contains words after the end of the loop
+    if pred_bag_:  # If ``ocr_bag_`` still contains words after the end of the loop
         error_counts['distance'] += sum([len(w) for w in pred_bag_])
 
     error_counts['precision'] = safe_divide(error_counts['true_words'], error_counts['pred_words'])
@@ -239,12 +239,12 @@ def simple_coordinates_based_evaluation(gt_words: List[Union['CanonicalWord', 'O
     """Computes edit distance between spacially overlapping words and returns the CER.
 
      "Simple" means that this method does NOT deal with word-boxes related issues. It only evaluates gt-words which
-     overlap to `overlap_threshold` with a predicted word and vice-versa. If no predicted word is found
+     overlap to ``overlap_threshold`` with a predicted word and vice-versa. If no predicted word is found
      (e.g. with crummy groundtruth- or preds-boxes), the word is left out and not counted in the final result.
 
      Args:
-         gt_words: The list of ground truth words (e.g. coming from `OcrPage.children.words`)
-         pred_words: The list of predicted words (e.g. coming from `OcrPage.children.words`)
+         gt_words: The list of ground truth words (e.g. coming from ``OcrPage.children.words``)
+         pred_words: The list of predicted words (e.g. coming from ``OcrPage.children.words``)
          overlap_threshold: The minimal overlap-proportion.
 
      Returns:
@@ -282,19 +282,19 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
     """Performs a regional and coordinates-based evaluation.
 
     This function returns extremely detailed counts, with word counts, caracter counts by charsets (latin, greek,
-    numbers and punctuation) and correct rate (`cr`, corresponding to the normalized levenshtein distance) for
+    numbers and punctuation) and correct rate (*cr*, corresponding to the normalized levenshtein distance) for
     each of these elements and for each olr region (commentary, primary text...).
 
-    How to read the results? `cr`or `ccr`/`cwr` (correct character/word rate respectively) very straightforward. They
+    How to read the results? *cr* or *ccr* / *cwr* (correct character/word rate respectively) very straightforward. They
     correspond to the number of correct elements divided by the total number of elements.
 
     Note:
         Coordinate-based means that evaluation does not process documents in a linear manner, which is prone to
         alignement error when document layouts are complex. Instead, this matches overlapping words in groundtruth and
         ocr-data. More formally, for each groundtruth word :
-            - find the predicted word which coordinates overlap the with groundtruth word to `word_overlap_threshold`
-                - if found, calculate Levenshtein distance between the two
-                - if not found, do not evaluate this word
+        * find the predicted word which coordinates overlap the with groundtruth word to ``word_overlap_threshold``
+        * if found, calculate Levenshtein distance between the two
+        * if not found, do not evaluate this word
 
     Args:
         gt_page: The groundtruth page
@@ -323,7 +323,7 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
 
     for gt_word in gt_page.children.words:
 
-        # Find `gt_word`'s regions
+        # Find ``gt_word``'s regions
         gt_word_regions = ['global'] + [r.region_type for r in gt_page.children.regions if
                                         is_bbox_within_bbox(gt_word.bbox.bbox,
                                                             r.bbox.bbox)]
@@ -382,13 +382,13 @@ def commentary_evaluation(commentary: 'OcrCommentary',
                           write_files: bool = True,
                           output_dir: Optional[str] = None,
                           word_overlap_threshold: float = 0.8):
-    """Evaluates all the pages of a `OcrCommentary` that have groundtruth.
+    """Evaluates all the pages of a ``OcrCommentary`` that have groundtruth.
 
     Args:
-        commentary: The `OcrCommentary` object to evaluate.
+        commentary: The ``OcrCommentary`` object to evaluate.
         write_files: Whether to write the files or not
         output_dir: Leave to none if you want to write files to the default dir
-        word_overlap_threshold: See `coord_based_page_evaluation`.
+        word_overlap_threshold: See ``coord_based_page_evaluation``.
     """
 
     bow_error_counts, coord_error_counts, editops = None, None, None
@@ -433,7 +433,7 @@ def directory_evaluation(gt_dir: Path,
                          editops_record: dict = None,
                          output_dir: Optional[Path] = None,
                          normalize: bool = True) -> Tuple[dict, dict, dict]:
-    """Evaluates all the text files in `ocr_dir` against the corresponding text files in `gt_dir`.
+    """Evaluates all the text files in ``ocr_dir`` against the corresponding text files in ``gt_dir``.
 
     Args:
         gt_dir: The directory containing the groundtruth files.
@@ -516,7 +516,7 @@ def line_based_evaluation(gt_lines: List[str],
                           editops_record: dict = None,
                           output_dir: Optional[Path] = None,
                           normalize: bool = True) -> Tuple[dict, dict, dict]:
-    """Evaluates all the text files in `ocr_dir` against the corresponding text files in `gt_dir`.
+    """Evaluates all the text files in ``ocr_dir`` against the corresponding text files in ``gt_dir``.
 
     Args:
         gt_lines: The list of groundtruth lines.

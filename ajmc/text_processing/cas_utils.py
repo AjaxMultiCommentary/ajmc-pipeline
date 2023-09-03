@@ -1,5 +1,5 @@
 """
-`basic_rebuild`, `get_iiif_url`, `compute_image_links`, `get_cas`, `rebuild_to_xmi`, `export_commentaries_to_xmi` are
+``basic_rebuild``, ``get_iiif_url``, ``compute_image_links``, ``get_cas``, ``rebuild_to_xmi``, ``export_commentaries_to_xmi`` are
 legacy but functional.
 """
 import json
@@ -138,10 +138,10 @@ def rebuild_to_xmi(page: dict,
     Converts a rebuild-dict into Apache UIMA/XMI format.
 
     The resulting file will be named after the page ID, adding
-    the `.xmi` extension.
+    the ``.xmi`` extension.
 
     Args:
-        page (dict): a page dict as returned by `basic_rebuild`
+        page (dict): a page dict as returned by ``basic_rebuild``
         output_dir (Path): path to the output directory
         ocr_run_id (str): OCR run ID
         region_types: regions considered
@@ -154,7 +154,7 @@ def rebuild_to_xmi(page: dict,
         typesystem = load_typesystem(f)  # object for the type system
 
     cas = Cas(typesystem=typesystem)
-    cas.sofa_string = page['fulltext']  # str # `ft` field in the rebuild CI
+    cas.sofa_string = page['fulltext']  # str # ``ft`` field in the rebuild CI
     cas.sofa_mime = 'text/plain'
 
     sentence = typesystem.get_type('de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence')
@@ -203,7 +203,7 @@ def export_commentary_to_xmis(commentary: Type['OcrCommentary'],
         xmis_dir: Absolute path to the directory in which to write the xmi files.
         make_jsons: Whether to create canonical jsons. If false, jsons are grepped from json_dir.
         make_xmis: Whether to create xmis.
-        region_types: The desired regions to convert to xmis, eg `introduction, preface, commentary, footnote`.
+        region_types: The desired regions to convert to xmis, eg ``introduction, preface, commentary, footnote``.
         overwrite: Whether to overwrite existing files.
     """
 
@@ -235,8 +235,8 @@ def export_commentary_to_xmis(commentary: Type['OcrCommentary'],
 
 
 def get_cas(xmi_path: Path, xml_path: Path) -> Cas:
-    # ⚠️ for some reason, passing to `load_cas_from_xmi()` the file object
-    # works just fine, while passing to it the path (`str`) raises an
+    # ⚠️ for some reason, passing to ``load_cas_from_xmi()`` the file object
+    # works just fine, while passing to it the path (``str``) raises an
     # exception of empty XMI files (very strange!) 
     with open(xmi_path, 'rb') as inputfile:
         cas = load_cas_from_xmi(inputfile, typesystem=load_typesystem(xml_path))
@@ -275,11 +275,11 @@ def align_cas_annotation(cas_annotation, rebuild, verbose: bool = False):
 
 
 def import_page_rebuild(page_id: str, annotation_type: str = 'ner'):
-    """Finds and rebuild the inception json of the fgiven `page_id`.
+    """Finds and rebuild the inception json of the fgiven ``page_id``.
 
     Args:
         page_id: The id of the page to rebuild.
-        annotation_type: The type of annotation to rebuild, either `ner` or `lemlink`.
+        annotation_type: The type of annotation to rebuild, either ``ner`` or ``lemlink``.
     """
     comm_id = page_id.split('_')[0]
 

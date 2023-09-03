@@ -223,7 +223,7 @@ def chunk_string_by_charsets(string: str, fallback: str = 'latin'):
 
 
 def get_char_charset(char: str, fallback: str = 'fallback') -> str:
-    """Returns the charset of a character, if any, `fallback` otherwise."""
+    """Returns the charset of a character, if any, ``fallback`` otherwise."""
     for charset_name, charset_chars in CHARSETS_CHARS_NFC.items():
         if char in charset_chars:
             return charset_name
@@ -235,15 +235,15 @@ def count_chars_by_charset(string: str, charset: str) -> int:
     """Counts the number of chars by unicode characters set.
 
     Example:
-        `count_chars_by_charset('γεια σας, world', 'greek')` returns `7` as there are 7 greek
-        chars in `string`.
+        ``count_chars_by_charset('γεια σας, world', 'greek')`` returns ``7`` as there are 7 greek
+        chars in ``string``.
 
     Args:
-        string: a NFC-normalized string (default). For NFD-normalized strings, use `count_chars_by_charset_nfd`.
-        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'`.
+        string: a NFC-normalized string (default). For NFD-normalized strings, use ``count_chars_by_charset_nfd``.
+        charset: should be ``'greek'``, ``'latin'``, ``'numeral'``, ``'punctuation'``.
 
     Returns:
-        int: the number of charset-matching characters in `string`.
+        int: the number of charset-matching characters in ``string``.
     """
     return sum([c in CHARSETS_CHARS_NFC[charset] for c in string])
 
@@ -252,15 +252,15 @@ def count_chars_by_charset_nfd(string: str, charset: str) -> int:
     """Counts the number of chars by unicode characters set.
 
     Example:
-        `count_chars_by_charset('γεια σας, world', 'greek')` returns `7` as there are 7 greek
-        chars in `string`.
+        ``count_chars_by_charset('γεια σας, world', 'greek')`` returns ``7`` as there are 7 greek
+        chars in ``string``.
 
     Args:
-        string: a NFD-normalized string. For NFC-normalized strings, use `count_chars_by_charset`.
-        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'`.
+        string: a NFD-normalized string. For NFC-normalized strings, use ``count_chars_by_charset``.
+        charset: should be ``'greek'``, ``'latin'``, ``'numeral'``, ``'punctuation'``.
 
     Returns:
-        int: the number of charset-matching characters in `string`.
+        int: the number of charset-matching characters in ``string``.
     """
     return sum([c in CHARSETS_CHARS_NFD[charset] for c in string])
 
@@ -269,15 +269,15 @@ def is_charset_string(string: str,
                       charset: str,
                       threshold: float = 0.5,
                       strict: bool = True) -> bool:
-    """Returns True if more than `threshold` of chars in string are in `charset`, False otherwise.
+    """Returns True if more than ``threshold`` of chars in string are in ``charset``, False otherwise.
 
     Args:
         string: self explanatory
-        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'` or a valid `re`-pattern,
-                    for instance `r'([\u00F4-\u00FF])'`
+        charset: should be ``'greek'``, ``'latin'``, ``'numeral'``, ``'punctuation'`` or a valid ``re``-pattern,
+                    for instance ``r'([\u00F4-\u00FF])'``
         threshold: the threshold above which the function returns True
-        strict: if True, only chars in `charset` are considered, if False, chars in `charset`, `'numeral'` and
-                `'punctuation'` are considered.
+        strict: if True, only chars in ``charset`` are considered, if False, chars in ``charset``, ``'numeral'`` and
+                ``'punctuation'`` are considered.
     """
 
     if strict:
@@ -291,14 +291,14 @@ def is_charset_string_nfd(string: str,
                           charset: str,
                           threshold: float = 0.5,
                           strict: bool = True) -> bool:
-    """Returns True if more than `threshold` of chars in string are in `charset`, False otherwise.
+    """Returns True if more than ``threshold`` of chars in string are in ``charset``, False otherwise.
 
     Args:
-        string: a NFD-normalized string. For NFC-normalized strings, use `is_charset_string`.
-        charset: should be `'greek'`, `'latin'`, `'numeral'`, `'punctuation'`.
+        string: a NFD-normalized string. For NFC-normalized strings, use ``is_charset_string``.
+        charset: should be ``'greek'``, ``'latin'``, ``'numeral'``, ``'punctuation'``.
         threshold: the threshold above which the function returns True
-        strict: if True, only chars in `charset` are considered, if False, chars in `charset`, `'numeral'` and
-                `'punctuation'` are considered.
+        strict: if True, only chars in ``charset`` are considered, if False, chars in ``charset``, ``'numeral'`` and
+                ``'punctuation'`` are considered.
     """
 
     if strict:

@@ -12,7 +12,7 @@ from ajmc.commons.geometry import Shape
 
 # ===========================  COORDS EXTRACTERS  ============================
 def get_hocr_element_bbox(element: bs4.element.Tag) -> Shape:
-    """Extract bbox from `title='...; bbox X1 Y1 X2 Y2; ...'`"""
+    """Extract bbox from ``title='...; bbox X1 Y1 X2 Y2; ...'``"""
     coords = [int(num) for el in element['title'].split(';') if el.strip().startswith('bbox')
               for num in el.strip().split()[1:]]
     return Shape([(coords[0], coords[1]), (coords[2], coords[3])])
@@ -46,14 +46,14 @@ def get_element_text(element: bs4.element.Tag, ocr_format: str = 'tesshocr') -> 
 
 # ===========================  ELEMENT EXTRACTERS  ============================
 def find_all_tesshocr_elements(element: bs4.element.Tag, name: str) -> List[bs4.element.Tag]:
-    """Finds all sub-elements with `name` in `element`.
+    """Finds all sub-elements with ``name`` in ``element``.
 
     Args:
-        element: A `bs4.element.Tag` to search within.
+        element: A ``bs4.element.Tag`` to search within.
         name: The name of the tags to search for, e.g. 'lines', 'words'.
 
     Returns:
-        A list of `bs4.element.Tag`s.
+        A list of ``bs4.element.Tag``.
     """
 
     if 'word' in name:
@@ -65,14 +65,14 @@ def find_all_tesshocr_elements(element: bs4.element.Tag, name: str) -> List[bs4.
 
 
 def find_all_krakenhocr_elements(element: bs4.element.Tag, name: str) -> List[bs4.element.Tag]:
-    """Finds all sub-elements with `name` in `element`.
+    """Finds all sub-elements with ``name`` in ``element``.
 
     Args:
-        element: A `bs4.element.Tag` to search within.
+        element: A ``bs4.element.Tag`` to search within.
         name: The name of the tags to search for, e.g. 'lines', 'words'.
 
     Returns:
-        A list of `bs4.element.Tag`s.
+        A list of ``bs4.element.Tag``.
     """
 
     if 'word' in name:
@@ -84,14 +84,14 @@ def find_all_krakenhocr_elements(element: bs4.element.Tag, name: str) -> List[bs
 
 
 def find_all_pagexml_elements(element: bs4.element.Tag, name: str) -> List[bs4.element.Tag]:
-    """Finds all sub-elements with `name` in `element`.
+    """Finds all sub-elements with ``name`` in ``element``.
 
     Args:
-        element: A `bs4.element.Tag` to search within.
+        element: A ``bs4.element.Tag`` to search within.
         name: The name of the tags to search for, e.g. 'lines', 'words'.
 
     Returns:
-        A list of `bs4.element.Tag`s.
+        A list of ``bs4.element.Tag``.
     """
 
     if 'word' in name:
@@ -103,15 +103,15 @@ def find_all_pagexml_elements(element: bs4.element.Tag, name: str) -> List[bs4.e
 
 
 def find_all_elements(element: Union[bs4.element.Tag, bs4.BeautifulSoup], name: str, format: str = 'tesshocr') -> List[bs4.element.Tag]:
-    """Generic extractor. Finds all sub-elements with `name` in `element`.
+    """Generic extractor. Finds all sub-elements with ``name`` in ``element``.
 
     Args:
-        element: A `bs4.element.Tag` to search within.
+        element: A ``bs4.element.Tag`` to search within.
         name: The name of the tags to search for, e.g. 'lines', 'words'.
         format: The ocr-output format to consider: 'tesshocr', 'krakenhocr' or 'pagexml'.
 
     Returns:
-        A list of `bs4.element.Tag`s.
+        A list of ``bs4.element.Tag``.
     """
 
     if format == 'tesshocr':

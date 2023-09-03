@@ -16,18 +16,18 @@ def do_map_for_yolo(images_dir: str,
                     gt_dir: str,
                     preds_dir: str,
                     ids_to_labels,
-                    image_format='png',
+                    img_extension='.png',
                     ):
     # Create the Metric builder
     metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=False, num_classes=len(ids_to_labels.keys()))
     counts = {l: 0 for l in ids_to_labels.values()}
 
-    # Walk over each prediction txt in `preds_dir`
+    # Walk over each prediction txt in ``preds_dir``
     for pred_path in glob.glob(os.path.join(preds_dir, '*.txt')):
         pred_name = pred_path.split('/')[-1]
 
         # Get the image to un-normalize
-        image_name = pred_name.replace('.txt', '.' + image_format)
+        image_name = pred_name.replace('.txt', img_extension)
         image = AjmcImage(path=Path(images_dir) /image_name)
 
         # Parse preds

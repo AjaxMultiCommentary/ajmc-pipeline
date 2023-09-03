@@ -1,26 +1,34 @@
 """This module is highly inspired by HuggingFace's 
-[`run_ner.py`](https://github.com/huggingface/transformers/blob/main/examples/pytorch/token-classification/run_ner.py). 
+`run_ner.py <https://github.com/huggingface/transformers/blob/main/examples/pytorch/token-classification/run_ner.py>`_.
 It runs on a single GPU."""
 
 import json
 import logging
+import os
+import random
 import time
 from typing import Union, Dict, Any
 
-import pandas as pd
-import os
 import numpy as np
+import pandas as pd
 import torch
 import transformers
 from torch.utils.data import DataLoader, RandomSampler
-from ajmc.nlp.token_classification.evaluation import evaluate_dataset, seqeval_to_df, evaluate_hipe
+
+from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.nlp.token_classification.config import parse_config_from_json
 from ajmc.nlp.token_classification.data_preparation.hipe_iob import prepare_datasets
+from ajmc.nlp.token_classification.evaluation import evaluate_dataset, seqeval_to_df, evaluate_hipe
 from ajmc.nlp.token_classification.model import predict_and_write_tsv
-from ajmc.nlp.utils import set_seed
-from ajmc.commons.miscellaneous import get_custom_logger
 
 logger = get_custom_logger(__name__)
+
+
+def set_seed(seed):
+    """Sets seed for ``random``, ``np.random`` and ``torch``."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
 
 
 def train(config: Dict[str, Any],
@@ -28,19 +36,23 @@ def train(config: Dict[str, Any],
           train_dataset: 'token_classification.data_preparation.HipeDataset',
           eval_dataset: 'token_classification.data_preparation.HipeDataset',
           tokenizer: transformers.PreTrainedTokenizer):
-    """
-    Main function of the the script :
-        - Does the training on `train_dataset`
-        - At the end of each epoch :
-            - evaluate the model on `eval_dataset` using seqeval
-            - saves a model checkpoint
-            - saves the model as best_model if model has highest scores
+    """Main training function.
 
-    :param config: An `argparse.Namespace` containing the required `transformers.TrainingArguments`
-    :param model: A transformers model instance
-    :param train_dataset: The `torch.utils.data.Dataset` on which to train
-    :param eval_dataset: The `torch.utils.data.Dataset` on which to evaluate the model
-    :param tokenizer: The model's tokenizer.
+    This function does the following:
+
+    * Does the training on ``train_dataset``
+    * At the end of each epoch:
+
+      * evaluate the model on ``eval_dataset`` using seqeval
+      * saves a model checkpoint
+      * saves the model as best_model if model has highest scores
+
+    Args:
+        config: An ``argparse.Namespace`` containing the required ``transformers.TrainingArguments``
+        model: A transformers model instance
+        train_dataset: The ``torch.utils.data.Dataset`` on which to train
+        eval_dataset: The ``torch.utils.data.Dataset`` on which to evaluate the model
+        tokenizer: The model's tokenizer.
     """
     model.to(config['device'])
 
@@ -164,7 +176,7 @@ def create_dirs(config: Dict[str, Any]):
 
 
 def main(config: Union[str, Dict[str, Any]]):
-    """Main function.
+    """Main entrypoint.
 
     Args:
         config: The config-dict or the path to a config['json'].
@@ -225,5 +237,3 @@ def main(config: Union[str, Dict[str, Any]]):
             predict_and_write_tsv(model=model, output_dir=config['predictions_dir'],
                                   tokenizer=tokenizer, ids_to_labels=config['ids_to_labels'],
                                   labels_column=config['labels_column'], url=path)
-
-# todo 👁️ reimplement freeze, additionnal data and

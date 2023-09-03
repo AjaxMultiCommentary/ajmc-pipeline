@@ -1,5 +1,5 @@
 """
-`automatic_region_detection` automatically detects regions-boxes in image-files and outputs
+``automatic_region_detection`` automatically detects regions-boxes in image-files and outputs
 a csv that can be directly imported to VIA.
 """
 
@@ -25,7 +25,7 @@ logger = get_custom_logger(__name__)
 def detect_regions(img_path: Path, dilation_kernel_size: int, dilation_iterations: int, draw_image: bool,
                    img_output_dir: Path, via_csv_dict: dict, artifact_size_threshold: float = 0.003) -> dict:
     """Automatically detects regions of interest in an image, using a simple dilation process.
-    Returns a `'key':[values]`-like dictionnary containing all the generated bboxes for all the images.
+    Returns a ``'key':[values]``-like dictionnary containing all the generated bboxes for all the images.
 
     Args:
         img_path: Absolute page to the image.
@@ -154,36 +154,36 @@ def main(img_dir: Union[str, Path],
     """
     Automatically detects regions-boxes in image-files and outputs a csv that can be directly imported to VIA.
 
-    Detecting boxes in image-files is done using `cv2.dilation`. This dilates recognized letters-contours to recognize
+    Detecting boxes in image-files is done using ``cv2.dilation``. This dilates recognized letters-contours to recognize
     wider structures. The retrieved bboxes are then shrinked back to their original size. This can be seen
     when drawing bboxes on images.
 
-    To get the optimal output from `cv2.dilation`, the following parameters can be tweaked:
-    - `dilation_kernel_size`: The size of the kernel used for dilation. The bigger the kernel, the more
-        the dilation will spread. The kernel is a square.
-    - `dilation_iterations`: The number of times the dilation is applied. The more iterations, the more
-        the dilation will spread.
-    The best way to chose is to test on a few images using `draw_images=True`.
+    To get the optimal output from ``cv2.dilation``, the following parameters can be tweaked:
+
+    * ``dilation_kernel_size``: The size of the kernel used for dilation. The bigger the kernel, the more the dilation will spread. \
+    The kernel is a square.
+    * ``dilation_iterations``: The number of times the dilation is applied. The more iterations, the more the dilation will spread.
+
+    The best way to chose is to test on a few images using ``draw_images=True``.
 
     Once satisfactory regions can be output in the csv, please transfer the project to VIA2 :
 
-    - [Download VIA2](https://www.robots.ox.ac.uk/~vgg/software/via/)
-    - Open a new VIA2 project and import your images
-    - In the `project`-menu, chose import file/region attributes and import `default_via_attributes.json` in `ajmc/data`.
-    - In the `annotation`-menu, chose import annotations from csv, and import the output csv annotations.
-    - It is then recommended to save your project as a json (and to delete the csv).
+    * [Download VIA2](https://www.robots.ox.ac.uk/~vgg/software/via/)
+    * Open a new VIA2 project and import your images
+    * In the ``project``-menu, chose import file/region attributes and import ``default_via_attributes.json`` in ``ajmc/data``.
+    * In the ``annotation``-menu, chose import annotations from csv, and import the output csv annotations.
+    * It is then recommended to save your project as a json (and to delete the csv).
 
-    To automatically annotated some of the detected regions, please refer to `automatic_region_classification` in `ajmc/olr/_scripts`
+    To automatically annotated some of the detected regions, please refer to ``automatic_region_classification`` in ``ajmc/olr/_scripts``
 
     Args:
-        img_dir: {image_dir}. Can be both `Path` or `str` as this function is an entrypoint.
-        output_dir: Absolute path to the dir in which to output csv and images (if draw_images). Can be both
-        `Path` or `str` as this function is an entrypoint.
+        img_dir: {image_dir}. Can be both ``Path`` or ``str`` as this function is an entrypoint.
+        output_dir: Absolute path to the dir in which to output csv and images (if draw_images). Can be both ``Path`` or ``str`` as this function is an entrypoint.
         dilation_kernel_size: {dilation_kernel_size}
         dilation_iterations: {dilation_iterations}
         draw_images: Whether to draw the detected regions and output the image.
         artifact_size_threshold: {artifact_size_threshold}
-        img_extension: {image_format}
+        img_extension: {img_extension}
     """
 
     # Dirs
@@ -191,7 +191,7 @@ def main(img_dir: Union[str, Path],
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True, parents=True)
 
-    for img_path in tqdm(sorted(list(img_dir.glob(f'*.{img_extension}'))), desc='Processing images '):
+    for img_path in tqdm(sorted(list(img_dir.glob(f'*{img_extension}'))), desc='Processing images '):
         via_csv_dict = detect_regions(img_path=img_path,
                                       dilation_kernel_size=dilation_kernel_size,
                                       dilation_iterations=dilation_iterations,
