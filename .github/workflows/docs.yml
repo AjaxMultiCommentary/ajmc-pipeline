@@ -10,8 +10,8 @@ jobs:
       - uses: actions/setup-python@v3
       - name: Install dependencies
         run: |
-          pip install sphinx furo
-          pip install --no-deps --ignore-requires-python nb-sphinx myst-parser
+          python3 -m pip install sphinx furo
+          python3 -m pip install --no-deps --ignore-requires-python nb-sphinx myst-parser
       - name: Sphinx build
         run: |
           sphinx-build doc _build
