@@ -1,0 +1,1217 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="index" title="Index" href="genindex.html"/>
+    <link rel="search" title="Search" href="search.html"/>
+    <link rel="next" title="ajmc.olr package" href="ajmc.olr.html"/>
+    <link rel="prev" title="ajmc.ocr.pytorch package" href="ajmc.ocr.pytorch.html"/>
+
+    <!-- Generated with Sphinx 7.2.5 and Furo 2023.08.19 -->
+    <title>ajmc.ocr.tesseract package - ajmc v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c"/>
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be"/>
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c"/>
+
+
+    <style>
+        body {
+            --color-code-background: #f8f8f8;
+            --color-code-foreground: black;
+
+        }
+
+        @media not print {
+            body[data-theme="dark"] {
+                --color-code-background: #202020;
+                --color-code-foreground: #d0d0d0;
+
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body:not([data-theme="light"]) {
+                    --color-code-background: #202020;
+                    --color-code-foreground: #d0d0d0;
+
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+</script>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="svg-toc" viewBox="0 0 24 24">
+        <title>Contents</title>
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+            <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-menu" viewBox="0 0 24 24">
+        <title>Menu</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+        <title>Expand</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun" viewBox="0 0 24 24">
+        <title>Light mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-moon" viewBox="0 0 24 24">
+        <title>Dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun-half" viewBox="0 0 24 24">
+        <title>Auto light/dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M13 12h5"/>
+            <path d="M13 15h4"/>
+            <path d="M13 18h1"/>
+            <path d="M13 9h4"/>
+            <path d="M13 6h1"/>
+        </svg>
+    </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+    <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+    <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+<div class="page">
+    <header class="mobile-header">
+        <div class="header-left">
+            <label class="nav-overlay-icon" for="__navigation">
+                <div class="visually-hidden">Toggle site navigation sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-menu"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+        <div class="header-center">
+            <a href="index.html">
+                <div class="brand">ajmc v0.0.1 documentation</div>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle-container theme-toggle-header">
+                <button class="theme-toggle">
+                    <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                    <svg class="theme-icon-when-auto">
+                        <use href="#svg-sun-half"></use>
+                    </svg>
+                    <svg class="theme-icon-when-dark">
+                        <use href="#svg-moon"></use>
+                    </svg>
+                    <svg class="theme-icon-when-light">
+                        <use href="#svg-sun"></use>
+                    </svg>
+                </button>
+            </div>
+            <label class="toc-overlay-icon toc-header-icon" for="__toc">
+                <div class="visually-hidden">Toggle table of contents sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-toc"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+    </header>
+    <aside class="sidebar-drawer">
+        <div class="sidebar-container">
+
+            <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+
+
+                <span class="sidebar-brand-text">ajmc v0.0.1 documentation</span>
+
+            </a>
+                <form class="sidebar-search-container" method="get" action="search.html" role="search">
+                    <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+                    <input type="hidden" name="check_keywords" value="yes">
+                    <input type="hidden" name="area" value="default">
+                </form>
+                <div id="searchbox"></div>
+                <div class="sidebar-scroll">
+                    <div class="sidebar-tree">
+                        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+                        <ul class="current">
+                            <li class="toctree-l1 current has-children"><a class="reference internal"
+                                                                           href="modules.html">ajmc</a><input checked=""
+                                                                                                              class="toctree-checkbox"
+                                                                                                              id="toctree-checkbox-1"
+                                                                                                              name="toctree-checkbox-1"
+                                                                                                              role="switch"
+                                                                                                              type="checkbox"/><label
+                                    for="toctree-checkbox-1">
+                                <div class="visually-hidden">Toggle navigation of ajmc</div>
+                                <i class="icon">
+                                    <svg>
+                                        <use href="#svg-arrow-right"></use>
+                                    </svg>
+                                </i></label>
+                                <ul class="current">
+                                    <li class="toctree-l2 current has-children"><a class="reference internal"
+                                                                                   href="ajmc.html">ajmc
+                                        package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2"
+                                                          name="toctree-checkbox-2" role="switch"
+                                                          type="checkbox"/><label for="toctree-checkbox-2">
+                                        <div class="visually-hidden">Toggle navigation of ajmc package</div>
+                                        <i class="icon">
+                                            <svg>
+                                                <use href="#svg-arrow-right"></use>
+                                            </svg>
+                                        </i></label>
+                                        <ul class="current">
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="ajmc.commons.html">ajmc.commons package</a>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="ajmc.corpora.html">ajmc.corpora package</a>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="ajmc.nlp.html">ajmc.nlp
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-3"
+                                                                  name="toctree-checkbox-3" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-3">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.nlp package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4 has-children"><a class="reference internal"
+                                                                                           href="ajmc.nlp.token_classification.html">ajmc.nlp.token_classification
+                                                        package</a><input class="toctree-checkbox"
+                                                                          id="toctree-checkbox-4"
+                                                                          name="toctree-checkbox-4" role="switch"
+                                                                          type="checkbox"/><label
+                                                            for="toctree-checkbox-4">
+                                                        <div class="visually-hidden">Toggle navigation of
+                                                            ajmc.nlp.token_classification package
+                                                        </div>
+                                                        <i class="icon">
+                                                            <svg>
+                                                                <use href="#svg-arrow-right"></use>
+                                                            </svg>
+                                                        </i></label>
+                                                        <ul>
+                                                            <li class="toctree-l5"><a class="reference internal"
+                                                                                      href="ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation
+                                                                package</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 current has-children"><a class="reference internal"
+                                                                                           href="ajmc.ocr.html">ajmc.ocr
+                                                package</a><input checked="" class="toctree-checkbox"
+                                                                  id="toctree-checkbox-5" name="toctree-checkbox-5"
+                                                                  role="switch" type="checkbox"/><label
+                                                    for="toctree-checkbox-5">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.ocr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul class="current">
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="ajmc.ocr.preprocessing.html">ajmc.ocr.preprocessing
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="ajmc.ocr.pytorch.html">ajmc.ocr.pytorch
+                                                        package</a></li>
+                                                    <li class="toctree-l4 current current-page"><a
+                                                            class="current reference internal" href="#">ajmc.ocr.tesseract
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="ajmc.olr.html">ajmc.olr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-6"
+                                                                  name="toctree-checkbox-6" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-6">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.olr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="ajmc.olr.layoutlm.html">ajmc.olr.layoutlm
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="ajmc.olr.yolo.html">ajmc.olr.yolo
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="ajmc.text_processing.html">ajmc.text_processing
+                                                package</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/base_functionalities.html">Basic
+                                functionalities</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/commentary_importation_pipeline.html">Commentary
+                                importation pipeline</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/data_organisation.html">Understanding the ajmc
+                                directory structure.</a></li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Contributing:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/introduction_to_code.html">Understanding the
+                                goal of the library</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/introduction_to_code.html#The-commons-directory">The
+                                commons directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/introduction_to_code.html#The-text_processing-directory">The
+                                <code class="docutils literal notranslate"><span
+                                        class="pre">text_processing</span></code> directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/contributing_guidelines.html">Contributing
+                                guidelines</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </aside>
+    <div class="main">
+        <div class="content">
+            <div class="article-container">
+                <a href="#" class="back-to-top muted-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+                    </svg>
+                    <span>Back to top</span>
+                </a>
+                <div class="content-icon-container">
+
+                    <div class="theme-toggle-container theme-toggle-content">
+                        <button class="theme-toggle">
+                            <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                            <svg class="theme-icon-when-auto">
+                                <use href="#svg-sun-half"></use>
+                            </svg>
+                            <svg class="theme-icon-when-dark">
+                                <use href="#svg-moon"></use>
+                            </svg>
+                            <svg class="theme-icon-when-light">
+                                <use href="#svg-sun"></use>
+                            </svg>
+                        </button>
+                    </div>
+                    <label class="toc-overlay-icon toc-content-icon" for="__toc">
+                        <div class="visually-hidden">Toggle table of contents sidebar</div>
+                        <i class="icon">
+                            <svg>
+                                <use href="#svg-toc"></use>
+                            </svg>
+                        </i>
+                    </label>
+                </div>
+                <article role="main">
+                    <section id="module-ajmc.ocr.tesseract">
+                        <span id="ajmc-ocr-tesseract-package"></span>
+                        <h1>ajmc.ocr.tesseract package<a class="headerlink" href="#module-ajmc.ocr.tesseract"
+                                                         title="Link to this heading">#</a></h1>
+                        <section id="submodules">
+                            <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a>
+                            </h2>
+                        </section>
+                        <section id="module-ajmc.ocr.tesseract.dictionaries">
+                            <span id="ajmc-ocr-tesseract-dictionaries-module"></span>
+                            <h2>ajmc.ocr.tesseract.dictionaries module<a class="headerlink"
+                                                                         href="#module-ajmc.ocr.tesseract.dictionaries"
+                                                                         title="Link to this heading">#</a></h2>
+                            <p>Utils to handle tesseract dictionaries, BR and MR’s dictionaries and combine them with
+                                tesseract’s dictionaries
+                                to create new models.</p>
+                            <p>Architecture should be: <code class="docutils literal notranslate"><span class="pre">XP_DIR</span>
+                                <span class="pre">/</span> <span class="pre">models</span> <span class="pre">/</span>
+                                <span class="pre">model_name</span> <span class="pre">/</span> <span class="pre">model_name.traineddata</span></code>
+                            </p>
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.dictionaries.change_traineddata_wordlist">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">change_traineddata_wordlist</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">traineddata_name</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">wordlist_name</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/dictionaries.html#change_traineddata_wordlist"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.dictionaries.change_traineddata_wordlist"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Change the wordlist of a traineddata file</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.dictionaries.create_traineddata_with_wordlist">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">create_traineddata_with_wordlist</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">source_traineddata_name</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">wordlist_names</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">List</span><span class="p"><span
+                                        class="pre">[</span></span><span class="pre">str</span><span class="p"><span
+                                        class="pre">]</span></span></span></em>, <em class="sig-param"><span
+                                        class="n"><span class="pre">output_model_name</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span
+                                        class="w"> </span><span class="pre">None</span></span><span
+                                        class="w"> </span><span class="o"><span class="pre">=</span></span><span
+                                        class="w"> </span><span class="default_value"><span
+                                        class="pre">None</span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/dictionaries.html#create_traineddata_with_wordlist"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.dictionaries.create_traineddata_with_wordlist"
+                                        title="Link to this definition">#</a></dt>
+                                <dd></dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.dictionaries.get_mr_abbr_wordlist">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">get_mr_abbr_wordlist</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">langs</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">List</span><span
+                                        class="p"><span class="pre">[</span></span><span class="pre">str</span><span
+                                        class="p"><span class="pre">]</span></span></span></em><span
+                                        class="sig-paren">)</span> <span class="sig-return"><span
+                                        class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span
+                                        class="pre">List</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">str</span><span class="p"><span
+                                        class="pre">]</span></span></span></span><a class="reference internal"
+                                                                                    href="_modules/ajmc/ocr/tesseract/dictionaries.html#get_mr_abbr_wordlist"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.dictionaries.get_mr_abbr_wordlist"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Get the wordlist of the MR abbreviation dictionary</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.dictionaries.get_or_create_wordlist_path">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">get_or_create_wordlist_path</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">wordlist_name</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em><span class="sig-paren">)</span> <span
+                                        class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
+                                        class="sig-return-typehint"><span class="pre">Path</span></span></span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/dictionaries.html#get_or_create_wordlist_path"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.dictionaries.get_or_create_wordlist_path"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Gets the path to wordlist.txt file, creating it if it doesn’t exist</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.dictionaries.get_traineddata_wordlist">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">get_traineddata_wordlist</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">traineddata_name</span></span></em><span class="sig-paren">)</span>
+                                    <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
+                                            class="sig-return-typehint"><span class="pre">List</span><span
+                                            class="p"><span class="pre">[</span></span><span class="pre">str</span><span
+                                            class="p"><span class="pre">]</span></span></span></span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/dictionaries.html#get_traineddata_wordlist"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.dictionaries.get_traineddata_wordlist"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Get the wordlist of a traineddata file</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.dictionaries.merge_wordlists">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span class="pre">merge_wordlists</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="o"><span
+                                        class="pre">*</span></span><span class="n"><span
+                                        class="pre">wordlists</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">List</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">str</span><span class="p"><span
+                                        class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span
+                                        class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
+                                        class="sig-return-typehint"><span class="pre">List</span><span class="p"><span
+                                        class="pre">[</span></span><span class="pre">str</span><span class="p"><span
+                                        class="pre">]</span></span></span></span><a class="reference internal"
+                                                                                    href="_modules/ajmc/ocr/tesseract/dictionaries.html#merge_wordlists"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.dictionaries.merge_wordlists"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Merge wordlists</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.dictionaries.write_all_wordlists">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">write_all_wordlists</span></span><span
+                                        class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/dictionaries.html#write_all_wordlists"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.dictionaries.write_all_wordlists"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Write all wordlists</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.dictionaries.write_combined_wordlists">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">write_combined_wordlists</span></span><span
+                                        class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/dictionaries.html#write_combined_wordlists"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.dictionaries.write_combined_wordlists"
+                                        title="Link to this definition">#</a></dt>
+                                <dd></dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.dictionaries.write_mr_abbr_wordlist">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span class="pre">write_mr_abbr_wordlist</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">langs</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">List</span><span
+                                        class="p"><span class="pre">[</span></span><span class="pre">str</span><span
+                                        class="p"><span class="pre">]</span></span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/ocr/tesseract/dictionaries.html#write_mr_abbr_wordlist"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.dictionaries.write_mr_abbr_wordlist"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Write the wordlist of the MR abbreviation dictionary</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.dictionaries.write_unpacked_traineddata">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.dictionaries.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">write_unpacked_traineddata</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">traineddata_path</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">unpacked_dir</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">Path</span></span><span
+                                        class="w"> </span><span class="o"><span class="pre">=</span></span><span
+                                        class="w"> </span><span class="default_value"><span
+                                        class="pre">None</span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/dictionaries.html#write_unpacked_traineddata"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.dictionaries.write_unpacked_traineddata"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Unpacks a traineddata file</p>
+                                </dd>
+                            </dl>
+
+                        </section>
+                        <section id="module-ajmc.ocr.tesseract.experiments">
+                            <span id="ajmc-ocr-tesseract-experiments-module"></span>
+                            <h2>ajmc.ocr.tesseract.experiments module<a class="headerlink"
+                                                                        href="#module-ajmc.ocr.tesseract.experiments"
+                                                                        title="Link to this heading">#</a></h2>
+                            <p>Contains the code for running experiments.</p>
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.experiments.make_experiment">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.experiments.</span></span><span
+                                        class="sig-name descname"><span class="pre">make_experiment</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">xp_config</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_xps</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_models</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_datasets</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em><span
+                                        class="sig-paren">)</span> <span class="sig-return"><span
+                                        class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span
+                                        class="pre">None</span></span></span><a class="reference internal"
+                                                                                href="_modules/ajmc/ocr/tesseract/experiments.html#make_experiment"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.experiments.make_experiment"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Creates the experiment repo</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.experiments.make_experiment_dir">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.experiments.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">make_experiment_dir</span></span><span class="sig-paren">(</span><em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">experiment_id</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/experiments.html#make_experiment_dir"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.experiments.make_experiment_dir"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Creates an empty experiment directory with its subdirectories</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.experiments.make_experiments">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.experiments.</span></span><span
+                                        class="sig-name descname"><span class="pre">make_experiments</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">experiment_ids</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">List</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">str</span><span class="p"><span class="pre">]</span></span><span
+                                        class="w"> </span><span class="p"><span class="pre">|</span></span><span
+                                        class="w"> </span><span class="pre">None</span></span><span
+                                        class="w"> </span><span class="o"><span class="pre">=</span></span><span
+                                        class="w"> </span><span class="default_value"><span
+                                        class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_xps</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_datasets</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_models</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/ocr/tesseract/experiments.html#make_experiments"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.experiments.make_experiments"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Makes the experiments</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.experiments.make_general_results_table">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.experiments.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">make_general_results_table</span></span><span
+                                        class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/experiments.html#make_general_results_table"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.experiments.make_general_results_table"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Makes a table with the general results of the experiments</p>
+                                </dd>
+                            </dl>
+
+                        </section>
+                        <section id="module-ajmc.ocr.tesseract.models">
+                            <span id="ajmc-ocr-tesseract-models-module"></span>
+                            <h2>ajmc.ocr.tesseract.models module<a class="headerlink"
+                                                                   href="#module-ajmc.ocr.tesseract.models"
+                                                                   title="Link to this heading">#</a></h2>
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.models.get_training_command">
+                                    <span class="sig-prename descclassname"><span
+                                            class="pre">ajmc.ocr.tesseract.models.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">get_training_command</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">model_config</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span
+                                        class="sig-paren">)</span> <span class="sig-return"><span
+                                        class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span
+                                        class="pre">str</span></span></span><a class="reference internal"
+                                                                               href="_modules/ajmc/ocr/tesseract/models.html#get_training_command"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.models.get_training_command"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Gets the tess training command given a model model_config</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.models.make_model">
+                                    <span class="sig-prename descclassname"><span
+                                            class="pre">ajmc.ocr.tesseract.models.</span></span><span
+                                        class="sig-name descname"><span class="pre">make_model</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">model_config</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_models</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_datasets</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em><span
+                                        class="sig-paren">)</span> <span class="sig-return"><span
+                                        class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span
+                                        class="pre">None</span></span></span><a class="reference internal"
+                                                                                href="_modules/ajmc/ocr/tesseract/models.html#make_model"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.models.make_model"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Creates the model repo</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.models.make_model_dirs">
+                                    <span class="sig-prename descclassname"><span
+                                            class="pre">ajmc.ocr.tesseract.models.</span></span><span
+                                        class="sig-name descname"><span class="pre">make_model_dirs</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">model_id</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/models.html#make_model_dirs"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.models.make_model_dirs"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Creates an empty model directory with its subdirectories</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.models.make_models">
+                                    <span class="sig-prename descclassname"><span
+                                            class="pre">ajmc.ocr.tesseract.models.</span></span><span
+                                        class="sig-name descname"><span class="pre">make_models</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">models_ids</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">List</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">str</span><span class="p"><span class="pre">]</span></span><span
+                                        class="w"> </span><span class="p"><span class="pre">|</span></span><span
+                                        class="w"> </span><span class="pre">None</span></span><span
+                                        class="w"> </span><span class="o"><span class="pre">=</span></span><span
+                                        class="w"> </span><span class="default_value"><span
+                                        class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_models</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">overwrite_datasets</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/ocr/tesseract/models.html#make_models"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.models.make_models"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Creates datasets.</p>
+                                    <dl class="field-list simple">
+                                        <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                        <dd class="field-odd">
+                                            <ul class="simple">
+                                                <li><p><strong>models_ids</strong> – The list of models to create. If
+                                                    None, creates all models.</p></li>
+                                                <li><p><strong>overwrite_models</strong> – Wheter to overwrite existing
+                                                    models.</p></li>
+                                                <li><p><strong>overwrite_datasets</strong> – Wheter to overwrite
+                                                    existing datasets.</p></li>
+                                            </ul>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.models.run">
+                                    <span class="sig-prename descclassname"><span
+                                            class="pre">ajmc.ocr.tesseract.models.</span></span><span
+                                        class="sig-name descname"><span class="pre">run</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">img_dir</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">output_dir</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">langs</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">config</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">dict</span></span><span class="w"> </span><span
+                                        class="o"><span class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">None</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">psm</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">int</span></span><span class="w"> </span><span
+                                        class="o"><span class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">3</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">img_suffix</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">'png'</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">tessdata_prefix</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Path</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">PosixPath('/Users/sven/packages/tesseract_/tessdata')</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/ocr/tesseract/models.html#run"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.models.run"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Runs tesseract on images in <code class="docutils literal notranslate"><span
+                                        class="pre">img_dir</span></code>.</p>
+                                    <div class="admonition note">
+                                        <p class="admonition-title">Note</p>
+                                        <p>assumes tesseract is installed.</p>
+                                    </div>
+                                    <dl class="field-list simple">
+                                        <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                        <dd class="field-odd">
+                                            <ul class="simple">
+                                                <li><p><strong>img_dir</strong> (<em>Path</em>) – path to directory
+                                                    containing images to be OCR’d</p></li>
+                                                <li><p><strong>output_dir</strong> (<em>Path</em>) – path to directory
+                                                    where OCR’d text will be saved</p></li>
+                                                <li><p><strong>langs</strong> (<em>str</em>) – language(s) to use for
+                                                    OCR. Use ‘+’ to separate multiple languages, e.g. ‘eng+fra’</p></li>
+                                                <li><p><strong>config</strong> (<em>dict</em>) – dictionary of config
+                                                    options to pass to tesseract. See <a class="reference external"
+                                                                                         href="https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html">https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html</a>
+                                                </p></li>
+                                                <li><p><strong>psm</strong> (<em>int</em>) – page segmentation mode. See
+                                                    <a class="reference external"
+                                                       href="https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html">https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html</a>
+                                                </p></li>
+                                                <li><p><strong>img_suffix</strong> (<em>str</em>) – suffix of images to
+                                                    be OCR’d</p></li>
+                                                <li><p><strong>tessdata_prefix</strong> (<em>Path</em>) – path to
+                                                    directory containing tesseract language data</p></li>
+                                            </ul>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.models.train">
+                                    <span class="sig-prename descclassname"><span
+                                            class="pre">ajmc.ocr.tesseract.models.</span></span><span
+                                        class="sig-name descname"><span class="pre">train</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">model_config</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/ocr/tesseract/models.html#train"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.models.train"
+                                        title="Link to this definition">#</a></dt>
+                                <dd></dd>
+                            </dl>
+
+                        </section>
+                        <section id="module-ajmc.ocr.tesseract.pipeline">
+                            <span id="ajmc-ocr-tesseract-pipeline-module"></span>
+                            <h2>ajmc.ocr.tesseract.pipeline module<a class="headerlink"
+                                                                     href="#module-ajmc.ocr.tesseract.pipeline"
+                                                                     title="Link to this heading">#</a></h2>
+                            <p>Train or evaluate tesseract</p>
+                            <div class="admonition-usage admonition">
+                                <p class="admonition-title">Usage:</p>
+                                <p><code class="docutils literal notranslate"><span class="pre">$</span> <span
+                                        class="pre">/scratch/sven/anaconda3/envs/ajmc/bin/python</span> <span
+                                        class="pre">ajmc/ocr/tesseract/pipeline.py</span> <span class="pre">--make_experiments</span></code>
+                                </p>
+                            </div>
+                        </section>
+                        <section id="module-ajmc.ocr.tesseract.tesseract_utils">
+                            <span id="ajmc-ocr-tesseract-tesseract-utils-module"></span>
+                            <h2>ajmc.ocr.tesseract.tesseract_utils module<a class="headerlink"
+                                                                            href="#module-ajmc.ocr.tesseract.tesseract_utils"
+                                                                            title="Link to this heading">#</a></h2>
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.tesseract_utils.create_general_table">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.tesseract_utils.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">create_general_table</span></span><span
+                                        class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/tesseract_utils.html#create_general_table"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.tesseract_utils.create_general_table"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Creates a general table from the outputs of the tesseract OCR.</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.ocr.tesseract.tesseract_utils.reformulate_output_dir">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.tesseract_utils.</span></span><span
+                                        class="sig-name descname"><span class="pre">reformulate_output_dir</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">output_dir</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Path</span></span></em><span class="sig-paren">)</span> <span
+                                        class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
+                                        class="sig-return-typehint"><span class="pre">Path</span></span></span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/tesseract_utils.html#reformulate_output_dir"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.ocr.tesseract.tesseract_utils.reformulate_output_dir"
+                                        title="Link to this definition">#</a></dt>
+                                <dd></dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.ocr.tesseract.tesseract_utils.run_tess_command">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.ocr.tesseract.tesseract_utils.</span></span><span
+                                        class="sig-name descname"><span class="pre">run_tess_command</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">command</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/tesseract/tesseract_utils.html#run_tess_command"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.ocr.tesseract.tesseract_utils.run_tess_command"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Wrapper around subprocess to run a tesscommand in the proper subshell</p>
+                                </dd>
+                            </dl>
+
+                        </section>
+                    </section>
+
+                </article>
+            </div>
+            <footer>
+
+                <div class="related-pages">
+                    <a class="next-page" href="ajmc.olr.html">
+                        <div class="page-info">
+                            <div class="context">
+                                <span>Next</span>
+                            </div>
+                            <div class="title">ajmc.olr package</div>
+                        </div>
+                        <svg class="furo-related-icon">
+                            <use href="#svg-arrow-right"></use>
+                        </svg>
+                    </a>
+                    <a class="prev-page" href="ajmc.ocr.pytorch.html">
+                        <svg class="furo-related-icon">
+                            <use href="#svg-arrow-right"></use>
+                        </svg>
+                        <div class="page-info">
+                            <div class="context">
+                                <span>Previous</span>
+                            </div>
+
+                            <div class="title">ajmc.ocr.pytorch package</div>
+
+                        </div>
+                    </a>
+                </div>
+                <div class="bottom-of-page">
+                    <div class="left-details">
+                        <div class="copyright">
+                            Copyright &#169; 2023, Sven Najem-Meyer
+                        </div>
+                        Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link"
+                                                                                          href="https://pradyunsg.me">@pradyunsg</a>'s
+
+                        <a href="https://github.com/pradyunsg/furo">Furo</a>
+
+                    </div>
+                    <div class="right-details">
+
+                    </div>
+                </div>
+
+            </footer>
+        </div>
+        <aside class="toc-drawer">
+
+
+            <div class="toc-sticky toc-scroll">
+                <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+                </div>
+                <div class="toc-tree-container">
+                    <div class="toc-tree">
+                        <ul>
+                            <li><a class="reference internal" href="#">ajmc.ocr.tesseract package</a>
+                                <ul>
+                                    <li><a class="reference internal" href="#submodules">Submodules</a></li>
+                                    <li><a class="reference internal" href="#module-ajmc.ocr.tesseract.dictionaries">ajmc.ocr.tesseract.dictionaries
+                                        module</a>
+                                        <ul>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.change_traineddata_wordlist"><code
+                                                    class="docutils literal notranslate"><span class="pre">change_traineddata_wordlist()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.create_traineddata_with_wordlist"><code
+                                                    class="docutils literal notranslate"><span class="pre">create_traineddata_with_wordlist()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.get_mr_abbr_wordlist"><code
+                                                    class="docutils literal notranslate"><span class="pre">get_mr_abbr_wordlist()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.get_or_create_wordlist_path"><code
+                                                    class="docutils literal notranslate"><span class="pre">get_or_create_wordlist_path()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.get_traineddata_wordlist"><code
+                                                    class="docutils literal notranslate"><span class="pre">get_traineddata_wordlist()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.merge_wordlists"><code
+                                                    class="docutils literal notranslate"><span class="pre">merge_wordlists()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.write_all_wordlists"><code
+                                                    class="docutils literal notranslate"><span class="pre">write_all_wordlists()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.write_combined_wordlists"><code
+                                                    class="docutils literal notranslate"><span class="pre">write_combined_wordlists()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.write_mr_abbr_wordlist"><code
+                                                    class="docutils literal notranslate"><span class="pre">write_mr_abbr_wordlist()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.dictionaries.write_unpacked_traineddata"><code
+                                                    class="docutils literal notranslate"><span class="pre">write_unpacked_traineddata()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="reference internal" href="#module-ajmc.ocr.tesseract.experiments">ajmc.ocr.tesseract.experiments
+                                        module</a>
+                                        <ul>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.experiments.make_experiment"><code
+                                                    class="docutils literal notranslate"><span class="pre">make_experiment()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.experiments.make_experiment_dir"><code
+                                                    class="docutils literal notranslate"><span class="pre">make_experiment_dir()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.experiments.make_experiments"><code
+                                                    class="docutils literal notranslate"><span class="pre">make_experiments()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.experiments.make_general_results_table"><code
+                                                    class="docutils literal notranslate"><span class="pre">make_general_results_table()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="reference internal" href="#module-ajmc.ocr.tesseract.models">ajmc.ocr.tesseract.models
+                                        module</a>
+                                        <ul>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.models.get_training_command"><code
+                                                    class="docutils literal notranslate"><span class="pre">get_training_command()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.models.make_model"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">make_model()</span></code></a></li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.models.make_model_dirs"><code
+                                                    class="docutils literal notranslate"><span class="pre">make_model_dirs()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.models.make_models"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">make_models()</span></code></a></li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.models.run"><code
+                                                    class="docutils literal notranslate"><span class="pre">run()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.models.train"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">train()</span></code></a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="reference internal" href="#module-ajmc.ocr.tesseract.pipeline">ajmc.ocr.tesseract.pipeline
+                                        module</a></li>
+                                    <li><a class="reference internal" href="#module-ajmc.ocr.tesseract.tesseract_utils">ajmc.ocr.tesseract.tesseract_utils
+                                        module</a>
+                                        <ul>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.tesseract_utils.create_general_table"><code
+                                                    class="docutils literal notranslate"><span class="pre">create_general_table()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.tesseract_utils.reformulate_output_dir"><code
+                                                    class="docutils literal notranslate"><span class="pre">reformulate_output_dir()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.ocr.tesseract.tesseract_utils.run_tess_command"><code
+                                                    class="docutils literal notranslate"><span class="pre">run_tess_command()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </aside>
+    </div>
+</div>
+<script src="_static/documentation_options.js?v=2fea6348"></script>
+<script src="_static/doctools.js?v=888ff710"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="_static/scripts/furo.js?v=32e29ea5"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
+        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+</body>
+</html>

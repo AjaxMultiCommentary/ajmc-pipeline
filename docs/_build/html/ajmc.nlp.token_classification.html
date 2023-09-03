@@ -1,0 +1,1315 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="index" title="Index" href="genindex.html"/>
+    <link rel="search" title="Search" href="search.html"/>
+    <link rel="next" title="ajmc.nlp.token_classification.data_preparation package"
+          href="ajmc.nlp.token_classification.data_preparation.html"/>
+    <link rel="prev" title="ajmc.nlp package" href="ajmc.nlp.html"/>
+
+    <!-- Generated with Sphinx 7.2.5 and Furo 2023.08.19 -->
+    <title>ajmc.nlp.token_classification package - ajmc v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c"/>
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be"/>
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c"/>
+
+
+    <style>
+        body {
+            --color-code-background: #f8f8f8;
+            --color-code-foreground: black;
+
+        }
+
+        @media not print {
+            body[data-theme="dark"] {
+                --color-code-background: #202020;
+                --color-code-foreground: #d0d0d0;
+
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body:not([data-theme="light"]) {
+                    --color-code-background: #202020;
+                    --color-code-foreground: #d0d0d0;
+
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+</script>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="svg-toc" viewBox="0 0 24 24">
+        <title>Contents</title>
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+            <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-menu" viewBox="0 0 24 24">
+        <title>Menu</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+        <title>Expand</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun" viewBox="0 0 24 24">
+        <title>Light mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-moon" viewBox="0 0 24 24">
+        <title>Dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun-half" viewBox="0 0 24 24">
+        <title>Auto light/dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M13 12h5"/>
+            <path d="M13 15h4"/>
+            <path d="M13 18h1"/>
+            <path d="M13 9h4"/>
+            <path d="M13 6h1"/>
+        </svg>
+    </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+    <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+    <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+<div class="page">
+    <header class="mobile-header">
+        <div class="header-left">
+            <label class="nav-overlay-icon" for="__navigation">
+                <div class="visually-hidden">Toggle site navigation sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-menu"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+        <div class="header-center">
+            <a href="index.html">
+                <div class="brand">ajmc v0.0.1 documentation</div>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle-container theme-toggle-header">
+                <button class="theme-toggle">
+                    <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                    <svg class="theme-icon-when-auto">
+                        <use href="#svg-sun-half"></use>
+                    </svg>
+                    <svg class="theme-icon-when-dark">
+                        <use href="#svg-moon"></use>
+                    </svg>
+                    <svg class="theme-icon-when-light">
+                        <use href="#svg-sun"></use>
+                    </svg>
+                </button>
+            </div>
+            <label class="toc-overlay-icon toc-header-icon" for="__toc">
+                <div class="visually-hidden">Toggle table of contents sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-toc"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+    </header>
+    <aside class="sidebar-drawer">
+        <div class="sidebar-container">
+
+            <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+
+
+                <span class="sidebar-brand-text">ajmc v0.0.1 documentation</span>
+
+            </a>
+                <form class="sidebar-search-container" method="get" action="search.html" role="search">
+                    <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+                    <input type="hidden" name="check_keywords" value="yes">
+                    <input type="hidden" name="area" value="default">
+                </form>
+                <div id="searchbox"></div>
+                <div class="sidebar-scroll">
+                    <div class="sidebar-tree">
+                        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+                        <ul class="current">
+                            <li class="toctree-l1 current has-children"><a class="reference internal"
+                                                                           href="modules.html">ajmc</a><input checked=""
+                                                                                                              class="toctree-checkbox"
+                                                                                                              id="toctree-checkbox-1"
+                                                                                                              name="toctree-checkbox-1"
+                                                                                                              role="switch"
+                                                                                                              type="checkbox"/><label
+                                    for="toctree-checkbox-1">
+                                <div class="visually-hidden">Toggle navigation of ajmc</div>
+                                <i class="icon">
+                                    <svg>
+                                        <use href="#svg-arrow-right"></use>
+                                    </svg>
+                                </i></label>
+                                <ul class="current">
+                                    <li class="toctree-l2 current has-children"><a class="reference internal"
+                                                                                   href="ajmc.html">ajmc
+                                        package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2"
+                                                          name="toctree-checkbox-2" role="switch"
+                                                          type="checkbox"/><label for="toctree-checkbox-2">
+                                        <div class="visually-hidden">Toggle navigation of ajmc package</div>
+                                        <i class="icon">
+                                            <svg>
+                                                <use href="#svg-arrow-right"></use>
+                                            </svg>
+                                        </i></label>
+                                        <ul class="current">
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="ajmc.commons.html">ajmc.commons package</a>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="ajmc.corpora.html">ajmc.corpora package</a>
+                                            </li>
+                                            <li class="toctree-l3 current has-children"><a class="reference internal"
+                                                                                           href="ajmc.nlp.html">ajmc.nlp
+                                                package</a><input checked="" class="toctree-checkbox"
+                                                                  id="toctree-checkbox-3" name="toctree-checkbox-3"
+                                                                  role="switch" type="checkbox"/><label
+                                                    for="toctree-checkbox-3">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.nlp package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul class="current">
+                                                    <li class="toctree-l4 current has-children current-page"><a
+                                                            class="current reference internal" href="#">ajmc.nlp.token_classification
+                                                        package</a><input checked="" class="toctree-checkbox"
+                                                                          id="toctree-checkbox-4"
+                                                                          name="toctree-checkbox-4" role="switch"
+                                                                          type="checkbox"/><label
+                                                            for="toctree-checkbox-4">
+                                                        <div class="visually-hidden">Toggle navigation of
+                                                            ajmc.nlp.token_classification package
+                                                        </div>
+                                                        <i class="icon">
+                                                            <svg>
+                                                                <use href="#svg-arrow-right"></use>
+                                                            </svg>
+                                                        </i></label>
+                                                        <ul>
+                                                            <li class="toctree-l5"><a class="reference internal"
+                                                                                      href="ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation
+                                                                package</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="ajmc.ocr.html">ajmc.ocr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-5"
+                                                                  name="toctree-checkbox-5" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-5">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.ocr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="ajmc.ocr.preprocessing.html">ajmc.ocr.preprocessing
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="ajmc.ocr.pytorch.html">ajmc.ocr.pytorch
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="ajmc.ocr.tesseract.html">ajmc.ocr.tesseract
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="ajmc.olr.html">ajmc.olr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-6"
+                                                                  name="toctree-checkbox-6" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-6">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.olr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="ajmc.olr.layoutlm.html">ajmc.olr.layoutlm
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="ajmc.olr.yolo.html">ajmc.olr.yolo
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="ajmc.text_processing.html">ajmc.text_processing
+                                                package</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/base_functionalities.html">Basic
+                                functionalities</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/commentary_importation_pipeline.html">Commentary
+                                importation pipeline</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/data_organisation.html">Understanding the ajmc
+                                directory structure.</a></li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Contributing:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/introduction_to_code.html">Understanding the
+                                goal of the library</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/introduction_to_code.html#The-commons-directory">The
+                                commons directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/introduction_to_code.html#The-text_processing-directory">The
+                                <code class="docutils literal notranslate"><span
+                                        class="pre">text_processing</span></code> directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="other_pages/contributing_guidelines.html">Contributing
+                                guidelines</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </aside>
+    <div class="main">
+        <div class="content">
+            <div class="article-container">
+                <a href="#" class="back-to-top muted-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+                    </svg>
+                    <span>Back to top</span>
+                </a>
+                <div class="content-icon-container">
+
+                    <div class="theme-toggle-container theme-toggle-content">
+                        <button class="theme-toggle">
+                            <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                            <svg class="theme-icon-when-auto">
+                                <use href="#svg-sun-half"></use>
+                            </svg>
+                            <svg class="theme-icon-when-dark">
+                                <use href="#svg-moon"></use>
+                            </svg>
+                            <svg class="theme-icon-when-light">
+                                <use href="#svg-sun"></use>
+                            </svg>
+                        </button>
+                    </div>
+                    <label class="toc-overlay-icon toc-content-icon" for="__toc">
+                        <div class="visually-hidden">Toggle table of contents sidebar</div>
+                        <i class="icon">
+                            <svg>
+                                <use href="#svg-toc"></use>
+                            </svg>
+                        </i>
+                    </label>
+                </div>
+                <article role="main">
+                    <section id="module-ajmc.nlp.token_classification">
+                        <span id="ajmc-nlp-token-classification-package"></span>
+                        <h1>ajmc.nlp.token_classification package<a class="headerlink"
+                                                                    href="#module-ajmc.nlp.token_classification"
+                                                                    title="Link to this heading">#</a></h1>
+                        <section id="subpackages">
+                            <h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading">#</a>
+                            </h2>
+                            <div class="toctree-wrapper compound">
+                                <ul>
+                                    <li class="toctree-l1"><a class="reference internal"
+                                                              href="ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation
+                                        package</a>
+                                        <ul>
+                                            <li class="toctree-l2"><a class="reference internal"
+                                                                      href="ajmc.nlp.token_classification.data_preparation.html#submodules">Submodules</a>
+                                            </li>
+                                            <li class="toctree-l2"><a class="reference internal"
+                                                                      href="ajmc.nlp.token_classification.data_preparation.html#module-ajmc.nlp.token_classification.data_preparation.hipe_iob">ajmc.nlp.token_classification.data_preparation.hipe_iob
+                                                module</a>
+                                                <ul>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.hipe_iob.HipeDataset"><code
+                                                            class="docutils literal notranslate"><span class="pre">HipeDataset</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.hipe_iob.create_prediction_dataset"><code
+                                                            class="docutils literal notranslate"><span class="pre">create_prediction_dataset()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.hipe_iob.prepare_datasets"><code
+                                                            class="docutils literal notranslate"><span class="pre">prepare_datasets()</span></code></a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l2"><a class="reference internal"
+                                                                      href="ajmc.nlp.token_classification.data_preparation.html#module-ajmc.nlp.token_classification.data_preparation.utils">ajmc.nlp.token_classification.data_preparation.utils
+                                                module</a>
+                                                <ul>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.utils.CustomDataset"><code
+                                                            class="docutils literal notranslate"><span class="pre">CustomDataset</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.utils.align_from_tokenized"><code
+                                                            class="docutils literal notranslate"><span class="pre">align_from_tokenized()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.utils.align_labels_to_tokenized"><code
+                                                            class="docutils literal notranslate"><span class="pre">align_labels_to_tokenized()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.utils.align_to_tokenized"><code
+                                                            class="docutils literal notranslate"><span class="pre">align_to_tokenized()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.utils.manual_truncation"><code
+                                                            class="docutils literal notranslate"><span class="pre">manual_truncation()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.utils.nerify_labels"><code
+                                                            class="docutils literal notranslate"><span class="pre">nerify_labels()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.utils.sort_ner_labels"><code
+                                                            class="docutils literal notranslate"><span class="pre">sort_ner_labels()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="ajmc.nlp.token_classification.data_preparation.html#ajmc.nlp.token_classification.data_preparation.utils.write_predictions_to_tsv"><code
+                                                            class="docutils literal notranslate"><span class="pre">write_predictions_to_tsv()</span></code></a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section id="submodules">
+                            <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a>
+                            </h2>
+                        </section>
+                        <section id="module-ajmc.nlp.token_classification.config">
+                            <span id="ajmc-nlp-token-classification-config-module"></span>
+                            <h2>ajmc.nlp.token_classification.config module<a class="headerlink"
+                                                                              href="#module-ajmc.nlp.token_classification.config"
+                                                                              title="Link to this heading">#</a></h2>
+                            <p>This module handles the configs</p>
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.nlp.token_classification.config.create_default_config">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.config.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">create_default_config</span></span><span
+                                        class="sig-paren">(</span><span class="sig-paren">)</span> <span
+                                        class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
+                                        class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span
+                                        class="pre">[</span></span><span class="pre">str</span><span class="p"><span
+                                        class="pre">,</span></span><span class="w"> </span><span
+                                        class="pre">Any</span><span class="p"><span
+                                        class="pre">]</span></span></span></span><a class="reference internal"
+                                                                                    href="_modules/ajmc/nlp/token_classification/config.html#create_default_config"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.nlp.token_classification.config.create_default_config"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Creates a default token-classification config.</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.nlp.token_classification.config.parse_config_from_json">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.config.</span></span><span
+                                        class="sig-name descname"><span class="pre">parse_config_from_json</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">json_path</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em><span class="sig-paren">)</span> <span
+                                        class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
+                                        class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span
+                                        class="pre">[</span></span><span class="pre">str</span><span class="p"><span
+                                        class="pre">,</span></span><span class="w"> </span><span
+                                        class="pre">Any</span><span class="p"><span
+                                        class="pre">]</span></span></span></span><a class="reference internal"
+                                                                                    href="_modules/ajmc/nlp/token_classification/config.html#parse_config_from_json"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.nlp.token_classification.config.parse_config_from_json"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Parses config from a json file.</p>
+                                    <p>Also transforms <code class="docutils literal notranslate"><span class="pre">config['device_name']</span></code>
+                                        to <code class="docutils literal notranslate"><span class="pre">torch.device(config['device_name'])</span></code>,
+                                        raising an error if <code class="docutils literal notranslate"><span
+                                                class="pre">cuda[:#]</span></code>
+                                        is set but not available.</p>
+                                </dd>
+                            </dl>
+
+                        </section>
+                        <section id="module-ajmc.nlp.token_classification.evaluation">
+                            <span id="ajmc-nlp-token-classification-evaluation-module"></span>
+                            <h2>ajmc.nlp.token_classification.evaluation module<a class="headerlink"
+                                                                                  href="#module-ajmc.nlp.token_classification.evaluation"
+                                                                                  title="Link to this heading">#</a>
+                            </h2>
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.nlp.token_classification.evaluation.evaluate_dataset">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.evaluation.</span></span><span
+                                        class="sig-name descname"><span class="pre">evaluate_dataset</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">dataset</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">torch.utils.data.Dataset</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">model</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">transformers.PreTrainedModel</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">batch_size</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">ids_to_labels</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">int</span><span class="p"><span class="pre">,</span></span><span
+                                        class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>,
+                                    <em class="sig-param"><span class="n"><span
+                                            class="pre">rebuild_ner_labels</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                            class="pre">=</span></span><span class="w"> </span><span
+                                            class="default_value"><span class="pre">True</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">do_debug</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">bool</span></span><span class="w"> </span><span
+                                        class="o"><span class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/nlp/token_classification/evaluation.html#evaluate_dataset"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.nlp.token_classification.evaluation.evaluate_dataset"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Evaluate an entire dataset using seqeval. Is used during the main train loop.</p>
+                                    <dl class="field-list simple">
+                                        <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                        <dd class="field-odd">
+                                            <ul class="simple">
+                                                <li><p><strong>dataset</strong> – A dataset inheriting from <code
+                                                        class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code>,
+                                                    implementing at least <code
+                                                            class="docutils literal notranslate"><span class="pre">__len__</span></code>
+                                                    and <code class="docutils literal notranslate"><span class="pre">__getitem__()</span></code>,
+                                                    where each item is a dict alike <code
+                                                            class="docutils literal notranslate"><span class="pre">{{'model_input':</span>
+                                                        <span class="pre">tensor(),</span> <span
+                                                                class="pre">...}}</span></code> corresponding to a
+                                                    single example.</p></li>
+                                                <li><p><strong>model</strong> – Self explanatory</p></li>
+                                                <li><p><strong>batch_size</strong> – Self explanatory</p></li>
+                                                <li><p><strong>ids_to_labels</strong> – A dict mapping the label numbers
+                                                    (int) used by the model to the original label names (str), e.g.
+                                                    <code class="docutils literal notranslate"><span
+                                                            class="pre">{{0:</span> <span
+                                                            class="pre">&quot;O&quot;,</span> <span
+                                                            class="pre">1:</span> <span
+                                                            class="pre">&quot;B-PERS&quot;,</span> <span class="pre">...}}</span></code>
+                                                </p></li>
+                                                <li><p><strong>rebuild_ner_labels</strong> – Whether to simulate NER
+                                                    Labels (for seqeval)</p></li>
+                                                <li><p><strong>do_debug</strong> – Whether break loops after the first
+                                                    iteration.</p></li>
+                                            </ul>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.nlp.token_classification.evaluation.evaluate_hipe">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.evaluation.</span></span><span
+                                        class="sig-name descname"><span class="pre">evaluate_hipe</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">dataset</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">token_classification.data_preparation.HipeDataset</span></span></em>,
+                                    <em class="sig-param"><span class="n"><span class="pre">model</span></span><span
+                                            class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                            class="n"><span class="pre">transformers.PreTrainedModel</span></span></em>,
+                                    <em class="sig-param"><span class="n"><span class="pre">device</span></span><span
+                                            class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                            class="n"><span class="pre">torch.device</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">ids_to_labels</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">int</span><span class="p"><span class="pre">,</span></span><span
+                                        class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>,
+                                    <em class="sig-param"><span class="n"><span
+                                            class="pre">output_dir</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">str</span></span></em>, <em class="sig-param"><span
+                                        class="n"><span class="pre">labels_column</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">hipe_script_path</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">groundtruth_tsv_path</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">str</span></span><span
+                                        class="w"> </span><span class="o"><span class="pre">=</span></span><span
+                                        class="w"> </span><span class="default_value"><span
+                                        class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">groundtruth_tsv_url</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">None</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">batch_size</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">int</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">8</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">do_debug</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">bool</span></span><span class="w"> </span><span
+                                        class="o"><span class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/nlp/token_classification/evaluation.html#evaluate_hipe"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.nlp.token_classification.evaluation.evaluate_hipe"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Performs the entire pipeline to hipe-evaluate a model, i.e. :
+                                    - Getting the model’s prediction on a dataset
+                                    - Reconstructing a HIPE-compliant tsv with these prediction
+                                    - Comparing the predictions-tsv and the corresponding groundtruth-tsv using the hipe
+                                    scorer.
+                                    - Writing the files.</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.nlp.token_classification.evaluation.evaluate_iob_files">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.evaluation.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">evaluate_iob_files</span></span><span class="sig-paren">(</span><em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">output_dir</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">groundtruth_path</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">preds_path</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">method</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">hipe_script_path</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">None</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">output_suffix</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">None</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">task</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">str</span></span><span class="w"> </span><span
+                                        class="o"><span class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">'nerc_coarse'</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/nlp/token_classification/evaluation.html#evaluate_iob_files"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.nlp.token_classification.evaluation.evaluate_iob_files"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Evaluates CLEF-HIPE compliant files.
+                                    If <code class="docutils literal notranslate"><span class="pre">method</span></code>
+                                    is set to <code class="docutils literal notranslate"><span class="pre">'hipe'</span></code>,
+                                    runs run CLEF-HIPE-evaluation within <code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">os.system</span></code>. Else if <code
+                                            class="docutils literal notranslate"><span class="pre">method</span></code>
+                                    is set to
+                                    <code class="docutils literal notranslate"><span class="pre">'seqeval</span></code>,
+                                    imports the files as dfs.</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.nlp.token_classification.evaluation.seqeval_evaluation">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.evaluation.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">seqeval_evaluation</span></span><span class="sig-paren">(</span><em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">predictions</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">List</span><span
+                                        class="p"><span class="pre">[</span></span><span class="pre">List</span><span
+                                        class="p"><span class="pre">[</span></span><span class="pre">str</span><span
+                                        class="p"><span class="pre">]</span></span><span class="p"><span
+                                        class="pre">]</span></span></span></em>, <em class="sig-param"><span
+                                        class="n"><span class="pre">groundtruth</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">List</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">List</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">str</span><span class="p"><span class="pre">]</span></span><span
+                                        class="p"><span class="pre">]</span></span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">nerify_labels</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/nlp/token_classification/evaluation.html#seqeval_evaluation"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.nlp.token_classification.evaluation.seqeval_evaluation"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Simple wrapper around seqeval.</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.nlp.token_classification.evaluation.seqeval_to_df">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.evaluation.</span></span><span
+                                        class="sig-name descname"><span class="pre">seqeval_to_df</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">seqeval_output</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">str</span><span class="p"><span class="pre">,</span></span><span
+                                        class="w"> </span><span class="pre">Dict</span><span class="p"><span
+                                        class="pre">[</span></span><span class="pre">str</span><span class="p"><span
+                                        class="pre">,</span></span><span class="w"> </span><span
+                                        class="pre">float</span><span class="p"><span class="pre">]</span></span><span
+                                        class="w"> </span><span class="p"><span class="pre">|</span></span><span
+                                        class="w"> </span><span class="pre">float</span><span class="p"><span
+                                        class="pre">]</span></span></span></em>, <em class="sig-param"><span
+                                        class="n"><span class="pre">do_debug</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em><span
+                                        class="sig-paren">)</span> <span class="sig-return"><span
+                                        class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span
+                                        class="pre">pandas.DataFrame</span></span></span><a class="reference internal"
+                                                                                            href="_modules/ajmc/nlp/token_classification/evaluation.html#seqeval_to_df"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.nlp.token_classification.evaluation.seqeval_to_df"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Transforms <code class="docutils literal notranslate"><span class="pre">seqeval_output</span></code>
+                                    to a MultiIndex <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>.
+                                </p>
+                                    <dl class="field-list simple">
+                                        <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                        <dd class="field-odd">
+                                            <ul class="simple">
+                                                <li><p><strong>seqeval_output</strong> –
+                                                    <p>A dict containing:</p>
+                                                    <ul>
+                                                        <li><p>A dict of metrics for each entity type</p></li>
+                                                        <li><p>A pair <code class="docutils literal notranslate"><span
+                                                                class="pre">{'overall_metric':</span> <span class="pre">value}</span></code>
+                                                            for each overall metric.</p></li>
+                                                    </ul>
+                                                    <p>Looks like <code class="docutils literal notranslate"><span
+                                                            class="pre">{'ent_type1':</span> <span class="pre">{'precision':float,</span>
+                                                        <span class="pre">'recall':float},</span> <span
+                                                                class="pre">...</span> <span class="pre">,</span> <span
+                                                                class="pre">'overall_recall':float,...}</span></code>.
+                                                    </p>
+                                                    </p></li>
+                                                <li><p><strong>do_debug</strong> – Fills empty entity types with 0.</p>
+                                                </li>
+                                            </ul>
+                                        </dd>
+                                        <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                        <dd class="field-even"><p>A <code class="docutils literal notranslate"><span
+                                                class="pre">pd.DataFrame</span></code> with a MultiIndex. The first
+                                            level is the entity type, the second level is the metric.</p>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            </dl>
+
+                        </section>
+                        <section id="module-ajmc.nlp.token_classification.model">
+                            <span id="ajmc-nlp-token-classification-model-module"></span>
+                            <h2>ajmc.nlp.token_classification.model module<a class="headerlink"
+                                                                             href="#module-ajmc.nlp.token_classification.model"
+                                                                             title="Link to this heading">#</a></h2>
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.nlp.token_classification.model.predict">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.model.</span></span><span
+                                        class="sig-name descname"><span class="pre">predict</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">model_inputs</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">Dict</span><span
+                                        class="p"><span class="pre">[</span></span><span class="pre">str</span><span
+                                        class="p"><span class="pre">,</span></span><span class="w"> </span><span
+                                        class="pre">torch.tensor</span><span class="p"><span class="pre">]</span></span></span></em>,
+                                    <em class="sig-param"><span class="n"><span class="pre">model</span></span><span
+                                            class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                            class="n"><span class="pre">transformers.models</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/nlp/token_classification/model.html#predict"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.nlp.token_classification.model.predict"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Predicts for a batch or a single example.</p>
+                                    <dl class="field-list simple">
+                                        <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                        <dd class="field-odd"><p><strong>model_inputs</strong> – A mapping to between
+                                            the names of the model’s requirements and <code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">torch.Tensor</span></code> of size (max_length,
+                                            batch_size).</p>
+                                        </dd>
+                                    </dl>
+                                    <p class="rubric">Example</p>
+                                    <p><code class="docutils literal notranslate"><span class="pre">{'input_ids':</span>
+                                        <span class="pre">torch.tensor([[int,</span> <span class="pre">int,</span> <span
+                                                class="pre">...],</span> <span class="pre">[int,</span> <span
+                                                class="pre">int,</span> <span class="pre">...]])</span></code>.
+                                        model: A <code class="docutils literal notranslate"><span class="pre">transformers.models</span></code>.
+                                    </p>
+                                    <dl class="field-list simple">
+                                        <dt class="field-odd">Returns<span class="colon">:</span></dt>
+                                        <dd class="field-odd"><p><code class="docutils literal notranslate"><span
+                                                class="pre">np.ndarray</span></code> containing the predicted labels, so
+                                            in the shape (number of exs, length of an ex).</p>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py"
+                                    id="ajmc.nlp.token_classification.model.predict_and_write_tsv">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.model.</span></span><span
+                                        class="sig-name descname"><span
+                                        class="pre">predict_and_write_tsv</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">model</span></span></em>, <em class="sig-param"><span
+                                        class="n"><span class="pre">output_dir</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>,
+                                    <em class="sig-param"><span class="n"><span class="pre">ids_to_labels</span></span></em>,
+                                    <em class="sig-param"><span class="n"><span
+                                            class="pre">labels_column</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">str</span></span></em>, <em class="sig-param"><span
+                                        class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">str</span><span
+                                        class="w"> </span><span class="p"><span class="pre">|</span></span><span
+                                        class="w"> </span><span class="pre">None</span></span><span
+                                        class="w"> </span><span class="o"><span class="pre">=</span></span><span
+                                        class="w"> </span><span class="default_value"><span
+                                        class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span
+                                        class="pre">url</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span
+                                        class="w"> </span><span class="pre">None</span></span><span
+                                        class="w"> </span><span class="o"><span class="pre">=</span></span><span
+                                        class="w"> </span><span class="default_value"><span
+                                        class="pre">None</span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/nlp/token_classification/model.html#predict_and_write_tsv"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink"
+                                        href="#ajmc.nlp.token_classification.model.predict_and_write_tsv"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Creates a dataset from a tsv, predicts and writes predictions to tsv.</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.nlp.token_classification.model.predict_batches">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.model.</span></span><span
+                                        class="sig-name descname"><span class="pre">predict_batches</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">batches</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">torch.utils.data.dataloader.DataLoader</span><span
+                                        class="w"> </span><span class="p"><span class="pre">|</span></span><span
+                                        class="w"> </span><span class="pre">List</span><span class="p"><span
+                                        class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span
+                                        class="pre">[</span></span><span class="pre">str</span><span class="p"><span
+                                        class="pre">,</span></span><span class="w"> </span><span class="pre">torch.tensor</span><span
+                                        class="p"><span class="pre">]</span></span><span class="p"><span
+                                        class="pre">]</span></span></span></em>, <em class="sig-param"><span
+                                        class="n"><span class="pre">model</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">transformers.PreTrainedModel</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">do_debug</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">bool</span></span><span class="w"> </span><span
+                                        class="o"><span class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em><span
+                                        class="sig-paren">)</span> <span class="sig-return"><span
+                                        class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span
+                                        class="pre">ndarray</span></span></span><a class="reference internal"
+                                                                                   href="_modules/ajmc/nlp/token_classification/model.html#predict_batches"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.nlp.token_classification.model.predict_batches"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Runs <code class="docutils literal notranslate"><span class="pre">predict</span></code>
+                                    on a collection of batches.</p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.nlp.token_classification.model.predict_dataset">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.model.</span></span><span
+                                        class="sig-name descname"><span class="pre">predict_dataset</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">dataset</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">torch.utils.data.Dataset</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">model</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">transformers.PreTrainedModel</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span class="pre">do_debug</span></span><span
+                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                        class="n"><span class="pre">bool</span></span><span class="w"> </span><span
+                                        class="o"><span class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">False</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">batch_size</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">int</span></span><span class="w"> </span><span class="o"><span
+                                        class="pre">=</span></span><span class="w"> </span><span
+                                        class="default_value"><span class="pre">8</span></span></em><span
+                                        class="sig-paren">)</span> <span class="sig-return"><span
+                                        class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span
+                                        class="pre">ndarray</span></span></span><a class="reference internal"
+                                                                                   href="_modules/ajmc/nlp/token_classification/model.html#predict_dataset"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.nlp.token_classification.model.predict_dataset"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Runs <code class="docutils literal notranslate"><span class="pre">predict</span></code>
+                                    on a dataset.</p>
+                                    <dl class="field-list simple">
+                                        <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                        <dd class="field-odd">
+                                            <ul class="simple">
+                                                <li><p><strong>dataset</strong> – A dataset inheriting from <code
+                                                        class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code>,
+                                                    implementing at least <code
+                                                            class="docutils literal notranslate"><span class="pre">__len__</span></code>
+                                                    and <code class="docutils literal notranslate"><span class="pre">__getitem__()</span></code>,
+                                                    where each item is a dict alike <code
+                                                            class="docutils literal notranslate"><span class="pre">{{'model_input':</span>
+                                                        <span class="pre">tensor(),</span> <span
+                                                                class="pre">...}}</span></code> corresponding to a
+                                                    single example.</p></li>
+                                                <li><p><strong>model</strong> – A <code
+                                                        class="docutils literal notranslate"><span class="pre">transformers.models</span></code>.
+                                                </p></li>
+                                                <li><p><strong>do_debug</strong> – Whether break loops after the first
+                                                    iteration.</p></li>
+                                                <li><p><strong>batch_size</strong> – Self explanatory.</p></li>
+                                            </ul>
+                                        </dd>
+                                        <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                        <dd class="field-even"><p><code class="docutils literal notranslate"><span
+                                                class="pre">np.ndarray</span></code> containing the predicted labels, so
+                                            in the shape (number of exs, length of an ex).</p>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            </dl>
+
+                        </section>
+                        <section id="module-ajmc.nlp.token_classification.pipeline">
+                            <span id="ajmc-nlp-token-classification-pipeline-module"></span>
+                            <h2>ajmc.nlp.token_classification.pipeline module<a class="headerlink"
+                                                                                href="#module-ajmc.nlp.token_classification.pipeline"
+                                                                                title="Link to this heading">#</a></h2>
+                            <p>This module is highly inspired by HuggingFace’s
+                                <a class="reference external"
+                                   href="https://github.com/huggingface/transformers/blob/main/examples/pytorch/token-classification/run_ner.py">run_ner.py</a>.
+                                It runs on a single GPU.</p>
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.nlp.token_classification.pipeline.create_dirs">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.pipeline.</span></span><span
+                                        class="sig-name descname"><span class="pre">create_dirs</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">config</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">str</span><span class="p"><span class="pre">,</span></span><span
+                                        class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/nlp/token_classification/pipeline.html#create_dirs"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.nlp.token_classification.pipeline.create_dirs"
+                                        title="Link to this definition">#</a></dt>
+                                <dd></dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.nlp.token_classification.pipeline.main">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.pipeline.</span></span><span
+                                        class="sig-name descname"><span class="pre">main</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">config</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span
+                                        class="w"> </span><span class="pre">Dict</span><span class="p"><span
+                                        class="pre">[</span></span><span class="pre">str</span><span class="p"><span
+                                        class="pre">,</span></span><span class="w"> </span><span
+                                        class="pre">Any</span><span class="p"><span
+                                        class="pre">]</span></span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/nlp/token_classification/pipeline.html#main"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.nlp.token_classification.pipeline.main"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Main entrypoint.</p>
+                                    <dl class="field-list simple">
+                                        <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                        <dd class="field-odd"><p><strong>config</strong> – The config-dict or the path
+                                            to a config[‘json’].</p>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.nlp.token_classification.pipeline.set_seed">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.pipeline.</span></span><span
+                                        class="sig-name descname"><span class="pre">set_seed</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">seed</span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/nlp/token_classification/pipeline.html#set_seed"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.nlp.token_classification.pipeline.set_seed"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Sets seed for <code class="docutils literal notranslate"><span
+                                        class="pre">random</span></code>, <code
+                                        class="docutils literal notranslate"><span class="pre">np.random</span></code>
+                                    and <code class="docutils literal notranslate"><span class="pre">torch</span></code>.
+                                </p>
+                                </dd>
+                            </dl>
+
+                            <dl class="py function">
+                                <dt class="sig sig-object py" id="ajmc.nlp.token_classification.pipeline.train">
+                                    <span class="sig-prename descclassname"><span class="pre">ajmc.nlp.token_classification.pipeline.</span></span><span
+                                        class="sig-name descname"><span class="pre">train</span></span><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        class="pre">config</span></span><span class="p"><span
+                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                        class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span
+                                        class="pre">str</span><span class="p"><span class="pre">,</span></span><span
+                                        class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>,
+                                    <em class="sig-param"><span class="n"><span class="pre">model</span></span><span
+                                            class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                            class="n"><span class="pre">transformers.PreTrainedModel</span></span></em>,
+                                    <em class="sig-param"><span class="n"><span
+                                            class="pre">train_dataset</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">token_classification.data_preparation.HipeDataset</span></span></em>,
+                                    <em class="sig-param"><span class="n"><span
+                                            class="pre">eval_dataset</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">token_classification.data_preparation.HipeDataset</span></span></em>,
+                                    <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span
+                                            class="p"><span class="pre">:</span></span><span class="w"> </span><span
+                                            class="n"><span
+                                            class="pre">transformers.PreTrainedTokenizer</span></span></em><span
+                                        class="sig-paren">)</span><a class="reference internal"
+                                                                     href="_modules/ajmc/nlp/token_classification/pipeline.html#train"><span
+                                        class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                        class="headerlink" href="#ajmc.nlp.token_classification.pipeline.train"
+                                        title="Link to this definition">#</a></dt>
+                                <dd><p>Main training function.</p>
+                                    <p>This function does the following:</p>
+                                    <ul class="simple">
+                                        <li><p>Does the training on <code class="docutils literal notranslate"><span
+                                                class="pre">train_dataset</span></code></p></li>
+                                        <li><p>At the end of each epoch:</p>
+                                            <ul>
+                                                <li><p>evaluate the model on <code class="docutils literal notranslate"><span
+                                                        class="pre">eval_dataset</span></code> using seqeval</p></li>
+                                                <li><p>saves a model checkpoint</p></li>
+                                                <li><p>saves the model as best_model if model has highest scores</p>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <dl class="field-list simple">
+                                        <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                        <dd class="field-odd">
+                                            <ul class="simple">
+                                                <li><p><strong>config</strong> – An <code
+                                                        class="docutils literal notranslate"><span class="pre">argparse.Namespace</span></code>
+                                                    containing the required <code
+                                                            class="docutils literal notranslate"><span class="pre">transformers.TrainingArguments</span></code>
+                                                </p></li>
+                                                <li><p><strong>model</strong> – A transformers model instance</p></li>
+                                                <li><p><strong>train_dataset</strong> – The <code
+                                                        class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code>
+                                                    on which to train</p></li>
+                                                <li><p><strong>eval_dataset</strong> – The <code
+                                                        class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code>
+                                                    on which to evaluate the model</p></li>
+                                                <li><p><strong>tokenizer</strong> – The model’s tokenizer.</p></li>
+                                            </ul>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            </dl>
+
+                        </section>
+                    </section>
+
+                </article>
+            </div>
+            <footer>
+
+                <div class="related-pages">
+                    <a class="next-page" href="ajmc.nlp.token_classification.data_preparation.html">
+                        <div class="page-info">
+                            <div class="context">
+                                <span>Next</span>
+                            </div>
+                            <div class="title">ajmc.nlp.token_classification.data_preparation package</div>
+                        </div>
+                        <svg class="furo-related-icon">
+                            <use href="#svg-arrow-right"></use>
+                        </svg>
+                    </a>
+                    <a class="prev-page" href="ajmc.nlp.html">
+                        <svg class="furo-related-icon">
+                            <use href="#svg-arrow-right"></use>
+                        </svg>
+                        <div class="page-info">
+                            <div class="context">
+                                <span>Previous</span>
+                            </div>
+
+                            <div class="title">ajmc.nlp package</div>
+
+                        </div>
+                    </a>
+                </div>
+                <div class="bottom-of-page">
+                    <div class="left-details">
+                        <div class="copyright">
+                            Copyright &#169; 2023, Sven Najem-Meyer
+                        </div>
+                        Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link"
+                                                                                          href="https://pradyunsg.me">@pradyunsg</a>'s
+
+                        <a href="https://github.com/pradyunsg/furo">Furo</a>
+
+                    </div>
+                    <div class="right-details">
+
+                    </div>
+                </div>
+
+            </footer>
+        </div>
+        <aside class="toc-drawer">
+
+
+            <div class="toc-sticky toc-scroll">
+                <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+                </div>
+                <div class="toc-tree-container">
+                    <div class="toc-tree">
+                        <ul>
+                            <li><a class="reference internal" href="#">ajmc.nlp.token_classification package</a>
+                                <ul>
+                                    <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+                                    <li><a class="reference internal" href="#submodules">Submodules</a></li>
+                                    <li><a class="reference internal"
+                                           href="#module-ajmc.nlp.token_classification.config">ajmc.nlp.token_classification.config
+                                        module</a>
+                                        <ul>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.config.create_default_config"><code
+                                                    class="docutils literal notranslate"><span class="pre">create_default_config()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.config.parse_config_from_json"><code
+                                                    class="docutils literal notranslate"><span class="pre">parse_config_from_json()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="reference internal"
+                                           href="#module-ajmc.nlp.token_classification.evaluation">ajmc.nlp.token_classification.evaluation
+                                        module</a>
+                                        <ul>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.evaluation.evaluate_dataset"><code
+                                                    class="docutils literal notranslate"><span class="pre">evaluate_dataset()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.evaluation.evaluate_hipe"><code
+                                                    class="docutils literal notranslate"><span class="pre">evaluate_hipe()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.evaluation.evaluate_iob_files"><code
+                                                    class="docutils literal notranslate"><span class="pre">evaluate_iob_files()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.evaluation.seqeval_evaluation"><code
+                                                    class="docutils literal notranslate"><span class="pre">seqeval_evaluation()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.evaluation.seqeval_to_df"><code
+                                                    class="docutils literal notranslate"><span class="pre">seqeval_to_df()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="reference internal"
+                                           href="#module-ajmc.nlp.token_classification.model">ajmc.nlp.token_classification.model
+                                        module</a>
+                                        <ul>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.model.predict"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">predict()</span></code></a></li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.model.predict_and_write_tsv"><code
+                                                    class="docutils literal notranslate"><span class="pre">predict_and_write_tsv()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.model.predict_batches"><code
+                                                    class="docutils literal notranslate"><span class="pre">predict_batches()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.model.predict_dataset"><code
+                                                    class="docutils literal notranslate"><span class="pre">predict_dataset()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="reference internal"
+                                           href="#module-ajmc.nlp.token_classification.pipeline">ajmc.nlp.token_classification.pipeline
+                                        module</a>
+                                        <ul>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.pipeline.create_dirs"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">create_dirs()</span></code></a></li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.pipeline.main"><code
+                                                    class="docutils literal notranslate"><span class="pre">main()</span></code></a>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.pipeline.set_seed"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">set_seed()</span></code></a></li>
+                                            <li><a class="reference internal"
+                                                   href="#ajmc.nlp.token_classification.pipeline.train"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">train()</span></code></a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </aside>
+    </div>
+</div>
+<script src="_static/documentation_options.js?v=2fea6348"></script>
+<script src="_static/doctools.js?v=888ff710"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="_static/scripts/furo.js?v=32e29ea5"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
+        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+</body>
+</html>

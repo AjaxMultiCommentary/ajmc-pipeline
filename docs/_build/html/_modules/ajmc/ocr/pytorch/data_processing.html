@@ -1,0 +1,1087 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../../">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark">
+    <link rel="index" title="Index" href="../../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../../search.html"/>
+
+    <!-- Generated with Sphinx 7.2.5 and Furo 2023.08.19 -->
+    <title>ajmc.ocr.pytorch.data_processing - ajmc v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c"/>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=135e06be"/>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=36a5483c"/>
+
+
+    <style>
+        body {
+            --color-code-background: #f8f8f8;
+            --color-code-foreground: black;
+
+        }
+
+        @media not print {
+            body[data-theme="dark"] {
+                --color-code-background: #202020;
+                --color-code-foreground: #d0d0d0;
+
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body:not([data-theme="light"]) {
+                    --color-code-background: #202020;
+                    --color-code-foreground: #d0d0d0;
+
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+</script>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="svg-toc" viewBox="0 0 24 24">
+        <title>Contents</title>
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+            <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-menu" viewBox="0 0 24 24">
+        <title>Menu</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+        <title>Expand</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun" viewBox="0 0 24 24">
+        <title>Light mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-moon" viewBox="0 0 24 24">
+        <title>Dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun-half" viewBox="0 0 24 24">
+        <title>Auto light/dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M13 12h5"/>
+            <path d="M13 15h4"/>
+            <path d="M13 18h1"/>
+            <path d="M13 9h4"/>
+            <path d="M13 6h1"/>
+        </svg>
+    </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+    <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+    <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+<div class="page">
+    <header class="mobile-header">
+        <div class="header-left">
+            <label class="nav-overlay-icon" for="__navigation">
+                <div class="visually-hidden">Toggle site navigation sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-menu"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+        <div class="header-center">
+            <a href="../../../../index.html">
+                <div class="brand">ajmc v0.0.1 documentation</div>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle-container theme-toggle-header">
+                <button class="theme-toggle">
+                    <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                    <svg class="theme-icon-when-auto">
+                        <use href="#svg-sun-half"></use>
+                    </svg>
+                    <svg class="theme-icon-when-dark">
+                        <use href="#svg-moon"></use>
+                    </svg>
+                    <svg class="theme-icon-when-light">
+                        <use href="#svg-sun"></use>
+                    </svg>
+                </button>
+            </div>
+            <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+                <div class="visually-hidden">Toggle table of contents sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-toc"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+    </header>
+    <aside class="sidebar-drawer">
+        <div class="sidebar-container">
+
+            <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
+
+
+                <span class="sidebar-brand-text">ajmc v0.0.1 documentation</span>
+
+            </a>
+                <form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+                    <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+                    <input type="hidden" name="check_keywords" value="yes">
+                    <input type="hidden" name="area" value="default">
+                </form>
+                <div id="searchbox"></div>
+                <div class="sidebar-scroll">
+                    <div class="sidebar-tree">
+                        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+                        <ul>
+                            <li class="toctree-l1 has-children"><a class="reference internal"
+                                                                   href="../../../../modules.html">ajmc</a><input
+                                    class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1"
+                                    role="switch" type="checkbox"/><label for="toctree-checkbox-1">
+                                <div class="visually-hidden">Toggle navigation of ajmc</div>
+                                <i class="icon">
+                                    <svg>
+                                        <use href="#svg-arrow-right"></use>
+                                    </svg>
+                                </i></label>
+                                <ul>
+                                    <li class="toctree-l2 has-children"><a class="reference internal"
+                                                                           href="../../../../ajmc.html">ajmc package</a><input
+                                            class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2"
+                                            role="switch" type="checkbox"/><label for="toctree-checkbox-2">
+                                        <div class="visually-hidden">Toggle navigation of ajmc package</div>
+                                        <i class="icon">
+                                            <svg>
+                                                <use href="#svg-arrow-right"></use>
+                                            </svg>
+                                        </i></label>
+                                        <ul>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../../ajmc.commons.html">ajmc.commons
+                                                package</a></li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../../ajmc.corpora.html">ajmc.corpora
+                                                package</a></li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../../ajmc.nlp.html">ajmc.nlp
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-3"
+                                                                  name="toctree-checkbox-3" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-3">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.nlp package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4 has-children"><a class="reference internal"
+                                                                                           href="../../../../ajmc.nlp.token_classification.html">ajmc.nlp.token_classification
+                                                        package</a><input class="toctree-checkbox"
+                                                                          id="toctree-checkbox-4"
+                                                                          name="toctree-checkbox-4" role="switch"
+                                                                          type="checkbox"/><label
+                                                            for="toctree-checkbox-4">
+                                                        <div class="visually-hidden">Toggle navigation of
+                                                            ajmc.nlp.token_classification package
+                                                        </div>
+                                                        <i class="icon">
+                                                            <svg>
+                                                                <use href="#svg-arrow-right"></use>
+                                                            </svg>
+                                                        </i></label>
+                                                        <ul>
+                                                            <li class="toctree-l5"><a class="reference internal"
+                                                                                      href="../../../../ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation
+                                                                package</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../../ajmc.ocr.html">ajmc.ocr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-5"
+                                                                  name="toctree-checkbox-5" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-5">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.ocr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.ocr.preprocessing.html">ajmc.ocr.preprocessing
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.ocr.pytorch.html">ajmc.ocr.pytorch
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.ocr.tesseract.html">ajmc.ocr.tesseract
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../../ajmc.olr.html">ajmc.olr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-6"
+                                                                  name="toctree-checkbox-6" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-6">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.olr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.olr.layoutlm.html">ajmc.olr.layoutlm
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.olr.yolo.html">ajmc.olr.yolo
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../../ajmc.text_processing.html">ajmc.text_processing
+                                                package</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/base_functionalities.html">Basic
+                                functionalities</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/commentary_importation_pipeline.html">Commentary
+                                importation pipeline</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/data_organisation.html">Understanding
+                                the ajmc directory structure.</a></li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Contributing:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/introduction_to_code.html">Understanding
+                                the goal of the library</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/introduction_to_code.html#The-commons-directory">The
+                                commons directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/introduction_to_code.html#The-text_processing-directory">The
+                                <code class="docutils literal notranslate"><span
+                                        class="pre">text_processing</span></code> directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/contributing_guidelines.html">Contributing
+                                guidelines</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </aside>
+    <div class="main">
+        <div class="content">
+            <div class="article-container">
+                <a href="#" class="back-to-top muted-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+                    </svg>
+                    <span>Back to top</span>
+                </a>
+                <div class="content-icon-container">
+                    <div class="theme-toggle-container theme-toggle-content">
+                        <button class="theme-toggle">
+                            <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                            <svg class="theme-icon-when-auto">
+                                <use href="#svg-sun-half"></use>
+                            </svg>
+                            <svg class="theme-icon-when-dark">
+                                <use href="#svg-moon"></use>
+                            </svg>
+                            <svg class="theme-icon-when-light">
+                                <use href="#svg-sun"></use>
+                            </svg>
+                        </button>
+                    </div>
+                    <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+                        <div class="visually-hidden">Toggle table of contents sidebar</div>
+                        <i class="icon">
+                            <svg>
+                                <use href="#svg-toc"></use>
+                            </svg>
+                        </i>
+                    </label>
+                </div>
+                <article role="main">
+                    <h1>Source code for ajmc.ocr.pytorch.data_processing</h1>
+                    <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span
+                            class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.nn.utils.rnn</span> <span class="kn">import</span> <span class="n">pad_sequence</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">torchvision.io</span> <span class="kn">import</span> <span class="n">read_image</span><span
+                            class="p">,</span> <span class="n">ImageReadMode</span>
+
+<span class="kn">from</span> <span class="nn">ajmc.commons.unicode_utils</span> <span class="kn">import</span> <span
+                            class="n">harmonise_unicode</span>
+<span class="kn">from</span> <span class="nn">ajmc.ocr</span> <span class="kn">import</span> <span
+                            class="n">variables</span> <span class="k">as</span> <span class="n">ocr_vs</span>
+
+
+<div class="viewcode-block" id="OcrLine">
+<a class="viewcode-back" href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.OcrLine">[docs]</a>
+<span class="k">class</span> <span class="nc">OcrLine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A custom class for OCR lines.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        - A line corresponds both to a txt and an img if in train mode, only an image if not.</span>
+<span class="sd">        - img : the image of the line</span>
+<span class="sd">            - img_width: The width of the original image</span>
+<span class="sd">            - img_height: The height of the original image</span>
+<span class="sd">            - img_padding_length: The length of padding added for batching in the decoder</span>
+<span class="sd">        - Chunks : the chunks of the image of the line</span>
+<span class="sd">            - chunks_width: The widths of chunks</span>
+<span class="sd">            - chunks_height = img height</span>
+<span class="sd">            - chunks_count: The number of chunks</span>
+<span class="sd">            - last_chunk_padding: The length of the padding added to the last chunk.</span>
+<span class="sd">        - text : the text corresponding to the image.</span>
+<span class="sd">            - text_length: The length of the text</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Todo test this for speed</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span>
+                 <span class="n">img_path</span><span class="p">:</span> <span class="n">Path</span><span
+        class="p">,</span>
+                 <span class="n">img_height</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                 <span class="n">chunk_width</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                 <span class="n">chunk_overlap</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                 <span class="n">classes_to_indices</span><span class="p">:</span> <span class="nb">dict</span>
+                 <span class="p">):</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span
+        class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">img_tensor</span> <span class="o">=</span> <span class="n">prepare_img</span><span
+        class="p">(</span><span class="n">img_path</span><span class="p">,</span> <span class="n">img_height</span><span
+        class="o">=</span><span class="n">img_height</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_width</span> <span
+        class="o">=</span> <span class="n">img_tensor</span><span class="o">.</span><span class="n">shape</span><span
+        class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunks</span> <span class="o">=</span> <span
+        class="n">chunk_img_tensor</span><span class="p">(</span><span class="n">img_tensor</span><span
+        class="p">,</span> <span class="n">chunk_width</span><span class="p">,</span> <span
+        class="n">chunk_overlap</span><span class="p">)</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="n">img_path</span><span
+        class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">ocr_vs</span><span
+        class="o">.</span><span class="n">GT_TEXT_EXTENSION</span><span class="p">)</span><span class="o">.</span><span
+        class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span
+        class="s1">&#39;utf-8&#39;</span><span class="p">)</span>  <span class="c1"># Todo change store this ??</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span
+        class="n">harmonise_unicode</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_tensor</span> <span class="o">=</span> <span
+        class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span
+        class="n">classes_to_indices</span><span class="p">[</span><span class="n">c</span><span
+        class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span
+        class="n">text</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="OcrBatch">
+<a class="viewcode-back" href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.OcrBatch">[docs]</a>
+<span class="k">class</span> <span class="nc">OcrBatch</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">ocr_lines</span><span class="p">:</span> <span class="n">List</span><span
+        class="p">[</span><span class="n">OcrLine</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ocr_lines</span> <span
+        class="o">=</span> <span class="n">ocr_lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">img_widths</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span
+        class="p">:</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">l</span><span
+        class="o">.</span><span class="n">img_width</span> <span class="k">for</span> <span class="n">l</span> <span
+        class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocr_lines</span><span
+        class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">cat</span><span class="p">([</span><span class="n">l</span><span class="o">.</span><span class="n">chunks</span> <span
+        class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span
+        class="o">.</span><span class="n">ocr_lines</span><span class="p">],</span> <span class="n">dim</span><span
+        class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chunks_to_img_mapping</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span
+        class="nb">int</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span
+        class="n">l</span><span class="o">.</span><span class="n">chunks</span><span class="p">)</span> <span class="k">for</span> <span
+        class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span
+        class="n">ocr_lines</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">text_lengths</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span
+        class="p">:</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">l</span><span
+        class="o">.</span><span class="n">text_tensor</span><span class="o">.</span><span class="n">shape</span><span
+        class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span
+        class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span
+        class="n">ocr_lines</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">texts_tensor</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span
+        class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pad_sequence</span><span class="p">([</span><span
+        class="n">l</span><span class="o">.</span><span class="n">text_tensor</span> <span class="k">for</span> <span
+        class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span
+        class="n">ocr_lines</span><span class="p">],</span> <span class="n">batch_first</span><span
+        class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">texts</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span
+        class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span
+        class="n">text</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span
+        class="bp">self</span><span class="o">.</span><span class="n">ocr_lines</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="invert_image_tensor">
+<a class="viewcode-back" href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.invert_image_tensor">[docs]</a>
+<span class="k">def</span> <span class="nf">invert_image_tensor</span><span class="p">(</span><span class="n">image_tensor</span><span
+        class="p">):</span>
+    <span class="k">return</span> <span class="mi">255</span> <span class="o">-</span> <span
+        class="n">image_tensor</span></div>
+
+
+
+<div class="viewcode-block" id="normalize_image_tensor">
+<a class="viewcode-back"
+   href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.normalize_image_tensor">[docs]</a>
+<span class="k">def</span> <span class="nf">normalize_image_tensor</span><span class="p">(</span><span class="n">image_tensor</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span
+        class="sd">&quot;&quot;&quot;Prepares an image tensor for training.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">image_tensor</span><span class="o">.</span><span
+        class="n">float</span><span class="p">()</span> <span class="o">/</span> <span class="mi">255</span></div>
+
+
+
+<div class="viewcode-block" id="crop_image_tensor_to_nonzero">
+<a class="viewcode-back"
+   href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.crop_image_tensor_to_nonzero">[docs]</a>
+<span class="k">def</span> <span class="nf">crop_image_tensor_to_nonzero</span><span class="p">(</span><span class="n">image_tensor</span><span
+        class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Crops an image tensor of shape (1, height, width) to the smallest bounding box containing all non-zero pixels.&quot;&quot;&quot;</span>
+
+    <span class="n">non_zero</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">nonzero</span><span class="p">(</span><span class="n">image_tensor</span><span class="p">)</span>
+
+    <span class="n">xmin</span> <span class="o">=</span> <span class="n">non_zero</span><span class="p">[:,</span> <span
+        class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span
+        class="p">()</span>
+    <span class="n">xmax</span> <span class="o">=</span> <span class="n">non_zero</span><span class="p">[:,</span> <span
+        class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span
+        class="p">()</span>
+    <span class="n">ymin</span> <span class="o">=</span> <span class="n">non_zero</span><span class="p">[:,</span> <span
+        class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span
+        class="p">()</span>
+    <span class="n">ymax</span> <span class="o">=</span> <span class="n">non_zero</span><span class="p">[:,</span> <span
+        class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span
+        class="p">()</span>
+
+    <span class="k">return</span> <span class="n">image_tensor</span><span class="p">[:,</span> <span
+        class="n">xmin</span><span class="p">:</span><span class="n">xmax</span> <span class="o">+</span> <span
+        class="mi">1</span><span class="p">,</span> <span class="n">ymin</span><span class="p">:</span><span class="n">ymax</span> <span
+        class="o">+</span> <span class="mi">1</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="compute_n_chunks">
+<a class="viewcode-back" href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.compute_n_chunks">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_n_chunks</span><span class="p">(</span><span
+        class="n">img_tensor</span><span class="p">,</span>
+                     <span class="n">chunk_width</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                     <span class="n">chunk_overlap</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the number a chunks that can be extracted from an image tensor, given a chunk width and an overlap.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        We have $n * w - (n - 1) * o = W+padding$ where $n$ is the number of chunks, $w$ is the chunk width, $o$ is the overlap</span>
+<span class="sd">        and $W$ is the image width (without padding), which can be rewritten to : $n (w - o) + o = W+padding$. Therefore,</span>
+<span class="sd">        $n = (W+padding - o) / (w - o)$, and $n = (W+padding - o) // (w - o) (+ 1 if there is a remainder)$.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img_tensor: The image tensor from which to extract the chunks.</span>
+<span class="sd">        chunk_width: The width of the chunks.</span>
+<span class="sd">        chunk_overlap: The overlap between the chunks.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The number of chunks that can be extracted from the image tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">remainder</span> <span class="o">=</span> <span class="p">(</span><span
+        class="n">img_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+        class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">chunk_overlap</span><span
+        class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">chunk_width</span> <span
+        class="o">-</span> <span class="n">chunk_overlap</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">img_tensor</span><span class="o">.</span><span
+        class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span
+        class="n">chunk_overlap</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span
+        class="n">chunk_width</span> <span class="o">-</span> <span class="n">chunk_overlap</span><span
+        class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span
+        class="k">if</span> <span class="n">remainder</span> <span class="k">else</span> <span class="mi">0</span><span
+        class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_padding">
+<a class="viewcode-back" href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.compute_padding">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_padding</span><span class="p">(</span><span
+        class="n">img_tensor</span><span class="p">,</span>
+                    <span class="n">n_chunks</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                    <span class="n">chunk_width</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                    <span class="n">chunk_overlap</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the padding to apply to an image tensor to extract chunks of a given width with a given overlap.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img_tensor: The image tensor from which to extract the chunks.</span>
+<span class="sd">        n_chunks: The number of chunks to extract.</span>
+<span class="sd">        chunk_width: The width of the chunks.</span>
+<span class="sd">        chunk_overlap: The overlap between the chunks.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The padding to apply to the image tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">n_chunks</span> <span class="o">*</span> <span
+        class="n">chunk_width</span> <span class="o">-</span> <span class="p">(</span><span
+        class="n">n_chunks</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span
+        class="o">*</span> <span class="n">chunk_overlap</span> <span class="o">-</span> <span
+        class="n">img_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+        class="mi">2</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="chunk_img_tensor">
+<a class="viewcode-back" href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.chunk_img_tensor">[docs]</a>
+<span class="k">def</span> <span class="nf">chunk_img_tensor</span><span class="p">(</span><span
+        class="n">img_tensor</span><span class="p">,</span>
+                     <span class="n">chunk_width</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                     <span class="n">chunk_overlap</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chunks an image tensor of shape (1, height, width) into chunks of shape (N_chunks, height, chunk_width).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img_tensor: The image tensor to chunk, of shape (1, height, width).</span>
+<span class="sd">        chunk_width: The desired width of the chunks.</span>
+<span class="sd">        chunk_overlap: The desired overlap between the chunks.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The image tensor chunked into chunks of shape (N_chunks, 1,  height, chunk_width).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n_chunks</span> <span class="o">=</span> <span class="n">compute_n_chunks</span><span
+        class="p">(</span><span class="n">img_tensor</span><span class="p">,</span> <span
+        class="n">chunk_width</span><span class="p">,</span> <span class="n">chunk_overlap</span><span
+        class="p">)</span>
+    <span class="n">padding</span> <span class="o">=</span> <span class="n">compute_padding</span><span
+        class="p">(</span><span class="n">img_tensor</span><span class="p">,</span> <span class="n">n_chunks</span><span
+        class="p">,</span> <span class="n">chunk_width</span><span class="p">,</span> <span
+        class="n">chunk_overlap</span><span class="p">)</span>
+
+    <span class="c1"># Pad the tensor</span>
+    <span class="n">img_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span
+        class="n">pad</span><span class="p">(</span><span class="n">img_tensor</span><span class="p">,</span> <span
+        class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">padding</span><span
+        class="p">),</span> <span class="n">mode</span><span class="o">=</span><span
+        class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">value</span><span
+        class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Chunk the tensor</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+        class="p">(</span><span class="n">n_chunks</span><span class="p">):</span>
+        <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
+        class="n">img_tensor</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span> <span
+        class="o">*</span> <span class="p">(</span><span class="n">chunk_width</span> <span class="o">-</span> <span
+        class="n">chunk_overlap</span><span class="p">):</span><span class="n">i</span> <span class="o">*</span> <span
+        class="p">(</span><span class="n">chunk_width</span> <span class="o">-</span> <span
+        class="n">chunk_overlap</span><span class="p">)</span> <span class="o">+</span> <span
+        class="n">chunk_width</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span
+        class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">dim</span><span
+        class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_img">
+<a class="viewcode-back"
+   href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.prepare_img">[docs]</a>
+<span class="k">def</span> <span class="nf">prepare_img</span><span class="p">(</span><span
+        class="n">img_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+                <span class="n">img_height</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepares an image tensor for training.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img_path: The path to a grayscale image of shape (1, initial_height, initial_width).</span>
+<span class="sd">        img_height: The height to which to resize the image.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The prepared image tensor, in shape (1, img_height, resized_width).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">img_tensor</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span
+        class="nb">str</span><span class="p">(</span><span class="n">img_path</span><span class="p">),</span> <span
+        class="n">mode</span><span class="o">=</span><span class="n">ImageReadMode</span><span class="o">.</span><span
+        class="n">GRAY</span><span class="p">)</span>
+    <span class="n">img_tensor</span> <span class="o">=</span> <span class="n">invert_image_tensor</span><span
+        class="p">(</span><span class="n">img_tensor</span><span class="p">)</span>
+    <span class="n">img_tensor</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span
+        class="n">Resize</span><span class="p">(</span><span class="n">img_height</span><span class="p">,</span> <span
+        class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span><span
+        class="n">img_tensor</span><span class="p">)</span>
+    <span class="n">img_tensor</span> <span class="o">=</span> <span class="n">crop_image_tensor_to_nonzero</span><span
+        class="p">(</span><span class="n">img_tensor</span><span class="p">)</span>
+    <span class="n">img_tensor</span> <span class="o">=</span> <span class="n">normalize_image_tensor</span><span
+        class="p">(</span><span class="n">img_tensor</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">img_tensor</span></div>
+
+
+
+<div class="viewcode-block" id="recompose_chunks">
+<a class="viewcode-back" href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.recompose_chunks">[docs]</a>
+<span class="k">def</span> <span class="nf">recompose_chunks</span><span class="p">(</span><span class="n">chunks</span><span
+        class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span
+        class="p">,</span>
+                     <span class="n">chunk_overlap</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reassembles chunks of an image tensor into a single image tensor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        chunks: The chunks to reassemble, in shape (n_chunks, width, height). Note that the channels dimension is not</span>
+<span class="sd">            present, as the chunks are grayscale images. processed by the encoder.</span>
+<span class="sd">        chunk_overlap: The overlap between the chunks.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The reassembled image tensor, in shape (width, height).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># take the first chunk, remove the overlap</span>
+    <span class="n">reassembled_img</span> <span class="o">=</span> <span class="n">chunks</span><span
+        class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="nb">int</span><span
+        class="p">(</span><span class="n">chunk_overlap</span> <span class="o">/</span> <span class="mi">2</span><span
+        class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">squeeze</span><span
+        class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+        class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span
+        class="p">(</span><span class="n">chunks</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span
+        class="p">(</span><span class="n">chunks</span><span class="p">)</span> <span class="o">-</span> <span
+        class="mi">1</span><span class="p">:</span>  <span class="c1"># for the last chunk, we dont cut the end overlap as there is none</span>
+            <span class="n">reassembled_img</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">cat</span><span class="p">([</span><span class="n">reassembled_img</span><span
+        class="p">,</span> <span class="n">chunks</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span
+        class="nb">int</span><span class="p">(</span><span class="n">chunk_overlap</span> <span class="o">/</span> <span
+        class="mi">2</span><span class="p">):,</span> <span class="p">:]],</span> <span class="n">dim</span><span
+        class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># for the other chunks, we cut the begin and end overlap</span>
+            <span class="n">reassembled_img</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">cat</span><span class="p">([</span><span class="n">reassembled_img</span><span
+        class="p">,</span> <span class="n">chunks</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span
+        class="nb">int</span><span class="p">(</span><span class="n">chunk_overlap</span> <span class="o">/</span> <span
+        class="mi">2</span><span class="p">):</span><span class="o">-</span><span class="nb">int</span><span
+        class="p">(</span><span class="n">chunk_overlap</span> <span class="o">/</span> <span class="mi">2</span><span
+        class="p">),</span> <span class="p">:]],</span> <span class="n">dim</span><span class="o">=</span><span
+        class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Todo 👁️ the end of this tensor could be chunked to non-zero values to recut the introduced padding</span>
+    <span class="c1"># This will have to be done somehow, imgs offsets requires it.</span>
+    <span class="k">return</span> <span class="n">reassembled_img</span></div>
+
+
+
+<div class="viewcode-block" id="recompose_batched_chunks">
+<a class="viewcode-back"
+   href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.recompose_batched_chunks">[docs]</a>
+<span class="k">def</span> <span class="nf">recompose_batched_chunks</span><span class="p">(</span><span class="n">batched_chunks</span><span
+        class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span
+        class="p">,</span> <span class="n">mapping</span><span class="p">:</span> <span class="n">List</span><span
+        class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">chunk_overlap</span><span
+        class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span
+        class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply ``recompose_chunks`` to a batch of chunks.</span>
+
+<span class="sd">    Warning:</span>
+<span class="sd">        This function is to be applied on a processed batch of chunks, with the shape</span>
+<span class="sd">        (n_chunks, chunk_width, chunk_height [or num_classes if performed after decoder).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        batched_chunks: The batch of chunks, in shape (n_chunks, chunk_width, chunk_height [or num_classes if performed after decoder).</span>
+<span class="sd">        mapping: The mapping from the batch to the original image tensor, in shape (1). The mapping is a tensor of</span>
+<span class="sd">            integers, where each integer represents the number of chunks that were extracted from the original image</span>
+<span class="sd">            tensor. Eg : [3, 2] means that the first image tensor was chunked into 3 chunks, the second into 2 chunks.</span>
+<span class="sd">        chunk_overlap: The overlap between the chunks.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The reassembled image tensor, in shape (n_images, 1, img_height, img_width+eventual padding).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chunk_groups</span> <span class="o">=</span> <span class="n">torch</span><span
+        class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">batched_chunks</span><span
+        class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">dim</span><span
+        class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">reassembled</span> <span class="o">=</span> <span class="p">[</span><span
+        class="n">recompose_chunks</span><span class="p">(</span><span class="n">group</span><span
+        class="p">,</span> <span class="n">chunk_overlap</span><span class="p">)</span> <span class="k">for</span> <span
+        class="n">group</span> <span class="ow">in</span> <span class="n">chunk_groups</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">pad_sequence</span><span class="p">(</span><span
+        class="n">reassembled</span><span class="p">,</span> <span class="n">batch_first</span><span
+        class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="OcrIterDataset">
+<a class="viewcode-back"
+   href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.OcrIterDataset">[docs]</a>
+<span class="k">class</span> <span class="nc">OcrIterDataset</span><span class="p">(</span><span
+        class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span
+        class="n">data</span><span class="o">.</span><span class="n">IterableDataset</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span>
+                 <span class="n">data_dir</span><span class="p">:</span> <span class="n">Path</span><span
+        class="p">,</span>
+                 <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span><span
+        class="p">,</span>
+                 <span class="n">max_batch_size</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                 <span class="n">img_height</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                 <span class="n">chunk_width</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                 <span class="n">chunk_overlap</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">,</span>
+                 <span class="n">classes_to_indices</span><span class="p">:</span> <span class="n">Dict</span><span
+        class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span
+        class="p">],</span>
+                 <span class="n">indices_to_classes</span><span class="p">:</span> <span class="n">Dict</span><span
+        class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span
+        class="p">],</span>
+                 <span class="n">is_training</span><span class="p">:</span> <span class="nb">bool</span> <span
+        class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span> <span
+        class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">per_worker_steps_run</span><span class="p">:</span> <span class="nb">int</span> <span
+        class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span
+        class="o">=</span> <span class="n">data_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span
+        class="o">=</span> <span class="n">classes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_batch_size</span> <span
+        class="o">=</span> <span class="n">max_batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_height</span> <span
+        class="o">=</span> <span class="n">img_height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_width</span> <span class="o">=</span> <span
+        class="n">chunk_width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_overlap</span> <span
+        class="o">=</span> <span class="n">chunk_overlap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes_to_indices</span> <span
+        class="o">=</span> <span class="n">classes_to_indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indices_to_classes</span> <span
+        class="o">=</span> <span class="n">indices_to_classes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_paths</span> <span
+        class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span
+        class="o">.</span><span class="n">data_dir</span><span class="o">.</span><span class="n">rglob</span><span
+        class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span
+        class="n">ocr_vs</span><span class="o">.</span><span class="n">IMG_EXTENSION</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span
+        class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_paths</span><span
+        class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_training</span> <span class="o">=</span> <span
+        class="n">is_training</span>  <span class="c1"># Todo see how we handle this</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_worker_steps_run</span> <span class="o">=</span> <span
+        class="n">per_worker_steps_run</span>
+
+
+<div class="viewcode-block" id="OcrIterDataset.distribute">
+<a class="viewcode-back"
+   href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.OcrIterDataset.distribute">[docs]</a>
+    <span class="k">def</span> <span class="nf">distribute</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Distributes the datasets accross workers, see https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset&quot;&quot;&quot;</span>
+        <span class="n">worker_start</span> <span class="o">=</span> <span class="bp">self</span><span
+        class="o">.</span><span class="n">per_worker_steps_run</span>
+        <span class="n">worker_end</span> <span class="o">=</span> <span class="nb">len</span><span
+        class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_paths</span><span
+        class="p">)</span>
+
+        <span class="n">worker_info</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span
+        class="n">get_worker_info</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">worker_info</span> <span class="ow">is</span> <span
+        class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">samples_per_worker</span> <span class="o">=</span> <span class="nb">int</span><span
+        class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span
+        class="n">worker_end</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span
+        class="n">worker_info</span><span class="o">.</span><span class="n">num_workers</span><span class="p">)))</span>
+            <span class="n">worker_id</span> <span class="o">=</span> <span class="n">worker_info</span><span class="o">.</span><span
+        class="n">id</span>
+            <span class="n">worker_start</span> <span class="o">=</span> <span class="n">worker_id</span> <span
+        class="o">*</span> <span class="n">samples_per_worker</span> <span class="o">+</span> <span
+        class="bp">self</span><span class="o">.</span><span class="n">per_worker_steps_run</span>
+            <span class="n">worker_end</span> <span class="o">=</span> <span class="nb">min</span><span
+        class="p">(</span><span class="n">worker_start</span> <span class="o">+</span> <span class="n">samples_per_worker</span> <span
+        class="o">-</span> <span class="bp">self</span><span class="o">.</span><span
+        class="n">per_worker_steps_run</span><span class="p">,</span> <span class="n">worker_end</span><span
+        class="p">)</span>
+
+        <span class="k">return</span> <span class="n">worker_start</span><span class="p">,</span> <span class="n">worker_end</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_custom_iterator</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        We keep tensors in the following form:</span>
+<span class="sd">            id_bs0.pt</span>
+<span class="sd">            id_bs0.txt</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span
+        class="bp">self</span><span class="o">.</span><span class="n">distribute</span><span class="p">()</span>
+        <span class="n">next_index</span> <span class="o">=</span> <span class="n">start</span>
+
+        <span class="c1"># Create the first line</span>
+        <span class="n">ocr_line</span> <span class="o">=</span> <span class="n">OcrLine</span><span
+        class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_paths</span><span
+        class="p">[</span><span class="n">next_index</span><span class="p">],</span>
+                           <span class="n">img_height</span><span class="o">=</span><span class="bp">self</span><span
+        class="o">.</span><span class="n">img_height</span><span class="p">,</span>
+                           <span class="n">chunk_overlap</span><span class="o">=</span><span class="bp">self</span><span
+        class="o">.</span><span class="n">chunk_overlap</span><span class="p">,</span>
+                           <span class="n">chunk_width</span><span class="o">=</span><span class="bp">self</span><span
+        class="o">.</span><span class="n">chunk_width</span><span class="p">,</span>
+                           <span class="n">classes_to_indices</span><span class="o">=</span><span class="bp">self</span><span
+        class="o">.</span><span class="n">classes_to_indices</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="n">next_index</span> <span class="o">&lt;</span> <span
+        class="n">end</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">ocr_line</span><span class="o">.</span><span
+        class="n">chunks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+        class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span
+        class="o">.</span><span class="n">max_batch_size</span><span class="p">:</span>  <span class="c1"># If there are more chunks that batch_size, skip</span>
+                <span class="n">next_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">next_index</span> <span class="o">&lt;</span> <span class="n">end</span><span
+        class="p">:</span>
+                    <span class="n">ocr_line</span> <span class="o">=</span> <span class="n">OcrLine</span><span
+        class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_paths</span><span
+        class="p">[</span><span class="n">next_index</span><span class="p">],</span>
+                                       <span class="n">img_height</span><span class="o">=</span><span
+        class="bp">self</span><span class="o">.</span><span class="n">img_height</span><span class="p">,</span>
+                                       <span class="n">chunk_overlap</span><span class="o">=</span><span
+        class="bp">self</span><span class="o">.</span><span class="n">chunk_overlap</span><span class="p">,</span>
+                                       <span class="n">chunk_width</span><span class="o">=</span><span
+        class="bp">self</span><span class="o">.</span><span class="n">chunk_width</span><span class="p">,</span>
+                                       <span class="n">classes_to_indices</span><span class="o">=</span><span
+        class="bp">self</span><span class="o">.</span><span class="n">classes_to_indices</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+            <span class="n">chunks_count</span><span class="p">:</span> <span class="nb">int</span> <span
+        class="o">=</span> <span class="n">ocr_line</span><span class="o">.</span><span class="n">chunks</span><span
+        class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+        class="p">]</span>
+            <span class="n">ocr_lines</span> <span class="o">=</span> <span class="p">[</span><span
+        class="n">ocr_line</span><span class="p">]</span>
+            <span class="n">next_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># we get the number of chunks (=shape[0]) in the next tensor</span>
+
+            <span class="k">while</span> <span class="n">next_index</span> <span class="o">&lt;</span> <span class="n">end</span><span
+        class="p">:</span>
+                <span class="n">ocr_line</span> <span class="o">=</span> <span class="n">OcrLine</span><span
+        class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_paths</span><span
+        class="p">[</span><span class="n">next_index</span><span class="p">],</span>
+                                   <span class="n">img_height</span><span class="o">=</span><span class="bp">self</span><span
+        class="o">.</span><span class="n">img_height</span><span class="p">,</span>
+                                   <span class="n">chunk_overlap</span><span class="o">=</span><span
+        class="bp">self</span><span class="o">.</span><span class="n">chunk_overlap</span><span class="p">,</span>
+                                   <span class="n">chunk_width</span><span class="o">=</span><span
+        class="bp">self</span><span class="o">.</span><span class="n">chunk_width</span><span class="p">,</span>
+                                   <span class="n">classes_to_indices</span><span class="o">=</span><span class="bp">self</span><span
+        class="o">.</span><span class="n">classes_to_indices</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ocr_line</span><span class="o">.</span><span
+        class="n">chunks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+        class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">chunks_count</span> <span
+        class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span
+        class="n">max_batch_size</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ocr_lines</span><span class="o">.</span><span class="n">append</span><span
+        class="p">(</span><span class="n">ocr_line</span><span class="p">)</span>
+                    <span class="n">chunks_count</span> <span class="o">+=</span> <span class="n">ocr_line</span><span
+        class="o">.</span><span class="n">chunks</span><span class="o">.</span><span class="n">shape</span><span
+        class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">next_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">yield</span> <span class="n">OcrBatch</span><span class="p">(</span><span class="n">ocr_lines</span><span
+        class="p">)</span>  <span class="c1"># Will this have to be converted to tuple ?</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_custom_iterator</span><span
+        class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="get_custom_dataloader">
+<a class="viewcode-back"
+   href="../../../../ajmc.ocr.pytorch.html#ajmc.ocr.pytorch.data_processing.get_custom_dataloader">[docs]</a>
+<span class="k">def</span> <span class="nf">get_custom_dataloader</span><span class="p">(</span><span class="n">train_dataset</span><span
+        class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span
+        class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span
+        class="p">,</span>
+                          <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span
+        class="n">DataLoader</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span
+        class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span
+        class="p">(</span><span class="n">train_dataset</span><span class="p">,</span>
+                                       <span class="n">batch_size</span><span class="o">=</span><span
+        class="kc">None</span><span class="p">,</span>
+                                       <span class="n">batch_sampler</span><span class="o">=</span><span
+        class="kc">None</span><span class="p">,</span>
+                                       <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span
+        class="p">,</span>
+                                       <span class="n">collate_fn</span><span class="o">=</span><span
+        class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span
+        class="p">,</span> <span class="p">)</span></div>
+
+</pre>
+                    </div>
+                </article>
+            </div>
+            <footer>
+
+                <div class="related-pages">
+
+
+                </div>
+                <div class="bottom-of-page">
+                    <div class="left-details">
+                        <div class="copyright">
+                            Copyright &#169; 2023, Sven Najem-Meyer
+                        </div>
+                        Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link"
+                                                                                          href="https://pradyunsg.me">@pradyunsg</a>'s
+
+                        <a href="https://github.com/pradyunsg/furo">Furo</a>
+
+                    </div>
+                    <div class="right-details">
+
+                    </div>
+                </div>
+
+            </footer>
+        </div>
+        <aside class="toc-drawer no-toc">
+
+
+        </aside>
+    </div>
+</div>
+<script src="../../../../_static/documentation_options.js?v=2fea6348"></script>
+<script src="../../../../_static/doctools.js?v=888ff710"></script>
+<script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../../../../_static/scripts/furo.js?v=32e29ea5"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
+        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+</body>
+</html>

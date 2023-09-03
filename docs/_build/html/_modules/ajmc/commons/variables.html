@@ -1,0 +1,1221 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark">
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+
+    <!-- Generated with Sphinx 7.2.5 and Furo 2023.08.19 -->
+    <title>ajmc.commons.variables - ajmc v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c"/>
+
+
+    <style>
+        body {
+            --color-code-background: #f8f8f8;
+            --color-code-foreground: black;
+
+        }
+
+        @media not print {
+            body[data-theme="dark"] {
+                --color-code-background: #202020;
+                --color-code-foreground: #d0d0d0;
+
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body:not([data-theme="light"]) {
+                    --color-code-background: #202020;
+                    --color-code-foreground: #d0d0d0;
+
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+</script>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="svg-toc" viewBox="0 0 24 24">
+        <title>Contents</title>
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+            <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-menu" viewBox="0 0 24 24">
+        <title>Menu</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+        <title>Expand</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun" viewBox="0 0 24 24">
+        <title>Light mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-moon" viewBox="0 0 24 24">
+        <title>Dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun-half" viewBox="0 0 24 24">
+        <title>Auto light/dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M13 12h5"/>
+            <path d="M13 15h4"/>
+            <path d="M13 18h1"/>
+            <path d="M13 9h4"/>
+            <path d="M13 6h1"/>
+        </svg>
+    </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+    <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+    <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+<div class="page">
+    <header class="mobile-header">
+        <div class="header-left">
+            <label class="nav-overlay-icon" for="__navigation">
+                <div class="visually-hidden">Toggle site navigation sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-menu"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+        <div class="header-center">
+            <a href="../../../index.html">
+                <div class="brand">ajmc v0.0.1 documentation</div>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle-container theme-toggle-header">
+                <button class="theme-toggle">
+                    <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                    <svg class="theme-icon-when-auto">
+                        <use href="#svg-sun-half"></use>
+                    </svg>
+                    <svg class="theme-icon-when-dark">
+                        <use href="#svg-moon"></use>
+                    </svg>
+                    <svg class="theme-icon-when-light">
+                        <use href="#svg-sun"></use>
+                    </svg>
+                </button>
+            </div>
+            <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+                <div class="visually-hidden">Toggle table of contents sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-toc"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+    </header>
+    <aside class="sidebar-drawer">
+        <div class="sidebar-container">
+
+            <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+
+
+                <span class="sidebar-brand-text">ajmc v0.0.1 documentation</span>
+
+            </a>
+                <form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+                    <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+                    <input type="hidden" name="check_keywords" value="yes">
+                    <input type="hidden" name="area" value="default">
+                </form>
+                <div id="searchbox"></div>
+                <div class="sidebar-scroll">
+                    <div class="sidebar-tree">
+                        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+                        <ul>
+                            <li class="toctree-l1 has-children"><a class="reference internal"
+                                                                   href="../../../modules.html">ajmc</a><input
+                                    class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1"
+                                    role="switch" type="checkbox"/><label for="toctree-checkbox-1">
+                                <div class="visually-hidden">Toggle navigation of ajmc</div>
+                                <i class="icon">
+                                    <svg>
+                                        <use href="#svg-arrow-right"></use>
+                                    </svg>
+                                </i></label>
+                                <ul>
+                                    <li class="toctree-l2 has-children"><a class="reference internal"
+                                                                           href="../../../ajmc.html">ajmc
+                                        package</a><input class="toctree-checkbox" id="toctree-checkbox-2"
+                                                          name="toctree-checkbox-2" role="switch"
+                                                          type="checkbox"/><label for="toctree-checkbox-2">
+                                        <div class="visually-hidden">Toggle navigation of ajmc package</div>
+                                        <i class="icon">
+                                            <svg>
+                                                <use href="#svg-arrow-right"></use>
+                                            </svg>
+                                        </i></label>
+                                        <ul>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../ajmc.commons.html">ajmc.commons
+                                                package</a></li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../ajmc.corpora.html">ajmc.corpora
+                                                package</a></li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../ajmc.nlp.html">ajmc.nlp
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-3"
+                                                                  name="toctree-checkbox-3" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-3">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.nlp package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4 has-children"><a class="reference internal"
+                                                                                           href="../../../ajmc.nlp.token_classification.html">ajmc.nlp.token_classification
+                                                        package</a><input class="toctree-checkbox"
+                                                                          id="toctree-checkbox-4"
+                                                                          name="toctree-checkbox-4" role="switch"
+                                                                          type="checkbox"/><label
+                                                            for="toctree-checkbox-4">
+                                                        <div class="visually-hidden">Toggle navigation of
+                                                            ajmc.nlp.token_classification package
+                                                        </div>
+                                                        <i class="icon">
+                                                            <svg>
+                                                                <use href="#svg-arrow-right"></use>
+                                                            </svg>
+                                                        </i></label>
+                                                        <ul>
+                                                            <li class="toctree-l5"><a class="reference internal"
+                                                                                      href="../../../ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation
+                                                                package</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../ajmc.ocr.html">ajmc.ocr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-5"
+                                                                  name="toctree-checkbox-5" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-5">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.ocr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.ocr.preprocessing.html">ajmc.ocr.preprocessing
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.ocr.pytorch.html">ajmc.ocr.pytorch
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.ocr.tesseract.html">ajmc.ocr.tesseract
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../ajmc.olr.html">ajmc.olr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-6"
+                                                                  name="toctree-checkbox-6" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-6">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.olr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.olr.layoutlm.html">ajmc.olr.layoutlm
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.olr.yolo.html">ajmc.olr.yolo
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../ajmc.text_processing.html">ajmc.text_processing
+                                                package</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/base_functionalities.html">Basic
+                                functionalities</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/commentary_importation_pipeline.html">Commentary
+                                importation pipeline</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/data_organisation.html">Understanding
+                                the ajmc directory structure.</a></li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Contributing:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/introduction_to_code.html">Understanding
+                                the goal of the library</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/introduction_to_code.html#The-commons-directory">The
+                                commons directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/introduction_to_code.html#The-text_processing-directory">The
+                                <code class="docutils literal notranslate"><span
+                                        class="pre">text_processing</span></code> directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/contributing_guidelines.html">Contributing
+                                guidelines</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </aside>
+    <div class="main">
+        <div class="content">
+            <div class="article-container">
+                <a href="#" class="back-to-top muted-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+                    </svg>
+                    <span>Back to top</span>
+                </a>
+                <div class="content-icon-container">
+                    <div class="theme-toggle-container theme-toggle-content">
+                        <button class="theme-toggle">
+                            <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                            <svg class="theme-icon-when-auto">
+                                <use href="#svg-sun-half"></use>
+                            </svg>
+                            <svg class="theme-icon-when-dark">
+                                <use href="#svg-moon"></use>
+                            </svg>
+                            <svg class="theme-icon-when-light">
+                                <use href="#svg-sun"></use>
+                            </svg>
+                        </button>
+                    </div>
+                    <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+                        <div class="visually-hidden">Toggle table of contents sidebar</div>
+                        <i class="icon">
+                            <svg>
+                                <use href="#svg-toc"></use>
+                            </svg>
+                        </i>
+                    </label>
+                </div>
+                <article role="main">
+                    <h1>Source code for ajmc.commons.variables</h1>
+                    <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span
+                            class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span
+                            class="p">,</span> <span class="n">Type</span>
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                                 TYPES</span>
+<span class="c1"># ======================================================================================================================</span>
+<span class="n">BoxType</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span
+                            class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span
+                            class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Tuple</span><span
+                            class="p">[</span><span class="nb">int</span><span class="p">,</span> <span
+                            class="nb">int</span><span class="p">]]</span>
+<span class="n">PageType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span
+                            class="n">Type</span><span class="p">[</span><span class="s1">&#39;Page&#39;</span><span
+                            class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="s1">&#39;CanonicalPage&#39;</span><span
+                            class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="s1">&#39;OcrPage&#39;</span><span
+                            class="p">]]</span>
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                                 PATHS</span>
+<span class="c1"># ======================================================================================================================</span>
+
+<span class="c1"># PACKAGE-RELATIVE PATHS</span>
+<span class="n">PACKAGE_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span
+                            class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span
+                            class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+<span class="n">SCHEMA_PATH</span> <span class="o">=</span> <span class="n">PACKAGE_DIR</span> <span class="o">/</span> <span
+                            class="s1">&#39;ajmc/data/templates/page.schema.json&#39;</span>
+<span class="n">TYPESYSTEM_PATH</span> <span class="o">=</span> <span class="n">PACKAGE_DIR</span> <span
+                            class="o">/</span> <span class="s1">&#39;ajmc/data/templates/TypeSystem.xml&#39;</span>
+
+<span class="c1"># AJMC DATA DIR AND STRUCTURE</span>
+<span class="n">EXEC_ENV</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span
+                            class="n">uname</span><span class="p">()</span><span class="o">.</span><span
+                            class="n">node</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span
+                            class="s1">&#39;AJMC_GDRIVE_BASE_DIR&#39;</span><span class="p">):</span>
+    <span class="n">DRIVE_BASE_DIR</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="n">os</span><span class="o">.</span><span
+                            class="n">getenv</span><span class="p">(</span><span class="s1">&#39;AJMC_GDRIVE_BASE_DIR&#39;</span><span
+                            class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">DRIVE_BASE_DIR</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;WARNING: Unknown execution environment!</span>
+<span class="s2">    Please enter the drive base directory below (e.g. ``/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/``):</span>
+<span class="s2">    (Note: you can change this permanently by adding ``export AJMC_GDRIVE_BASE_DIR=&quot;/your/drive/base/dir&quot;`` </span>
+<span class="s2">    in your .bashrc.&quot;&quot;&quot;</span><span class="p">))</span>
+
+<span class="n">DRIVE_DATA_DIR</span> <span class="o">=</span> <span class="n">DRIVE_BASE_DIR</span> <span
+                            class="o">/</span> <span class="s1">&#39;data&#39;</span>
+<span class="n">COMMS_DATA_DIR</span> <span class="o">=</span> <span class="n">DRIVE_DATA_DIR</span> <span
+                            class="o">/</span> <span class="s1">&#39;commentaries/commentaries_data&#39;</span>
+<span class="n">NE_CORPUS_DIR</span> <span class="o">=</span> <span class="n">DRIVE_DATA_DIR</span> <span
+                            class="o">/</span> <span class="s1">&#39;AjMC-NE-corpus&#39;</span>
+
+<span class="c1"># RELATIVE PATHS</span>
+<span class="n">COMM_IMG_REL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="s1">&#39;images/png&#39;</span><span class="p">)</span>
+<span class="n">COMM_OCR_RUNS_REL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="s1">&#39;ocr/runs&#39;</span><span class="p">)</span>
+<span class="n">COMM_OCR_GT_REL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="s1">&#39;ocr/groundtruth&#39;</span><span class="p">)</span>
+<span class="n">COMM_OCR_GT_PAIRS_REL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="s1">&#39;ocr/gt_file_pairs&#39;</span><span
+                            class="p">)</span>
+<span class="n">COMM_VIA_REL_PATH</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="s1">&#39;olr/via_project.json&#39;</span><span
+                            class="p">)</span>
+<span class="n">COMM_CANONICAL_REL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="s1">&#39;canonical&#39;</span><span class="p">)</span>
+<span class="n">COMM_SECTIONS_REL_PATH</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="s1">&#39;sections.json&#39;</span><span class="p">)</span>
+<span class="n">COMM_NER_ANN_REL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span
+                            class="s1">&#39;ner/annotation&#39;</span><span class="p">)</span>
+<span class="n">COMM_LEMLINK_ANN_REL_DIR</span> <span class="o">=</span> <span class="n">Path</span><span
+                            class="p">(</span><span class="s1">&#39;lemlink/annotation&#39;</span><span
+                            class="p">)</span>
+
+
+<div class="viewcode-block" id="get_comm_base_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_base_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_base_dir</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">COMMS_DATA_DIR</span> <span class="o">/</span> <span
+        class="n">comm_id</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_ocr_gt_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_ocr_gt_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_ocr_gt_dir</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_OCR_GT_REL_DIR</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_img_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_img_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_img_dir</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_IMG_REL_DIR</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_via_path">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_via_path">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_via_path</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_VIA_REL_PATH</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_ocr_runs_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_ocr_runs_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_ocr_runs_dir</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_OCR_RUNS_REL_DIR</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_ocr_outputs_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_ocr_outputs_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_ocr_outputs_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ocr_run_id</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span
+        class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_ocr_runs_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">ocr_run_id</span> <span class="o">/</span> <span
+        class="s1">&#39;outputs&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_ocr_gt_pairs_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_ocr_gt_pairs_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_ocr_gt_pairs_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span
+        class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_OCR_GT_PAIRS_REL_DIR</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_ner_jsons_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_ner_jsons_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_ner_jsons_dir</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span
+        class="n">ocr_run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_NER_ANN_REL_DIR</span> <span class="o">/</span> <span
+        class="n">ocr_run_id</span> <span class="o">/</span> <span class="s1">&#39;jsons&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_ner_xmis_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_ner_xmis_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_ner_xmis_dir</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span
+        class="n">ocr_run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_NER_ANN_REL_DIR</span> <span class="o">/</span> <span
+        class="n">ocr_run_id</span> <span class="o">/</span> <span class="s1">&#39;xmis&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_lemlink_jsons_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_lemlink_jsons_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_lemlink_jsons_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ocr_run_id</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span
+        class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_LEMLINK_ANN_REL_DIR</span> <span
+        class="o">/</span> <span class="n">ocr_run_id</span> <span class="o">/</span> <span
+        class="s1">&#39;jsons&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_lemlink_xmis_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_lemlink_xmis_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_lemlink_xmis_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ocr_run_id</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span
+        class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_LEMLINK_ANN_REL_DIR</span> <span
+        class="o">/</span> <span class="n">ocr_run_id</span> <span class="o">/</span> <span
+        class="s1">&#39;xmis&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_canonical_dir">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_canonical_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_canonical_dir</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_CANONICAL_REL_DIR</span></div>
+
+
+<div class="viewcode-block" id="get_comm_canonical_path_from_pattern">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_canonical_path_from_pattern">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_canonical_path_from_pattern</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span
+        class="n">ocr_run_pattern</span><span class="p">:</span> <span class="nb">str</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="n">canonical_dir</span> <span class="o">=</span> <span class="n">get_comm_canonical_dir</span><span
+        class="p">(</span><span class="n">comm_id</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span
+        class="n">canonical_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span
+        class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+        class="n">ocr_run_pattern</span><span class="si">}</span><span class="s1">.json&#39;</span><span
+        class="p">))</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span
+        class="sa">f</span><span class="s1">&#39;No canonical file found for comm_id=</span><span
+        class="si">{</span><span class="n">comm_id</span><span class="si">}</span><span
+        class="s1"> and ocr_run_pattern=</span><span class="si">{</span><span class="n">ocr_run_pattern</span><span
+        class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_canonical_default_path">
+<a class="viewcode-back"
+   href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_canonical_default_path">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_canonical_default_path</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span
+        class="n">ocr_run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_canonical_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span
+        class="si">{</span><span class="n">ocr_run_id</span><span class="si">}</span><span class="s1">.json&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="get_comm_sections_path">
+<a class="viewcode-back" href="../../../ajmc.commons.html#ajmc.commons.variables.get_comm_sections_path">[docs]</a>
+<span class="k">def</span> <span class="nf">get_comm_sections_path</span><span class="p">(</span><span
+        class="n">comm_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_comm_base_dir</span><span class="p">(</span><span class="n">comm_id</span><span
+        class="p">)</span> <span class="o">/</span> <span class="n">COMM_SECTIONS_REL_PATH</span></div>
+
+
+
+<span class="c1"># Sheet names corresponds to the dictionary&#39;s keys</span>
+<span class="n">SPREADSHEETS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="s1">&#39;1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;olr_gt&#39;</span><span class="p">:</span> <span class="s1">&#39;1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;ocr_gt&#39;</span><span class="p">:</span> <span class="s1">&#39;1RsJQTgM4oO-ds0cK3rstx-iBxsvxjwCSVRWS63NvQrQ&#39;</span>
+<span class="p">}</span>
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                                 FORMATS AND EXTENSIONS</span>
+<span class="c1"># ======================================================================================================================</span>
+
+<span class="n">OCR_OUTPUT_EXTENSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.xml&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;.hocr&#39;</span><span class="p">,</span> <span
+                            class="s1">&#39;.html&#39;</span><span class="p">]</span>
+
+<span class="n">DEFAULT_IMG_EXTENSION</span> <span class="o">=</span> <span class="s1">&#39;.png&#39;</span>
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                                 COMMENTARIES</span>
+<span class="c1"># ======================================================================================================================</span>
+
+<span class="n">ALL_COMM_IDS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Colonna1975&#39;</span><span
+                            class="p">,</span>
+                <span class="s1">&#39;DeRomilly1976&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Ferrari1974&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Finglass2011&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Garvie1998&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Hermann1851&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Kamerbeek1953&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Paduano1982&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;SchneidewinNauckRadermacher1913&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Stanford1963&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Untersteiner1934&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Wecklein1894&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;annalsoftacitusp00taci&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bsb10234118&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cu31924087948174&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lestragdiesdeso00tourgoog&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pvergiliusmaroa00virggoog&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;sophoclesplaysa05campgoog&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;sophokle1v3soph&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;thukydides02thuc&#39;</span><span class="p">]</span>
+
+<span class="n">EXTERNAL_COMM_IDS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;thukydides02thuc&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;pvergiliusmaroa00virggoog&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;annalsoftacitusp00taci&#39;</span><span
+                            class="p">]</span>
+
+<span class="n">PD_COMM_IDS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bsb10234118&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;cu31924087948174&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;sophoclesplaysa05campgoog&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;sophokle1v3soph&#39;</span><span class="p">,</span> <span
+                            class="s1">&#39;Wecklein1894&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;SchneidewinNauckRadermacher1913&#39;</span><span class="p">]</span>
+
+<span class="n">SAMPLE_PAGES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bsb10234118_0096&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;sophokle1v3soph_0126&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;cu31924087948174_0063&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;cu31924087948174_0063&#39;</span><span
+                            class="p">,</span>
+                <span class="s1">&#39;Wecklein1894_0087&#39;</span><span class="p">]</span>
+
+<span class="n">COMM_IDS_TO_LANG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Colonna1975&#39;</span><span class="p">:</span> <span class="s1">&#39;ita&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;DeRomilly1976&#39;</span><span class="p">:</span> <span class="s1">&#39;fra&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;Ferrari1974&#39;</span><span class="p">:</span> <span class="s1">&#39;ita&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;Finglass2011&#39;</span><span class="p">:</span> <span class="s1">&#39;eng&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;Garvie1998&#39;</span><span class="p">:</span> <span class="s1">&#39;eng&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;Hermann1851&#39;</span><span class="p">:</span> <span class="s1">&#39;lat&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;Kamerbeek1953&#39;</span><span class="p">:</span> <span class="s1">&#39;eng&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;Paduano1982&#39;</span><span class="p">:</span> <span class="s1">&#39;ita&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;SchneidewinNauckRadermacher1913&#39;</span><span class="p">:</span> <span class="s1">&#39;deu&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;Stanford1963&#39;</span><span class="p">:</span> <span class="s1">&#39;eng&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;Untersteiner1934&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;ita&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Wecklein1894&#39;</span><span class="p">:</span> <span class="s1">&#39;deu&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;annalsoftacitusp00taci&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;eng&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;bsb10234118&#39;</span><span class="p">:</span> <span class="s1">&#39;deu&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;cu31924087948174&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;eng&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;lestragdiesdeso00tourgoog&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;fra&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pvergiliusmaroa00virggoog&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;deu&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophoclesplaysa05campgoog&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;eng&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophokle1v3soph&#39;</span><span class="p">:</span> <span class="s1">&#39;deu&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;thukydides02thuc&#39;</span><span class="p">:</span> <span class="s1">&#39;deu&#39;</span>
+<span class="p">}</span>
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                                 LAYOUT</span>
+<span class="c1"># ======================================================================================================================</span>
+
+<span class="n">ORDERED_OLR_REGION_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;commentary&#39;</span><span
+                            class="p">,</span>
+                            <span class="s1">&#39;primary_text&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;preface&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;translation&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;introduction&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;line_number_text&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;line_number_commentary&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;page_number&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;appendix&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;app_crit&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;bibliography&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;footnote&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;running_header&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;table_of_contents&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;title&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;printed_marginalia&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;handwritten_marginalia&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;other&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;undefined&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;line_region&#39;</span><span class="p">,</span>  <span class="c1"># added only to make sure every word has a region</span>
+                            <span class="p">]</span>
+
+<span class="n">EXCLUDED_REGION_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;line_number_commentary&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;handwritten_marginalia&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;undefined&#39;</span><span class="p">,</span> <span
+                            class="s1">&#39;line_region&#39;</span><span class="p">]</span>
+<span class="n">ROIS</span> <span class="o">=</span> <span class="p">[</span><span class="n">rt</span> <span class="k">for</span> <span
+                            class="n">rt</span> <span class="ow">in</span> <span
+                            class="n">ORDERED_OLR_REGION_TYPES</span> <span class="k">if</span> <span
+                            class="n">rt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">EXCLUDED_REGION_TYPES</span><span
+                            class="p">]</span>
+
+<span class="n">REGION_TYPES_TO_COARSE_LABELS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Commentary</span>
+    <span class="s1">&#39;commentary&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;commentary&#39;</span><span class="p">,</span>
+    <span class="c1"># Primary text</span>
+    <span class="s1">&#39;primary_text&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;primary_text&#39;</span><span class="p">,</span>
+    <span class="c1"># Footnotes</span>
+    <span class="s1">&#39;footnote&#39;</span><span class="p">:</span> <span class="s1">&#39;footnote&#39;</span><span
+                            class="p">,</span>
+    <span class="c1"># Running header</span>
+    <span class="s1">&#39;running_header&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;running_header&#39;</span><span class="p">,</span>
+    <span class="c1"># Paratext</span>
+    <span class="s1">&#39;preface&#39;</span><span class="p">:</span> <span class="s1">&#39;paratext&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;introduction&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;paratext&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;appendix&#39;</span><span class="p">:</span> <span class="s1">&#39;paratext&#39;</span><span
+                            class="p">,</span>
+    <span class="c1"># Numbers</span>
+    <span class="s1">&#39;line_number_text&#39;</span><span class="p">:</span> <span class="s1">&#39;numbers&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;line_number_commentary&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;numbers&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;page_number&#39;</span><span class="p">:</span> <span class="s1">&#39;numbers&#39;</span><span
+                            class="p">,</span>
+    <span class="c1"># App Crit</span>
+    <span class="s1">&#39;app_crit&#39;</span><span class="p">:</span> <span class="s1">&#39;app_crit&#39;</span><span
+                            class="p">,</span>
+    <span class="c1"># Others</span>
+    <span class="s1">&#39;translation&#39;</span><span class="p">:</span> <span class="s1">&#39;others&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;bibliography&#39;</span><span class="p">:</span> <span class="s1">&#39;others&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="s1">&#39;others&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;table_of_contents&#39;</span><span class="p">:</span> <span class="s1">&#39;others&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;others&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;printed_marginalia&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;others&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;handwritten_marginalia&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;others&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;other&#39;</span><span class="p">:</span> <span class="s1">&#39;others&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;undefined&#39;</span><span class="p">:</span> <span class="s1">&#39;others&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;line_region&#39;</span><span class="p">:</span> <span class="s1">&#39;others&#39;</span>
+<span class="p">}</span>
+
+<span class="n">REGION_TYPES_TO_FINE_LABELS</span> <span class="o">=</span> <span class="p">{</span><span
+                            class="n">k</span><span class="p">:</span> <span class="n">k</span> <span
+                            class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">REGION_TYPES_TO_COARSE_LABELS</span><span
+                            class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+<span class="n">VIA_CSV_DICT_TEMPLATE</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span
+                            class="p">:</span> <span class="p">[],</span>
+                         <span class="s1">&#39;file_size&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                         <span class="s1">&#39;file_attributes&#39;</span><span class="p">:</span> <span
+                            class="p">[],</span>
+                         <span class="s1">&#39;region_count&#39;</span><span class="p">:</span> <span
+                            class="p">[],</span>
+                         <span class="s1">&#39;region_id&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                         <span class="s1">&#39;region_shape_attributes&#39;</span><span class="p">:</span> <span
+                            class="p">[],</span>
+                         <span class="s1">&#39;region_attributes&#39;</span><span class="p">:</span> <span
+                            class="p">[]}</span>
+
+<span class="n">REGION_TYPES_TO_SEGMONTO</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;commentary&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;MainZone:commentary&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;primary_text&#39;</span><span class="p">:</span> <span class="s1">&#39;MainZone:primaryText&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;preface&#39;</span><span class="p">:</span> <span class="s1">&#39;MainZone:preface&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;translation&#39;</span><span class="p">:</span> <span class="s1">&#39;MainZone:translation&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;introduction&#39;</span><span class="p">:</span> <span class="s1">&#39;MainZone:introduction&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;line_number_text&#39;</span><span class="p">:</span> <span class="s1">&#39;NumberingZone:textNumber&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;line_number_commentary&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;page_number&#39;</span><span class="p">:</span> <span class="s1">&#39;NumberingZone:pageNumber&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;appendix&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;MainZone:appendix&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;app_crit&#39;</span><span class="p">:</span> <span class="s1">&#39;MarginTextZone:criticalApparatus&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;bibliography&#39;</span><span class="p">:</span> <span class="s1">&#39;MainZone:bibliography&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;footnote&#39;</span><span class="p">:</span> <span class="s1">&#39;MarginTextZone:footnote&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;MainZone:index&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;running_header&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;RunningTitleZone&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;table_of_contents&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;MainZone:ToC&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;TitlePageZone&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;printed_marginalia&#39;</span><span class="p">:</span> <span class="s1">&#39;MarginTextZone:printedNote&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;handwritten_marginalia&#39;</span><span class="p">:</span> <span class="s1">&#39;MarginTextZone:handwrittenNote&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;other&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;CustomZone:other&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;undefined&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;CustomZone:undefined&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;line_region&#39;</span><span class="p">:</span> <span class="s1">&#39;CustomZone:line_region&#39;</span>
+<span class="p">}</span>
+
+<span class="n">SEGMONTO_TO_VALUE_IDS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;MainZone:commentary&#39;</span><span class="p">:</span> <span class="s1">&#39;BT01&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;MainZone:primaryText&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT02&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MainZone:preface&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT03&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MainZone:translation&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT04&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MainZone:introduction&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT05&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;NumberingZone:textNumber&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT06&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;NumberingZone:pageNumber&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT07&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MainZone:appendix&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT08&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MarginTextZone:criticalApparatus&#39;</span><span class="p">:</span> <span class="s1">&#39;BT09&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;MainZone:bibliography&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT10&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MarginTextZone:footnote&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT11&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MainZone:index&#39;</span><span class="p">:</span> <span class="s1">&#39;BT12&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;RunningTitleZone&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT13&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MainZone:ToC&#39;</span><span class="p">:</span> <span class="s1">&#39;BT14&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;TitlePageZone&#39;</span><span class="p">:</span> <span class="s1">&#39;BT15&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;MarginTextZone:printedNote&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT16&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MarginTextZone:handwrittenNote&#39;</span><span class="p">:</span> <span class="s1">&#39;BT17&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;CustomZone:other&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT18&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CustomZone:undefined&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT19&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CustomZone:line_region&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT20&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CustomZone:weird&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;BT21&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                                 TEXT CONTAINERS</span>
+<span class="c1"># ======================================================================================================================</span>
+
+<span class="n">TEXTCONTAINER_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;commentary&#39;</span><span
+                            class="p">,</span>
+                       <span class="s1">&#39;section&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;page&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;region&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;sentence&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;line&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;hyphenation&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;entity&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;word&#39;</span><span class="p">]</span>
+
+<span class="n">TC_TYPES_TO_CHILD_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span
+                            class="p">:</span> <span class="n">t</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span> <span
+                            class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span
+                            class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;y&#39;</span> <span
+                            class="k">else</span> <span class="n">t</span><span class="p">[:</span><span
+                            class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span
+                            class="s1">&#39;ies&#39;</span> <span class="k">for</span> <span class="n">t</span> <span
+                            class="ow">in</span> <span class="n">TEXTCONTAINER_TYPES</span><span class="p">}</span>
+
+<span class="n">CHILD_TYPES</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span
+                            class="n">TC_TYPES_TO_CHILD_TYPES</span><span class="o">.</span><span
+                            class="n">values</span><span class="p">())</span>
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                                 ANNOTATIONS</span>
+<span class="c1"># ======================================================================================================================</span>
+
+<span class="n">MINIREF_PAGES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;cu31924087948174_0035&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cu31924087948174_0063&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophoclesplaysa05campgoog_0014&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophoclesplaysa05campgoog_0146&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophoclesplaysa05campgoog_0288&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Wecklein1894_0007&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Wecklein1894_0016&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Wecklein1894_0080&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Wecklein1894_0087&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophokle1v3soph_0017&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophokle1v3soph_0049&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophokle1v3soph_0085&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophokle1v3soph_0125&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">LINKAGE_MINIREF_PAGES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;annalsoftacitusp00taci_0210&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;annalsoftacitusp00taci_0211&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;bsb10234118_0090&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;bsb10234118_0115&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cu31924087948174_0063&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cu31924087948174_0152&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;DeRomilly1976_0032&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;DeRomilly1976_0088&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Ferrari1974_0050&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Ferrari1974_0115&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Garvie1998_0224&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Garvie1998_0257&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Kamerbeek1953_0098&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Kamerbeek1953_0099&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;lestragdiesdeso00tourgoog_0113&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;lestragdiesdeso00tourgoog_0120&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Paduano1982_0195&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Paduano1982_0214&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pvergiliusmaroa00virggoog_0199&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pvergiliusmaroa00virggoog_0200&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophoclesplaysa05campgoog_0094&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophoclesplaysa05campgoog_0095&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophokle1v3soph_0047&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sophokle1v3soph_0062&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;thukydides02thuc_0009&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;thukydides02thuc_0011&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Untersteiner1934_0104&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Untersteiner1934_0105&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Wecklein1894_0016&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Wecklein1894_0024&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">IDS_TO_RUNS</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># Maps commentary_ids to the ocr_run_id used as a base in the annotation campaign.</span>
+    <span class="s1">&#39;cu31924087948174&#39;</span><span class="p">:</span> <span class="s1">&#39;1bm0b3_tess_final&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;lestragdiesdeso00tourgoog&#39;</span><span class="p">:</span> <span class="s1">&#39;21i0dA_tess_hocr&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;sophokle1v3soph&#39;</span><span class="p">:</span> <span class="s1">&#39;1bm0b5_tess_final&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;sophoclesplaysa05campgoog&#39;</span><span class="p">:</span> <span class="s1">&#39;15o0dN_lace_retrained_sophoclesplaysa05campgoog-2021-05-24-08-15-12-porson-with-sophoclesplaysa05campgoog-2021-05-23-22-17-38&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;Wecklein1894&#39;</span><span class="p">:</span> <span
+                            class="s1">&#39;1bm0b6_tess_final&#39;</span>
+<span class="p">}</span>
+<span class="n">IDS_TO_REGIONS</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># Maps commentary_ids to the region_types used in the annotation campaign.</span>
+    <span class="s1">&#39;cu31924087948174&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;commentary&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;introduction&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;preface&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;Wecklein1894&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;commentary&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;introduction&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;preface&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;sophokle1v3soph&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;commentary&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;introduction&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;preface&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;sophoclesplaysa05campgoog&#39;</span><span class="p">:</span> <span class="p">[</span><span
+                            class="s1">&#39;commentary&#39;</span><span class="p">,</span> <span class="s1">&#39;introduction&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;preface&#39;</span><span class="p">,</span> <span
+                            class="s1">&#39;footnote&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;lestragdiesdeso00tourgoog&#39;</span><span class="p">:</span> <span class="p">[</span><span
+                            class="s1">&#39;commentary&#39;</span><span class="p">,</span> <span class="s1">&#39;introduction&#39;</span><span
+                            class="p">,</span> <span class="s1">&#39;preface&#39;</span><span class="p">,</span> <span
+                            class="s1">&#39;footnote&#39;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">ANNOTATION_LAYERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;entities&#39;</span><span class="p">:</span> <span class="s1">&#39;webanno.custom.AjMCNamedEntity&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;segments&#39;</span><span class="p">:</span> <span class="s1">&#39;de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;sentences&#39;</span><span class="p">:</span> <span class="s1">&#39;webanno.custom.GoldSentences&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;hyphenations&#39;</span><span class="p">:</span> <span class="s1">&#39;webanno.custom.GoldHyphenation&#39;</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;tokens&#39;</span><span class="p">:</span> <span class="s1">&#39;de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token&#39;</span><span
+                            class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                                 AESTHETICS</span>
+<span class="c1"># ======================================================================================================================</span>
+
+<span class="n">COLORS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># https://coolors.co/b2001e-f02282-461e44-3b9ff1-37507d-125b4f-98e587-ffc802-af7159-b5a267</span>
+    <span class="s1">&#39;distinct&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;red&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">178</span><span class="p">,</span> <span class="mi">0</span><span
+                            class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+        <span class="s1">&#39;pink&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">240</span><span class="p">,</span> <span class="mi">34</span><span
+                            class="p">,</span> <span class="mi">130</span><span class="p">),</span>
+        <span class="s1">&#39;blue&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">59</span><span class="p">,</span> <span class="mi">159</span><span
+                            class="p">,</span> <span class="mi">241</span><span class="p">),</span>
+        <span class="s1">&#39;green&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">152</span><span class="p">,</span> <span class="mi">229</span><span
+                            class="p">,</span> <span class="mi">135</span><span class="p">),</span>
+        <span class="s1">&#39;yellow&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">255</span><span class="p">,</span> <span class="mi">200</span><span
+                            class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="s1">&#39;brown&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">175</span><span class="p">,</span> <span class="mi">113</span><span
+                            class="p">,</span> <span class="mi">89</span><span class="p">),</span>
+        <span class="s1">&#39;dark_green&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">18</span><span class="p">,</span> <span class="mi">91</span><span
+                            class="p">,</span> <span class="mi">79</span><span class="p">),</span>
+        <span class="s1">&#39;purple&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">70</span><span class="p">,</span> <span class="mi">30</span><span
+                            class="p">,</span> <span class="mi">68</span><span class="p">),</span>
+        <span class="s1">&#39;dark_blue&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">55</span><span class="p">,</span> <span class="mi">80</span><span
+                            class="p">,</span> <span class="mi">125</span><span class="p">),</span>
+        <span class="s1">&#39;ecru&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">181</span><span class="p">,</span> <span class="mi">162</span><span
+                            class="p">,</span> <span class="mi">103</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="c1"># https://coolors.co/f72585-b5179e-7209b7-560bad-480ca8-3a0ca3-3f37c9-4361ee-4895ef-4cc9f0</span>
+    <span class="s1">&#39;hues&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;pink&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">247</span><span class="p">,</span> <span class="mi">37</span><span
+                            class="p">,</span> <span class="mi">133</span><span class="p">),</span>
+        <span class="s1">&#39;byzantine&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">181</span><span class="p">,</span> <span class="mi">23</span><span
+                            class="p">,</span> <span class="mi">158</span><span class="p">),</span>
+        <span class="s1">&#39;purple1&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">114</span><span class="p">,</span> <span class="mi">9</span><span
+                            class="p">,</span> <span class="mi">183</span><span class="p">),</span>
+        <span class="s1">&#39;purple2&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">86</span><span class="p">,</span> <span class="mi">11</span><span
+                            class="p">,</span> <span class="mi">173</span><span class="p">),</span>
+        <span class="s1">&#39;trypan_blue1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">72</span><span
+                            class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span
+                            class="mi">168</span><span class="p">),</span>
+        <span class="s1">&#39;trypan_blue2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">58</span><span
+                            class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span
+                            class="mi">163</span><span class="p">),</span>
+        <span class="s1">&#39;persian_blue&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">63</span><span
+                            class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span
+                            class="mi">201</span><span class="p">),</span>
+        <span class="s1">&#39;ultramarine_blue&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">67</span><span class="p">,</span> <span class="mi">97</span><span
+                            class="p">,</span> <span class="mi">238</span><span class="p">),</span>
+        <span class="s1">&#39;dodger_blue&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">72</span><span
+                            class="p">,</span> <span class="mi">149</span><span class="p">,</span> <span
+                            class="mi">239</span><span class="p">),</span>
+        <span class="s1">&#39;vivid_sky_blue&#39;</span><span class="p">:</span> <span class="p">(</span><span
+                            class="mi">76</span><span class="p">,</span> <span class="mi">201</span><span
+                            class="p">,</span> <span class="mi">240</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="c1"># Other color palettes</span>
+    <span class="c1"># https://coolors.co/97dffc-93caf6-8eb5f0-858ae3-7364d2-613dc1-5829a7-4e148c-461177-3d0e61</span>
+    <span class="c1"># https://coolors.co/b7094c-a01a58-892b64-723c70-5c4d7d-455e89-2e6f95-1780a1-0091ad</span>
+    <span class="c1"># https://coolors.co/0081a7-00afb9-fdfcdc-fed9b7-f07167</span>
+<span class="p">}</span>
+
+<span class="n">TEXTCONTAINERS_TYPES_TO_COLORS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;word&#39;</span><span class="p">:</span> <span class="n">COLORS</span><span class="p">[</span><span
+                            class="s1">&#39;hues&#39;</span><span class="p">][</span><span
+                            class="s1">&#39;pink&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;line&#39;</span><span class="p">:</span> <span class="n">COLORS</span><span class="p">[</span><span
+                            class="s1">&#39;hues&#39;</span><span class="p">][</span><span class="s1">&#39;byzantine&#39;</span><span
+                            class="p">],</span>
+    <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="n">COLORS</span><span
+                            class="p">[</span><span class="s1">&#39;hues&#39;</span><span class="p">][</span><span
+                            class="s1">&#39;purple1&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">COLORS</span><span class="p">[</span><span
+                            class="s1">&#39;hues&#39;</span><span class="p">][</span><span
+                            class="s1">&#39;purple2&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;entity&#39;</span><span class="p">:</span> <span class="n">COLORS</span><span
+                            class="p">[</span><span class="s1">&#39;hues&#39;</span><span class="p">][</span><span
+                            class="s1">&#39;trypan_blue1&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;hyphenation&#39;</span><span class="p">:</span> <span class="n">COLORS</span><span
+                            class="p">[</span><span class="s1">&#39;hues&#39;</span><span class="p">][</span><span
+                            class="s1">&#39;trypan_blue2&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;sentence&#39;</span><span class="p">:</span> <span class="n">COLORS</span><span
+                            class="p">[</span><span class="s1">&#39;hues&#39;</span><span class="p">][</span><span
+                            class="s1">&#39;persian_blue&#39;</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">REGION_TYPES_TO_COLORS</span> <span class="o">=</span> <span class="p">{</span><span
+                            class="n">l</span><span class="p">:</span> <span class="n">c</span> <span
+                            class="k">for</span> <span class="n">l</span><span class="p">,</span> <span
+                            class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span
+                            class="p">(</span><span class="n">ORDERED_OLR_REGION_TYPES</span><span class="p">,</span>
+                                               <span class="nb">list</span><span class="p">(</span><span class="n">COLORS</span><span
+                            class="p">[</span><span class="s1">&#39;distinct&#39;</span><span class="p">]</span><span
+                            class="o">.</span><span class="n">values</span><span class="p">())</span> <span
+                            class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">COLORS</span><span
+                            class="p">[</span><span class="s1">&#39;hues&#39;</span><span class="p">]</span><span
+                            class="o">.</span><span class="n">values</span><span class="p">()))}</span>
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                                 MISC</span>
+<span class="c1"># ======================================================================================================================</span>
+
+
+<span class="n">PARAMETERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ocr_region_inclusion_threshold&#39;</span><span class="p">:</span> <span class="mf">0.7</span><span
+                            class="p">,</span>
+    <span class="s1">&#39;entity_inclusion_threshold&#39;</span><span class="p">:</span> <span
+                            class="mf">0.8</span><span class="p">,</span>
+<span class="p">}</span>
+
+</pre>
+                    </div>
+                </article>
+            </div>
+            <footer>
+
+                <div class="related-pages">
+
+
+                </div>
+                <div class="bottom-of-page">
+                    <div class="left-details">
+                        <div class="copyright">
+                            Copyright &#169; 2023, Sven Najem-Meyer
+                        </div>
+                        Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link"
+                                                                                          href="https://pradyunsg.me">@pradyunsg</a>'s
+
+                        <a href="https://github.com/pradyunsg/furo">Furo</a>
+
+                    </div>
+                    <div class="right-details">
+
+                    </div>
+                </div>
+
+            </footer>
+        </div>
+        <aside class="toc-drawer no-toc">
+
+
+        </aside>
+    </div>
+</div>
+<script src="../../../_static/documentation_options.js?v=2fea6348"></script>
+<script src="../../../_static/doctools.js?v=888ff710"></script>
+<script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
+        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+</body>
+</html>

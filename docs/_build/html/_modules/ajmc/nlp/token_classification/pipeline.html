@@ -1,0 +1,933 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../../">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark">
+    <link rel="index" title="Index" href="../../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../../search.html"/>
+
+    <!-- Generated with Sphinx 7.2.5 and Furo 2023.08.19 -->
+    <title>ajmc.nlp.token_classification.pipeline - ajmc v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c"/>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=135e06be"/>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=36a5483c"/>
+
+
+    <style>
+        body {
+            --color-code-background: #f8f8f8;
+            --color-code-foreground: black;
+
+        }
+
+        @media not print {
+            body[data-theme="dark"] {
+                --color-code-background: #202020;
+                --color-code-foreground: #d0d0d0;
+
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body:not([data-theme="light"]) {
+                    --color-code-background: #202020;
+                    --color-code-foreground: #d0d0d0;
+
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+</script>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="svg-toc" viewBox="0 0 24 24">
+        <title>Contents</title>
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+            <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-menu" viewBox="0 0 24 24">
+        <title>Menu</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+        <title>Expand</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun" viewBox="0 0 24 24">
+        <title>Light mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-moon" viewBox="0 0 24 24">
+        <title>Dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun-half" viewBox="0 0 24 24">
+        <title>Auto light/dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M13 12h5"/>
+            <path d="M13 15h4"/>
+            <path d="M13 18h1"/>
+            <path d="M13 9h4"/>
+            <path d="M13 6h1"/>
+        </svg>
+    </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+    <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+    <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+<div class="page">
+    <header class="mobile-header">
+        <div class="header-left">
+            <label class="nav-overlay-icon" for="__navigation">
+                <div class="visually-hidden">Toggle site navigation sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-menu"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+        <div class="header-center">
+            <a href="../../../../index.html">
+                <div class="brand">ajmc v0.0.1 documentation</div>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle-container theme-toggle-header">
+                <button class="theme-toggle">
+                    <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                    <svg class="theme-icon-when-auto">
+                        <use href="#svg-sun-half"></use>
+                    </svg>
+                    <svg class="theme-icon-when-dark">
+                        <use href="#svg-moon"></use>
+                    </svg>
+                    <svg class="theme-icon-when-light">
+                        <use href="#svg-sun"></use>
+                    </svg>
+                </button>
+            </div>
+            <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+                <div class="visually-hidden">Toggle table of contents sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-toc"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+    </header>
+    <aside class="sidebar-drawer">
+        <div class="sidebar-container">
+
+            <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
+
+
+                <span class="sidebar-brand-text">ajmc v0.0.1 documentation</span>
+
+            </a>
+                <form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+                    <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+                    <input type="hidden" name="check_keywords" value="yes">
+                    <input type="hidden" name="area" value="default">
+                </form>
+                <div id="searchbox"></div>
+                <div class="sidebar-scroll">
+                    <div class="sidebar-tree">
+                        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+                        <ul>
+                            <li class="toctree-l1 has-children"><a class="reference internal"
+                                                                   href="../../../../modules.html">ajmc</a><input
+                                    class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1"
+                                    role="switch" type="checkbox"/><label for="toctree-checkbox-1">
+                                <div class="visually-hidden">Toggle navigation of ajmc</div>
+                                <i class="icon">
+                                    <svg>
+                                        <use href="#svg-arrow-right"></use>
+                                    </svg>
+                                </i></label>
+                                <ul>
+                                    <li class="toctree-l2 has-children"><a class="reference internal"
+                                                                           href="../../../../ajmc.html">ajmc package</a><input
+                                            class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2"
+                                            role="switch" type="checkbox"/><label for="toctree-checkbox-2">
+                                        <div class="visually-hidden">Toggle navigation of ajmc package</div>
+                                        <i class="icon">
+                                            <svg>
+                                                <use href="#svg-arrow-right"></use>
+                                            </svg>
+                                        </i></label>
+                                        <ul>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../../ajmc.commons.html">ajmc.commons
+                                                package</a></li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../../ajmc.corpora.html">ajmc.corpora
+                                                package</a></li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../../ajmc.nlp.html">ajmc.nlp
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-3"
+                                                                  name="toctree-checkbox-3" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-3">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.nlp package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4 has-children"><a class="reference internal"
+                                                                                           href="../../../../ajmc.nlp.token_classification.html">ajmc.nlp.token_classification
+                                                        package</a><input class="toctree-checkbox"
+                                                                          id="toctree-checkbox-4"
+                                                                          name="toctree-checkbox-4" role="switch"
+                                                                          type="checkbox"/><label
+                                                            for="toctree-checkbox-4">
+                                                        <div class="visually-hidden">Toggle navigation of
+                                                            ajmc.nlp.token_classification package
+                                                        </div>
+                                                        <i class="icon">
+                                                            <svg>
+                                                                <use href="#svg-arrow-right"></use>
+                                                            </svg>
+                                                        </i></label>
+                                                        <ul>
+                                                            <li class="toctree-l5"><a class="reference internal"
+                                                                                      href="../../../../ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation
+                                                                package</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../../ajmc.ocr.html">ajmc.ocr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-5"
+                                                                  name="toctree-checkbox-5" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-5">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.ocr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.ocr.preprocessing.html">ajmc.ocr.preprocessing
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.ocr.pytorch.html">ajmc.ocr.pytorch
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.ocr.tesseract.html">ajmc.ocr.tesseract
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../../ajmc.olr.html">ajmc.olr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-6"
+                                                                  name="toctree-checkbox-6" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-6">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.olr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.olr.layoutlm.html">ajmc.olr.layoutlm
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../../ajmc.olr.yolo.html">ajmc.olr.yolo
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../../ajmc.text_processing.html">ajmc.text_processing
+                                                package</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/base_functionalities.html">Basic
+                                functionalities</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/commentary_importation_pipeline.html">Commentary
+                                importation pipeline</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/data_organisation.html">Understanding
+                                the ajmc directory structure.</a></li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Contributing:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/introduction_to_code.html">Understanding
+                                the goal of the library</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/introduction_to_code.html#The-commons-directory">The
+                                commons directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/introduction_to_code.html#The-text_processing-directory">The
+                                <code class="docutils literal notranslate"><span
+                                        class="pre">text_processing</span></code> directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../../other_pages/contributing_guidelines.html">Contributing
+                                guidelines</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </aside>
+    <div class="main">
+        <div class="content">
+            <div class="article-container">
+                <a href="#" class="back-to-top muted-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+                    </svg>
+                    <span>Back to top</span>
+                </a>
+                <div class="content-icon-container">
+                    <div class="theme-toggle-container theme-toggle-content">
+                        <button class="theme-toggle">
+                            <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                            <svg class="theme-icon-when-auto">
+                                <use href="#svg-sun-half"></use>
+                            </svg>
+                            <svg class="theme-icon-when-dark">
+                                <use href="#svg-moon"></use>
+                            </svg>
+                            <svg class="theme-icon-when-light">
+                                <use href="#svg-sun"></use>
+                            </svg>
+                        </button>
+                    </div>
+                    <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+                        <div class="visually-hidden">Toggle table of contents sidebar</div>
+                        <i class="icon">
+                            <svg>
+                                <use href="#svg-toc"></use>
+                            </svg>
+                        </i>
+                    </label>
+                </div>
+                <article role="main">
+                    <h1>Source code for ajmc.nlp.token_classification.pipeline</h1>
+                    <div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module is highly inspired by HuggingFace&#39;s </span>
+<span class="sd">`run_ner.py &lt;https://github.com/huggingface/transformers/blob/main/examples/pytorch/token-classification/run_ner.py&gt;`_.</span>
+<span class="sd">It runs on a single GPU.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span
+                            class="n">Union</span><span class="p">,</span> <span class="n">Dict</span><span
+                            class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">transformers</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span
+                            class="p">,</span> <span class="n">RandomSampler</span>
+<span class="kn">from</span> <span class="nn">ajmc.nlp.token_classification.evaluation</span> <span
+                            class="kn">import</span> <span class="n">evaluate_dataset</span><span
+                            class="p">,</span> <span class="n">seqeval_to_df</span><span class="p">,</span> <span
+                            class="n">evaluate_hipe</span>
+<span class="kn">from</span> <span class="nn">ajmc.nlp.token_classification.config</span> <span class="kn">import</span> <span
+                            class="n">parse_config_from_json</span>
+<span class="kn">from</span> <span class="nn">ajmc.nlp.token_classification.data_preparation.hipe_iob</span> <span
+                            class="kn">import</span> <span class="n">prepare_datasets</span>
+<span class="kn">from</span> <span class="nn">ajmc.nlp.token_classification.model</span> <span class="kn">import</span> <span
+                            class="n">predict_and_write_tsv</span>
+<span class="kn">from</span> <span class="nn">ajmc.commons.miscellaneous</span> <span class="kn">import</span> <span
+                            class="n">get_custom_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_custom_logger</span><span
+                            class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="set_seed">
+<a class="viewcode-back"
+   href="../../../../ajmc.nlp.token_classification.html#ajmc.nlp.token_classification.pipeline.set_seed">[docs]</a>
+<span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="n">seed</span><span
+        class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets seed for ``random``, ``np.random`` and ``torch``.&quot;&quot;&quot;</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span
+        class="n">seed</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span
+        class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span
+        class="n">seed</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="train">
+<a class="viewcode-back"
+   href="../../../../ajmc.nlp.token_classification.html#ajmc.nlp.token_classification.pipeline.train">[docs]</a>
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">config</span><span
+        class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span
+        class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+          <span class="n">model</span><span class="p">:</span> <span class="n">transformers</span><span
+        class="o">.</span><span class="n">PreTrainedModel</span><span class="p">,</span>
+          <span class="n">train_dataset</span><span class="p">:</span> <span class="s1">&#39;token_classification.data_preparation.HipeDataset&#39;</span><span
+        class="p">,</span>
+          <span class="n">eval_dataset</span><span class="p">:</span> <span class="s1">&#39;token_classification.data_preparation.HipeDataset&#39;</span><span
+        class="p">,</span>
+          <span class="n">tokenizer</span><span class="p">:</span> <span class="n">transformers</span><span
+        class="o">.</span><span class="n">PreTrainedTokenizer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main training function.</span>
+
+<span class="sd">    This function does the following:</span>
+
+<span class="sd">    * Does the training on ``train_dataset``</span>
+<span class="sd">    * At the end of each epoch:</span>
+
+<span class="sd">      * evaluate the model on ``eval_dataset`` using seqeval</span>
+<span class="sd">      * saves a model checkpoint</span>
+<span class="sd">      * saves the model as best_model if model has highest scores</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: An ``argparse.Namespace`` containing the required ``transformers.TrainingArguments``</span>
+<span class="sd">        model: A transformers model instance</span>
+<span class="sd">        train_dataset: The ``torch.utils.data.Dataset`` on which to train</span>
+<span class="sd">        eval_dataset: The ``torch.utils.data.Dataset`` on which to evaluate the model</span>
+<span class="sd">        tokenizer: The model&#39;s tokenizer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;device&#39;</span><span class="p">])</span>
+
+    <span class="n">train_sampler</span> <span class="o">=</span> <span class="n">RandomSampler</span><span
+        class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+    <span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span
+        class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span
+        class="n">sampler</span><span class="o">=</span><span class="n">train_sampler</span><span
+        class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">])</span>
+
+    <span class="n">t_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span
+        class="n">train_dataloader</span><span class="p">)</span> <span class="o">//</span> <span
+        class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;gradient_accumulation_steps&#39;</span><span class="p">]</span> <span class="o">*</span> <span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]</span>
+
+    <span class="n">no_decay</span> <span class="o">=</span> <span class="p">[</span><span
+        class="s2">&quot;bias&quot;</span><span class="p">,</span> <span
+        class="s2">&quot;LayerNorm.weight&quot;</span><span class="p">]</span>
+    <span class="n">optimizer_grouped_parameters</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">[</span><span
+        class="n">p</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span
+        class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span
+        class="n">named_parameters</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span
+        class="nb">any</span><span class="p">(</span><span class="n">nd</span> <span class="ow">in</span> <span
+        class="n">n</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span
+        class="n">no_decay</span><span class="p">)],</span>
+            <span class="s2">&quot;weight_decay&quot;</span><span class="p">:</span> <span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;weight_decay&#39;</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span
+        class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">n</span><span
+        class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span
+        class="o">.</span><span class="n">named_parameters</span><span class="p">()</span> <span
+        class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">nd</span> <span
+        class="ow">in</span> <span class="n">n</span> <span class="k">for</span> <span class="n">nd</span> <span
+        class="ow">in</span> <span class="n">no_decay</span><span class="p">)],</span> <span class="s2">&quot;weight_decay&quot;</span><span
+        class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+    <span class="p">]</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span
+        class="n">optimizer_grouped_parameters</span><span class="p">,</span> <span class="n">lr</span><span
+        class="o">=</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;learning_rate&#39;</span><span class="p">],</span> <span class="n">eps</span><span
+        class="o">=</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;adam_epsilon&#39;</span><span class="p">])</span>
+    <span class="n">scheduler</span> <span class="o">=</span> <span class="n">transformers</span><span
+        class="o">.</span><span class="n">get_linear_schedule_with_warmup</span><span class="p">(</span>
+        <span class="n">optimizer</span><span class="p">,</span> <span class="n">num_warmup_steps</span><span class="o">=</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;warmup_steps&#39;</span><span
+        class="p">],</span> <span class="n">num_training_steps</span><span class="o">=</span><span
+        class="n">t_total</span>
+    <span class="p">)</span>
+    <span class="c1"># =================== Pretraining declarations ====================</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s2">&quot;&quot;&quot;Running training on </span><span class="si">{</span><span
+        class="nb">len</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span><span
+        class="si">}</span><span class="s2"> examples, for </span><span class="si">{</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]</span><span class="si">}</span><span
+        class="s2"> epochs.&quot;&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">global_step</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">best_f1</span> <span class="o">=</span> <span class="mf">0.3</span>
+    <span class="n">count_no_improvement</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">train_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span
+        class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">set_seed</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;seed&#39;</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">epoch_num</span> <span class="ow">in</span> <span class="nb">range</span><span
+        class="p">(</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;epochs&#39;</span><span class="p">]):</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s2">&quot;Starting epoch </span><span class="si">{</span><span class="n">epoch_num</span><span
+        class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">loss_batches_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">epoch_time</span> <span class="o">=</span> <span class="n">time</span><span
+        class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span
+        class="n">batch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span
+        class="n">train_dataloader</span><span class="p">):</span>
+
+            <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span
+        class="n">key</span><span class="p">:</span> <span class="n">batch</span><span class="p">[</span><span
+        class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span
+        class="p">(</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;device&#39;</span><span class="p">])</span> <span class="k">for</span> <span
+        class="n">key</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span
+        class="n">keys</span><span class="p">()}</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span
+        class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">outputs</span><span
+        class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># model outputs are tuples in pytorch and transformers</span>
+
+            <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;gradient_accumulation_steps&#39;</span><span
+        class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span> <span
+        class="o">/</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;gradient_accumulation_steps&#39;</span><span
+        class="p">]</span>
+
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">loss_batches_list</span><span class="o">.</span><span class="n">append</span><span
+        class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span
+        class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;gradient_accumulation_steps&#39;</span><span class="p">]</span> <span
+        class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span
+        class="o">.</span><span class="n">utils</span><span class="o">.</span><span
+        class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span
+        class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;max_grad_norm&#39;</span><span class="p">])</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span
+        class="p">()</span>
+                <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span
+        class="p">()</span>  <span class="c1"># Update learning rate schedule</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span
+        class="p">()</span>
+                <span class="n">global_step</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;do_debug&#39;</span><span
+        class="p">]:</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># ============================ Evaluate and append during training ============================</span>
+        <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;evaluate_during_training&#39;</span><span
+        class="p">]:</span>
+            <span class="n">epoch_results</span> <span class="o">=</span> <span class="n">evaluate_dataset</span><span
+        class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">eval_dataset</span><span
+        class="p">,</span>
+                                             <span class="n">model</span><span class="o">=</span><span
+        class="n">model</span><span class="p">,</span>
+                                             <span class="n">batch_size</span><span class="o">=</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">],</span>
+                                             <span class="n">ids_to_labels</span><span class="o">=</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;ids_to_labels&#39;</span><span
+        class="p">],</span>
+                                             <span class="n">do_debug</span><span class="o">=</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;do_debug&#39;</span><span class="p">])</span>
+            <span class="n">epoch_results</span> <span class="o">=</span> <span class="n">seqeval_to_df</span><span
+        class="p">(</span><span class="n">epoch_results</span><span class="p">)</span>
+
+            <span class="n">epoch_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span
+        class="n">DataFrame</span><span class="p">({(</span><span class="s2">&quot;TRAINING&quot;</span><span class="p">,</span> <span
+        class="s2">&quot;EP&quot;</span><span class="p">):</span> <span class="p">[</span><span
+        class="n">epoch_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                                       <span class="p">(</span><span class="s2">&quot;TRAINING&quot;</span><span
+        class="p">,</span> <span class="s2">&quot;TIME&quot;</span><span class="p">):</span> <span
+        class="p">[</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span
+        class="o">-</span> <span class="n">epoch_time</span><span class="p">],</span>
+                                       <span class="p">(</span><span class="s2">&quot;TRAINING&quot;</span><span
+        class="p">,</span> <span class="s2">&quot;LOSS&quot;</span><span class="p">):</span> <span
+        class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span
+        class="p">(</span><span class="n">loss_batches_list</span><span class="p">)]})</span>
+            <span class="n">epoch_results</span> <span class="o">=</span> <span class="n">pd</span><span
+        class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">epoch_data</span><span
+        class="p">,</span> <span class="n">epoch_results</span><span class="p">],</span> <span
+        class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">train_results</span> <span class="o">=</span> <span class="n">pd</span><span
+        class="o">.</span><span class="n">concat</span><span class="p">([</span><span
+        class="n">train_results</span><span class="p">,</span> <span class="n">epoch_results</span><span
+        class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span
+        class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># ========================= Save best model and write its results ===============================</span>
+            <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span
+        class="n">epoch_results</span><span class="p">[(</span><span class="s1">&#39;ALL&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;F1&#39;</span><span class="p">)][</span><span class="mi">0</span><span
+        class="p">],</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&gt;</span> <span
+        class="nb">round</span><span class="p">(</span><span class="n">best_f1</span><span class="p">,</span> <span
+        class="mi">4</span><span class="p">):</span>
+
+                <span class="n">count_no_improvement</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">best_f1</span> <span class="o">=</span> <span class="n">epoch_results</span><span
+        class="p">[(</span><span class="s1">&#39;ALL&#39;</span><span class="p">,</span> <span
+        class="s1">&#39;F1&#39;</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">epoch_results</span><span class="o">.</span><span class="n">to_csv</span><span
+        class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span
+        class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;seqeval_output_dir&#39;</span><span class="p">],</span> <span
+        class="s2">&quot;best_results.tsv&quot;</span><span class="p">),</span> <span class="n">sep</span><span
+        class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span
+        class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span
+        class="p">)</span>
+
+                <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;do_save&#39;</span><span
+        class="p">]:</span>
+                    <span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span
+        class="p">(</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;model_save_dir&#39;</span><span class="p">])</span>
+                    <span class="n">tokenizer</span><span class="o">.</span><span class="n">save_pretrained</span><span
+        class="p">(</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;model_save_dir&#39;</span><span class="p">])</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span
+        class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">os</span><span
+        class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;model_save_dir&#39;</span><span class="p">],</span> <span
+        class="s2">&quot;training_args.bin&quot;</span><span class="p">))</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">count_no_improvement</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">count_no_improvement</span> <span class="o">==</span> <span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;early_stopping_patience&#39;</span><span
+        class="p">]</span> <span class="ow">and</span> <span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;do_early_stopping&#39;</span><span class="p">]:</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;do_debug&#39;</span><span
+        class="p">]:</span>
+            <span class="k">break</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;evaluate_during_training&#39;</span><span
+        class="p">]:</span>
+        <span class="n">train_results</span><span class="o">.</span><span class="n">to_csv</span><span
+        class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span
+        class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;seqeval_output_dir&#39;</span><span class="p">],</span> <span
+        class="s2">&quot;train_results.tsv&quot;</span><span class="p">),</span> <span class="n">sep</span><span
+        class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span
+        class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span
+        class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;do_save&#39;</span><span class="p">]:</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span
+        class="p">(</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;model_save_dir&#39;</span><span class="p">])</span>
+        <span class="n">tokenizer</span><span class="o">.</span><span class="n">save_pretrained</span><span
+        class="p">(</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;model_save_dir&#39;</span><span class="p">])</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span
+        class="n">config</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span
+        class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;model_save_dir&#39;</span><span class="p">],</span> <span class="s2">&quot;training_args.bin&quot;</span><span
+        class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="create_dirs">
+<a class="viewcode-back"
+   href="../../../../ajmc.nlp.token_classification.html#ajmc.nlp.token_classification.pipeline.create_dirs">[docs]</a>
+<span class="k">def</span> <span class="nf">create_dirs</span><span class="p">(</span><span class="n">config</span><span
+        class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span
+        class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="c1"># Create directories</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span
+        class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;overwrite_output_dir&#39;</span><span class="p">])</span>
+
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;model_save_dir&#39;</span><span
+        class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span
+        class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">],</span> <span class="s2">&quot;model&quot;</span><span
+        class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;model_save_dir&#39;</span><span class="p">],</span> <span
+        class="n">exist_ok</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;overwrite_output_dir&#39;</span><span class="p">])</span>
+
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;predictions_dir&#39;</span><span
+        class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span
+        class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">],</span> <span class="s2">&quot;predictions&quot;</span><span
+        class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;predictions_dir&#39;</span><span class="p">],</span> <span
+        class="n">exist_ok</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;overwrite_output_dir&#39;</span><span class="p">])</span>
+
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;seqeval_output_dir&#39;</span><span
+        class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span
+        class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;results/seqeval&#39;</span><span
+        class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;seqeval_output_dir&#39;</span><span
+        class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;overwrite_output_dir&#39;</span><span class="p">])</span>
+
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;hipe_output_dir&#39;</span><span
+        class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span
+        class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;results/hipe_eval&#39;</span><span
+        class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;hipe_output_dir&#39;</span><span class="p">],</span> <span
+        class="n">exist_ok</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;overwrite_output_dir&#39;</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back"
+   href="../../../../ajmc.nlp.token_classification.html#ajmc.nlp.token_classification.pipeline.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">config</span><span
+        class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span
+        class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span
+        class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main entrypoint.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The config-dict or the path to a config[&#39;json&#39;].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Create the config</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span
+        class="n">config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">parse_config_from_json</span><span
+        class="p">(</span><span class="n">config</span><span class="p">)</span>
+    
+    <span class="c1"># Get the logger </span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">get_custom_logger</span><span
+        class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">level</span><span
+        class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span
+        class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s2">&quot;&quot;&quot;Runing pipeline on </span><span class="si">{</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span
+        class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span
+        class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">create_dirs</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># Save config</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span
+        class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span
+        class="p">],</span> <span class="s1">&#39;config.json&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span
+        class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span
+        class="n">config</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span
+        class="n">skipkeys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span
+        class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span
+        class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                  <span class="n">default</span><span class="o">=</span><span class="k">lambda</span> <span
+        class="n">o</span><span class="p">:</span> <span class="s1">&#39;&lt;not serializable&gt;&#39;</span><span
+        class="p">)</span>
+
+    <span class="c1"># todo 👁️ change model_name_or_path to model_config ; make a double path on data</span>
+    <span class="c1"># tokenizer = transformers.AutoTokenizer.from_pretrained(config[&#39;model_name_or_path&#39;], add_prefix_space=True)  # for roberta exclusively</span>
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">transformers</span><span
+        class="o">.</span><span class="n">AutoTokenizer</span><span class="o">.</span><span
+        class="n">from_pretrained</span><span class="p">(</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;model_name_or_path&#39;</span><span class="p">])</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="n">prepare_datasets</span><span
+        class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">tokenizer</span><span
+        class="p">)</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">transformers</span><span
+        class="o">.</span><span class="n">AutoModelForTokenClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span
+        class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;model_name_or_path&#39;</span><span
+        class="p">],</span>
+                                                                         <span class="n">num_labels</span><span
+        class="o">=</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;num_labels&#39;</span><span class="p">],</span>
+                                                                         <span class="c1"># This is defined in hipe_iob. not the best way</span>
+                                                                         <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;do_train&#39;</span><span class="p">]:</span>
+        <span class="n">train</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span
+        class="n">config</span><span class="p">,</span>
+              <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+              <span class="n">train_dataset</span><span class="o">=</span><span class="n">datasets</span><span
+        class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">],</span>
+              <span class="n">eval_dataset</span><span class="o">=</span><span class="n">datasets</span><span class="p">[</span><span
+        class="s1">&#39;eval&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;evaluate_during_training&#39;</span><span class="p">]</span> <span
+        class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span
+        class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;do_hipe_eval&#39;</span><span
+        class="p">]:</span>
+        <span class="n">evaluate_hipe</span><span class="p">(</span><span class="n">dataset</span><span
+        class="o">=</span><span class="n">datasets</span><span class="p">[</span><span
+        class="s1">&#39;eval&#39;</span><span class="p">],</span>
+                      <span class="n">model</span><span class="o">=</span><span class="n">model</span><span
+        class="p">,</span>
+                      <span class="n">device</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;device&#39;</span><span class="p">],</span>
+                      <span class="n">ids_to_labels</span><span class="o">=</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;ids_to_labels&#39;</span><span class="p">],</span>
+                      <span class="n">output_dir</span><span class="o">=</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;hipe_output_dir&#39;</span><span class="p">],</span>
+                      <span class="n">labels_column</span><span class="o">=</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;labels_column&#39;</span><span class="p">],</span>
+                      <span class="n">hipe_script_path</span><span class="o">=</span><span class="n">config</span><span
+        class="p">[</span><span class="s1">&#39;hipe_script_path&#39;</span><span class="p">],</span>
+                      <span class="n">groundtruth_tsv_path</span><span class="o">=</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;eval_path&#39;</span><span
+        class="p">],</span>
+                      <span class="n">groundtruth_tsv_url</span><span class="o">=</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;eval_url&#39;</span><span
+        class="p">],</span>
+                      <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;do_predict&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;predict_urls&#39;</span><span
+        class="p">]:</span>
+            <span class="n">predict_and_write_tsv</span><span class="p">(</span><span class="n">model</span><span
+        class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">output_dir</span><span
+        class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;predictions_dir&#39;</span><span
+        class="p">],</span>
+                                  <span class="n">tokenizer</span><span class="o">=</span><span
+        class="n">tokenizer</span><span class="p">,</span> <span class="n">ids_to_labels</span><span
+        class="o">=</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;ids_to_labels&#39;</span><span class="p">],</span>
+                                  <span class="n">labels_column</span><span class="o">=</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;labels_column&#39;</span><span
+        class="p">],</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;predict_paths&#39;</span><span
+        class="p">]:</span>
+            <span class="n">predict_and_write_tsv</span><span class="p">(</span><span class="n">model</span><span
+        class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">output_dir</span><span
+        class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;predictions_dir&#39;</span><span
+        class="p">],</span>
+                                  <span class="n">tokenizer</span><span class="o">=</span><span
+        class="n">tokenizer</span><span class="p">,</span> <span class="n">ids_to_labels</span><span
+        class="o">=</span><span class="n">config</span><span class="p">[</span><span
+        class="s1">&#39;ids_to_labels&#39;</span><span class="p">],</span>
+                                  <span class="n">labels_column</span><span class="o">=</span><span
+        class="n">config</span><span class="p">[</span><span class="s1">&#39;labels_column&#39;</span><span
+        class="p">],</span> <span class="n">url</span><span class="o">=</span><span class="n">path</span><span
+        class="p">)</span></div>
+
+
+
+</pre>
+                    </div>
+                </article>
+            </div>
+            <footer>
+
+                <div class="related-pages">
+
+
+                </div>
+                <div class="bottom-of-page">
+                    <div class="left-details">
+                        <div class="copyright">
+                            Copyright &#169; 2023, Sven Najem-Meyer
+                        </div>
+                        Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link"
+                                                                                          href="https://pradyunsg.me">@pradyunsg</a>'s
+
+                        <a href="https://github.com/pradyunsg/furo">Furo</a>
+
+                    </div>
+                    <div class="right-details">
+
+                    </div>
+                </div>
+
+            </footer>
+        </div>
+        <aside class="toc-drawer no-toc">
+
+
+        </aside>
+    </div>
+</div>
+<script src="../../../../_static/documentation_options.js?v=2fea6348"></script>
+<script src="../../../../_static/doctools.js?v=888ff710"></script>
+<script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../../../../_static/scripts/furo.js?v=32e29ea5"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
+        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+</body>
+</html>

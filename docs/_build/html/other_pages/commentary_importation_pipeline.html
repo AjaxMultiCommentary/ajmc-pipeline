@@ -1,0 +1,999 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="next" title="Understanding the ajmc directory structure." href="data_organisation.html"/>
+    <link rel="prev" title="Basic functionalities" href="base_functionalities.html"/>
+
+    <!-- Generated with Sphinx 7.2.5 and Furo 2023.08.19 -->
+    <title>Commentary importation pipeline - ajmc v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c"/>
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be"/>
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css"/>
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c"/>
+
+
+    <style>
+        body {
+            --color-code-background: #f8f8f8;
+            --color-code-foreground: black;
+
+        }
+
+        @media not print {
+            body[data-theme="dark"] {
+                --color-code-background: #202020;
+                --color-code-foreground: #d0d0d0;
+
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body:not([data-theme="light"]) {
+                    --color-code-background: #202020;
+                    --color-code-foreground: #d0d0d0;
+
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+</script>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="svg-toc" viewBox="0 0 24 24">
+        <title>Contents</title>
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+            <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-menu" viewBox="0 0 24 24">
+        <title>Menu</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+        <title>Expand</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun" viewBox="0 0 24 24">
+        <title>Light mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-moon" viewBox="0 0 24 24">
+        <title>Dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun-half" viewBox="0 0 24 24">
+        <title>Auto light/dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M13 12h5"/>
+            <path d="M13 15h4"/>
+            <path d="M13 18h1"/>
+            <path d="M13 9h4"/>
+            <path d="M13 6h1"/>
+        </svg>
+    </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+    <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+    <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+<div class="page">
+    <header class="mobile-header">
+        <div class="header-left">
+            <label class="nav-overlay-icon" for="__navigation">
+                <div class="visually-hidden">Toggle site navigation sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-menu"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+        <div class="header-center">
+            <a href="../index.html">
+                <div class="brand">ajmc v0.0.1 documentation</div>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle-container theme-toggle-header">
+                <button class="theme-toggle">
+                    <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                    <svg class="theme-icon-when-auto">
+                        <use href="#svg-sun-half"></use>
+                    </svg>
+                    <svg class="theme-icon-when-dark">
+                        <use href="#svg-moon"></use>
+                    </svg>
+                    <svg class="theme-icon-when-light">
+                        <use href="#svg-sun"></use>
+                    </svg>
+                </button>
+            </div>
+            <label class="toc-overlay-icon toc-header-icon" for="__toc">
+                <div class="visually-hidden">Toggle table of contents sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-toc"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+    </header>
+    <aside class="sidebar-drawer">
+        <div class="sidebar-container">
+
+            <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+
+
+                <span class="sidebar-brand-text">ajmc v0.0.1 documentation</span>
+
+            </a>
+                <form class="sidebar-search-container" method="get" action="../search.html" role="search">
+                    <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+                    <input type="hidden" name="check_keywords" value="yes">
+                    <input type="hidden" name="area" value="default">
+                </form>
+                <div id="searchbox"></div>
+                <div class="sidebar-scroll">
+                    <div class="sidebar-tree">
+                        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+                        <ul>
+                            <li class="toctree-l1 has-children"><a class="reference internal" href="../modules.html">ajmc</a><input
+                                    class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1"
+                                    role="switch" type="checkbox"/><label for="toctree-checkbox-1">
+                                <div class="visually-hidden">Toggle navigation of ajmc</div>
+                                <i class="icon">
+                                    <svg>
+                                        <use href="#svg-arrow-right"></use>
+                                    </svg>
+                                </i></label>
+                                <ul>
+                                    <li class="toctree-l2 has-children"><a class="reference internal"
+                                                                           href="../ajmc.html">ajmc package</a><input
+                                            class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2"
+                                            role="switch" type="checkbox"/><label for="toctree-checkbox-2">
+                                        <div class="visually-hidden">Toggle navigation of ajmc package</div>
+                                        <i class="icon">
+                                            <svg>
+                                                <use href="#svg-arrow-right"></use>
+                                            </svg>
+                                        </i></label>
+                                        <ul>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../ajmc.commons.html">ajmc.commons
+                                                package</a></li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../ajmc.corpora.html">ajmc.corpora
+                                                package</a></li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../ajmc.nlp.html">ajmc.nlp
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-3"
+                                                                  name="toctree-checkbox-3" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-3">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.nlp package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4 has-children"><a class="reference internal"
+                                                                                           href="../ajmc.nlp.token_classification.html">ajmc.nlp.token_classification
+                                                        package</a><input class="toctree-checkbox"
+                                                                          id="toctree-checkbox-4"
+                                                                          name="toctree-checkbox-4" role="switch"
+                                                                          type="checkbox"/><label
+                                                            for="toctree-checkbox-4">
+                                                        <div class="visually-hidden">Toggle navigation of
+                                                            ajmc.nlp.token_classification package
+                                                        </div>
+                                                        <i class="icon">
+                                                            <svg>
+                                                                <use href="#svg-arrow-right"></use>
+                                                            </svg>
+                                                        </i></label>
+                                                        <ul>
+                                                            <li class="toctree-l5"><a class="reference internal"
+                                                                                      href="../ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation
+                                                                package</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../ajmc.ocr.html">ajmc.ocr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-5"
+                                                                  name="toctree-checkbox-5" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-5">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.ocr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.ocr.preprocessing.html">ajmc.ocr.preprocessing
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.ocr.pytorch.html">ajmc.ocr.pytorch
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.ocr.tesseract.html">ajmc.ocr.tesseract
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../ajmc.olr.html">ajmc.olr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-6"
+                                                                  name="toctree-checkbox-6" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-6">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.olr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.olr.layoutlm.html">ajmc.olr.layoutlm
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.olr.yolo.html">ajmc.olr.yolo
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../ajmc.text_processing.html">ajmc.text_processing
+                                                package</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+                        <ul class="current">
+                            <li class="toctree-l1"><a class="reference internal" href="base_functionalities.html">Basic
+                                functionalities</a></li>
+                            <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Commentary
+                                importation pipeline</a></li>
+                            <li class="toctree-l1"><a class="reference internal" href="data_organisation.html">Understanding
+                                the ajmc directory structure.</a></li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Contributing:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal" href="introduction_to_code.html">Understanding
+                                the goal of the library</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="introduction_to_code.html#The-commons-directory">The commons
+                                directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="introduction_to_code.html#The-text_processing-directory">The
+                                <code class="docutils literal notranslate"><span
+                                        class="pre">text_processing</span></code> directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal" href="contributing_guidelines.html">Contributing
+                                guidelines</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </aside>
+    <div class="main">
+        <div class="content">
+            <div class="article-container">
+                <a href="#" class="back-to-top muted-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+                    </svg>
+                    <span>Back to top</span>
+                </a>
+                <div class="content-icon-container">
+
+                    <div class="theme-toggle-container theme-toggle-content">
+                        <button class="theme-toggle">
+                            <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                            <svg class="theme-icon-when-auto">
+                                <use href="#svg-sun-half"></use>
+                            </svg>
+                            <svg class="theme-icon-when-dark">
+                                <use href="#svg-moon"></use>
+                            </svg>
+                            <svg class="theme-icon-when-light">
+                                <use href="#svg-sun"></use>
+                            </svg>
+                        </button>
+                    </div>
+                    <label class="toc-overlay-icon toc-content-icon" for="__toc">
+                        <div class="visually-hidden">Toggle table of contents sidebar</div>
+                        <i class="icon">
+                            <svg>
+                                <use href="#svg-toc"></use>
+                            </svg>
+                        </i>
+                    </label>
+                </div>
+                <article role="main">
+                    <section id="Commentary-importation-pipeline">
+                        <h1>Commentary importation pipeline<a class="headerlink" href="#Commentary-importation-pipeline"
+                                                              title="Link to this heading">#</a></h1>
+                        <p>This notebook goes through all the steps involved in the creation of <code
+                                class="docutils literal notranslate"><span class="pre">CanonicalCommentary</span></code>s
+                            from OCR outputs.</p>
+                        <p>We will therefore:</p>
+                        <ol class="arabic simple">
+                            <li><p>See how to import an <code class="docutils literal notranslate"><span class="pre">OcrCommentary</span></code>
+                                from OCR outputs.</p></li>
+                            <li><p>See how to optimise this commentary and transform it to a <code
+                                    class="docutils literal notranslate"><span
+                                    class="pre">CanonicalCommentary</span></code></p></li>
+                            <li><p>See how to export it to a canonical json format for later use.</p></li>
+                        </ol>
+                        <section id="Creating-an-OcrCommetary.">
+                            <h2>Creating an <code class="docutils literal notranslate"><span
+                                    class="pre">OcrCommetary</span></code>.<a class="headerlink"
+                                                                              href="#Creating-an-OcrCommetary."
+                                                                              title="Link to this heading">#</a></h2>
+                            <p><code class="docutils literal notranslate"><span class="pre">OcrCommentary</span></code>s
+                                need access to (at least) three kind of information: - OCR outputs files, which
+                                represent single pages and which will serve as a basis to create <code
+                                        class="docutils literal notranslate"><span class="pre">OcrPage</span></code>
+                                objects - The corresponding images (after which the former are named) - A
+                                via-project.json containing information about the layout.</p>
+                            <p>Using the data provided in <code class="docutils literal notranslate"><span class="pre">ajmc/data/sample_commentaries</span></code>,
+                                we can create our first <code class="docutils literal notranslate"><span class="pre">OcrCommentary</span></code>.
+                            </p>
+                            <div class="nbinput nblast docutils container">
+                                <div class="prompt highlight-none notranslate">
+                                    <div class="highlight"><pre><span></span>[1]:
+</pre>
+                                    </div>
+                                </div>
+                                <div class="input_area highlight-ipython2 notranslate">
+                                    <div class="highlight"><pre><span></span><span class="kn">from</span> <span
+                                            class="nn">ajmc.text_processing.ocr_classes</span> <span
+                                            class="kn">import</span> <span class="n">OcrCommentary</span>
+<span class="kn">from</span> <span class="nn">ajmc.commons</span> <span class="kn">import</span> <span class="n">variables</span> <span
+                                                class="k">as</span> <span class="n">vs</span>
+
+<span class="n">comm_id</span> <span class="o">=</span> <span class="s1">&#39;sophoclesplaysa05campgoog&#39;</span>
+<span class="n">ocr_run_id</span> <span class="o">=</span> <span class="s1">&#39;3467O2_tess_retrained&#39;</span>
+
+<span class="n">ocr_commentary</span> <span class="o">=</span> <span class="n">OcrCommentary</span><span
+                                                class="p">(</span><span class="nb">id</span><span
+                                                class="o">=</span><span class="n">comm_id</span><span class="p">,</span>
+                               <span class="n">ocr_dir</span><span class="o">=</span><span class="n">vs</span><span
+                                                class="o">.</span><span class="n">get_comm_ocr_outputs_dir</span><span
+                                                class="p">(</span><span class="n">comm_id</span><span class="p">,</span> <span
+                                                class="n">ocr_run_id</span><span class="p">),</span>
+                               <span class="n">via_path</span><span class="o">=</span><span class="n">vs</span><span
+                                                class="o">.</span><span class="n">get_comm_via_path</span><span
+                                                class="p">(</span><span class="n">comm_id</span><span
+                                                class="p">),</span>
+                               <span class="n">image_dir</span><span class="o">=</span><span class="n">vs</span><span
+                                                class="o">.</span><span class="n">get_comm_img_dir</span><span
+                                                class="p">(</span><span class="n">comm_id</span><span
+                                                class="p">))</span>
+</pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>Providing all these paths can be cumbersome. <code
+                                    class="docutils literal notranslate"><span class="pre">ajmc</span></code> therefore
+                                has a systematic directory structure (see <code
+                                        class="docutils literal notranslate"><span class="pre">ajmc/notebooks/data_organisation.ipynb</span></code>)
+                                which allows us to create a commentary directly from its OCR outputs directory if it is
+                                compliant with the project’s folder structure. As <code
+                                        class="docutils literal notranslate"><span class="pre">../data/sample_commentaries</span></code>
+                                are ajmc-compliant, we can simply:</p>
+                            <div class="nbinput nblast docutils container">
+                                <div class="prompt highlight-none notranslate">
+                                    <div class="highlight"><pre><span></span>[3]:
+</pre>
+                                    </div>
+                                </div>
+                                <div class="input_area highlight-ipython2 notranslate">
+                                    <div class="highlight"><pre><span></span><span class="c1"># Note that our path holds to the structure pattern : &#39;/abspath/to/base_dir/[comm_id]/ocr/runs/[ocr_run_id]/outputs&#39;</span>
+<span class="n">ocr_commentary</span> <span class="o">=</span> <span class="n">OcrCommentary</span><span
+                                                class="o">.</span><span class="n">from_ajmc_data</span><span
+                                                class="p">(</span><span class="nb">id</span><span
+                                                class="o">=</span><span class="n">comm_id</span><span class="p">)</span>
+</pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>The creation of an <code class="docutils literal notranslate"><span class="pre">OcrCommentary</span></code>
+                                will take care of the creation of its pages, lines, regions and words. However, it is
+                                also possible to instantiate any of these directly:</p>
+                            <div class="nbinput nblast docutils container">
+                                <div class="prompt highlight-none notranslate">
+                                    <div class="highlight"><pre><span></span>[5]:
+</pre>
+                                    </div>
+                                </div>
+                                <div class="input_area highlight-ipython2 notranslate">
+                                    <div class="highlight"><pre><span></span><span class="kn">from</span> <span
+                                            class="nn">ajmc.text_processing.ocr_classes</span> <span
+                                            class="kn">import</span> <span class="n">OcrPage</span>
+
+
+<span class="n">page</span> <span class="o">=</span> <span class="n">OcrPage</span><span class="p">(</span><span
+                                                class="n">ocr_path</span><span class="o">=</span><span
+                                                class="p">(</span><span class="n">vs</span><span class="o">.</span><span
+                                                class="n">get_comm_ocr_outputs_dir</span><span class="p">(</span><span
+                                                class="n">comm_id</span><span class="p">,</span> <span class="n">ocr_run_id</span><span
+                                                class="p">)</span> <span class="o">/</span> <span class="s1">&#39;sophoclesplaysa05campgoog_0148.hocr&#39;</span><span
+                                                class="p">),</span>
+               <span class="n">image_path</span><span class="o">=</span><span class="n">vs</span><span
+                                                class="o">.</span><span class="n">get_comm_img_dir</span><span
+                                                class="p">(</span><span class="n">comm_id</span><span class="p">)</span> <span
+                                                class="o">/</span> <span class="s1">&#39;sophoclesplaysa05campgoog_0148.png&#39;</span><span
+                                                class="p">,</span>
+               <span class="n">commentary</span><span class="o">=</span><span class="n">ocr_commentary</span><span
+                                                class="p">)</span>
+</pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>Note: It is not necessary to provide all the arguments provided here. For instance, if
+                                you leave <code class="docutils literal notranslate"><span
+                                        class="pre">commentary=...</span></code> blank, the object will still be
+                                functionnal, but you won’t be able to retrieve commentary-level information, such as the
+                                via_project.</p>
+                        </section>
+                        <section id="Why-should-one-bother-creating-CanonicalCommentarys-?">
+                            <h2>Why should one bother creating <code class="docutils literal notranslate"><span
+                                    class="pre">CanonicalCommentary</span></code>s ?<a class="headerlink"
+                                                                                       href="#Why-should-one-bother-creating-CanonicalCommentarys-?"
+                                                                                       title="Link to this heading">#</a>
+                            </h2>
+                            <ul class="simple">
+                                <li><p>TL;DR : Skip to the next section if you don’t care about the details.</p></li>
+                            </ul>
+                            <section id="The-vagaries-of-OCR">
+                                <h3>The vagaries of OCR<a class="headerlink" href="#The-vagaries-of-OCR"
+                                                          title="Link to this heading">#</a></h3>
+                                <p>You may ask yourself: what’s actually the problem with <code
+                                        class="docutils literal notranslate"><span
+                                        class="pre">OcrCommentary</span></code>s ? Why should we care about enhancing an
+                                    <code class="docutils literal notranslate"><span
+                                            class="pre">OcrCommentary</span></code> in the first place ? Well, the
+                                    problem is not really about the object itself but on the many inconsistencies and
+                                    noise of the OCR outputs it relies on. To cite a few: 1. Empty or non words 2.
+                                    Crummy, elongated, stretched or shrinked word bounding boxes or even inverted
+                                    bounding boxes with negative width and height. 3. Labyrinthine reading order (very
+                                    often due to
+                                    marginal line numbers) 4. Single lines spanning over multiple columns, multiple
+                                    lines or side numbers 5. Diacritics recognized as single lines 6. Crummy, elongated,
+                                    stretched or shrinked line bounding boxes 7. …</p>
+                            </section>
+                            <section id="The-weakness-of-xml-formats">
+                                <h3>The weakness of xml formats<a class="headerlink" href="#The-weakness-of-xml-formats"
+                                                                  title="Link to this heading">#</a></h3>
+                                <p>To add to this already long though not exhaustive list of pitfalls, one should add
+                                    two other caveats: - OCR outputs come in different formats (Kraken or Tesseract
+                                    style <code class="docutils literal notranslate"><span
+                                            class="pre">hocr</span></code>, <code
+                                            class="docutils literal notranslate"><span class="pre">alto</span></code>,
+                                    <code class="docutils literal notranslate"><span class="pre">pagexml</span></code>…)
+                                    - Though very different because of their individualistic wills to create <a
+                                            class="reference external" href="https://xkcd.com/927/">harmonized,
+                                        overarching standards</a>, these formats all share the same weakness: the nested
+                                    architecture of xml-like documents. This property alone makes xml like formats
+                                    inadequate to our
+                                    purposes. Let me provided with a simple example. Say we have the following page :
+                                </p>
+                                <div class="highlight-xml notranslate">
+                                    <div class="highlight"><pre><span></span><span class="nt">&lt;xml_page</span><span
+                                            class="w"> </span><span class="na">attribute_1=</span><span class="s">&quot;...&quot;</span><span
+                                            class="w"> </span><span class="na">attribute_2=</span><span class="s">&quot;...&quot;</span><span
+                                            class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;xml_line</span><span class="w"> </span><span
+                                                class="na">attribute_1=</span><span
+                                                class="s">&quot;...&quot;</span><span class="w"> </span><span
+                                                class="na">attribute_2=</span><span
+                                                class="s">&quot;...&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;xml_word</span><span class="w"> </span><span
+                                                class="na">attribute_1=</span><span
+                                                class="s">&quot;...&quot;</span><span class="w"> </span><span
+                                                class="na">attribute_2=</span><span
+                                                class="s">&quot;...&quot;</span><span class="nt">&gt;</span>Foo<span
+                                                class="nt">&lt;/xml_word&gt;</span>
+<span class="w">        </span><span class="nt">&lt;xml_word</span><span class="w"> </span><span
+                                                class="na">attribute_1=</span><span
+                                                class="s">&quot;...&quot;</span><span class="w"> </span><span
+                                                class="na">attribute_2=</span><span
+                                                class="s">&quot;...&quot;</span><span class="nt">&gt;</span>Bar<span
+                                                class="nt">&lt;/xml_word&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/xml_line&gt;</span>
+<span class="w">    </span><span class="nt">&lt;xml_line</span><span class="w"> </span><span
+                                                class="na">attribute_1=</span><span
+                                                class="s">&quot;...&quot;</span><span class="w"> </span><span
+                                                class="na">attribute_2=</span><span
+                                                class="s">&quot;...&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;xml_word</span><span class="w"> </span><span
+                                                class="na">attribute_1=</span><span
+                                                class="s">&quot;...&quot;</span><span class="w"> </span><span
+                                                class="na">attribute_2=</span><span
+                                                class="s">&quot;...&quot;</span><span class="nt">&gt;</span>Zig<span
+                                                class="nt">&lt;/xml_word&gt;</span>
+<span class="w">        </span><span class="nt">&lt;xml_word</span><span class="w"> </span><span
+                                                class="na">attribute_1=</span><span
+                                                class="s">&quot;...&quot;</span><span class="w"> </span><span
+                                                class="na">attribute_2=</span><span
+                                                class="s">&quot;...&quot;</span><span class="nt">&gt;</span>Zag<span
+                                                class="nt">&lt;/xml_word&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/xml_line&gt;</span>
+<span class="nt">&lt;/xml_page&gt;</span>
+</pre>
+                                    </div>
+                                </div>
+                                <p>In <code class="docutils literal notranslate"><span
+                                        class="pre">xml_page</span></code> we have two <code
+                                        class="docutils literal notranslate"><span class="pre">xml_line</span></code>
+                                    elements, which themselves contain two <code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">xml_word</span></code> elements. This may already be complicated
+                                    to navigate through, but the most vicious issue is still to come. It appears when
+                                    you try to overlap different layers of text containers. Say you have a region
+                                    spanning only the <code class="docutils literal notranslate"><span
+                                            class="pre">n</span></code> first word of a line. Should your region be a
+                                    child of the line ? This makes no sense from a global perspective: regions (such as
+                                    paragraphs) are higher in the hierarchy and should
+                                    be parent to lines. One could be tempted to create a line for the region, but then
+                                    an other problem arises: when calling all the lines from a page, should one call the
+                                    lines from the regions or from the lines directly, as they are now different ? The
+                                    same problem appears with entities (e.g. named entities) that span over multiple
+                                    pages. Say we have an entity starting with the two last words of the last line of
+                                    page <code class="docutils literal notranslate"><span class="pre">n</span></code>
+                                    and ends with the first word of the main text of page <code
+                                            class="docutils literal notranslate"><span class="pre">n+1</span></code>.
+                                    Retrieve the
+                                    words in such an entity demands extrem precision and absurdly complex chunks of
+                                    code. In pseudo-python, you would end up with something like <code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">my_entity.words</span> <span class="pre">=</span> <span
+                                            class="pre">pages[n].children.lines[-1].children.words[-2:]+page[n+1].children.lines[0].children.words[0]</span></code>.
+                                    And this is even yet a simple case. What if you have a footnote on page <code
+                                            class="docutils literal notranslate"><span class="pre">n</span></code> that
+                                    you don’t want to include ? What if the first line of page <code
+                                            class="docutils literal notranslate"><span class="pre">n+1</span></code> is
+                                    actually the page number and not the main text ? I let you imagine the kind of
+                                    recondite
+                                    code you end up with (<code class="docutils literal notranslate"><span class="pre">my_entity.words</span>
+                                        <span class="pre">=</span> <span class="pre">pages[n].children.find_all(&quot;regions&quot;,</span>
+                                        <span class="pre">type=&quot;main_text&quot;)[-1].children.lines[-1].words[-2:]+pages[n+1]...</span></code>).
+                                    Not even mentionning the fact that this code is not yet dynamic and that a simple
+                                    change in page numbering, word alignment or region reading order completely ruins
+                                    the pipeline.</p>
+                            </section>
+                            <section id="The-advantages-of-the-canonical-format">
+                                <h3>The advantages of the canonical format<a class="headerlink"
+                                                                             href="#The-advantages-of-the-canonical-format"
+                                                                             title="Link to this heading">#</a></h3>
+                                <p>To tackle these issues, we propose with a fairly simple canonical format to store our
+                                    data. The philosophy of its implementation is to go from a hierarchised and nested
+                                    structure to a fully horizontal structure. Instead of having nested and re-nested
+                                    text containers we collect a global list of words and map every other text container
+                                    to a word range. Here’s an example</p>
+                                <div class="highlight-json notranslate">
+                                    <div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;words&quot;</span><span class="w"> </span><span class="p">:</span><span
+                                                class="w"> </span><span class="p">[{</span><span class="nt">&quot;text&quot;</span><span
+                                                class="p">:</span><span class="s2">&quot;Foo&quot;</span><span
+                                                class="p">,</span><span class="w"> </span><span class="nt">&quot;attribute_1&quot;</span><span
+                                                class="p">:</span><span class="s2">&quot;...&quot;</span><span
+                                                class="p">,</span><span class="w"> </span><span class="nt">&quot;attribute_2&quot;</span><span
+                                                class="p">:</span><span class="s2">&quot;...&quot;</span><span
+                                                class="p">},</span>
+<span class="w">             </span><span class="p">{</span><span class="nt">&quot;text&quot;</span><span
+                                                class="p">:</span><span class="s2">&quot;Bar&quot;</span><span
+                                                class="p">,</span><span class="w"> </span><span class="nt">&quot;attribute_1&quot;</span><span
+                                                class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span
+                                                class="p">,</span><span class="w"> </span><span class="nt">&quot;attribute_2&quot;</span><span
+                                                class="p">:</span><span class="s2">&quot;...&quot;</span><span
+                                                class="p">},</span>
+<span class="w">             </span><span class="p">{</span><span class="nt">&quot;text&quot;</span><span
+                                                class="p">:</span><span class="s2">&quot;Zig&quot;</span><span
+                                                class="p">,</span><span class="w"> </span><span class="nt">&quot;attribute_1&quot;</span><span
+                                                class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span
+                                                class="p">,</span><span class="w"> </span><span class="nt">&quot;attribute_2&quot;</span><span
+                                                class="p">:</span><span class="s2">&quot;...&quot;</span><span
+                                                class="p">},</span>
+<span class="w">             </span><span class="p">{</span><span class="nt">&quot;text&quot;</span><span
+                                                class="p">:</span><span class="s2">&quot;Zag&quot;</span><span
+                                                class="p">,</span><span class="w"> </span><span class="nt">&quot;attribute_1&quot;</span><span
+                                                class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span
+                                                class="p">,</span><span class="w"> </span><span class="nt">&quot;attribute_2&quot;</span><span
+                                                class="p">:</span><span class="s2">&quot;...&quot;</span><span
+                                                class="p">}],</span>
+<span class="w">  </span><span class="nt">&quot;pages&quot;</span><span class="p">:</span><span class="w"> </span><span
+                                                class="p">[{</span><span class="nt">&quot;word_range&quot;</span><span
+                                                class="p">:</span><span class="w"> </span><span class="p">[</span><span
+                                                class="mi">0</span><span class="p">,</span><span
+                                                class="mi">3</span><span class="p">]}],</span>
+<span class="w">  </span><span class="nt">&quot;lines&quot;</span><span class="p">:</span><span class="w"> </span><span
+                                                class="p">[{</span><span class="nt">&quot;word_range&quot;</span><span
+                                                class="p">:</span><span class="w"> </span><span class="p">[</span><span
+                                                class="mi">0</span><span class="p">,</span><span
+                                                class="mi">1</span><span class="p">]},</span>
+<span class="w">            </span><span class="p">{</span><span class="nt">&quot;word_range&quot;</span><span
+                                                class="p">:</span><span class="w"> </span><span class="p">[</span><span
+                                                class="mi">2</span><span class="p">,</span><span
+                                                class="mi">3</span><span class="p">]}]</span>
+<span class="p">}</span>
+</pre>
+                                    </div>
+                                </div>
+                                <p>This format comes with a lot of advantages :</p>
+                                <ol class="arabic simple">
+                                    <li><p>It’s a <code class="docutils literal notranslate"><span
+                                            class="pre">json</span></code>, not an <code
+                                            class="docutils literal notranslate"><span class="pre">xml</span></code>.
+                                        It’s easily readable both by humans and machines. You can import it as a python
+                                        <code class="docutils literal notranslate"><span class="pre">dict</span></code>
+                                        in 2 lines of code. No need for more complex <code
+                                                class="docutils literal notranslate"><span class="pre">bs4</span></code>
+                                        or <code class="docutils literal notranslate"><span
+                                                class="pre">etree</span></code> objects that would clearly overkill for
+                                        our purposes and offer nothing that <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">json</span></code>s or <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">dict</span></code>s can’t do.</p></li>
+                                    <li><p>It solves the nesting and overlapping problem at once. You can have
+                                        overlapping, nested, renested textcontainers. Important thing is that they can
+                                        be accessed <strong>horizontally</strong>, simply by finding the other
+                                        textcontainers with included or overlapping word ranges. Same to get a
+                                        textcontainer’s words : simply call <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">my_tc.words</span> <span class="pre">=</span> <span
+                                                class="pre">words[*my_tc.word_range]</span></code>.</p></li>
+                                    <li><p>It makes redundant information of xmls useless: To get a line’s bounding box,
+                                        you simply concatenate it’s words bounding box. This allows to store an entire
+                                        400 pages commentary in a ~35MB file, as opposed to ~85MB other OCR outputs
+                                        (with no information loss and no optimisation), which transitions well to the
+                                        next point.</p></li>
+                                    <li><p>It is computationnaly efficient. See a simple example here :</p></li>
+                                </ol>
+                                <div class="nbinput docutils container">
+                                    <div class="prompt highlight-none notranslate">
+                                        <div class="highlight"><pre><span></span>[7]:
+</pre>
+                                        </div>
+                                    </div>
+                                    <div class="input_area highlight-ipython2 notranslate">
+                                        <div class="highlight"><pre><span></span><span class="kn">import</span> <span
+                                                class="nn">time</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">ajmc.text_processing.ocr_classes</span> <span
+                                                    class="kn">import</span> <span class="n">OcrCommentary</span>
+<span class="kn">from</span> <span class="nn">ajmc.text_processing.canonical_classes</span> <span
+                                                    class="kn">import</span> <span class="n">CanonicalCommentary</span>
+
+
+
+<span class="k">def</span> <span class="nf">time_commentary_operations</span><span class="p">(</span><span class="n">commentary_type</span><span
+                                                    class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span
+                                                    class="s1">&#39;Measuring </span><span class="si">{</span><span
+                                                    class="n">commentary_type</span><span class="si">}</span><span
+                                                    class="s1"> importation time and manipulation time&#39;</span><span
+                                                    class="p">)</span>
+
+    <span class="n">json_path</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span
+                                                    class="n">COMMS_DATA_DIR</span> <span class="o">/</span> <span
+                                                    class="s1">&#39;sophoclesplaysa05campgoog/canonical/3467O2_tess_retrained.json&#39;</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span
+                                                    class="n">time</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">commentary_type</span> <span class="o">==</span> <span class="s2">&quot;OcrCommentary&quot;</span><span
+                                                    class="p">:</span>
+        <span class="n">commentary</span> <span class="o">=</span> <span class="n">OcrCommentary</span><span
+                                                    class="o">.</span><span class="n">from_ajmc_data</span><span
+                                                    class="p">(</span><span class="n">comm_id</span><span
+                                                    class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">commentary</span> <span class="o">=</span> <span class="n">CanonicalCommentary</span><span
+                                                    class="o">.</span><span class="n">from_json</span><span
+                                                    class="p">(</span><span class="n">json_path</span><span
+                                                    class="p">)</span>
+
+    <span class="n">commentary</span><span class="o">.</span><span class="n">children</span><span
+                                                    class="o">.</span><span class="n">words</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    Time required by importation and word retrieval: </span><span
+                                                    class="si">{:.2f}</span><span class="s2">s&quot;</span><span
+                                                    class="o">.</span><span class="n">format</span><span
+                                                    class="p">(</span><span class="n">time</span><span
+                                                    class="o">.</span><span class="n">time</span><span
+                                                    class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span
+                                                    class="p">))</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span
+                                                    class="n">time</span><span class="p">()</span>
+    <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span
+                                                    class="n">l</span> <span class="ow">in</span> <span class="n">commentary</span><span
+                                                    class="o">.</span><span class="n">children</span><span
+                                                    class="o">.</span><span class="n">lines</span> <span
+                                                    class="k">if</span> <span class="n">re</span><span
+                                                    class="o">.</span><span class="n">findall</span><span
+                                                    class="p">(</span><span class="sa">r</span><span class="s1">&#39;[0-9]&#39;</span><span
+                                                    class="p">,</span> <span class="n">l</span><span
+                                                    class="o">.</span><span class="n">text</span><span
+                                                    class="p">)]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    Time required to retrieve the text lines containing decimals: </span><span
+                                                    class="si">{:.2f}</span><span class="s2">s</span><span
+                                                    class="se">\n</span><span class="s2">&quot;</span><span
+                                                    class="o">.</span><span class="n">format</span><span
+                                                    class="p">(</span><span class="n">time</span><span
+                                                    class="o">.</span><span class="n">time</span><span
+                                                    class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span
+                                                    class="p">))</span>
+
+
+<span class="n">time_commentary_operations</span><span class="p">(</span><span class="s1">&#39;OcrCommentary&#39;</span><span
+                                                    class="p">)</span>
+<span class="n">time_commentary_operations</span><span class="p">(</span><span
+                                                    class="s1">&#39;CanonicalCommentary&#39;</span><span
+                                                    class="p">)</span>
+</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="nboutput nblast docutils container">
+                                    <div class="prompt empty docutils container">
+                                    </div>
+                                    <div class="output_area docutils container">
+                                        <div class="highlight"><pre>
+Measuring OcrCommentary importation time and manipulation time
+    Time required by importation and word retrieval: 9.01s
+    Time required to retrieve the text lines containing decimals: 2.03s
+
+Measuring CanonicalCommentary importation time and manipulation time
+    Time required by importation and word retrieval: 3.94s
+    Time required to retrieve the text lines containing decimals: 0.23s
+</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ol class="arabic simple" start="5">
+                                    <li><p>It allows to deal with multiple versions of the text easily, simply by
+                                        creating new lists of words and mapping text container customly to any list for
+                                        any word range (Recall how complicated such an implementation would be if it was
+                                        to be performed in a nested architecture at line or word level).</p></li>
+                                </ol>
+                            </section>
+                        </section>
+                        <section id="Post-processing-OCR-outputs">
+                            <h2>Post-processing OCR outputs<a class="headerlink" href="#Post-processing-OCR-outputs"
+                                                              title="Link to this heading">#</a></h2>
+                            <p>Now, how does this solves the OCR related issues mentionned above ? These are dealt with
+                                in post-processing. <code class="docutils literal notranslate"><span class="pre">OcrCommentary.to_canonical()</span></code>
+                                therefore launches two operations under the hood: 1. Post-processing OCR. 2. Converting
+                                to <code class="docutils literal notranslate"><span
+                                        class="pre">CanonicalCommentary</span></code>.</p>
+                            <p>Since we already covered the second step, let us briefly go through the first one.
+                                Post-processing the OCR aims at harmonizing text, bounding boxes and relations between
+                                text containers. It therefore brings a solution to each of the problems listed above: -
+                                It deletes empty words and non words. - It adjusts word bounding boxes to their content
+                                using contours detection (<code class="docutils literal notranslate"><span class="pre">cv2.findContours</span></code>)
+                                - It adjusts line and regions boxes to the minimal box containing the words (for
+                                regions, a
+                                <code class="docutils literal notranslate"><span class="pre">_inclusion_threshold</span></code>
+                                is used, which, set to 0.8 proves to be quiet robust. - It cuts lines according to
+                                regions, so that overlapping lines are now chunked. - It removes empty lines - It resets
+                                reading order from the region level downwards (i.e. order regions, then line in each
+                                region, then words in each line). The algorithm is also robust. Use <code
+                                        class="docutils literal notranslate"><span class="pre">AjmcImage.draw_reading_order</span></code>
+                                to test.</p>
+                            <p>All these operations are performed at page level, using <code
+                                    class="docutils literal notranslate"><span
+                                    class="pre">OcrPage.optimise()</span></code>, which is itself called internally by
+                                <code class="docutils literal notranslate"><span class="pre">OcrCommentary.to_canonical()</span></code>:
+                            </p>
+                            <div class="nbinput nblast docutils container">
+                                <div class="prompt highlight-none notranslate">
+                                    <div class="highlight"><pre><span></span>[ ]:
+</pre>
+                                    </div>
+                                </div>
+                                <div class="input_area highlight-ipython2 notranslate">
+                                    <div class="highlight"><pre><span></span><span class="n">can_commentary</span> <span
+                                            class="o">=</span> <span class="n">OcrCommentary</span><span
+                                            class="o">.</span><span class="n">from_ajmc_data</span><span
+                                            class="p">(</span><span class="n">ocr_path</span><span
+                                            class="o">=</span><span class="n">vs</span><span class="o">.</span><span
+                                            class="n">get_comm_ocr_outputs_dir</span><span class="p">(</span><span
+                                            class="n">comm_id</span><span class="p">,</span> <span
+                                            class="n">ocr_run_id</span><span class="p">)</span><span
+                                            class="o">.</span><span class="n">to_canonical</span><span
+                                            class="p">()</span>
+</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="Exporting-canonical-commentaries-to-json">
+                            <h2>Exporting canonical commentaries to json<a class="headerlink"
+                                                                           href="#Exporting-canonical-commentaries-to-json"
+                                                                           title="Link to this heading">#</a></h2>
+                            <p>This last step is pretty straightforward:</p>
+                            <div class="nbinput nblast docutils container">
+                                <div class="prompt highlight-none notranslate">
+                                    <div class="highlight"><pre><span></span>[ ]:
+</pre>
+                                    </div>
+                                </div>
+                                <div class="input_area highlight-ipython2 notranslate">
+                                    <div class="highlight"><pre><span></span><span class="n">can_commentary</span><span
+                                            class="o">.</span><span class="n">to_json</span><span
+                                            class="p">(</span><span class="n">output_path</span><span class="o">=</span><span
+                                            class="kc">None</span><span class="p">)</span>
+</pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>If <code class="docutils literal notranslate"><span class="pre">output_path</span></code>
+                                is not provided, the canonical json will be automatically exported to the location
+                                determined by ajmc’s directory structure guidelines (i.e. <code
+                                        class="docutils literal notranslate"><span class="pre">/base_dir/comm_id/canonical/v2/ocr_run_id.json</span></code>).
+                                Under the hood, this calls on each <code class="docutils literal notranslate"><span
+                                        class="pre">CanonicalTextContainer</span></code>s’ specific <code
+                                        class="docutils literal notranslate"><span
+                                        class="pre">self.to_json()</span></code> method.</p>
+                        </section>
+                    </section>
+
+                </article>
+            </div>
+            <footer>
+
+                <div class="related-pages">
+                    <a class="next-page" href="data_organisation.html">
+                        <div class="page-info">
+                            <div class="context">
+                                <span>Next</span>
+                            </div>
+                            <div class="title">Understanding the ajmc directory structure.</div>
+                        </div>
+                        <svg class="furo-related-icon">
+                            <use href="#svg-arrow-right"></use>
+                        </svg>
+                    </a>
+                    <a class="prev-page" href="base_functionalities.html">
+                        <svg class="furo-related-icon">
+                            <use href="#svg-arrow-right"></use>
+                        </svg>
+                        <div class="page-info">
+                            <div class="context">
+                                <span>Previous</span>
+                            </div>
+
+                            <div class="title">Basic functionalities</div>
+
+                        </div>
+                    </a>
+                </div>
+                <div class="bottom-of-page">
+                    <div class="left-details">
+                        <div class="copyright">
+                            Copyright &#169; 2023, Sven Najem-Meyer
+                        </div>
+                        Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link"
+                                                                                          href="https://pradyunsg.me">@pradyunsg</a>'s
+
+                        <a href="https://github.com/pradyunsg/furo">Furo</a>
+
+                    </div>
+                    <div class="right-details">
+
+                    </div>
+                </div>
+
+            </footer>
+        </div>
+        <aside class="toc-drawer">
+
+
+            <div class="toc-sticky toc-scroll">
+                <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+                </div>
+                <div class="toc-tree-container">
+                    <div class="toc-tree">
+                        <ul>
+                            <li><a class="reference internal" href="#">Commentary importation pipeline</a>
+                                <ul>
+                                    <li><a class="reference internal" href="#Creating-an-OcrCommetary.">Creating an
+                                        <code class="docutils literal notranslate"><span class="pre">OcrCommetary</span></code>.</a>
+                                    </li>
+                                    <li><a class="reference internal"
+                                           href="#Why-should-one-bother-creating-CanonicalCommentarys-?">Why should one
+                                        bother creating <code class="docutils literal notranslate"><span class="pre">CanonicalCommentary</span></code>s
+                                        ?</a>
+                                        <ul>
+                                            <li><a class="reference internal" href="#The-vagaries-of-OCR">The vagaries
+                                                of OCR</a></li>
+                                            <li><a class="reference internal" href="#The-weakness-of-xml-formats">The
+                                                weakness of xml formats</a></li>
+                                            <li><a class="reference internal"
+                                                   href="#The-advantages-of-the-canonical-format">The advantages of the
+                                                canonical format</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="reference internal" href="#Post-processing-OCR-outputs">Post-processing
+                                        OCR outputs</a></li>
+                                    <li><a class="reference internal" href="#Exporting-canonical-commentaries-to-json">Exporting
+                                        canonical commentaries to json</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </aside>
+    </div>
+</div>
+<script src="../_static/documentation_options.js?v=2fea6348"></script>
+<script src="../_static/doctools.js?v=888ff710"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
+        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script>
+    window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}
+</script>
+<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html>

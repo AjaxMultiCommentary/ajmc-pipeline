@@ -1,0 +1,1053 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="prev" title="Understanding the goal of the library" href="introduction_to_code.html"/>
+
+    <!-- Generated with Sphinx 7.2.5 and Furo 2023.08.19 -->
+    <title>Contributing guidelines - ajmc v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c"/>
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be"/>
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c"/>
+
+
+    <style>
+        body {
+            --color-code-background: #f8f8f8;
+            --color-code-foreground: black;
+
+        }
+
+        @media not print {
+            body[data-theme="dark"] {
+                --color-code-background: #202020;
+                --color-code-foreground: #d0d0d0;
+
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body:not([data-theme="light"]) {
+                    --color-code-background: #202020;
+                    --color-code-foreground: #d0d0d0;
+
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+</script>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="svg-toc" viewBox="0 0 24 24">
+        <title>Contents</title>
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+            <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-menu" viewBox="0 0 24 24">
+        <title>Menu</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+        <title>Expand</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun" viewBox="0 0 24 24">
+        <title>Light mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-moon" viewBox="0 0 24 24">
+        <title>Dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun-half" viewBox="0 0 24 24">
+        <title>Auto light/dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M13 12h5"/>
+            <path d="M13 15h4"/>
+            <path d="M13 18h1"/>
+            <path d="M13 9h4"/>
+            <path d="M13 6h1"/>
+        </svg>
+    </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+    <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+    <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+<div class="page">
+    <header class="mobile-header">
+        <div class="header-left">
+            <label class="nav-overlay-icon" for="__navigation">
+                <div class="visually-hidden">Toggle site navigation sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-menu"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+        <div class="header-center">
+            <a href="../index.html">
+                <div class="brand">ajmc v0.0.1 documentation</div>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle-container theme-toggle-header">
+                <button class="theme-toggle">
+                    <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                    <svg class="theme-icon-when-auto">
+                        <use href="#svg-sun-half"></use>
+                    </svg>
+                    <svg class="theme-icon-when-dark">
+                        <use href="#svg-moon"></use>
+                    </svg>
+                    <svg class="theme-icon-when-light">
+                        <use href="#svg-sun"></use>
+                    </svg>
+                </button>
+            </div>
+            <label class="toc-overlay-icon toc-header-icon" for="__toc">
+                <div class="visually-hidden">Toggle table of contents sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-toc"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+    </header>
+    <aside class="sidebar-drawer">
+        <div class="sidebar-container">
+
+            <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+
+
+                <span class="sidebar-brand-text">ajmc v0.0.1 documentation</span>
+
+            </a>
+                <form class="sidebar-search-container" method="get" action="../search.html" role="search">
+                    <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+                    <input type="hidden" name="check_keywords" value="yes">
+                    <input type="hidden" name="area" value="default">
+                </form>
+                <div id="searchbox"></div>
+                <div class="sidebar-scroll">
+                    <div class="sidebar-tree">
+                        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+                        <ul>
+                            <li class="toctree-l1 has-children"><a class="reference internal" href="../modules.html">ajmc</a><input
+                                    class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1"
+                                    role="switch" type="checkbox"/><label for="toctree-checkbox-1">
+                                <div class="visually-hidden">Toggle navigation of ajmc</div>
+                                <i class="icon">
+                                    <svg>
+                                        <use href="#svg-arrow-right"></use>
+                                    </svg>
+                                </i></label>
+                                <ul>
+                                    <li class="toctree-l2 has-children"><a class="reference internal"
+                                                                           href="../ajmc.html">ajmc package</a><input
+                                            class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2"
+                                            role="switch" type="checkbox"/><label for="toctree-checkbox-2">
+                                        <div class="visually-hidden">Toggle navigation of ajmc package</div>
+                                        <i class="icon">
+                                            <svg>
+                                                <use href="#svg-arrow-right"></use>
+                                            </svg>
+                                        </i></label>
+                                        <ul>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../ajmc.commons.html">ajmc.commons
+                                                package</a></li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../ajmc.corpora.html">ajmc.corpora
+                                                package</a></li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../ajmc.nlp.html">ajmc.nlp
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-3"
+                                                                  name="toctree-checkbox-3" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-3">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.nlp package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4 has-children"><a class="reference internal"
+                                                                                           href="../ajmc.nlp.token_classification.html">ajmc.nlp.token_classification
+                                                        package</a><input class="toctree-checkbox"
+                                                                          id="toctree-checkbox-4"
+                                                                          name="toctree-checkbox-4" role="switch"
+                                                                          type="checkbox"/><label
+                                                            for="toctree-checkbox-4">
+                                                        <div class="visually-hidden">Toggle navigation of
+                                                            ajmc.nlp.token_classification package
+                                                        </div>
+                                                        <i class="icon">
+                                                            <svg>
+                                                                <use href="#svg-arrow-right"></use>
+                                                            </svg>
+                                                        </i></label>
+                                                        <ul>
+                                                            <li class="toctree-l5"><a class="reference internal"
+                                                                                      href="../ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation
+                                                                package</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../ajmc.ocr.html">ajmc.ocr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-5"
+                                                                  name="toctree-checkbox-5" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-5">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.ocr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.ocr.preprocessing.html">ajmc.ocr.preprocessing
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.ocr.pytorch.html">ajmc.ocr.pytorch
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.ocr.tesseract.html">ajmc.ocr.tesseract
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../ajmc.olr.html">ajmc.olr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-6"
+                                                                  name="toctree-checkbox-6" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-6">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.olr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.olr.layoutlm.html">ajmc.olr.layoutlm
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../ajmc.olr.yolo.html">ajmc.olr.yolo
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../ajmc.text_processing.html">ajmc.text_processing
+                                                package</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal" href="base_functionalities.html">Basic
+                                functionalities</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="commentary_importation_pipeline.html">Commentary importation
+                                pipeline</a></li>
+                            <li class="toctree-l1"><a class="reference internal" href="data_organisation.html">Understanding
+                                the ajmc directory structure.</a></li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Contributing:</span></p>
+                        <ul class="current">
+                            <li class="toctree-l1"><a class="reference internal" href="introduction_to_code.html">Understanding
+                                the goal of the library</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="introduction_to_code.html#The-commons-directory">The commons
+                                directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="introduction_to_code.html#The-text_processing-directory">The
+                                <code class="docutils literal notranslate"><span
+                                        class="pre">text_processing</span></code> directory</a></li>
+                            <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Contributing
+                                guidelines</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </aside>
+    <div class="main">
+        <div class="content">
+            <div class="article-container">
+                <a href="#" class="back-to-top muted-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+                    </svg>
+                    <span>Back to top</span>
+                </a>
+                <div class="content-icon-container">
+
+                    <div class="theme-toggle-container theme-toggle-content">
+                        <button class="theme-toggle">
+                            <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                            <svg class="theme-icon-when-auto">
+                                <use href="#svg-sun-half"></use>
+                            </svg>
+                            <svg class="theme-icon-when-dark">
+                                <use href="#svg-moon"></use>
+                            </svg>
+                            <svg class="theme-icon-when-light">
+                                <use href="#svg-sun"></use>
+                            </svg>
+                        </button>
+                    </div>
+                    <label class="toc-overlay-icon toc-content-icon" for="__toc">
+                        <div class="visually-hidden">Toggle table of contents sidebar</div>
+                        <i class="icon">
+                            <svg>
+                                <use href="#svg-toc"></use>
+                            </svg>
+                        </i>
+                    </label>
+                </div>
+                <article role="main">
+                    <section id="contributing-guidelines">
+                        <h1>Contributing guidelines<a class="headerlink" href="#contributing-guidelines"
+                                                      title="Link to this heading">#</a></h1>
+                        <p>This notebook provides contributors (and especially students) with a set of general
+                            principles, specific rules and best practices. Its goal to facilitate collaboration and
+                            maintenance of the library. It is highly recommended to read the <code
+                                    class="docutils literal notranslate"><span
+                                    class="pre">introduction_to_code.ipynb</span></code> before going further.</p>
+                        <section id="general-principles">
+                            <h2>General principles<a class="headerlink" href="#general-principles"
+                                                     title="Link to this heading">#</a></h2>
+                            <p>I will first start by defining and illustrate the fundamental design principles of this
+                                codebase. All the examples below are voluntary simplified and do not reflect the actual
+                                codebase.</p>
+                            <section id="the-code-should-be-systematic">
+                                <h3>The code should be systematic<a class="headerlink"
+                                                                    href="#the-code-should-be-systematic"
+                                                                    title="Link to this heading">#</a></h3>
+                                <section id="definition">
+                                    <h4>Definition<a class="headerlink" href="#definition" title="Link to this heading">#</a>
+                                    </h4>
+                                    <p>Systematic means that similar situations, objects and pipelines should be handled
+                                        similarly. It means that design principles should be shared across modules so
+                                        that someone with a good knowledge of a module could easily predict how another
+                                        module is written. It rimes with generality and consistency. It can conflict
+                                        with the specificity of particular objects and with efficiency related issues.
+                                        Hence :</p>
+                                    <blockquote>
+                                        <div><p>Be as systematic as you can, as specific as you must.</p>
+                                        </div>
+                                    </blockquote>
+                                </section>
+                                <section id="examples">
+                                    <h4>Examples<a class="headerlink" href="#examples"
+                                                   title="Link to this heading">#</a></h4>
+                                    <ol class="arabic simple">
+                                        <li><p>Two functions which are part of similar pipelines, share similar goals or
+                                            deal with similar objects should have similar arguments.</p></li>
+                                    </ol>
+                                    <p>✅ This is good practice:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">def</span> <span
+                                                class="nf">compute_circle_area</span><span class="p">(</span><span
+                                                class="n">radius</span><span class="p">:</span> <span
+                                                class="nb">float</span><span class="p">)</span> <span
+                                                class="o">-&gt;</span> <span class="nb">float</span><span
+                                                class="p">:</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">pi</span> <span
+                                                    class="o">*</span> <span class="n">radius</span> <span
+                                                    class="o">**</span> <span class="mi">2</span>
+
+<span class="k">def</span> <span class="nf">compute_circle_circumference</span><span class="p">(</span><span class="n">radius</span><span
+                                                    class="p">:</span> <span class="nb">float</span><span
+                                                    class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span
+                                                    class="p">:</span>
+    <span class="k">return</span> <span class="mi">2</span><span class="o">*</span> <span class="n">numpy</span><span
+                                                    class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span
+                                                    class="n">radius</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>❌ This should be avoided:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">def</span> <span
+                                                class="nf">compute_circle_area</span><span class="p">(</span><span
+                                                class="n">circle</span><span class="p">:</span><span class="s1">&#39;MyCircleObject&#39;</span><span
+                                                class="p">)</span> <span class="o">-&gt;</span> <span
+                                                class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">pi</span> <span
+                                                    class="o">*</span> <span class="n">circle</span><span
+                                                    class="o">.</span><span class="n">radius</span> <span
+                                                    class="o">**</span> <span class="mi">2</span>
+
+<span class="k">def</span> <span class="nf">compute_circle_circumference</span><span class="p">(</span><span class="n">radius</span><span
+                                                    class="p">:</span> <span class="nb">float</span><span
+                                                    class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span
+                                                    class="p">:</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">numpy</span><span
+                                                    class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span
+                                                    class="n">radius</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>In the second example, two functions doing very related operations unnecessarily
+                                        require different types of arguments: the first expects a <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">MyCircleObject</span></code> while the second expects the
+                                        circle’s radius circle directly.</p>
+                                    <ol class="arabic simple" start="2">
+                                        <li><p>Closely related objects should behave similarly.</p></li>
+                                    </ol>
+                                    <p>✅ This is good practice</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">class</span> <span
+                                                class="nc">Circle</span><span class="p">:</span>
+    <span class="c1">#...</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span
+                                                    class="p">):</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span
+                                                    class="n">pi</span> <span class="o">*</span> <span
+                                                    class="bp">self</span><span class="o">.</span><span
+                                                    class="n">radius</span> <span class="o">**</span> <span
+                                                    class="mi">2</span>
+
+<span class="k">class</span> <span class="nc">Rectangle</span><span class="p">:</span>
+    <span class="c1">#...</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span
+                                                    class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span
+                                                    class="n">width</span> <span class="o">*</span> <span class="bp">self</span><span
+                                                    class="o">.</span><span class="n">height</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>❌ This should be avoided</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">class</span> <span
+                                                class="nc">Circle</span><span class="p">:</span>
+    <span class="c1">#...</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span
+                                                    class="p">):</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span
+                                                    class="n">pi</span> <span class="o">*</span> <span
+                                                    class="bp">self</span><span class="o">.</span><span
+                                                    class="n">radius</span> <span class="o">**</span> <span
+                                                    class="mi">2</span>
+
+<span class="k">class</span> <span class="nc">Rectangle</span><span class="p">:</span>
+    <span class="c1">#...</span>
+    <span class="k">def</span> <span class="nf">compute_area</span><span class="p">(</span><span
+                                                    class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span
+                                                    class="n">width</span> <span class="o">*</span> <span class="bp">self</span><span
+                                                    class="o">.</span><span class="n">height</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>Here, there is no reason for calling a method in one case (<code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">Rectangle.get_area()</span></code>) while retrieving the value
+                                        of a property in the other (<code class="docutils literal notranslate"><span
+                                                class="pre">Circle.area</span></code>). A similar example could have
+                                        been to not implement <code class="docutils literal notranslate"><span
+                                                class="pre">area</span></code> at all in <code
+                                                class="docutils literal notranslate"><span class="pre">Rectangle</span></code>.
+                                        Note that when an attribute is not relevant for an object, it is preferable to
+                                        define and implement a null value than to potentially raise <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">AttributeError</span></code>s.</p>
+                                    <p><strong>In ajmc</strong>. This is the case for words and lines. Though they are
+                                        very similar objects, lines can have children, but words have none as they are
+                                        the lowest level in our hierarchy. By convention, <code
+                                                class="docutils literal notranslate"><span class="pre">Word.children.words</span></code>
+                                        returns an empty list and does not raise an <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">AttributeError</span></code>. The same holds true for the
+                                        parents of a commentary.</p>
+                                </section>
+                            </section>
+                            <section id="the-code-should-be-centralized">
+                                <h3>The code should be centralized<a class="headerlink"
+                                                                     href="#the-code-should-be-centralized"
+                                                                     title="Link to this heading">#</a></h3>
+                                <section id="id1">
+                                    <h4>Definition<a class="headerlink" href="#id1" title="Link to this heading">#</a>
+                                    </h4>
+                                    <p>The centrality is intimately connected to the <a class="reference external"
+                                                                                        href="https://www.youtube.com/watch?v=IGH4-ZhfVDk">DRY
+                                        principle</a>. It states that every reused snippet of code should be
+                                        <em>called</em> and not <em>duplicated</em>. Good use of this principle makes
+                                        the maintenance of a codebase a lot easier. It can however conflict with the
+                                        simplicity of imports as well as with the readability of the good. The number of
+                                        usages, the simplicity of snippet as well the likelihood it will ever be changed
+                                        or require maintenance should be good hints whether to centralise or not.</p>
+                                </section>
+                                <section id="id2">
+                                    <h4>Examples<a class="headerlink" href="#id2" title="Link to this heading">#</a>
+                                    </h4>
+                                    <ol class="arabic simple">
+                                        <li><p>Docstrings.
+                                            <strong>In ajmc</strong>. This applies to code and to docstrings as well.
+                                            Common docstrings should be written once in <code
+                                                    class="docutils literal notranslate"><span class="pre">commons.docstrings.docstrings</span></code>
+                                            and then called with <code class="docutils literal notranslate"><span
+                                                    class="pre">docstring_formatter</span></code>:</p></li>
+                                    </ol>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="c1"># docstrings is a simple dict</span>
+<span class="n">docstrings</span><span class="p">[</span><span class="s1">&#39;circle_arg&#39;</span><span
+                                                    class="p">]</span> <span class="o">=</span> <span class="s1">&#39;A `MyCircleObject` allowing to call self.radius...&#39;</span>
+
+<span class="nd">@docstring_formatter</span><span class="p">(</span><span class="o">**</span><span
+                                                    class="n">docstrings</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">compute_circle_area</span><span class="p">(</span><span
+                                                    class="n">circle</span><span class="p">:</span> <span class="s1">&#39;MyCircleObject&#39;</span><span
+                                                    class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes area.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        circle: {circle_arg}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <ol class="arabic simple" start="2">
+                                        <li><p>Functions should expect minimal arguments.</p></li>
+                                    </ol>
+                                    <p>Centrality is enhanced by the use of <em>minimal arguments</em>. To be able to
+                                        reuse functions, have them expect only what they actually need to know in order
+                                        to do what they do.</p>
+                                    <p>✅ This is good practice:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">def</span> <span
+                                                class="nf">compute_text_len</span><span class="p">(</span><span
+                                                class="n">text</span><span class="p">:</span><span class="nb">str</span><span
+                                                class="p">)</span> <span class="o">-&gt;</span> <span
+                                                class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span
+                                                    class="p">)</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>❌ This should be avoided:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">def</span> <span
+                                                class="nf">compute_line_len</span><span class="p">(</span><span
+                                                class="n">line</span><span class="p">:</span> <span class="s1">&#39;OcrLine&#39;</span><span
+                                                class="p">)</span> <span class="o">-&gt;</span> <span
+                                                class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span
+                                                    class="o">.</span><span class="n">text</span><span
+                                                    class="p">)</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>Here, <code class="docutils literal notranslate"><span class="pre">compute_line_len</span></code>
+                                        expects an <code class="docutils literal notranslate"><span
+                                                class="pre">OcrLine</span></code> objets only to retrieve its text. The
+                                        function is match to specialised and should actually be a method to the object,
+                                        and not a free function in the loose. On the contrary, <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">compute_text_len</span></code> is much or general and can be
+                                        easily called by several text containers.</p>
+                                    <p>More generally, pipeline-like functions should be avoided as much as possible.
+                                        Something like :</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">def</span> <span
+                                                class="nf">run_outputs_evaluation_and_convert_to_table</span><span
+                                                class="p">(</span><span class="n">outputs_file</span><span
+                                                class="p">,</span> <span
+                                                class="n">some_output_related_parameter</span><span
+                                                class="p">,</span> <span class="n">output_path</span><span
+                                                class="p">,</span> <span class="n">table_styling</span><span class="p">):</span>
+    <span class="c1"># Do something</span>
+    <span class="c1"># ...</span>
+    <span class="k">return</span> 
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>is terrible in terms of flexibility and centrality. It does allow you to run your
+                                        evaluation (or whatever you are doing) without having your outputs as files and
+                                        <code class="docutils literal notranslate"><span class="pre">some_output_related_parameter</span></code>.
+                                        In future usages however, you might not have your outputs it the same format,
+                                        maybe even not as files, and maybe you won’t need <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">table_styling</span></code> anymore. Which is a perfect
+                                        transition to the next point.</p>
+                                    <ol class="arabic simple" start="3">
+                                        <li><p>Functions should perform atomic actions</p></li>
+                                    </ol>
+                                    <p>A single function should never perform two operations you think might be called
+                                        independently. The example above is speaking for itself. Instead of <code
+                                                class="docutils literal notranslate"><span class="pre">run_outputs_evaluation_and_convert_to_table</span></code>,
+                                        have <code class="docutils literal notranslate"><span class="pre">run_outputs_evaluation</span></code>
+                                        and <code class="docutils literal notranslate"><span class="pre">convert_evaluation_to_table</span></code>.
+                                    </p>
+                                </section>
+                            </section>
+                            <section id="the-code-should-be-efficient">
+                                <h3>The code should be efficient<a class="headerlink"
+                                                                   href="#the-code-should-be-efficient"
+                                                                   title="Link to this heading">#</a></h3>
+                                <section id="id3">
+                                    <h4>Definition<a class="headerlink" href="#id3" title="Link to this heading">#</a>
+                                    </h4>
+                                    <p>As they constitute the backend of a dynamic platform, <code
+                                            class="docutils literal notranslate"><span class="pre">ajmc</span></code>’s
+                                        modules should be fluid and run smoothly. The code should require as little
+                                        computation as possible.</p>
+                                </section>
+                                <section id="id4">
+                                    <h4>Examples<a class="headerlink" href="#id4" title="Link to this heading">#</a>
+                                    </h4>
+                                    <ol class="arabic simple">
+                                        <li><p>Shared directory (i.e. <code class="docutils literal notranslate"><span
+                                                class="pre">commons</span></code> and <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">text_processing</span></code> should require as little
+                                            dependencies as possible. If you need heavy computation, it is certainly
+                                            best to isolate your code in a task-specific folder which does not hamper
+                                            the code base from running.</p></li>
+                                        <li><p>Object instantiation should be lazy.</p></li>
+                                    </ol>
+                                    <p><code class="docutils literal notranslate"><span class="pre">lazy_objects</span></code>
+                                        provides two main utilities for lazyness: <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">lazy_property</span></code> and <code
+                                                class="docutils literal notranslate"><span class="pre">LazyObject</span></code>.
+                                        The former allows properties
+                                        to be computed and then stored only when they are called.</p>
+                                    <p>✅ This is good practice:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">class</span> <span
+                                                class="nc">AjmcImage</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+                                                    class="p">,</span> <span class="n">path_to_file</span><span
+                                                    class="p">:</span><span class="nb">str</span><span
+                                                    class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span
+                                                    class="n">path_to_file</span>
+
+    <span class="nd">@lazy_property</span>
+    <span class="k">def</span> <span class="nf">matrix</span><span class="p">(</span><span class="bp">self</span><span
+                                                    class="p">)</span> <span class="o">-&gt;</span> <span
+                                                    class="n">np</span><span class="o">.</span><span
+                                                    class="n">ndarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span
+                                                    class="n">imread</span><span class="p">(</span><span
+                                                    class="bp">self</span><span class="o">.</span><span
+                                                    class="n">path</span><span class="p">)</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>❌ This should be avoided:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">class</span> <span
+                                                class="nc">AjmcImage</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+                                                    class="p">,</span> <span class="n">path_to_file</span><span
+                                                    class="p">:</span><span class="nb">str</span><span
+                                                    class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span
+                                                    class="n">path_to_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span
+                                                    class="n">cv2</span><span class="o">.</span><span
+                                                    class="n">imread</span><span class="p">(</span><span
+                                                    class="bp">self</span><span class="o">.</span><span
+                                                    class="n">path</span><span class="p">)</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>In the second example, <code class="docutils literal notranslate"><span
+                                            class="pre">self.matrix</span></code> is read from the file at
+                                        initialization, which causes the computation to be done even-though the matrix
+                                        is maybe not going to be used.</p>
+                                    <p><strong>Note</strong>. <code class="docutils literal notranslate"><span
+                                            class="pre">lazy_property</span></code> handling heavy or possibly changing
+                                        objects should be used with parsimony. Remember that the object is kept in
+                                        memory! If you want the property to be forgotten, please go for a method or use
+                                        <code class="docutils literal notranslate"><span class="pre">del</span> <span
+                                                class="pre">self.lazy_prop_name</span></code>.</p>
+                                    <ol class="arabic simple" start="3">
+                                        <li><p>Know the <a class="reference external"
+                                                           href="https://stackify.com/20-simple-python-performance-tuning-tips/">basics
+                                            of python optimization</a>. If you doubt the efficiency of your code, use
+                                            <code class="docutils literal notranslate"><span class="pre">commons.miscellaneous.timer</span></code>
+                                            for robust experimenting.</p></li>
+                                    </ol>
+                                </section>
+                            </section>
+                            <section id="the-code-should-be-easily-readable">
+                                <h3>The code should be easily readable<a class="headerlink"
+                                                                         href="#the-code-should-be-easily-readable"
+                                                                         title="Link to this heading">#</a></h3>
+                                <section id="id5">
+                                    <h4>Definition<a class="headerlink" href="#id5" title="Link to this heading">#</a>
+                                    </h4>
+                                    <p>Programmers with a reasonable level in python should be able to easily walk
+                                        through the code, without struggling to find or understand things. This often
+                                        conflicts with optimisation and memory management but should remain of paramount
+                                        importance.</p>
+                                </section>
+                                <section id="id6">
+                                    <h4>Examples<a class="headerlink" href="#id6" title="Link to this heading">#</a>
+                                    </h4>
+                                    <ol class="arabic simple">
+                                        <li><p><strong>Abbreviations</strong> should be strictly prohibited unless
+                                            absolutely necessary or blatantly clear ; They make no sense in the age of
+                                            code completion.</p></li>
+                                    </ol>
+                                    <p>❌ This is bad practice:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">def</span> <span
+                                                class="nf">divs</span><span class="p">(</span><span
+                                                class="n">n</span><span class="p">):</span>
+   <span class="n">ds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+                                                    class="p">(</span><span class="n">n</span><span class="p">):</span>
+       <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="n">i</span> <span
+                                                    class="o">==</span> <span class="mi">0</span><span
+                                                    class="p">:</span>
+           <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
+                                                    class="n">i</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">ds</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>✅ This is much more readable:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">def</span> <span
+                                                class="nf">find_divisors</span><span class="p">(</span><span class="n">dividend</span><span
+                                                class="p">):</span>
+    <span class="n">divisors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="nb">range</span><span
+                                                    class="p">(</span><span class="n">dividend</span><span
+                                                    class="p">):</span>
+        <span class="k">if</span> <span class="n">dividend</span> <span class="o">%</span> <span
+                                                    class="n">candidate</span> <span class="o">==</span> <span
+                                                    class="mi">0</span><span class="p">:</span>
+            <span class="n">divisors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
+                                                    class="n">candidate</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">divisors</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p><strong>Note</strong>. A few tolerated extremely common abbreviations are:</p>
+                                    <ul class="simple">
+                                        <li><p><code class="docutils literal notranslate"><span
+                                                class="pre">img</span></code> for image</p></li>
+                                        <li><p><code class="docutils literal notranslate"><span class="pre">dir_</span></code>
+                                            for directory</p></li>
+                                        <li><p><code class="docutils literal notranslate"><span
+                                                class="pre">gt</span></code> for ground_truth</p></li>
+                                        <li><p><code class="docutils literal notranslate"><span class="pre">char</span></code>
+                                            for character</p></li>
+                                        <li><p><code class="docutils literal notranslate"><span
+                                                class="pre">vs</span></code> for variables</p></li>
+                                        <li><p>If they can easily be understood from context (e.g. In loops and
+                                            comprehensions : <code class="docutils literal notranslate"><span
+                                                    class="pre">[w</span> <span class="pre">for</span> <span
+                                                    class="pre">w</span> <span class="pre">in</span> <span class="pre">words]</span></code>)
+                                        </p></li>
+                                    </ul>
+                                    <ol class="arabic simple" start="2">
+                                        <li><p><strong>Variable names</strong> should say what variables are</p></li>
+                                    </ol>
+                                    <p>Just like <em>Ajax</em>’s name foreshadows his lament <em>Alas</em>, variable
+                                        names should announce their value. Make names so eloquent you need the less
+                                        comments possible : people can change your code but they very likely will not
+                                        upgrade comments. A few examples :</p>
+                                    <ul class="simple">
+                                        <li><p><code class="docutils literal notranslate"><span class="pre">image</span></code>
+                                            should be an image, not the path to it.</p></li>
+                                        <li><p><code class="docutils literal notranslate"><span class="pre">file</span></code>
+                                            should be an IO buffer, not a path or a filename.</p></li>
+                                        <li><p><code class="docutils literal notranslate"><span
+                                                class="pre">number</span></code> should be an int or a float, <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">numbers</span></code> should be a collection</p></li>
+                                        <li><p>By convention, <code class="docutils literal notranslate"><span
+                                                class="pre">i</span></code> is used for an <em>iterator</em> itself,
+                                            <strong>not for the value</strong> iterated upon. Please go for : <code
+                                                    class="docutils literal notranslate"><span class="pre">for</span>
+                                                <span class="pre">thing</span> <span class="pre">in</span> <span
+                                                        class="pre">things</span></code> not <code
+                                                    class="docutils literal notranslate"><span class="pre">for</span>
+                                                <span class="pre">i</span> <span class="pre">in</span> <span
+                                                        class="pre">things</span></code></p></li>
+                                        <li><p>Don’t hesitate to use long names if they shed light on the code! <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">reordered_lines</span></code> is much better than <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">lines_2</span></code>.</p></li>
+                                        <li><p>In any case avoid ambiguous, obscure or boilerplate names like <code
+                                                class="docutils literal notranslate"><span
+                                                class="pre">dict_new</span></code>, <code
+                                                class="docutils literal notranslate"><span class="pre">dict_new_2</span></code>,
+                                            <code class="docutils literal notranslate"><span
+                                                    class="pre">tmp_</span></code>, <code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">values_list</span></code>, <code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">to_output</span></code>…</p></li>
+                                    </ul>
+                                    <ol class="arabic simple" start="3">
+                                        <li><p><strong>Functions names</strong> should say what functions do.</p></li>
+                                    </ol>
+                                    <p>Functions should be named with <strong>verbs</strong> which correspond to their
+                                        actual action.</p>
+                                    <p>✅ This is good writing:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">def</span> <span
+                                                class="nf">compute_rectangle_area</span><span class="p">(</span><span
+                                                class="n">width</span><span class="p">,</span> <span
+                                                class="n">height</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">width</span> <span class="o">*</span> <span class="n">height</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>❌ These are misleading</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="c1"># Get means you are fetching an already computed value</span>
+<span class="k">def</span> <span class="nf">get_rectangle_area</span><span class="p">(</span><span
+                                                    class="n">width</span><span class="p">,</span> <span class="n">height</span><span
+                                                    class="p">):</span>
+    <span class="k">return</span> <span class="n">width</span> <span class="o">*</span> <span class="n">height</span>
+
+<span class="c1"># Substantives are kept for object</span>
+<span class="k">def</span> <span class="nf">rectangle_area_getter</span><span class="p">(</span><span
+                                                    class="n">width</span><span class="p">,</span> <span class="n">height</span><span
+                                                    class="p">):</span>
+    <span class="k">return</span> <span class="n">width</span> <span class="o">*</span> <span class="n">height</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <p>One exception to this principle are filters, i.e. function which test a condition
+                                        and return a boolean:</p>
+                                    <div class="highlight-python notranslate">
+                                        <div class="highlight"><pre><span></span><span class="k">def</span> <span
+                                                class="nf">is_square</span><span class="p">(</span><span class="n">rectangle</span><span
+                                                class="p">):</span>
+    <span class="k">return</span> <span class="n">rectangle</span><span class="o">.</span><span
+                                                    class="n">width</span> <span class="o">==</span> <span class="n">rectangle</span><span
+                                                    class="o">.</span><span class="n">height</span>
+</pre>
+                                        </div>
+                                    </div>
+                                    <ol class="arabic simple" start="4">
+                                        <li><p>Use simple objects and structure</p></li>
+                                    </ol>
+                                    <p>Also adding to the readability of the code is its simplicity. Unless optimisation
+                                        requires it, nested comprehension and smarter-than-smart structures should be
+                                        avoided. Likewise, the use of special objects (i.e. non-native should be
+                                        motivated). Use OOP, but remember that functional code is often easier to read.
+                                        Objects should be objects at all only if there is a reason it.</p>
+                                </section>
+                            </section>
+                        </section>
+                        <section id="other-specific-rules">
+                            <h2>Other specific rules<a class="headerlink" href="#other-specific-rules"
+                                                       title="Link to this heading">#</a></h2>
+                            <ol class="arabic simple">
+                                <li><p>Docstrings are written
+                                    in <a class="reference external"
+                                          href="https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html">Google
+                                        Style Formats</a>.</p></li>
+                                <li><p>Architecture:</p>
+                                    <ul class="simple">
+                                        <li><p>⚠️ <strong>scripts should be in scripts</strong> ⚠️ Script files (i.e.
+                                            files that actually do something when run) should always
+                                            be located in each directory’s dedicated <code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">_scripts</span></code> directory, which should not be a
+                                            python package itself (i.e.
+                                            has no <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code>).
+                                        </p></li>
+                                        <li><p><code class="docutils literal notranslate"><span
+                                                class="pre">commons</span></code> should not import anything from task
+                                            other dirs. <code class="docutils literal notranslate"><span class="pre">text_processing</span></code>
+                                            can import only from commons.
+                                            Task-specific dirs can import from everywhere.</p></li>
+                                    </ul>
+                                </li>
+                                <li><p>Path management:</p>
+                                    <ul class="simple">
+                                        <li><p>With the only exception of entrypoint function, paths are to be handled
+                                            with <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code>
+                                            objects. “Entrypoints”
+                                            are function that can be directly call by the API in a main pipeline; they
+                                            should accept <code class="docutils literal notranslate"><span class="pre">Union[str,</span>
+                                                <span class="pre">Path]</span></code> as
+                                            input.</p></li>
+                                        <li><p>Path management is centralized in <code
+                                                class="docutils literal notranslate"><span class="pre">ajmc.commons.variables</span></code>
+                                        </p></li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </section>
+                    </section>
+
+                </article>
+            </div>
+            <footer>
+
+                <div class="related-pages">
+
+                    <a class="prev-page" href="introduction_to_code.html">
+                        <svg class="furo-related-icon">
+                            <use href="#svg-arrow-right"></use>
+                        </svg>
+                        <div class="page-info">
+                            <div class="context">
+                                <span>Previous</span>
+                            </div>
+
+                            <div class="title">Understanding the goal of the library</div>
+
+                        </div>
+                    </a>
+                </div>
+                <div class="bottom-of-page">
+                    <div class="left-details">
+                        <div class="copyright">
+                            Copyright &#169; 2023, Sven Najem-Meyer
+                        </div>
+                        Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link"
+                                                                                          href="https://pradyunsg.me">@pradyunsg</a>'s
+
+                        <a href="https://github.com/pradyunsg/furo">Furo</a>
+
+                    </div>
+                    <div class="right-details">
+
+                    </div>
+                </div>
+
+            </footer>
+        </div>
+        <aside class="toc-drawer">
+
+
+            <div class="toc-sticky toc-scroll">
+                <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+                </div>
+                <div class="toc-tree-container">
+                    <div class="toc-tree">
+                        <ul>
+                            <li><a class="reference internal" href="#">Contributing guidelines</a>
+                                <ul>
+                                    <li><a class="reference internal" href="#general-principles">General principles</a>
+                                        <ul>
+                                            <li><a class="reference internal" href="#the-code-should-be-systematic">The
+                                                code should be systematic</a>
+                                                <ul>
+                                                    <li><a class="reference internal" href="#definition">Definition</a>
+                                                    </li>
+                                                    <li><a class="reference internal" href="#examples">Examples</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a class="reference internal" href="#the-code-should-be-centralized">The
+                                                code should be centralized</a>
+                                                <ul>
+                                                    <li><a class="reference internal" href="#id1">Definition</a></li>
+                                                    <li><a class="reference internal" href="#id2">Examples</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a class="reference internal" href="#the-code-should-be-efficient">The
+                                                code should be efficient</a>
+                                                <ul>
+                                                    <li><a class="reference internal" href="#id3">Definition</a></li>
+                                                    <li><a class="reference internal" href="#id4">Examples</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a class="reference internal"
+                                                   href="#the-code-should-be-easily-readable">The code should be easily
+                                                readable</a>
+                                                <ul>
+                                                    <li><a class="reference internal" href="#id5">Definition</a></li>
+                                                    <li><a class="reference internal" href="#id6">Examples</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="reference internal" href="#other-specific-rules">Other specific
+                                        rules</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </aside>
+    </div>
+</div>
+<script src="../_static/documentation_options.js?v=2fea6348"></script>
+<script src="../_static/doctools.js?v=888ff710"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
+        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+</body>
+</html>

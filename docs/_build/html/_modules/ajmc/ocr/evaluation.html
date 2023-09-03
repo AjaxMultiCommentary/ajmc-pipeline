@@ -1,0 +1,1721 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark">
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+
+    <!-- Generated with Sphinx 7.2.5 and Furo 2023.08.19 -->
+    <title>ajmc.ocr.evaluation - ajmc v0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c"/>
+
+
+    <style>
+        body {
+            --color-code-background: #f8f8f8;
+            --color-code-foreground: black;
+
+        }
+
+        @media not print {
+            body[data-theme="dark"] {
+                --color-code-background: #202020;
+                --color-code-foreground: #d0d0d0;
+
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body:not([data-theme="light"]) {
+                    --color-code-background: #202020;
+                    --color-code-foreground: #d0d0d0;
+
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+</script>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="svg-toc" viewBox="0 0 24 24">
+        <title>Contents</title>
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+            <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-menu" viewBox="0 0 24 24">
+        <title>Menu</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+        <title>Expand</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun" viewBox="0 0 24 24">
+        <title>Light mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </symbol>
+    <symbol id="svg-moon" viewBox="0 0 24 24">
+        <title>Dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+        </svg>
+    </symbol>
+    <symbol id="svg-sun-half" viewBox="0 0 24 24">
+        <title>Auto light/dark mode</title>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M13 12h5"/>
+            <path d="M13 15h4"/>
+            <path d="M13 18h1"/>
+            <path d="M13 9h4"/>
+            <path d="M13 6h1"/>
+        </svg>
+    </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+    <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+    <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+<div class="page">
+    <header class="mobile-header">
+        <div class="header-left">
+            <label class="nav-overlay-icon" for="__navigation">
+                <div class="visually-hidden">Toggle site navigation sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-menu"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+        <div class="header-center">
+            <a href="../../../index.html">
+                <div class="brand">ajmc v0.0.1 documentation</div>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle-container theme-toggle-header">
+                <button class="theme-toggle">
+                    <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                    <svg class="theme-icon-when-auto">
+                        <use href="#svg-sun-half"></use>
+                    </svg>
+                    <svg class="theme-icon-when-dark">
+                        <use href="#svg-moon"></use>
+                    </svg>
+                    <svg class="theme-icon-when-light">
+                        <use href="#svg-sun"></use>
+                    </svg>
+                </button>
+            </div>
+            <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+                <div class="visually-hidden">Toggle table of contents sidebar</div>
+                <i class="icon">
+                    <svg>
+                        <use href="#svg-toc"></use>
+                    </svg>
+                </i>
+            </label>
+        </div>
+    </header>
+    <aside class="sidebar-drawer">
+        <div class="sidebar-container">
+
+            <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+
+
+                <span class="sidebar-brand-text">ajmc v0.0.1 documentation</span>
+
+            </a>
+                <form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+                    <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+                    <input type="hidden" name="check_keywords" value="yes">
+                    <input type="hidden" name="area" value="default">
+                </form>
+                <div id="searchbox"></div>
+                <div class="sidebar-scroll">
+                    <div class="sidebar-tree">
+                        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+                        <ul>
+                            <li class="toctree-l1 has-children"><a class="reference internal"
+                                                                   href="../../../modules.html">ajmc</a><input
+                                    class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1"
+                                    role="switch" type="checkbox"/><label for="toctree-checkbox-1">
+                                <div class="visually-hidden">Toggle navigation of ajmc</div>
+                                <i class="icon">
+                                    <svg>
+                                        <use href="#svg-arrow-right"></use>
+                                    </svg>
+                                </i></label>
+                                <ul>
+                                    <li class="toctree-l2 has-children"><a class="reference internal"
+                                                                           href="../../../ajmc.html">ajmc
+                                        package</a><input class="toctree-checkbox" id="toctree-checkbox-2"
+                                                          name="toctree-checkbox-2" role="switch"
+                                                          type="checkbox"/><label for="toctree-checkbox-2">
+                                        <div class="visually-hidden">Toggle navigation of ajmc package</div>
+                                        <i class="icon">
+                                            <svg>
+                                                <use href="#svg-arrow-right"></use>
+                                            </svg>
+                                        </i></label>
+                                        <ul>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../ajmc.commons.html">ajmc.commons
+                                                package</a></li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../ajmc.corpora.html">ajmc.corpora
+                                                package</a></li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../ajmc.nlp.html">ajmc.nlp
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-3"
+                                                                  name="toctree-checkbox-3" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-3">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.nlp package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4 has-children"><a class="reference internal"
+                                                                                           href="../../../ajmc.nlp.token_classification.html">ajmc.nlp.token_classification
+                                                        package</a><input class="toctree-checkbox"
+                                                                          id="toctree-checkbox-4"
+                                                                          name="toctree-checkbox-4" role="switch"
+                                                                          type="checkbox"/><label
+                                                            for="toctree-checkbox-4">
+                                                        <div class="visually-hidden">Toggle navigation of
+                                                            ajmc.nlp.token_classification package
+                                                        </div>
+                                                        <i class="icon">
+                                                            <svg>
+                                                                <use href="#svg-arrow-right"></use>
+                                                            </svg>
+                                                        </i></label>
+                                                        <ul>
+                                                            <li class="toctree-l5"><a class="reference internal"
+                                                                                      href="../../../ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation
+                                                                package</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../ajmc.ocr.html">ajmc.ocr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-5"
+                                                                  name="toctree-checkbox-5" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-5">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.ocr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.ocr.preprocessing.html">ajmc.ocr.preprocessing
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.ocr.pytorch.html">ajmc.ocr.pytorch
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.ocr.tesseract.html">ajmc.ocr.tesseract
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3 has-children"><a class="reference internal"
+                                                                                   href="../../../ajmc.olr.html">ajmc.olr
+                                                package</a><input class="toctree-checkbox" id="toctree-checkbox-6"
+                                                                  name="toctree-checkbox-6" role="switch"
+                                                                  type="checkbox"/><label for="toctree-checkbox-6">
+                                                <div class="visually-hidden">Toggle navigation of ajmc.olr package</div>
+                                                <i class="icon">
+                                                    <svg>
+                                                        <use href="#svg-arrow-right"></use>
+                                                    </svg>
+                                                </i></label>
+                                                <ul>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.olr.layoutlm.html">ajmc.olr.layoutlm
+                                                        package</a></li>
+                                                    <li class="toctree-l4"><a class="reference internal"
+                                                                              href="../../../ajmc.olr.yolo.html">ajmc.olr.yolo
+                                                        package</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l3"><a class="reference internal"
+                                                                      href="../../../ajmc.text_processing.html">ajmc.text_processing
+                                                package</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/base_functionalities.html">Basic
+                                functionalities</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/commentary_importation_pipeline.html">Commentary
+                                importation pipeline</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/data_organisation.html">Understanding
+                                the ajmc directory structure.</a></li>
+                        </ul>
+                        <p class="caption" role="heading"><span class="caption-text">Contributing:</span></p>
+                        <ul>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/introduction_to_code.html">Understanding
+                                the goal of the library</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/introduction_to_code.html#The-commons-directory">The
+                                commons directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/introduction_to_code.html#The-text_processing-directory">The
+                                <code class="docutils literal notranslate"><span
+                                        class="pre">text_processing</span></code> directory</a></li>
+                            <li class="toctree-l1"><a class="reference internal"
+                                                      href="../../../other_pages/contributing_guidelines.html">Contributing
+                                guidelines</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </aside>
+    <div class="main">
+        <div class="content">
+            <div class="article-container">
+                <a href="#" class="back-to-top muted-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+                    </svg>
+                    <span>Back to top</span>
+                </a>
+                <div class="content-icon-container">
+                    <div class="theme-toggle-container theme-toggle-content">
+                        <button class="theme-toggle">
+                            <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+                            <svg class="theme-icon-when-auto">
+                                <use href="#svg-sun-half"></use>
+                            </svg>
+                            <svg class="theme-icon-when-dark">
+                                <use href="#svg-moon"></use>
+                            </svg>
+                            <svg class="theme-icon-when-light">
+                                <use href="#svg-sun"></use>
+                            </svg>
+                        </button>
+                    </div>
+                    <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+                        <div class="visually-hidden">Toggle table of contents sidebar</div>
+                        <i class="icon">
+                            <svg>
+                                <use href="#svg-toc"></use>
+                            </svg>
+                        </i>
+                    </label>
+                </div>
+                <article role="main">
+                    <h1>Source code for ajmc.ocr.evaluation</h1>
+                    <div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">``ocr/evaluation`` performs a double evaluation of ocr outputs against given groundtruth data.</span>
+
+<span class="sd">1. **Bag-of-word evaluation**: computes errors by matching words which have the minimal edit distance in a bag of groundtruth and in a a bag of predicted word.</span>
+<span class="sd">2. **Coordinate based evaluation**: computes errors by matching words with overlapping coordinates.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span
+                            class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span
+                            class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span
+                            class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">Levenshtein</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span
+                            class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">ajmc.commons</span> <span class="kn">import</span> <span class="n">variables</span> <span
+                            class="k">as</span> <span class="n">vs</span>
+<span class="kn">from</span> <span class="nn">ajmc.commons.arithmetic</span> <span class="kn">import</span> <span
+                            class="n">safe_divide</span>
+<span class="kn">from</span> <span class="nn">ajmc.commons.geometry</span> <span class="kn">import</span> <span
+                            class="n">are_bboxes_overlapping_with_threshold</span><span class="p">,</span> <span
+                            class="n">is_bbox_within_bbox</span>
+<span class="kn">from</span> <span class="nn">ajmc.commons.miscellaneous</span> <span class="kn">import</span> <span
+                            class="n">get_custom_logger</span>
+<span class="kn">from</span> <span class="nn">ajmc.commons.unicode_utils</span> <span class="kn">import</span> <span
+                            class="n">harmonise_unicode</span><span class="p">,</span> <span class="n">count_chars_by_charset</span><span
+                            class="p">,</span> <span class="n">CHARSETS_PATTERNS</span>
+<span class="kn">from</span> <span class="nn">ajmc.ocr</span> <span class="kn">import</span> <span
+                            class="n">variables</span> <span class="k">as</span> <span class="n">ocr_vs</span>
+<span class="kn">from</span> <span class="nn">ajmc.text_processing.ocr_classes</span> <span
+                            class="kn">import</span> <span class="n">OcrCommentary</span><span class="p">,</span> <span
+                            class="n">OcrPage</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_custom_logger</span><span
+                            class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                       UTILS</span>
+<span class="c1"># ======================================================================================================================</span>
+
+<div class="viewcode-block" id="initialize_soup">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.initialize_soup">[docs]</a>
+<span class="k">def</span> <span class="nf">initialize_soup</span><span class="p">(</span><span
+        class="n">img_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span
+        class="n">img_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="s2">&quot;BeautifulSoup&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes a blank html page for comparing predictions and errors</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img_width: Width of the page&#39;s image.</span>
+<span class="sd">        img_height: Height of the page&#39;s image</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The initialized BeautifulSoup Object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">divisor</span> <span class="o">=</span> <span class="n">img_width</span> <span
+        class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">1440</span>
+
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span
+        class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;!doctype html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;</span>
+<span class="s2">                         &lt;meta charset=&quot;utf-8&quot; divisor=&quot;</span><span
+        class="si">{</span><span class="n">divisor</span><span class="si">}</span><span class="s2">&quot; half_width=&quot;</span><span
+        class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">img_width</span><span
+        class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">divisor</span><span class="p">)</span><span
+        class="si">}</span><span class="s2">&quot;&gt;&lt;/head&gt;</span>
+<span class="s2">                         &lt;body&gt;&lt;p style=&quot;margin:auto;text-align:center&quot;&gt; </span>
+<span class="s2">                         &lt;b&gt;OCR/GROUNDTRUTH COMPARISON &lt;/b&gt;&lt;br&gt; </span>
+<span class="s2">                         Ocr is displayed on the left, groundtruth on the right.&lt;br&gt;</span>
+<span class="s2">                         Missrecognized words are contoured in red. &lt;/p&gt;</span>
+<span class="s2">                         &lt;/body&gt;&lt;/html&gt;&quot;&quot;&quot;</span><span
+        class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="s1">&#39;lxml&#39;</span><span
+        class="p">)</span>
+
+    <span class="n">soup</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span
+        class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
+        class="n">soup</span><span class="o">.</span><span class="n">new_tag</span><span class="p">(</span><span
+        class="n">name</span><span class="o">=</span><span class="s1">&#39;div&#39;</span><span class="p">,</span>
+                                       <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span
+        class="s1">&#39;style&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;margin:auto; position:relative; </span>
+<span class="s2">                                              width:</span><span class="si">{</span><span class="nb">int</span><span
+        class="p">(</span><span class="n">img_width</span><span class="w"> </span><span class="o">*</span><span
+        class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">/</span><span
+        class="w"> </span><span class="n">divisor</span><span class="p">)</span><span class="si">}</span><span
+        class="s2">px; </span>
+<span class="s2">                                              height:</span><span class="si">{</span><span class="nb">int</span><span
+        class="p">(</span><span class="n">img_height</span><span class="w"> </span><span class="o">/</span><span
+        class="w"> </span><span class="p">(</span><span class="n">divisor</span><span class="w"> </span><span class="o">*</span><span
+        class="w"> </span><span class="mf">0.8</span><span class="p">))</span><span class="si">}</span><span class="s2">px&quot;&quot;&quot;</span><span
+        class="p">}))</span>
+
+    <span class="k">return</span> <span class="n">soup</span></div>
+
+
+
+<div class="viewcode-block" id="insert_text_in_soup">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.insert_text_in_soup">[docs]</a>
+<span class="k">def</span> <span class="nf">insert_text_in_soup</span><span class="p">(</span><span
+        class="n">soup</span><span class="p">:</span> <span class="s2">&quot;BeautifulSoup&quot;</span><span
+        class="p">,</span> <span class="n">word</span><span class="p">:</span> <span class="s1">&#39;OcrWord&#39;</span><span
+        class="p">,</span> <span class="n">is_gt</span><span class="p">:</span> <span class="nb">bool</span><span
+        class="p">,</span> <span class="n">is_false</span><span class="p">:</span> <span class="nb">bool</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BeautifulSoup&quot;</span><span
+        class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds content to ``soup`` object.</span>
+
+<span class="sd">    This function is used to add single words to the ``soup`` object initialized by ``initialize_soup``, thereby</span>
+<span class="sd">    reconstructing both the groundtruth and the preds page, with false words in red.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        soup: an initilised BeautifulSoup object</span>
+<span class="sd">        word: The ocr- or groundtruth word to add</span>
+<span class="sd">        is_gt: Wheter the word is groundtruth or not (determines where to place it).</span>
+<span class="sd">        is_false: Whether the word was falsely predicted or not.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">        The modified BeautifulSoup object&quot;&quot;&quot;</span>
+
+    <span class="n">divisor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span
+        class="n">soup</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">head</span><span
+        class="o">.</span><span class="n">meta</span><span class="p">[</span><span
+        class="s1">&#39;divisor&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Write groundtruth to the right</span>
+    <span class="n">x_coord</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span
+        class="n">word</span><span class="o">.</span><span class="n">bbox</span><span class="o">.</span><span class="n">bbox</span><span
+        class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span
+        class="p">]</span> <span class="o">/</span> <span class="n">divisor</span><span class="p">)</span> <span
+        class="o">+</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">soup</span><span
+        class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span
+        class="n">meta</span><span class="p">[</span><span class="s2">&quot;half_width&quot;</span><span
+        class="p">])</span> <span class="k">if</span> <span class="n">is_gt</span> <span class="k">else</span> <span
+        class="mi">0</span><span class="p">)</span>
+    <span class="n">y_coord</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span
+        class="n">word</span><span class="o">.</span><span class="n">bbox</span><span class="o">.</span><span class="n">bbox</span><span
+        class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span
+        class="p">]</span> <span class="o">/</span> <span class="n">divisor</span><span class="p">)</span>
+
+    <span class="n">new_div</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span
+        class="n">new_tag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span
+        class="s2">&quot;div&quot;</span><span class="p">,</span>
+                           <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;style&quot;</span><span
+        class="p">:</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;position:absolute; </span>
+<span class="s2">                                             width:</span><span class="si">{</span><span
+        class="n">word</span><span class="o">.</span><span class="n">bbox</span><span class="o">.</span><span class="n">width</span><span
+        class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">divisor</span><span
+        class="si">}</span><span class="s2">px; </span>
+<span class="s2">                                             height:</span><span class="si">{</span><span class="n">word</span><span
+        class="o">.</span><span class="n">bbox</span><span class="o">.</span><span class="n">height</span><span
+        class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">divisor</span><span
+        class="si">}</span><span class="s2">px; </span>
+<span class="s2">                                             left:</span><span class="si">{</span><span class="n">x_coord</span><span
+        class="si">}</span><span class="s2">px; </span>
+<span class="s2">                                             top:</span><span class="si">{</span><span class="n">y_coord</span><span
+        class="si">}</span><span class="s2">px;</span>
+<span class="s2">                                             font-size: 80%;</span>
+<span class="s2">                                             &quot;&quot;&quot;</span> <span class="o">+</span> <span
+        class="p">(</span><span
+        class="s2">&quot;&quot;&quot;color: red;font-weight: bold;&quot;&quot;&quot;</span> <span
+        class="k">if</span> <span class="n">is_false</span> <span class="k">else</span> <span
+        class="s1">&#39;&#39;</span><span class="p">)})</span>
+
+    <span class="n">new_div</span><span class="o">.</span><span class="n">string</span> <span class="o">=</span> <span
+        class="n">word</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">soup</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span
+        class="n">body</span><span class="o">.</span><span class="n">div</span><span class="o">.</span><span class="n">append</span><span
+        class="p">(</span><span class="n">new_div</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">soup</span></div>
+
+
+
+<div class="viewcode-block" id="record_editops">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.record_editops">[docs]</a>
+<span class="k">def</span> <span class="nf">record_editops</span><span class="p">(</span><span
+        class="n">gt_word</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span
+        class="n">ocr_word</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span
+        class="n">editops</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                   <span class="n">editops_record</span><span class="p">:</span> <span class="n">Dict</span><span
+        class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span
+        class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span
+        class="p">],</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span
+        class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span
+        class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span
+        class="nb">str</span><span class="p">],</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds word-level edit operation to the record of all edit operations&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">editop</span> <span class="ow">in</span> <span
+        class="n">editops</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">editop</span><span class="p">[</span><span class="mi">0</span><span
+        class="p">]</span> <span class="o">==</span> <span class="s1">&#39;delete&#39;</span><span class="p">:</span>
+            <span class="n">editop_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;delete&#39;</span><span
+        class="p">,</span> <span class="n">ocr_word</span><span class="p">[</span><span class="n">editop</span><span
+        class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="s1">&#39;&#39;</span><span
+        class="p">)</span>
+        <span class="k">elif</span> <span class="n">editop</span><span class="p">[</span><span class="mi">0</span><span
+        class="p">]</span> <span class="o">==</span> <span class="s1">&#39;insert&#39;</span><span class="p">:</span>
+            <span class="n">editop_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;insert&#39;</span><span
+        class="p">,</span> <span class="n">gt_word</span><span class="p">[</span><span class="n">editop</span><span
+        class="p">[</span><span class="mi">2</span><span class="p">]],</span> <span class="s1">&#39;&#39;</span><span
+        class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">editop_tuple</span> <span class="o">=</span> <span class="p">(</span><span
+        class="n">editop</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span
+        class="n">ocr_word</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span
+        class="n">editop</span><span class="p">[</span><span class="mi">1</span><span class="p">])],</span> <span
+        class="n">gt_word</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span
+        class="n">editop</span><span class="p">[</span><span class="mi">2</span><span class="p">])])</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">editops_record</span><span class="p">[</span><span class="n">editop_tuple</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">editops_record</span><span class="p">[</span><span class="n">editop_tuple</span><span
+        class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">editops_record</span></div>
+
+
+
+<div class="viewcode-block" id="count_errors_by_charset">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.count_errors_by_charset">[docs]</a>
+<span class="k">def</span> <span class="nf">count_errors_by_charset</span><span class="p">(</span><span class="n">gt_string</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pred_string</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">charset</span><span
+        class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span
+        class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Counts the number of errors among the character comprised in an unicode character set.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        ``count_errors_by_charset(&#39;Hεll_ World1&#39;, &#39;ηειι- world&#39;, &#39;greek&#39;)`` returns ``3`` as among the 4 greek</span>
+<span class="sd">        chars in ``gt``, 3 are misrecognized.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pred_string: prediction/source string</span>
+<span class="sd">        gt_string: groundtruth/destination string</span>
+<span class="sd">        charset: should be ``&#39;greek&#39;``, ``&#39;latin&#39;``, ``&#39;numbers&#39;``, ``&#39;punctuation&#39;`` or a valid ``re``\ -pattern,</span>
+<span class="sd">                 for instance ``r&#39;([\u00F4-\u00FF])&#39;``</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: the number of errors on selected caracters in ``pred_string``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">CHARSETS_PATTERNS</span><span class="p">[</span><span
+        class="n">charset</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span
+        class="n">compile</span><span class="p">(</span><span class="n">charset</span><span class="p">,</span> <span
+        class="n">re</span><span class="o">.</span><span class="n">UNICODE</span><span class="p">)</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span
+        class="o">.</span><span class="n">span</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span
+        class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">re</span><span
+        class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">pattern</span><span
+        class="p">,</span> <span class="n">gt_string</span><span class="p">)]</span>
+    <span class="n">editops</span> <span class="o">=</span> <span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">editops</span><span class="p">(</span><span class="n">pred_string</span><span
+        class="p">,</span> <span class="n">gt_string</span><span class="p">)</span>
+
+    <span class="c1"># min() is there to cope with insertion at the end of the string</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="mi">1</span> <span
+        class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">editops</span> <span
+        class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">e</span><span
+        class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span
+        class="n">gt_string</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span
+        class="p">)</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="write_error_counts">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.write_error_counts">[docs]</a>
+<span class="k">def</span> <span class="nf">write_error_counts</span><span class="p">(</span><span class="n">bow_error_counts</span><span
+        class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+                       <span class="n">coord_error_counts</span><span class="p">:</span> <span
+        class="nb">dict</span><span class="p">,</span>
+                       <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span><span
+        class="p">):</span>
+    <span class="n">sorted_bow_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ccr&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;cwr&#39;</span><span class="p">,</span> <span
+        class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;recall&#39;</span><span class="p">]</span>
+    <span class="n">sorted_bow_keys</span> <span class="o">=</span> <span class="n">sorted_bow_keys</span> <span
+        class="o">+</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span
+        class="n">k</span> <span class="ow">in</span> <span class="n">bow_error_counts</span><span
+        class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span
+        class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sorted_bow_keys</span><span
+        class="p">]</span>
+
+    <span class="n">reformed_bow</span> <span class="o">=</span> <span class="p">{(</span><span class="s1">&#39;global&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;bow&#39;</span><span class="p">,</span> <span class="n">k</span><span
+        class="p">):</span> <span class="p">[</span><span class="n">bow_error_counts</span><span class="p">[</span><span
+        class="n">k</span><span class="p">]]</span> <span class="k">for</span> <span class="n">k</span> <span
+        class="ow">in</span> <span class="n">sorted_bow_keys</span><span class="p">}</span>
+
+    <span class="n">reformed_coord</span> <span class="o">=</span> <span class="p">{(</span><span
+        class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span
+        class="n">k</span><span class="p">):</span> <span class="p">[</span><span
+        class="n">coord_error_counts</span><span class="p">[</span><span class="n">i</span><span
+        class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span
+        class="p">]]</span>
+                      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">coord_error_counts</span><span
+        class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                      <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">coord_error_counts</span><span
+        class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span
+        class="n">keys</span><span class="p">()</span>
+                      <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span
+        class="p">[</span><span class="s1">&#39;cr&#39;</span><span class="p">,</span> <span
+        class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluated&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">]}</span>
+
+    <span class="n">df_bow</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span
+        class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span
+        class="n">reformed_bow</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span
+        class="s1">&#39;columns&#39;</span><span class="p">)</span>
+    <span class="n">df_coord</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span
+        class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span
+        class="n">reformed_coord</span><span class="p">,</span> <span class="n">orient</span><span
+        class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span
+        class="p">([</span><span class="n">df_bow</span><span class="p">,</span> <span class="n">df_coord</span><span
+        class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span
+        class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span
+        class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;evaluation_results.tsv&#39;</span><span
+        class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span
+        class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span
+        class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="write_editops_record">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.write_editops_record">[docs]</a>
+<span class="k">def</span> <span class="nf">write_editops_record</span><span class="p">(</span><span class="n">editops_record</span><span
+        class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">output_dir</span><span
+        class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="n">editops_record</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span
+        class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span
+        class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span
+        class="p">(</span><span class="n">editops_record</span><span class="o">.</span><span class="n">items</span><span
+        class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span
+        class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span
+        class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span
+        class="kc">True</span><span class="p">)}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">((</span><span
+        class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;editops.tsv&quot;</span><span
+        class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span
+        class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span
+        class="p">)</span> <span class="k">as</span> <span class="n">csv_file</span><span class="p">:</span>
+        <span class="n">spamwriter</span> <span class="o">=</span> <span class="n">csv</span><span
+        class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">csv_file</span><span
+        class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span
+        class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">quotechar</span><span
+        class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+        <span class="n">spamwriter</span><span class="o">.</span><span class="n">writerow</span><span
+        class="p">([</span><span class="s1">&#39;Operation&#39;</span><span class="p">,</span> <span class="s1">&#39;From&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;To&#39;</span><span class="p">,</span> <span
+        class="s1">&#39;Count&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span
+        class="ow">in</span> <span class="n">editops_record</span><span class="o">.</span><span
+        class="n">items</span><span class="p">():</span>
+            <span class="n">spamwriter</span><span class="o">.</span><span class="n">writerow</span><span
+        class="p">([</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span
+        class="p">],</span> <span class="n">k</span><span class="p">[</span><span class="mi">1</span><span
+        class="p">],</span> <span class="n">k</span><span class="p">[</span><span class="mi">2</span><span
+        class="p">],</span> <span class="n">v</span><span class="p">])</span></div>
+
+
+
+<span class="c1"># ======================================================================================================================</span>
+<span class="c1">#                                       EVALUATION METHODS</span>
+<span class="c1"># ======================================================================================================================</span>
+
+<span class="c1"># todo 👁️ add fuzzy eval</span>
+<div class="viewcode-block" id="bag_of_word_evaluation">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.bag_of_word_evaluation">[docs]</a>
+<span class="k">def</span> <span class="nf">bag_of_word_evaluation</span><span class="p">(</span><span
+        class="n">gt_bag</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span
+        class="nb">str</span><span class="p">],</span>
+                           <span class="n">pred_bag</span><span class="p">:</span> <span class="n">List</span><span
+        class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                           <span class="n">error_counts</span><span class="p">:</span> <span
+        class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span
+        class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span
+        class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span
+        class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span
+        class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span
+        class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span
+        class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Performs a bag-of-word evaluation of ``pred_bag`` against ``groundtruth_bag``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gt_bag: The list of groundtruth words</span>
+<span class="sd">        pred_bag: The list of ocr-predicted words</span>
+<span class="sd">        error_counts: A dict with results (pass it if you want to evaluate multiple pages)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Error statistics (dict)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">error_counts</span><span class="p">:</span>
+        <span class="n">error_counts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gt_words&#39;</span><span
+        class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span
+        class="s1">&#39;pred_words&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span
+        class="s1">&#39;true_words&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                        <span class="s1">&#39;chars&#39;</span><span class="p">:</span> <span class="mi">0</span><span
+        class="p">,</span> <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span
+        class="mi">0</span><span class="p">,</span> <span class="p">}</span>
+
+    <span class="n">pred_bag_</span> <span class="o">=</span> <span class="n">pred_bag</span><span
+        class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;gt_words&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gt_bag</span><span
+        class="p">)</span>
+    <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;pred_words&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred_bag_</span><span
+        class="p">)</span>
+    <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;chars&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">([</span><span
+        class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span
+        class="n">w</span> <span class="ow">in</span> <span class="n">gt_bag</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">gt_word</span> <span class="ow">in</span> <span
+        class="n">gt_bag</span><span class="p">:</span>  <span class="c1"># iterate over w in gt_string</span>
+
+        <span class="k">if</span> <span class="n">pred_bag_</span><span class="p">:</span>  <span class="c1"># If there are still words in ``ocr_bag_``...</span>
+
+            <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">pred_word</span><span
+        class="p">,</span> <span class="n">gt_word</span><span class="p">)</span> <span class="k">for</span> <span
+        class="n">pred_word</span> <span class="ow">in</span> <span class="n">pred_bag_</span><span class="p">]</span>
+
+            <span class="n">min_distance</span> <span class="o">=</span> <span class="nb">min</span><span
+        class="p">(</span><span class="n">distances</span><span class="p">)</span>
+
+            <span class="c1"># Records ``min_distance`` and removes word</span>
+            <span class="k">if</span> <span class="n">min_distance</span> <span class="o">==</span> <span
+        class="mi">0</span><span class="p">:</span>
+                <span class="n">error_counts</span><span class="p">[</span><span
+        class="s1">&#39;true_words&#39;</span><span class="p">]</span> <span class="o">+=</span> <span
+        class="mi">1</span>
+            <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="n">min_distance</span>
+            <span class="k">del</span> <span class="n">pred_bag_</span><span class="p">[</span><span
+        class="n">distances</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span
+        class="n">min_distance</span><span class="p">)]</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># If ``ocr_bag_`` is empty, add the distance of unrecognized gt_words</span>
+            <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gt_word</span><span
+        class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pred_bag_</span><span class="p">:</span>  <span class="c1"># If ``ocr_bag_`` still contains words after the end of the loop</span>
+        <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">([</span><span
+        class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span
+        class="n">w</span> <span class="ow">in</span> <span class="n">pred_bag_</span><span class="p">])</span>
+
+    <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span
+        class="p">]</span> <span class="o">=</span> <span class="n">safe_divide</span><span class="p">(</span><span
+        class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;true_words&#39;</span><span
+        class="p">],</span> <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;pred_words&#39;</span><span
+        class="p">])</span>
+    <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;recall&#39;</span><span
+        class="p">]</span> <span class="o">=</span> <span class="n">safe_divide</span><span class="p">(</span><span
+        class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;true_words&#39;</span><span
+        class="p">],</span> <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;gt_words&#39;</span><span
+        class="p">])</span>
+    <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;f1&#39;</span><span
+        class="p">]</span> <span class="o">=</span> <span class="n">safe_divide</span><span class="p">((</span><span
+        class="mi">2</span> <span class="o">*</span> <span class="n">error_counts</span><span class="p">[</span><span
+        class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">error_counts</span><span
+        class="p">[</span><span class="s1">&#39;recall&#39;</span><span class="p">]),</span> <span class="p">(</span>
+            <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span
+        class="p">]</span> <span class="o">+</span> <span class="n">error_counts</span><span class="p">[</span><span
+        class="s1">&#39;recall&#39;</span><span class="p">]))</span>
+    <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;cwr&#39;</span><span
+        class="p">]</span> <span class="o">=</span> <span class="n">safe_divide</span><span class="p">(</span><span
+        class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;true_words&#39;</span><span
+        class="p">],</span> <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;gt_words&#39;</span><span
+        class="p">])</span>
+    <span class="n">error_counts</span><span class="p">[</span><span class="s1">&#39;ccr&#39;</span><span
+        class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">safe_divide</span><span
+        class="p">(</span><span class="n">error_counts</span><span class="p">[</span><span
+        class="s1">&#39;distance&#39;</span><span class="p">],</span> <span class="n">error_counts</span><span
+        class="p">[</span><span class="s1">&#39;chars&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">error_counts</span></div>
+
+
+
+<div class="viewcode-block" id="simple_coordinates_based_evaluation">
+<a class="viewcode-back"
+   href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.simple_coordinates_based_evaluation">[docs]</a>
+<span class="k">def</span> <span class="nf">simple_coordinates_based_evaluation</span><span class="p">(</span><span
+        class="n">gt_words</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span
+        class="n">Union</span><span class="p">[</span><span class="s1">&#39;CanonicalWord&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;OcrWord&#39;</span><span class="p">]],</span>
+                                        <span class="n">pred_words</span><span class="p">:</span> <span
+        class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span
+        class="s1">&#39;CanonicalWord&#39;</span><span class="p">,</span> <span class="s1">&#39;OcrWord&#39;</span><span
+        class="p">]],</span>
+                                        <span class="n">overlap_threshold</span><span class="p">:</span> <span
+        class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">)</span> <span
+        class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes edit distance between spacially overlapping words and returns the CER.</span>
+
+<span class="sd">     &quot;Simple&quot; means that this method does NOT deal with word-boxes related issues. It only evaluates gt-words which</span>
+<span class="sd">     overlap to ``overlap_threshold`` with a predicted word and vice-versa. If no predicted word is found</span>
+<span class="sd">     (e.g. with crummy groundtruth- or preds-boxes), the word is left out and not counted in the final result.</span>
+
+<span class="sd">     Args:</span>
+<span class="sd">         gt_words: The list of ground truth words (e.g. coming from ``OcrPage.children.words``)</span>
+<span class="sd">         pred_words: The list of predicted words (e.g. coming from ``OcrPage.children.words``)</span>
+<span class="sd">         overlap_threshold: The minimal overlap-proportion.</span>
+
+<span class="sd">     Returns:</span>
+<span class="sd">         float: the character error rate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pred_words_</span> <span class="o">=</span> <span class="n">pred_words</span><span
+        class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">matched_words</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_characters</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_edit_distance</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">gt_word</span> <span class="ow">in</span> <span class="n">gt_words</span><span
+        class="p">:</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span
+        class="n">pred_word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span
+        class="p">(</span><span class="n">pred_words_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">are_bboxes_overlapping_with_threshold</span><span
+        class="p">(</span><span class="n">pred_word</span><span class="o">.</span><span class="n">bbox</span><span
+        class="o">.</span><span class="n">bbox</span><span class="p">,</span>
+                                                     <span class="n">gt_word</span><span class="o">.</span><span
+        class="n">bbox</span><span class="o">.</span><span class="n">bbox</span><span class="p">,</span>
+                                                     <span class="n">overlap_threshold</span><span class="p">):</span>
+                <span class="n">total_characters</span> <span class="o">+=</span> <span class="nb">len</span><span
+        class="p">(</span><span class="n">gt_word</span><span class="o">.</span><span class="n">text</span><span
+        class="p">)</span>
+                <span class="n">total_edit_distance</span> <span class="o">+=</span> <span
+        class="n">Levenshtein</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span
+        class="n">pred_word</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span
+        class="n">gt_word</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                <span class="n">matched_words</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">del</span> <span class="n">pred_words_</span><span class="p">[</span><span
+        class="n">i</span><span class="p">]</span>
+                <span class="k">break</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s2">&quot;&quot;&quot;Evaluating on </span><span class="si">{</span><span
+        class="n">matched_words</span><span class="si">}</span><span class="s2"> words, for a total of </span><span
+        class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gt_words</span><span
+        class="p">)</span><span class="si">}</span><span class="s2"> words.&quot;&quot;&quot;</span><span
+        class="p">)</span>
+
+    <span class="k">return</span> <span class="n">total_edit_distance</span> <span class="o">/</span> <span class="n">total_characters</span></div>
+
+
+
+<div class="viewcode-block" id="coord_based_page_evaluation">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.coord_based_page_evaluation">[docs]</a>
+<span class="k">def</span> <span class="nf">coord_based_page_evaluation</span><span class="p">(</span><span class="n">gt_page</span><span
+        class="p">:</span> <span class="s1">&#39;OcrPage&#39;</span><span class="p">,</span>
+                                <span class="n">pred_page</span><span class="p">:</span> <span class="s1">&#39;OcrPage&#39;</span><span
+        class="p">,</span>
+                                <span class="n">word_overlap_threshold</span><span class="p">:</span> <span class="n">Optional</span><span
+        class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span
+        class="mf">0.8</span><span class="p">,</span>
+                                <span class="n">error_counts</span><span class="p">:</span> <span
+        class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span
+        class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span
+        class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span
+        class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]]</span> <span
+        class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                <span class="n">editops_record</span><span class="p">:</span> <span
+        class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span
+        class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span
+        class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span
+        class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+                                <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span
+        class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span
+        class="p">,</span> <span class="s1">&#39;BeautifulSoup&#39;</span><span class="p">]:</span>
+<span class="w">    </span><span
+        class="sd">&quot;&quot;&quot;Performs a regional and coordinates-based evaluation.</span>
+
+<span class="sd">    This function returns extremely detailed counts, with word counts, caracter counts by charsets (latin, greek,</span>
+<span class="sd">    numbers and punctuation) and correct rate (*cr*, corresponding to the normalized levenshtein distance) for</span>
+<span class="sd">    each of these elements and for each olr region (commentary, primary text...).</span>
+
+<span class="sd">    How to read the results? *cr* or *ccr* / *cwr* (correct character/word rate respectively) very straightforward. They</span>
+<span class="sd">    correspond to the number of correct elements divided by the total number of elements.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Coordinate-based means that evaluation does not process documents in a linear manner, which is prone to</span>
+<span class="sd">        alignement error when document layouts are complex. Instead, this matches overlapping words in groundtruth and</span>
+<span class="sd">        ocr-data. More formally, for each groundtruth word :</span>
+<span class="sd">        * find the predicted word which coordinates overlap the with groundtruth word to ``word_overlap_threshold``</span>
+<span class="sd">        * if found, calculate Levenshtein distance between the two</span>
+<span class="sd">        * if not found, do not evaluate this word</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gt_page: The groundtruth page</span>
+<span class="sd">        pred_page: The predicted page</span>
+<span class="sd">        word_overlap_threshold: The threshold to find overlaping words</span>
+<span class="sd">        error_counts: A dict of counts (pass in if you want to evaluate multiple pages at once)</span>
+<span class="sd">        editops_record: A dict of edit operations (pass in if you want to evaluate multiple pages at once)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        error_counts, editops_record, soup</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">initialize_soup</span><span
+        class="p">(</span><span class="n">img_width</span><span class="o">=</span><span class="n">gt_page</span><span
+        class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">width</span><span
+        class="p">,</span> <span class="n">img_height</span><span class="o">=</span><span class="n">gt_page</span><span
+        class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">height</span><span
+        class="p">)</span>  <span class="c1"># Initialize html output</span>
+    <span class="n">charsets</span> <span class="o">=</span> <span class="p">[</span><span
+        class="s1">&#39;latin&#39;</span><span class="p">,</span> <span class="s1">&#39;greek&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;punctuation&#39;</span><span class="p">,</span> <span class="s1">&#39;numeral&#39;</span><span
+        class="p">]</span>
+    <span class="n">pred_words_</span> <span class="o">=</span> <span class="n">pred_page</span><span class="o">.</span><span
+        class="n">children</span><span class="o">.</span><span class="n">words</span><span class="o">.</span><span
+        class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">error_counts</span><span class="p">:</span>
+        <span class="n">error_counts</span> <span class="o">=</span> <span class="p">{</span><span
+        class="n">region</span><span class="p">:</span>
+                            <span class="p">{</span><span class="n">level</span><span class="p">:</span>
+                                 <span class="p">{</span><span class="n">count</span><span class="p">:</span> <span
+        class="mi">0</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span
+        class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluated&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">]}</span>
+                             <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span
+        class="p">[</span><span class="s1">&#39;words&#39;</span><span class="p">,</span> <span class="s1">&#39;chars&#39;</span><span
+        class="p">]</span> <span class="o">+</span> <span class="n">charsets</span><span class="p">}</span>
+                        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span
+        class="p">[</span><span class="s1">&#39;global&#39;</span><span class="p">]</span> <span
+        class="o">+</span> <span class="n">vs</span><span class="o">.</span><span
+        class="n">ORDERED_OLR_REGION_TYPES</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">editops_record</span><span class="p">:</span>
+        <span class="n">editops_record</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">gt_word</span> <span class="ow">in</span> <span
+        class="n">gt_page</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span
+        class="n">words</span><span class="p">:</span>
+
+        <span class="c1"># Find ``gt_word``&#39;s regions</span>
+        <span class="n">gt_word_regions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;global&#39;</span><span
+        class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">r</span><span
+        class="o">.</span><span class="n">region_type</span> <span class="k">for</span> <span class="n">r</span> <span
+        class="ow">in</span> <span class="n">gt_page</span><span class="o">.</span><span class="n">children</span><span
+        class="o">.</span><span class="n">regions</span> <span class="k">if</span>
+                                        <span class="n">is_bbox_within_bbox</span><span class="p">(</span><span
+        class="n">gt_word</span><span class="o">.</span><span class="n">bbox</span><span class="o">.</span><span
+        class="n">bbox</span><span class="p">,</span>
+                                                            <span class="n">r</span><span class="o">.</span><span
+        class="n">bbox</span><span class="o">.</span><span class="n">bbox</span><span class="p">)]</span>
+
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">gt_word_regions</span><span
+        class="p">:</span>
+            <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span
+        class="p">][</span><span class="s1">&#39;words&#39;</span><span class="p">][</span><span class="s1">&#39;total&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span
+        class="p">][</span><span class="s1">&#39;chars&#39;</span><span class="p">][</span><span class="s1">&#39;total&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gt_word</span><span
+        class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">charset</span> <span class="ow">in</span> <span class="n">charsets</span><span
+        class="p">:</span>
+                <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span class="p">][</span><span
+        class="n">charset</span><span class="p">][</span><span class="s1">&#39;total&#39;</span><span class="p">]</span> <span
+        class="o">+=</span> <span class="n">count_chars_by_charset</span><span class="p">(</span><span
+        class="n">gt_word</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span
+        class="n">charset</span><span class="p">)</span>
+
+        <span class="c1"># Find the corresponding ocr_word</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span
+        class="n">pred_word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span
+        class="p">(</span><span class="n">pred_words_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">are_bboxes_overlapping_with_threshold</span><span
+        class="p">(</span><span class="n">pred_word</span><span class="o">.</span><span class="n">bbox</span><span
+        class="o">.</span><span class="n">bbox</span><span class="p">,</span>
+                                                     <span class="n">gt_word</span><span class="o">.</span><span
+        class="n">bbox</span><span class="o">.</span><span class="n">bbox</span><span class="p">,</span> <span
+        class="n">word_overlap_threshold</span><span class="p">):</span>
+                <span class="n">distance</span> <span class="o">=</span> <span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">pred_word</span><span
+        class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">gt_word</span><span
+        class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">gt_word_regions</span><span
+        class="p">:</span>
+
+                    <span class="c1"># Count evaluated words and false words</span>
+                    <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span
+        class="p">][</span><span class="s1">&#39;words&#39;</span><span class="p">][</span><span class="s1">&#39;evaluated&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span
+        class="p">][</span><span class="s1">&#39;words&#39;</span><span class="p">][</span><span class="s1">&#39;false&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="nb">min</span><span class="p">(</span><span
+        class="mi">1</span><span class="p">,</span> <span class="n">distance</span><span class="p">)</span>
+
+                    <span class="c1"># Count evaluated chars and errors</span>
+                    <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span
+        class="p">][</span><span class="s1">&#39;chars&#39;</span><span class="p">][</span><span class="s1">&#39;evaluated&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gt_word</span><span
+        class="o">.</span><span class="n">text</span><span class="p">)</span>
+                    <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span
+        class="p">][</span><span class="s1">&#39;chars&#39;</span><span class="p">][</span><span class="s1">&#39;false&#39;</span><span
+        class="p">]</span> <span class="o">+=</span> <span class="n">distance</span>
+
+                    <span class="c1"># Count evaluated chars and errors by charset</span>
+                    <span class="k">for</span> <span class="n">charset</span> <span class="ow">in</span> <span
+        class="n">charsets</span><span class="p">:</span>
+                        <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span
+        class="p">][</span><span class="n">charset</span><span class="p">][</span><span
+        class="s1">&#39;evaluated&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count_chars_by_charset</span><span
+        class="p">(</span><span class="n">gt_word</span><span class="o">.</span><span class="n">text</span><span
+        class="p">,</span> <span class="n">charset</span><span class="p">)</span>
+                        <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span
+        class="p">][</span><span class="n">charset</span><span class="p">][</span><span
+        class="s1">&#39;false&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count_errors_by_charset</span><span
+        class="p">(</span><span class="n">gt_word</span><span class="o">.</span><span class="n">text</span><span
+        class="p">,</span> <span class="n">pred_word</span><span class="o">.</span><span class="n">text</span><span
+        class="p">,</span>
+                                                                                          <span class="n">charset</span><span
+        class="p">)</span>
+
+                <span class="c1"># Record edit operations</span>
+                <span class="n">editops_record</span> <span class="o">=</span> <span
+        class="n">record_editops</span><span class="p">(</span><span class="n">gt_word</span><span
+        class="o">=</span><span class="n">gt_word</span><span class="o">.</span><span class="n">text</span><span
+        class="p">,</span>
+                                                <span class="n">ocr_word</span><span class="o">=</span><span class="n">pred_word</span><span
+        class="o">.</span><span class="n">text</span><span class="p">,</span>
+                                                <span class="n">editops</span><span class="o">=</span><span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">editops</span><span class="p">(</span><span class="n">pred_word</span><span
+        class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">gt_word</span><span
+        class="o">.</span><span class="n">text</span><span class="p">),</span>
+                                                <span class="n">editops_record</span><span class="o">=</span><span
+        class="n">editops_record</span><span class="p">)</span>
+
+                <span class="c1"># Actualize soup</span>
+                <span class="n">soup</span> <span class="o">=</span> <span class="n">insert_text_in_soup</span><span
+        class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span
+        class="n">word</span><span class="o">=</span><span class="n">gt_word</span><span class="p">,</span> <span
+        class="n">is_gt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span
+        class="n">is_false</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span
+        class="n">distance</span><span class="p">))</span>
+                <span class="n">soup</span> <span class="o">=</span> <span class="n">insert_text_in_soup</span><span
+        class="p">(</span><span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span> <span
+        class="n">word</span><span class="o">=</span><span class="n">pred_word</span><span class="p">,</span> <span
+        class="n">is_gt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span
+        class="n">is_false</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span
+        class="n">distance</span><span class="p">))</span>
+
+                <span class="k">del</span> <span class="n">pred_words_</span><span class="p">[</span><span
+        class="n">i</span><span class="p">]</span>
+                <span class="k">break</span>
+
+    <span class="c1"># Compute error rates</span>
+    <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="p">[</span><span
+        class="s1">&#39;global&#39;</span><span class="p">]</span> <span class="o">+</span> <span
+        class="n">vs</span><span class="o">.</span><span class="n">ORDERED_OLR_REGION_TYPES</span><span
+        class="p">:</span>
+        <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="p">[</span><span
+        class="s1">&#39;words&#39;</span><span class="p">,</span> <span class="s1">&#39;chars&#39;</span><span
+        class="p">]</span> <span class="o">+</span> <span class="n">charsets</span><span class="p">:</span>
+            <span class="n">error_counts</span><span class="p">[</span><span class="n">region</span><span
+        class="p">][</span><span class="n">level</span><span class="p">][</span><span
+        class="s1">&#39;cr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span
+        class="o">-</span> <span class="n">safe_divide</span><span class="p">(</span><span class="n">error_counts</span><span
+        class="p">[</span><span class="n">region</span><span class="p">][</span><span class="n">level</span><span
+        class="p">][</span><span class="s1">&#39;false&#39;</span><span class="p">],</span>
+                                                                <span class="n">error_counts</span><span
+        class="p">[</span><span class="n">region</span><span class="p">][</span><span class="n">level</span><span
+        class="p">][</span><span class="s1">&#39;evaluated&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">editops_record</span><span class="p">,</span> <span class="n">error_counts</span><span
+        class="p">,</span> <span class="n">soup</span></div>
+
+
+
+<div class="viewcode-block" id="commentary_evaluation">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.commentary_evaluation">[docs]</a>
+<span class="k">def</span> <span class="nf">commentary_evaluation</span><span class="p">(</span><span class="n">commentary</span><span
+        class="p">:</span> <span class="s1">&#39;OcrCommentary&#39;</span><span class="p">,</span>
+                          <span class="n">write_files</span><span class="p">:</span> <span class="nb">bool</span> <span
+        class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                          <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span
+        class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span
+        class="p">,</span>
+                          <span class="n">word_overlap_threshold</span><span class="p">:</span> <span
+        class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluates all the pages of a ``OcrCommentary`` that have groundtruth.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        commentary: The ``OcrCommentary`` object to evaluate.</span>
+<span class="sd">        write_files: Whether to write the files or not</span>
+<span class="sd">        output_dir: Leave to none if you want to write files to the default dir</span>
+<span class="sd">        word_overlap_threshold: See ``coord_based_page_evaluation``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">bow_error_counts</span><span class="p">,</span> <span class="n">coord_error_counts</span><span
+        class="p">,</span> <span class="n">editops</span> <span class="o">=</span> <span class="kc">None</span><span
+        class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">soups</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">gt_page</span> <span class="ow">in</span> <span
+        class="n">tqdm</span><span class="p">(</span><span class="n">commentary</span><span class="o">.</span><span
+        class="n">ocr_gt_pages</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span
+        class="s1">&#39;Evaluating commentary pages&#39;</span><span class="p">):</span>
+        <span class="n">pred_page</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span
+        class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">commentary</span><span
+        class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">pages</span> <span
+        class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">id</span> <span
+        class="o">==</span> <span class="n">gt_page</span><span class="o">.</span><span class="n">id</span><span
+        class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">bow_error_counts</span> <span class="o">=</span> <span
+        class="n">bag_of_word_evaluation</span><span class="p">(</span><span class="n">gt_bag</span><span
+        class="o">=</span><span class="p">[</span><span class="n">w</span><span class="o">.</span><span
+        class="n">text</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span
+        class="n">gt_page</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span
+        class="n">words</span><span class="p">],</span>
+                                                  <span class="n">pred_bag</span><span class="o">=</span><span
+        class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span
+        class="n">w</span> <span class="ow">in</span> <span class="n">pred_page</span><span class="o">.</span><span
+        class="n">children</span><span class="o">.</span><span class="n">words</span><span class="p">],</span>
+                                                  <span class="n">error_counts</span><span class="o">=</span><span
+        class="n">bow_error_counts</span><span class="p">)</span>
+
+        <span class="n">editops</span><span class="p">,</span> <span class="n">coord_error_counts</span><span class="p">,</span> <span
+        class="n">soup</span> <span class="o">=</span> <span class="n">coord_based_page_evaluation</span><span
+        class="p">(</span><span class="n">gt_page</span><span class="o">=</span><span class="n">gt_page</span><span
+        class="p">,</span>
+                                                                        <span class="n">pred_page</span><span class="o">=</span><span
+        class="n">pred_page</span><span class="p">,</span>
+                                                                        <span class="n">word_overlap_threshold</span><span
+        class="o">=</span><span class="n">word_overlap_threshold</span><span class="p">,</span>
+                                                                        <span class="n">error_counts</span><span
+        class="o">=</span><span class="n">coord_error_counts</span><span class="p">,</span>
+                                                                        <span class="n">editops_record</span><span
+        class="o">=</span><span class="n">editops</span><span class="p">)</span>
+        <span class="n">soups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
+        class="n">soup</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">write_files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">output_dir</span><span class="p">:</span>
+            <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span
+        class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">commentary</span><span
+        class="o">.</span><span class="n">ocr_dir</span><span class="p">,</span> <span class="n">os</span><span
+        class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span
+        class="s1">&#39;evaluation&#39;</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span
+        class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span
+        class="kc">True</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">soup</span> <span
+        class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">soups</span><span
+        class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span
+        class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span
+        class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span
+        class="n">commentary</span><span class="o">.</span><span class="n">ocr_gt_pages</span><span
+        class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span
+        class="n">id</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span><span class="p">),</span> <span
+        class="s2">&quot;w&quot;</span><span class="p">,</span>
+                      <span class="n">encoding</span><span class="o">=</span><span
+        class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span
+        class="n">html_file</span><span class="p">:</span>
+                <span class="n">html_file</span><span class="o">.</span><span class="n">write</span><span
+        class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">soup</span><span class="p">))</span>
+
+        <span class="n">write_editops_record</span><span class="p">(</span><span class="n">editops_record</span><span
+        class="o">=</span><span class="n">editops</span><span class="p">,</span> <span class="n">output_dir</span><span
+        class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span
+        class="p">))</span>
+        <span class="n">write_error_counts</span><span class="p">(</span><span class="n">bow_error_counts</span><span
+        class="p">,</span> <span class="n">coord_error_counts</span><span class="p">,</span> <span
+        class="n">output_dir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bow_error_counts</span><span class="p">,</span> <span class="n">coord_error_counts</span><span
+        class="p">,</span> <span class="n">editops</span></div>
+
+
+
+<div class="viewcode-block" id="directory_evaluation">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.directory_evaluation">[docs]</a>
+<span class="k">def</span> <span class="nf">directory_evaluation</span><span class="p">(</span><span
+        class="n">gt_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+                         <span class="n">ocr_dir</span><span class="p">:</span> <span class="n">Path</span><span
+        class="p">,</span>
+                         <span class="n">gt_suffix</span><span class="p">:</span> <span class="nb">str</span> <span
+        class="o">=</span> <span class="n">ocr_vs</span><span class="o">.</span><span class="n">GT_TEXT_EXTENSION</span><span
+        class="p">,</span>
+                         <span class="n">ocr_suffix</span><span class="p">:</span> <span class="nb">str</span> <span
+        class="o">=</span> <span class="n">ocr_vs</span><span class="o">.</span><span
+        class="n">PRED_TEXT_EXTENSION</span><span class="p">,</span>
+                         <span class="n">error_record</span><span class="p">:</span> <span class="nb">dict</span> <span
+        class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">editops_record</span><span class="p">:</span> <span
+        class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span
+        class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span
+        class="p">,</span>
+                         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span
+        class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span
+        class="n">Tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span
+        class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluates all the text files in ``ocr_dir`` against the corresponding text files in ``gt_dir``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gt_dir: The directory containing the groundtruth files.</span>
+<span class="sd">        ocr_dir: The directory containing the OCR files.</span>
+<span class="sd">        gt_suffix: The suffix of the groundtruth files.</span>
+<span class="sd">        ocr_suffix: The suffix of the OCR files.</span>
+<span class="sd">        error_record: The error record to update (pass only if you want to aggregate multiple evaluations).</span>
+<span class="sd">        editops_record: The editops record to update (pass only if you want to aggregate multiple evaluations).</span>
+<span class="sd">        output_dir: If given, the evaluation files will be written to this directory.</span>
+<span class="sd">        normalize: Whether to harmonise the unicode of the groundtruth and OCR files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">error_record</span> <span class="o">=</span> <span class="n">error_record</span> <span
+        class="k">if</span> <span class="n">error_record</span> <span class="k">else</span> <span
+        class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span
+        class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span
+        class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;gt&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;ocr&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;greek_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;greek_chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;latin_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;latin_chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;numeral_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;numeral_chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;punctuation_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;punctuation_chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;words&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;words_distance&#39;</span><span class="p">]}</span>
+    <span class="n">editops_record</span> <span class="o">=</span> <span class="n">editops_record</span> <span
+        class="k">if</span> <span class="n">editops_record</span> <span class="k">else</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">ocr_path</span> <span class="ow">in</span> <span class="n">ocr_dir</span><span
+        class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;*</span><span
+        class="si">{</span><span class="n">ocr_suffix</span><span class="si">}</span><span class="s1">&#39;</span><span
+        class="p">):</span>
+        <span class="n">gt_path</span> <span class="o">=</span> <span class="n">gt_dir</span> <span
+        class="o">/</span> <span class="n">ocr_path</span><span class="o">.</span><span
+        class="n">with_suffix</span><span class="p">(</span><span class="n">gt_suffix</span><span
+        class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">gt_text</span> <span class="o">=</span> <span class="n">gt_path</span><span
+        class="o">.</span><span class="n">read_text</span><span class="p">(</span><span
+        class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">ocr_text</span> <span class="o">=</span> <span class="n">ocr_path</span><span class="o">.</span><span
+        class="n">read_text</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span
+        class="p">)</span>
+
+        <span class="c1"># Postprocess the OCR text</span>
+        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="n">ocr_text</span> <span class="o">=</span> <span class="n">ocr_text</span><span
+        class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span
+        class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">ocr_text</span> <span class="o">=</span> <span class="n">ocr_text</span><span
+        class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">ocr_text</span> <span class="o">=</span> <span class="n">harmonise_unicode</span><span
+        class="p">(</span><span class="n">ocr_text</span><span class="p">)</span>
+            <span class="n">gt_text</span> <span class="o">=</span> <span class="n">gt_text</span><span
+        class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span
+        class="p">)</span>
+            <span class="n">gt_text</span> <span class="o">=</span> <span class="n">harmonise_unicode</span><span
+        class="p">(</span><span class="n">gt_text</span><span class="p">)</span>
+
+        <span class="c1"># compute distance</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ocr_path</span><span
+        class="o">.</span><span class="n">stem</span><span class="p">)</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;gt&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gt_text</span><span
+        class="p">)</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;ocr&#39;</span><span class="p">]</span><span
+        class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ocr_text</span><span
+        class="p">)</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;chars&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span
+        class="p">(</span><span class="n">gt_text</span><span class="p">))</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;chars_distance&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">gt_text</span><span
+        class="p">,</span> <span class="n">ocr_text</span><span class="p">))</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;words&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span
+        class="p">(</span><span class="n">gt_text</span><span class="o">.</span><span class="n">split</span><span
+        class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)))</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;words_distance&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">gt_text</span><span
+        class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">ocr_text</span><span
+        class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+        <span class="k">for</span> <span class="n">charset</span> <span class="ow">in</span> <span class="n">CHARSETS_PATTERNS</span><span
+        class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">error_record</span><span class="p">[</span><span class="sa">f</span><span
+        class="s1">&#39;</span><span class="si">{</span><span class="n">charset</span><span class="si">}</span><span
+        class="s1">_chars&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span
+        class="p">(</span><span class="n">count_chars_by_charset</span><span class="p">(</span><span
+        class="n">gt_text</span><span class="p">,</span> <span class="n">charset</span><span class="p">))</span>
+            <span class="n">error_record</span><span class="p">[</span><span class="sa">f</span><span
+        class="s1">&#39;</span><span class="si">{</span><span class="n">charset</span><span class="si">}</span><span
+        class="s1">_chars_distance&#39;</span><span class="p">]</span><span class="o">.</span><span
+        class="n">append</span><span class="p">(</span><span class="n">count_errors_by_charset</span><span
+        class="p">(</span><span class="n">gt_text</span><span class="p">,</span> <span class="n">ocr_text</span><span
+        class="p">,</span> <span class="n">charset</span><span class="p">))</span>
+
+        <span class="c1"># Record edit operations</span>
+        <span class="n">editops_record</span> <span class="o">=</span> <span class="n">record_editops</span><span
+        class="p">(</span><span class="n">gt_word</span><span class="o">=</span><span class="n">gt_text</span><span
+        class="p">,</span>
+                                        <span class="n">ocr_word</span><span class="o">=</span><span
+        class="n">ocr_text</span><span class="p">,</span>
+                                        <span class="n">editops</span><span class="o">=</span><span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">editops</span><span class="p">(</span><span class="n">ocr_text</span><span
+        class="p">,</span> <span class="n">gt_text</span><span class="p">),</span>
+                                        <span class="n">editops_record</span><span class="o">=</span><span class="n">editops_record</span><span
+        class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span
+        class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span
+        class="s1">_ER&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span
+        class="n">safe_divide</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span
+        class="n">error_record</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span
+        class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s1">_distance&#39;</span><span
+        class="p">]),</span> <span class="nb">sum</span><span class="p">(</span><span class="n">error_record</span><span
+        class="p">[</span><span class="n">x</span><span class="p">])),</span> <span class="mi">3</span><span
+        class="p">)</span>
+               <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span
+        class="p">[</span><span class="s1">&#39;chars&#39;</span><span class="p">,</span> <span class="s1">&#39;words&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;greek_chars&#39;</span><span class="p">,</span> <span class="s1">&#39;latin_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;numeral_chars&#39;</span><span class="p">,</span> <span class="s1">&#39;punctuation_chars&#39;</span><span
+        class="p">]}</span>
+    <span class="c1"># counts = {f&#39;{x}_count&#39;: sum(error_record[x]) for x in [&#39;chars&#39;, &#39;words&#39;, &#39;greek_chars&#39;, &#39;latin_chars&#39;,</span>
+    <span class="c1">#                                                        &#39;numeral_chars&#39;, &#39;punctuation_chars&#39;]}</span>
+    <span class="c1"># results.update(counts)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s1">&#39;Character Error Rate: </span><span class="si">{</span><span class="n">results</span><span
+        class="p">[</span><span class="s2">&quot;chars_ER&quot;</span><span class="p">]</span><span
+        class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s1">&#39;Word Error Rate: </span><span class="si">{</span><span class="n">results</span><span
+        class="p">[</span><span class="s2">&quot;words_ER&quot;</span><span class="p">]</span><span
+        class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Write files</span>
+    <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span
+        class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span
+        class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span
+        class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span
+        class="p">)</span>
+
+        <span class="n">editops_record</span> <span class="o">=</span> <span class="p">{</span><span
+        class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span
+        class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span
+        class="p">(</span><span class="n">editops_record</span><span class="o">.</span><span class="n">items</span><span
+        class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span
+        class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span
+        class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span
+        class="kc">True</span><span class="p">)}</span>
+        <span class="n">write_editops_record</span><span class="p">(</span><span class="n">editops_record</span><span
+        class="o">=</span><span class="n">editops_record</span><span class="p">,</span> <span
+        class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
+
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span
+        class="n">from_dict</span><span class="p">(</span><span class="n">error_record</span><span
+        class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">((</span><span class="n">output_dir</span> <span
+        class="o">/</span> <span class="s1">&#39;error_record.tsv&#39;</span><span class="p">),</span> <span class="n">sep</span><span
+        class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span
+        class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span
+        class="p">)</span>
+
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span
+        class="n">from_dict</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span
+        class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span
+        class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">results</span><span
+        class="o">.</span><span class="n">items</span><span class="p">()})</span><span class="o">.</span><span
+        class="n">to_csv</span><span class="p">((</span><span class="n">output_dir</span> <span class="o">/</span> <span
+        class="s1">&#39;results.tsv&#39;</span><span class="p">),</span> <span class="n">sep</span><span
+        class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span
+        class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span
+        class="p">)</span>
+
+    <span class="k">return</span> <span class="n">error_record</span><span class="p">,</span> <span class="n">editops_record</span><span
+        class="p">,</span> <span class="n">results</span></div>
+
+
+
+<div class="viewcode-block" id="line_based_evaluation">
+<a class="viewcode-back" href="../../../ajmc.ocr.html#ajmc.ocr.evaluation.line_based_evaluation">[docs]</a>
+<span class="k">def</span> <span class="nf">line_based_evaluation</span><span class="p">(</span><span
+        class="n">gt_lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span
+        class="nb">str</span><span class="p">],</span>
+                          <span class="n">ocr_lines</span><span class="p">:</span> <span class="n">List</span><span
+        class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                          <span class="n">error_record</span><span class="p">:</span> <span class="nb">dict</span> <span
+        class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">editops_record</span><span class="p">:</span> <span
+        class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span
+        class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span
+        class="p">,</span>
+                          <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span
+        class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span
+        class="n">Tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span
+        class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluates all the text files in ``ocr_dir`` against the corresponding text files in ``gt_dir``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gt_lines: The list of groundtruth lines.</span>
+<span class="sd">        ocr_lines: The list of OCR lines.</span>
+<span class="sd">        error_record: The error record to update (pass only if you want to aggregate multiple evaluations).</span>
+<span class="sd">        editops_record: The editops record to update (pass only if you want to aggregate multiple evaluations).</span>
+<span class="sd">        output_dir: If given, the evaluation files will be written to this directory.</span>
+<span class="sd">        normalize: Whether to harmonise the unicode of the groundtruth and OCR files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">error_record</span> <span class="o">=</span> <span class="n">error_record</span> <span
+        class="k">if</span> <span class="n">error_record</span> <span class="k">else</span> <span
+        class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span
+        class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span
+        class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;gt&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;ocr&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;greek_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;greek_chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;latin_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;latin_chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;numeral_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;numeral_chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;punctuation_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;punctuation_chars_distance&#39;</span><span class="p">,</span>
+                                                                      <span class="s1">&#39;words&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;words_distance&#39;</span><span class="p">]}</span>
+    <span class="n">editops_record</span> <span class="o">=</span> <span class="n">editops_record</span> <span
+        class="k">if</span> <span class="n">editops_record</span> <span class="k">else</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">ocr_text</span><span
+        class="p">,</span> <span class="n">gt_text</span><span class="p">)</span> <span class="ow">in</span> <span
+        class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span
+        class="n">ocr_lines</span><span class="p">,</span> <span class="n">gt_lines</span><span class="p">)):</span>
+
+        <span class="c1"># Postprocess the OCR text</span>
+        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="n">ocr_text</span> <span class="o">=</span> <span class="n">re</span><span
+        class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span
+        class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span
+        class="n">ocr_text</span><span class="p">)</span>
+            <span class="n">ocr_text</span> <span class="o">=</span> <span class="n">ocr_text</span><span
+        class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">ocr_text</span> <span class="o">=</span> <span class="n">harmonise_unicode</span><span
+        class="p">(</span><span class="n">ocr_text</span><span class="p">)</span>
+
+        <span class="c1"># compute distance</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span
+        class="p">)</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;gt&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gt_text</span><span
+        class="p">)</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;ocr&#39;</span><span class="p">]</span><span
+        class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ocr_text</span><span
+        class="p">)</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;chars&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span
+        class="p">(</span><span class="n">gt_text</span><span class="p">))</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;chars_distance&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">gt_text</span><span
+        class="p">,</span> <span class="n">ocr_text</span><span class="p">))</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;words&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span
+        class="p">(</span><span class="n">gt_text</span><span class="o">.</span><span class="n">split</span><span
+        class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)))</span>
+        <span class="n">error_record</span><span class="p">[</span><span class="s1">&#39;words_distance&#39;</span><span
+        class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">gt_text</span><span
+        class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">ocr_text</span><span
+        class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+        <span class="k">for</span> <span class="n">charset</span> <span class="ow">in</span> <span class="n">CHARSETS_PATTERNS</span><span
+        class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">error_record</span><span class="p">[</span><span class="sa">f</span><span
+        class="s1">&#39;</span><span class="si">{</span><span class="n">charset</span><span class="si">}</span><span
+        class="s1">_chars&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span
+        class="p">(</span><span class="n">count_chars_by_charset</span><span class="p">(</span><span
+        class="n">gt_text</span><span class="p">,</span> <span class="n">charset</span><span class="p">))</span>
+            <span class="n">error_record</span><span class="p">[</span><span class="sa">f</span><span
+        class="s1">&#39;</span><span class="si">{</span><span class="n">charset</span><span class="si">}</span><span
+        class="s1">_chars_distance&#39;</span><span class="p">]</span><span class="o">.</span><span
+        class="n">append</span><span class="p">(</span><span class="n">count_errors_by_charset</span><span
+        class="p">(</span><span class="n">gt_text</span><span class="p">,</span> <span class="n">ocr_text</span><span
+        class="p">,</span> <span class="n">charset</span><span class="p">))</span>
+
+        <span class="c1"># Record edit operations</span>
+        <span class="n">editops_record</span> <span class="o">=</span> <span class="n">record_editops</span><span
+        class="p">(</span><span class="n">gt_word</span><span class="o">=</span><span class="n">gt_text</span><span
+        class="p">,</span>
+                                        <span class="n">ocr_word</span><span class="o">=</span><span
+        class="n">ocr_text</span><span class="p">,</span>
+                                        <span class="n">editops</span><span class="o">=</span><span class="n">Levenshtein</span><span
+        class="o">.</span><span class="n">editops</span><span class="p">(</span><span class="n">ocr_text</span><span
+        class="p">,</span> <span class="n">gt_text</span><span class="p">),</span>
+                                        <span class="n">editops_record</span><span class="o">=</span><span class="n">editops_record</span><span
+        class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span
+        class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span
+        class="s1">_ER&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span
+        class="n">safe_divide</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span
+        class="n">error_record</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span
+        class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s1">_distance&#39;</span><span
+        class="p">]),</span> <span class="nb">sum</span><span class="p">(</span><span class="n">error_record</span><span
+        class="p">[</span><span class="n">x</span><span class="p">])),</span> <span class="mi">3</span><span
+        class="p">)</span>
+               <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span
+        class="p">[</span><span class="s1">&#39;chars&#39;</span><span class="p">,</span> <span class="s1">&#39;words&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;greek_chars&#39;</span><span class="p">,</span> <span class="s1">&#39;latin_chars&#39;</span><span
+        class="p">,</span> <span class="s1">&#39;numeral_chars&#39;</span><span class="p">,</span> <span class="s1">&#39;punctuation_chars&#39;</span><span
+        class="p">]}</span>
+    <span class="c1"># counts = {f&#39;{x}_count&#39;: sum(error_record[x]) for x in [&#39;chars&#39;, &#39;words&#39;, &#39;greek_chars&#39;, &#39;latin_chars&#39;,</span>
+    <span class="c1">#                                                        &#39;numeral_chars&#39;, &#39;punctuation_chars&#39;]}</span>
+    <span class="c1"># results.update(counts)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s1">&#39;Character Error Rate: </span><span class="si">{</span><span class="n">results</span><span
+        class="p">[</span><span class="s2">&quot;chars_ER&quot;</span><span class="p">]</span><span
+        class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s1">&#39;Word Error Rate: </span><span class="si">{</span><span class="n">results</span><span
+        class="p">[</span><span class="s2">&quot;words_ER&quot;</span><span class="p">]</span><span
+        class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s1">&#39;Greek Character Error Rate: </span><span class="si">{</span><span
+        class="n">results</span><span class="p">[</span><span class="s2">&quot;greek_chars_ER&quot;</span><span
+        class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s1">&#39;Latin Character Error Rate: </span><span class="si">{</span><span
+        class="n">results</span><span class="p">[</span><span class="s2">&quot;latin_chars_ER&quot;</span><span
+        class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
+        class="sa">f</span><span class="s1">&#39;Numeral Character Error Rate: </span><span class="si">{</span><span
+        class="n">results</span><span class="p">[</span><span class="s2">&quot;numeral_chars_ER&quot;</span><span
+        class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Write files</span>
+    <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span
+        class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span
+        class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span
+        class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span
+        class="p">)</span>
+
+        <span class="n">editops_record</span> <span class="o">=</span> <span class="p">{</span><span
+        class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span
+        class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span
+        class="p">(</span><span class="n">editops_record</span><span class="o">.</span><span class="n">items</span><span
+        class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span
+        class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span
+        class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span
+        class="kc">True</span><span class="p">)}</span>
+        <span class="n">write_editops_record</span><span class="p">(</span><span class="n">editops_record</span><span
+        class="o">=</span><span class="n">editops_record</span><span class="p">,</span> <span
+        class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
+
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span
+        class="n">from_dict</span><span class="p">(</span><span class="n">error_record</span><span
+        class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">((</span><span class="n">output_dir</span> <span
+        class="o">/</span> <span class="s1">&#39;error_record.tsv&#39;</span><span class="p">),</span> <span class="n">sep</span><span
+        class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span
+        class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span
+        class="p">)</span>
+
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span
+        class="n">from_dict</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span
+        class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span
+        class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">results</span><span
+        class="o">.</span><span class="n">items</span><span class="p">()})</span><span class="o">.</span><span
+        class="n">to_csv</span><span class="p">((</span><span class="n">output_dir</span> <span class="o">/</span> <span
+        class="s1">&#39;results.tsv&#39;</span><span class="p">),</span> <span class="n">sep</span><span
+        class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span
+        class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span
+        class="p">)</span>
+
+    <span class="k">return</span> <span class="n">error_record</span><span class="p">,</span> <span class="n">editops_record</span><span
+        class="p">,</span> <span class="n">results</span></div>
+
+</pre>
+                    </div>
+                </article>
+            </div>
+            <footer>
+
+                <div class="related-pages">
+
+
+                </div>
+                <div class="bottom-of-page">
+                    <div class="left-details">
+                        <div class="copyright">
+                            Copyright &#169; 2023, Sven Najem-Meyer
+                        </div>
+                        Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link"
+                                                                                          href="https://pradyunsg.me">@pradyunsg</a>'s
+
+                        <a href="https://github.com/pradyunsg/furo">Furo</a>
+
+                    </div>
+                    <div class="right-details">
+
+                    </div>
+                </div>
+
+            </footer>
+        </div>
+        <aside class="toc-drawer no-toc">
+
+
+        </aside>
+    </div>
+</div>
+<script src="../../../_static/documentation_options.js?v=2fea6348"></script>
+<script src="../../../_static/doctools.js?v=888ff710"></script>
+<script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
+        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+</body>
+</html>
