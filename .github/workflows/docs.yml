@@ -8,13 +8,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
-      - name: Install dependencies
-        run: |
-          python3 -m pip install sphinx furo
-          python3 -m pip install --no-deps --ignore-requires-python nb-sphinx myst-parser
-      - name: Sphinx build
-        run: |
-          sphinx-build doc _build
+      # - name: Install dependencies
+        # run: |
+          # python3 -m pip install sphinx furo
+          # python3 -m pip install --no-deps --ignore-requires-python nb-sphinx myst-parser
+      # - name: Sphinx build
+       # run: |
+         # sphinx-build doc _build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
