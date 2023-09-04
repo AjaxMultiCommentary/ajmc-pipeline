@@ -119,6 +119,7 @@
 </label>
 
 
+
 <div class="page">
     <header class="mobile-header">
         <div class="header-left">
@@ -374,6 +375,43 @@
                         <span id="ajmc-corpora-package"></span>
                         <h1>ajmc.corpora package<a class="headerlink" href="#module-ajmc.corpora"
                                                    title="Link to this heading">#</a></h1>
+                        <p><code class="docutils literal notranslate"><span class="pre">ajmc.corpora</span></code>
+                            contains utils for scraping and handling corpora for the AjMC project.</p>
+                        <section id="architecture">
+                            <h2>Architecture<a class="headerlink" href="#architecture"
+                                               title="Link to this heading">#</a></h2>
+                            <p>The functionalities of this package can be divided in three main categories:</p>
+                            <ul class="simple">
+                                <li><p>Scraping corpora from the web</p></li>
+                                <li><p>Cleaning and preparing downloaded corpora for further processing</p></li>
+                                <li><p>Processing and manipulating corpora</p></li>
+                            </ul>
+                            <section id="scraping-and-cleaning">
+                                <h3>Scraping and cleaning<a class="headerlink" href="#scraping-and-cleaning"
+                                                            title="Link to this heading">#</a></h3>
+                                <p>As each corpus has its own peculiarities, it also has its own scraping and cleaning
+                                    script (see <code class="docutils literal notranslate"><span class="pre">corpora._scripts</span></code>).
+                                </p>
+                            </section>
+                            <section id="processing">
+                                <h3>Processing<a class="headerlink" href="#processing"
+                                                 title="Link to this heading">#</a></h3>
+                                <p><code class="docutils literal notranslate"><span class="pre">corpora</span></code>
+                                    provides a set of functions and objects for processing and manipulating corpora.
+                                    Basically, each corpus has a type specified in its <code
+                                            class="docutils literal notranslate"><span class="pre">metadata.json</span></code>
+                                    file. This type is used to determine which functions and objects to use for
+                                    processing the corpus.</p>
+                                <p>The main object is the <code class="docutils literal notranslate"><span class="pre">Corpus</span></code>
+                                    object, which is a wrapper around the different corpus styles. See <code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">corpora_classes.py</span></code> for more.</p>
+                            </section>
+                        </section>
+                        <section id="basic-usage">
+                            <h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading">#</a>
+                            </h2>
+                        </section>
                         <section id="submodules">
                             <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a>
                             </h2>
@@ -1468,6 +1506,14 @@
                         <ul>
                             <li><a class="reference internal" href="#">ajmc.corpora package</a>
                                 <ul>
+                                    <li><a class="reference internal" href="#architecture">Architecture</a>
+                                        <ul>
+                                            <li><a class="reference internal" href="#scraping-and-cleaning">Scraping and
+                                                cleaning</a></li>
+                                            <li><a class="reference internal" href="#processing">Processing</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="reference internal" href="#basic-usage">Basic usage</a></li>
                                     <li><a class="reference internal" href="#submodules">Submodules</a></li>
                                     <li><a class="reference internal" href="#module-ajmc.corpora.bibliographic_records">ajmc.corpora.bibliographic_records
                                         module</a>

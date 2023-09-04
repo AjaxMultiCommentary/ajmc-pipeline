@@ -1,7 +1,9 @@
 
 # Contributing guidelines
 
-This notebook provides contributors (and especially students) with a set of general principles, specific rules and best practices. Its goal to facilitate collaboration and maintenance of the library. It is highly recommended to read the `introduction_to_code.ipynb` before going further.
+This notebook provides contributors (and especially students) with a set of general principles, specific rules and best
+practices. Its goal to facilitate collaboration and maintenance of the library. It is highly recommended to read
+the `introduction_to_code.ipynb` before going further.
 
 
 ## General principles

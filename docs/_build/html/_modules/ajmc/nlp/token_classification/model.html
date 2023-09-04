@@ -116,6 +116,7 @@
 </label>
 
 
+
 <div class="page">
     <header class="mobile-header">
         <div class="header-left">
@@ -367,20 +368,21 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span
                             class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span
                             class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">transformers</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span
+                            class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span
+                            class="n">SequentialSampler</span>
+
 <span class="kn">from</span> <span class="nn">ajmc.commons.docstrings</span> <span class="kn">import</span> <span
                             class="n">docstrings</span><span class="p">,</span> <span
                             class="n">docstring_formatter</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span
-                            class="p">,</span> <span class="n">SequentialSampler</span>
-
-<span class="kn">from</span> <span class="nn">ajmc.nlp.token_classification.data_preparation.hipe_iob</span> <span
-                            class="kn">import</span> <span class="n">create_prediction_dataset</span>
 <span class="kn">from</span> <span class="nn">ajmc.commons.miscellaneous</span> <span class="kn">import</span> <span
                             class="n">get_custom_logger</span>
+<span class="kn">from</span> <span class="nn">ajmc.nlp.token_classification.data_preparation.hipe_iob</span> <span
+                            class="kn">import</span> <span class="n">create_prediction_dataset</span>
 <span class="kn">from</span> <span class="nn">ajmc.nlp.token_classification.data_preparation.utils</span> <span
                             class="kn">import</span> <span class="n">write_predictions_to_tsv</span>
 

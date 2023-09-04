@@ -108,9 +108,9 @@ def compute_n_chunks(img_tensor,
     """Computes the number a chunks that can be extracted from an image tensor, given a chunk width and an overlap.
 
     Note:
-        We have $n * w - (n - 1) * o = W+padding$ where $n$ is the number of chunks, $w$ is the chunk width, $o$ is the overlap
-        and $W$ is the image width (without padding), which can be rewritten to : $n (w - o) + o = W+padding$. Therefore,
-        $n = (W+padding - o) / (w - o)$, and $n = (W+padding - o) // (w - o) (+ 1 if there is a remainder)$.
+        We have :math:`n * w - (n - 1) * o = W + padding` where :math:`n` is the number of chunks, :math:`w` is the chunk width, :math:`o` is the overlap
+        and :math:`W` is the image width (without padding), which can be rewritten to : :math:`n (w - o) + o = W + padding`. Therefore,
+        :math:`n = (W+padding - o) / (w - o)`, and :math:`n = (W+padding - o) // (w - o)` (:math:`+ 1` if there is a remainder).
 
     Args:
         img_tensor: The image tensor from which to extract the chunks.

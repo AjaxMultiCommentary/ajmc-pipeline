@@ -119,6 +119,7 @@
 </label>
 
 
+
 <div class="page">
     <header class="mobile-header">
         <div class="header-left">
@@ -627,17 +628,20 @@
                                         <dt class="sig sig-object py"
                                             id="ajmc.ocr.pytorch.ctc_decoder_torch.GreedyDecoder.convert_to_strings">
                                             <span class="sig-name descname"><span class="pre">convert_to_strings</span></span><span
-                                                class="sig-paren">(</span><em class="sig-param"><span class="pre">sequences,</span>
-                                            <span class="pre">sizes=None,</span> <span class="pre">remove_repetitions=False,</span>
-                                            <span class="pre">return_offsets=False)</span> <span
-                                                    class="pre">-&gt;</span> <span class="pre">(typing.List[str],</span>
-                                            <span class="pre">typing.List[&lt;built-in</span> <span
-                                                    class="pre">method</span> <span class="pre">tensor</span> <span
-                                                    class="pre">of</span> <span class="pre">type</span> <span
-                                                    class="pre">object</span> <span class="pre">at</span> <span
-                                                    class="pre">0x13297b830&gt;]</span></em><span
-                                                class="sig-paren">)</span><a class="reference internal"
-                                                                             href="_modules/ajmc/ocr/pytorch/ctc_decoder_torch.html#GreedyDecoder.convert_to_strings"><span
+                                                class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                                class="pre">sequences</span></span></em>, <em class="sig-param"><span
+                                                class="n"><span class="pre">sizes</span></span><span class="o"><span
+                                                class="pre">=</span></span><span class="default_value"><span
+                                                class="pre">None</span></span></em>, <em class="sig-param"><span
+                                                class="n"><span class="pre">remove_repetitions</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">False</span></span></em>, <em
+                                                class="sig-param"><span class="n"><span
+                                                class="pre">return_offsets</span></span><span class="o"><span
+                                                class="pre">=</span></span><span class="default_value"><span
+                                                class="pre">False</span></span></em><span class="sig-paren">)</span><a
+                                                class="reference internal"
+                                                href="_modules/ajmc/ocr/pytorch/ctc_decoder_torch.html#GreedyDecoder.convert_to_strings"><span
                                                 class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                                 class="headerlink"
                                                 href="#ajmc.ocr.pytorch.ctc_decoder_torch.GreedyDecoder.convert_to_strings"
@@ -650,16 +654,13 @@
                                         <dt class="sig sig-object py"
                                             id="ajmc.ocr.pytorch.ctc_decoder_torch.GreedyDecoder.decode">
                                             <span class="sig-name descname"><span class="pre">decode</span></span><span
-                                                class="sig-paren">(</span><em class="sig-param"><span
-                                                class="pre">probs,</span> <span class="pre">sizes=None)</span> <span
-                                                class="pre">-&gt;</span> <span class="pre">(typing.List[str],</span>
-                                            <span class="pre">typing.List[&lt;built-in</span> <span
-                                                    class="pre">method</span> <span class="pre">tensor</span> <span
-                                                    class="pre">of</span> <span class="pre">type</span> <span
-                                                    class="pre">object</span> <span class="pre">at</span> <span
-                                                    class="pre">0x13297b830&gt;]</span></em><span
-                                                class="sig-paren">)</span><a class="reference internal"
-                                                                             href="_modules/ajmc/ocr/pytorch/ctc_decoder_torch.html#GreedyDecoder.decode"><span
+                                                class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                                class="pre">probs</span></span></em>, <em class="sig-param"><span
+                                                class="n"><span class="pre">sizes</span></span><span class="o"><span
+                                                class="pre">=</span></span><span class="default_value"><span
+                                                class="pre">None</span></span></em><span class="sig-paren">)</span><a
+                                                class="reference internal"
+                                                href="_modules/ajmc/ocr/pytorch/ctc_decoder_torch.html#GreedyDecoder.decode"><span
                                                 class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                                 class="headerlink"
                                                 href="#ajmc.ocr.pytorch.ctc_decoder_torch.GreedyDecoder.decode"
@@ -700,11 +701,7 @@
                                                 class="sig-param"><span class="n"><span class="pre">remove_repetitions=False)</span> <span
                                                 class="pre">-&gt;</span> <span class="pre">(&lt;class</span> <span
                                                 class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span
-                                                class="n"><span class="pre">&lt;built-in</span> <span
-                                                class="pre">method</span> <span class="pre">tensor</span> <span
-                                                class="pre">of</span> <span class="pre">type</span> <span class="pre">object</span> <span
-                                                class="pre">at</span> <span
-                                                class="pre">0x13297b830&gt;</span></span></em><span
+                                                class="n"><span class="pre">torch.tensor</span></span></em><span
                                                 class="sig-paren">)</span><a class="reference internal"
                                                                              href="_modules/ajmc/ocr/pytorch/ctc_decoder_torch.html#GreedyDecoder.process_string"><span
                                                 class="viewcode-link"><span class="pre">[source]</span></span></a><a
@@ -1405,9 +1402,9 @@
                                                     class="w"> </span></em><span class="sig-name descname"><span
                                                 class="pre">chunks</span></span><em class="property"><span
                                                 class="p"><span class="pre">:</span></span><span class="w"> </span><span
-                                                class="pre">Tensor</span></em><a class="headerlink"
-                                                                                 href="#ajmc.ocr.pytorch.data_processing.OcrBatch.chunks"
-                                                                                 title="Link to this definition">#</a>
+                                                class="pre">torch.Tensor</span></em><a class="headerlink"
+                                                                                       href="#ajmc.ocr.pytorch.data_processing.OcrBatch.chunks"
+                                                                                       title="Link to this definition">#</a>
                                         </dt>
                                         <dd></dd>
                                     </dl>
@@ -1478,9 +1475,9 @@
                                                     class="w"> </span></em><span class="sig-name descname"><span
                                                 class="pre">texts_tensor</span></span><em class="property"><span
                                                 class="p"><span class="pre">:</span></span><span class="w"> </span><span
-                                                class="pre">Tensor</span></em><a class="headerlink"
-                                                                                 href="#ajmc.ocr.pytorch.data_processing.OcrBatch.texts_tensor"
-                                                                                 title="Link to this definition">#</a>
+                                                class="pre">torch.Tensor</span></em><a class="headerlink"
+                                                                                       href="#ajmc.ocr.pytorch.data_processing.OcrBatch.texts_tensor"
+                                                                                       title="Link to this definition">#</a>
                                         </dt>
                                         <dd></dd>
                                     </dl>
@@ -1494,55 +1491,17 @@
                                             class="w"> </span></em><span class="sig-prename descclassname"><span
                                         class="pre">ajmc.ocr.pytorch.data_processing.</span></span><span
                                         class="sig-name descname"><span class="pre">OcrIterDataset</span></span><span
-                                        class="sig-paren">(</span><em class="sig-param"><span class="n"><span
-                                        class="pre">data_dir</span></span><span class="p"><span
+                                        class="sig-paren">(</span><em class="sig-param"><span class="o"><span
+                                        class="pre">*</span></span><span class="n"><span
+                                        class="pre">args</span></span><span class="p"><span
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span
-                                        class="pre">classes</span></span><span class="p"><span
+                                        class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span
+                                        class="pre">**</span></span><span class="n"><span
+                                        class="pre">kwargs</span></span><span class="p"><span
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span
-                                        class="pre">max_batch_size</span></span><span class="p"><span
-                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span
-                                        class="pre">img_height</span></span><span class="p"><span
-                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span
-                                        class="pre">chunk_width</span></span><span class="p"><span class="pre">:</span></span><span
-                                        class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em
-                                        class="sig-param"><span class="n"><span
-                                        class="pre">chunk_overlap</span></span><span class="p"><span
-                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span
-                                        class="pre">classes_to_indices</span></span><span class="p"><span
-                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span
-                                        class="pre">str</span><span class="p"><span class="pre">,</span></span><span
-                                        class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>,
-                                    <em class="sig-param"><span class="n"><span
-                                            class="pre">indices_to_classes</span></span><span class="p"><span
-                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                            class="pre">Dict</span><span class="p"><span
-                                            class="pre">[</span></span><span class="pre">int</span><span class="p"><span
-                                            class="pre">,</span></span><span class="w"> </span><span
-                                            class="pre">str</span><span class="p"><span
-                                            class="pre">]</span></span></span></em>, <em class="sig-param"><span
-                                        class="n"><span class="pre">is_training</span></span><span class="p"><span
-                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">bool</span></span><span class="w"> </span><span class="o"><span
-                                        class="pre">=</span></span><span class="w"> </span><span
-                                        class="default_value"><span class="pre">True</span></span></em>, <em
-                                        class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span
-                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
-                                        class="n"><span class="pre">bool</span></span><span class="w"> </span><span
-                                        class="o"><span class="pre">=</span></span><span class="w"> </span><span
-                                        class="default_value"><span class="pre">True</span></span></em>, <em
-                                        class="sig-param"><span class="n"><span class="pre">per_worker_steps_run</span></span><span
-                                        class="p"><span class="pre">:</span></span><span class="w"> </span><span
-                                        class="n"><span class="pre">int</span></span><span class="w"> </span><span
-                                        class="o"><span class="pre">=</span></span><span class="w"> </span><span
-                                        class="default_value"><span class="pre">0</span></span></em><span
-                                        class="sig-paren">)</span><a class="reference internal"
-                                                                     href="_modules/ajmc/ocr/pytorch/data_processing.html#OcrIterDataset"><span
+                                        class="pre">Any</span></span></em><span class="sig-paren">)</span><a
+                                        class="reference internal"
+                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#OcrIterDataset"><span
                                         class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                         class="headerlink" href="#ajmc.ocr.pytorch.data_processing.OcrIterDataset"
                                         title="Link to this definition">#</a></dt>
@@ -1661,9 +1620,9 @@
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
                                         class="pre">int</span></span></em><span class="sig-paren">)</span> <span
                                         class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
-                                        class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a
-                                        class="reference internal"
-                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#chunk_img_tensor"><span
+                                        class="sig-return-typehint"><span
+                                        class="pre">torch.Tensor</span></span></span><a class="reference internal"
+                                                                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#chunk_img_tensor"><span
                                         class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                         class="headerlink" href="#ajmc.ocr.pytorch.data_processing.chunk_img_tensor"
                                         title="Link to this definition">#</a></dt>
@@ -1710,12 +1669,19 @@
                                     chunk width and an overlap.</p>
                                     <div class="admonition note">
                                         <p class="admonition-title">Note</p>
-                                        <p>We have $n * w - (n - 1) * o = W+padding$ where $n$ is the number of chunks,
-                                            $w$ is the chunk width, $o$ is the overlap
-                                            and $W$ is the image width (without padding), which can be rewritten to : $n
-                                            (w - o) + o = W+padding$. Therefore,
-                                            $n = (W+padding - o) / (w - o)$, and $n = (W+padding - o) // (w - o) (+ 1 if
-                                            there is a remainder)$.</p>
+                                        <p>We have <span class="math notranslate nohighlight">\(n * w - (n - 1) * o = W + padding\)</span>
+                                            where <span class="math notranslate nohighlight">\(n\)</span> is the number
+                                            of chunks, <span class="math notranslate nohighlight">\(w\)</span> is the
+                                            chunk width, <span class="math notranslate nohighlight">\(o\)</span> is the
+                                            overlap
+                                            and <span class="math notranslate nohighlight">\(W\)</span> is the image
+                                            width (without padding), which can be rewritten to : <span
+                                                    class="math notranslate nohighlight">\(n (w - o) + o = W + padding\)</span>.
+                                            Therefore,
+                                            <span class="math notranslate nohighlight">\(n = (W+padding - o) / (w - o)\)</span>,
+                                            and <span class="math notranslate nohighlight">\(n = (W+padding - o) // (w - o)\)</span>
+                                            (<span class="math notranslate nohighlight">\(+ 1\)</span> if there is a
+                                            remainder).</p>
                                     </div>
                                     <dl class="field-list simple">
                                         <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1786,11 +1752,11 @@
                                         class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                         class="pre">image_tensor</span></span><span class="p"><span class="pre">:</span></span><span
                                         class="w"> </span><span class="n"><span
-                                        class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span
-                                        class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
-                                        class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a
-                                        class="reference internal"
-                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#crop_image_tensor_to_nonzero"><span
+                                        class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span>
+                                    <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
+                                            class="sig-return-typehint"><span
+                                            class="pre">torch.Tensor</span></span></span><a class="reference internal"
+                                                                                            href="_modules/ajmc/ocr/pytorch/data_processing.html#crop_image_tensor_to_nonzero"><span
                                         class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                         class="headerlink"
                                         href="#ajmc.ocr.pytorch.data_processing.crop_image_tensor_to_nonzero"
@@ -1809,12 +1775,13 @@
                                         class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                         class="pre">train_dataset</span></span><span class="p"><span
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">Dataset</span></span></em>, <em class="sig-param"><span
-                                        class="n"><span class="pre">num_workers</span></span><span class="p"><span
-                                        class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">int</span></span></em><span class="sig-paren">)</span> <span
-                                        class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
-                                        class="sig-return-typehint"><span class="pre">DataLoader</span></span></span><a
+                                        class="pre">torch.utils.data.Dataset</span></span></em>, <em
+                                        class="sig-param"><span class="n"><span
+                                        class="pre">num_workers</span></span><span class="p"><span class="pre">:</span></span><span
+                                        class="w"> </span><span class="n"><span class="pre">int</span></span></em><span
+                                        class="sig-paren">)</span> <span class="sig-return"><span
+                                        class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span
+                                        class="pre">torch.utils.data.DataLoader</span></span></span><a
                                         class="reference internal"
                                         href="_modules/ajmc/ocr/pytorch/data_processing.html#get_custom_dataloader"><span
                                         class="viewcode-link"><span class="pre">[source]</span></span></a><a
@@ -1847,9 +1814,9 @@
                                         class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                         class="pre">image_tensor</span></span></em><span class="sig-paren">)</span>
                                     <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
-                                            class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a
-                                        class="reference internal"
-                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#normalize_image_tensor"><span
+                                            class="sig-return-typehint"><span
+                                            class="pre">torch.Tensor</span></span></span><a class="reference internal"
+                                                                                            href="_modules/ajmc/ocr/pytorch/data_processing.html#normalize_image_tensor"><span
                                         class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                         class="headerlink"
                                         href="#ajmc.ocr.pytorch.data_processing.normalize_image_tensor"
@@ -1870,9 +1837,9 @@
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
                                         class="pre">int</span></span></em><span class="sig-paren">)</span> <span
                                         class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
-                                        class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a
-                                        class="reference internal"
-                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#prepare_img"><span
+                                        class="sig-return-typehint"><span
+                                        class="pre">torch.Tensor</span></span></span><a class="reference internal"
+                                                                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#prepare_img"><span
                                         class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                         class="headerlink" href="#ajmc.ocr.pytorch.data_processing.prepare_img"
                                         title="Link to this definition">#</a></dt>
@@ -1904,7 +1871,7 @@
                                         class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                         class="pre">batched_chunks</span></span><span class="p"><span
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">Tensor</span></span></em>, <em class="sig-param"><span
+                                        class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span
                                         class="n"><span class="pre">mapping</span></span><span class="p"><span
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
                                         class="pre">List</span><span class="p"><span class="pre">[</span></span><span
@@ -1914,9 +1881,9 @@
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
                                         class="pre">int</span></span></em><span class="sig-paren">)</span> <span
                                         class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
-                                        class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a
-                                        class="reference internal"
-                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#recompose_batched_chunks"><span
+                                        class="sig-return-typehint"><span
+                                        class="pre">torch.Tensor</span></span></span><a class="reference internal"
+                                                                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#recompose_batched_chunks"><span
                                         class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                         class="headerlink"
                                         href="#ajmc.ocr.pytorch.data_processing.recompose_batched_chunks"
@@ -1961,14 +1928,14 @@
                                         class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                         class="pre">chunks</span></span><span class="p"><span
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
-                                        class="pre">Tensor</span></span></em>, <em class="sig-param"><span
+                                        class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span
                                         class="n"><span class="pre">chunk_overlap</span></span><span class="p"><span
                                         class="pre">:</span></span><span class="w"> </span><span class="n"><span
                                         class="pre">int</span></span></em><span class="sig-paren">)</span> <span
                                         class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span
-                                        class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a
-                                        class="reference internal"
-                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#recompose_chunks"><span
+                                        class="sig-return-typehint"><span
+                                        class="pre">torch.Tensor</span></span></span><a class="reference internal"
+                                                                                        href="_modules/ajmc/ocr/pytorch/data_processing.html#recompose_chunks"><span
                                         class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                         class="headerlink" href="#ajmc.ocr.pytorch.data_processing.recompose_chunks"
                                         title="Link to this definition">#</a></dt>
@@ -2825,5 +2792,9 @@
 <script src="_static/scripts/furo.js?v=32e29ea5"></script>
 <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
         src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+<script>
+    window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}
+</script>
+<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>

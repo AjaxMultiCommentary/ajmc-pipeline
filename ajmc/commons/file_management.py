@@ -197,8 +197,8 @@ def check_via_spreadsheet_conformity(comm_id: str,
 
     Returns:
          A tuple containing two sets of str:
-             1. The difference $sheet_pages - via_pages$.
-             2. The difference $via_pages - sheet_pages$.
+             1. The difference ``sheet_pages - via_pages``.
+             2. The difference ``via_pages - sheet_pages``.
     """
 
     via_project = json.loads(vs.get_comm_via_path(comm_id).read_text(encoding='utf-8'))
