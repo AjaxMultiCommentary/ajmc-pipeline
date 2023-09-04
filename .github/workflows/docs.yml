@@ -2,12 +2,17 @@ name: Docs
 on: [ push, pull_request, workflow_dispatch ]
 permissions:
   contents: write
+  pages: write
 jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - id: deployment
+        uses: sphinx-notes/pages@v3
+        with:
+          publish: false
+      # - uses: actions/checkout@v3
+      # - uses: actions/setup-python@v3
       # - name: Install dependencies
         # run: |
           # python3 -m pip install sphinx furo
@@ -15,11 +20,11 @@ jobs:
       # - name: Sphinx build
        # run: |
          # sphinx-build doc _build
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+      # - name: Deploy
+      - uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           # publish_branch: main
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _build/
+          publish_dir: ${{ steps.deployment.outputs.artifact }}
           force_orphan: true
