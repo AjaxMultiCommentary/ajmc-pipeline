@@ -30,6 +30,8 @@ debugpy==1.5.1
 decorator==5.1.1
 defusedxml==0.7.1
 deprecation==2.1.0
+torch==1.11.0
+torchvision==0.12.0
 detectron2 @ git+https://github.com/facebookresearch/detectron2.git@dc1b7d14331005eab9c6b67cbf0397d552793b3f
 dill==0.3.4
 dkpro-cassis==0.7.1
@@ -180,10 +182,8 @@ tokenizers==0.12.1
 toml==0.10.2
 tomli==2.0.1
 toposort==1.7
-torch==1.11.0
 torchaudio==0.10.1
 torchmetrics==0.9.3
-torchvision==0.12.0
 tornado==6.1
 tqdm==4.64.0
 traitlets==5.1.1
