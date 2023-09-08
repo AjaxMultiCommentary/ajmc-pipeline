@@ -46,7 +46,7 @@ fvcore==0.1.5.post20220506
 google-auth==2.6.6
 google-auth-oauthlib==0.4.6
 grpcio==1.46.0
-hipe-commons==0.3.0
+hipe_commons @ git+https://github.com/hipe-eval/HIPE-pycommons.git
 htrvx==0.0.9
 huggingface-hub==0.5.1
 hydra-core==1.1.2
