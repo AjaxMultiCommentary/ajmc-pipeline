@@ -10,11 +10,11 @@ from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
 from torchvision.io import read_image, ImageReadMode
 
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.unicode_utils import harmonise_unicode
 from ajmc.ocr import variables as ocr_vs
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 # Todo add a training mode where the text is not given

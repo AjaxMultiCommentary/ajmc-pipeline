@@ -18,12 +18,12 @@ from tqdm import tqdm
 from ajmc.commons import variables as vs
 from ajmc.commons.arithmetic import safe_divide
 from ajmc.commons.geometry import are_bboxes_overlapping_with_threshold, is_bbox_within_bbox
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.unicode_utils import harmonise_unicode, count_chars_by_charset, CHARSETS_PATTERNS
 from ajmc.ocr import variables as ocr_vs
 from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 # ======================================================================================================================
@@ -525,6 +525,15 @@ def line_based_evaluation(gt_lines: List[str],
         editops_record: The editops record to update (pass only if you want to aggregate multiple evaluations).
         output_dir: If given, the evaluation files will be written to this directory.
         normalize: Whether to harmonise the unicode of the groundtruth and OCR files.
+
+    Returns:
+        The error record, the editops record and the results.
+
+            * ``error_record``
+            * ``editops_record``
+            * ``results``, a dictionary with keys ``chars_ER``, ``words_ER``, ``greek_chars_ER``, ``latin_chars_ER``,
+                ``numeral_chars_ER``, ``punctuation_chars_ER``. The values are the corresponding error rates.
+
     """
 
     error_record = error_record if error_record else {k: [] for k in ['id', 'gt', 'ocr',

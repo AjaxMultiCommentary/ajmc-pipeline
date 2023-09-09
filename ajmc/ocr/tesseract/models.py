@@ -4,13 +4,13 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
-from ajmc.commons.miscellaneous import get_custom_logger, log_to_file
+from ajmc.commons.miscellaneous import get_ajmc_logger, log_to_file
 from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.config import config_to_tesstrain_config, CONFIGS
 from ajmc.ocr.preprocessing.data_preparation import make_dataset
 from ajmc.ocr.tesseract.dictionaries import change_traineddata_wordlist
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 def make_model_dirs(model_id: str):

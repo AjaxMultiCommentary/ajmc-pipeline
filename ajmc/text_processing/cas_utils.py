@@ -14,9 +14,9 @@ from tqdm import tqdm
 
 from ajmc.commons import variables as vs
 from ajmc.commons.arithmetic import compute_interval_overlap
-from ajmc.commons.miscellaneous import aligned_print, get_custom_logger
+from ajmc.commons.miscellaneous import aligned_print, get_ajmc_logger
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 def basic_rebuild(page: dict,

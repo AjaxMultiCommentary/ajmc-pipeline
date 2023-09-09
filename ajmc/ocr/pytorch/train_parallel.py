@@ -2,7 +2,7 @@ import argparse
 import os
 import random
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import torch
 import torch.optim as optim
@@ -12,13 +12,13 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
 
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr.evaluation import line_based_evaluation
 from ajmc.ocr.pytorch.config import get_config
 from ajmc.ocr.pytorch.data_processing import OcrIterDataset, OcrBatch, recompose_batched_chunks, get_custom_dataloader
 from ajmc.ocr.pytorch.model import OcrTorchModel
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 class OcrModelTrainer:
@@ -83,7 +83,7 @@ class OcrModelTrainer:
         train_dataset.per_worker_steps_run = self.per_worker_steps_run
         self.train_dataloader = get_custom_dataloader(train_dataset, num_workers=self.num_workers)
         self.eval_dataloader = get_custom_dataloader(eval_dataset, num_workers=self.num_workers)
-
+        self.results = None  # Is going to updated later
 
     def run_batch(self, batch: OcrBatch) -> float:
 
@@ -110,15 +110,14 @@ class OcrModelTrainer:
         for target in targets:
             strings.append(''.join([self.eval_dataloader.dataset.indices_to_classes[char_index.item()] for char_index in target]))
 
-    def evaluate_during_training(self):
+    def evaluate_during_training(self, step):
 
         logger.info("Evaluating model during training")
         all_targets = []  # Todo harmonise the name target
         all_predictions: List[str] = []
 
         with torch.no_grad():
-            # for step in tqdm(range(self.eval_dataloader.dataset.data_len)):  # TODO change this
-            for step in tqdm(range(100)):
+            for _ in tqdm(range(self.eval_dataloader.dataset.data_len)):
                 batch = next(iter(self.eval_dataloader.dataset))
                 source = batch.chunks.to(self.device)
                 all_targets += batch.texts
@@ -127,7 +126,7 @@ class OcrModelTrainer:
                 else:
                     all_predictions += self.model.predict(source, batch.chunks_to_img_mapping)
 
-        line_based_evaluation(all_targets, all_predictions, output_dir=self.evaluation_output_dir)
+        return line_based_evaluation(all_targets, all_predictions, output_dir=(self.evaluation_output_dir / f"eval_{step}"))
 
 
     def save_snapshot(self, step):
@@ -139,12 +138,26 @@ class OcrModelTrainer:
         torch.save(snapshot, self.snapshot_path)
         print(f"Step {step} | Training snapshot saved at {self.snapshot_path}")
 
+
+    def update_results(self, results: Dict[str, float]):
+
+        if self.results is None:
+            self.results = {k: [v] for k, v in results.items()}
+        else:
+            for k, v in results.items():
+                self.results[k].append(v)
+
+
+    def plot_results(self):
+
+
     def train(self, total_steps: int):
 
         logger.info(f"Starting training for {total_steps} steps with {os.environ['WORLD_SIZE']} workers")
         per_worker_steps_total = total_steps // self.num_workers
 
         running_loss = 0.0
+        eval_losses = []
 
         for step in range(self.per_worker_steps_run, per_worker_steps_total):
             step *= self.num_workers
@@ -161,12 +174,14 @@ class OcrModelTrainer:
                 running_loss = 0.0
 
             if step % self.evaluation_rate < self.num_workers and (self.device == 0 or not self.is_distributed):
-                self.evaluate_during_training()
+                _, _, results = self.evaluate_during_training(step=step)
+
+                eval_losses.append(loss)
 
             if step % self.snapshot_rate < self.num_workers and (self.device == 0 or not self.is_distributed):
                 self.save_snapshot(step)
 
-        self.evaluate_during_training()
+        self.evaluate_during_training(step=step)
 
 
 def ddp_setup():

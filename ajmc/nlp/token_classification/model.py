@@ -7,11 +7,11 @@ import transformers
 from torch.utils.data import DataLoader, DataLoader, SequentialSampler
 
 from ajmc.commons.docstrings import docstrings, docstring_formatter
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.nlp.token_classification.data_preparation.hipe_iob import create_prediction_dataset
 from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 @docstring_formatter(**docstrings)

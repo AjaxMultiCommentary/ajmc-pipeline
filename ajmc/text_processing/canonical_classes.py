@@ -13,10 +13,10 @@ from ajmc.commons.arithmetic import is_interval_within_interval
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import get_bbox_from_points, Shape
 from ajmc.commons.image import AjmcImage
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 class CanonicalCommentary(Commentary):

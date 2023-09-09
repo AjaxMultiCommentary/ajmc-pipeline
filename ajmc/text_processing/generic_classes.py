@@ -9,11 +9,11 @@ from lazy_objects.lazy_objects import lazy_property, lazy_init, LazyObject
 
 from ajmc.commons import variables as vs, image as ajmc_img
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr import variables as ocr_vs
 from ajmc.olr.utils import get_olr_splits_page_ids
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 class TextContainer:

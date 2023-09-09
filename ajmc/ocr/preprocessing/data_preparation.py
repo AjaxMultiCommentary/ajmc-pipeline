@@ -8,12 +8,12 @@ import pandas as pd
 from PIL import Image as PILImage, ImageFilter
 from tqdm import tqdm
 
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.config import CONFIGS
 from ajmc.ocr.preprocessing.get_source_datasets import make_clean_ajmc_dataset, make_clean_pogretra_dataset, compute_dataset_metadata
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 def split_root_dataset_metadata(metadata: pd.DataFrame) -> pd.DataFrame:
     """This function is a custom split for ajmc and pog."""

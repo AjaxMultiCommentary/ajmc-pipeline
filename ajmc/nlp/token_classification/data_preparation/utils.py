@@ -4,9 +4,9 @@ import torch
 from hipe_commons.helpers.tsv import get_tsv_data
 
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.miscellaneous import get_custom_logger, split_list
+from ajmc.commons.miscellaneous import get_ajmc_logger, split_list
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 def nerify_labels(labels: Iterable[str],

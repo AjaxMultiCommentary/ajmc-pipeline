@@ -16,9 +16,9 @@ from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import is_bbox_within_bbox, Shape
 from ajmc.commons.image import binarize, find_contours, remove_artifacts_from_contours
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 @docstring_formatter(**docstrings)

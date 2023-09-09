@@ -10,11 +10,11 @@ from hipe_commons.helpers.tsv import get_tsv_data
 from torch.utils.data import DataLoader, SequentialSampler
 
 from ajmc.commons.docstrings import docstrings, docstring_formatter
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.nlp.token_classification.data_preparation.utils import write_predictions_to_tsv
 from ajmc.nlp.token_classification.model import predict, predict_dataset
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 def seqeval_evaluation(predictions: List[List[str]],

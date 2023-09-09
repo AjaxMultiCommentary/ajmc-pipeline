@@ -11,9 +11,9 @@ from lazy_objects.lazy_objects import lazy_property, lazy_init
 from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 class AjmcImage:

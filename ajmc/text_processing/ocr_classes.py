@@ -21,7 +21,7 @@ from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import adjust_bbox_to_included_contours, get_bbox_from_points, is_bbox_within_bbox, \
     is_bbox_within_bbox_with_threshold, Shape
 from ajmc.commons.image import AjmcImage
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr.utils import guess_ocr_format
 from ajmc.olr.utils import get_page_region_dicts_from_via, sort_to_reading_order
 from ajmc.text_processing import cas_utils
@@ -30,7 +30,7 @@ from ajmc.text_processing.canonical_classes import CanonicalCommentary, Canonica
 from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
 from ajmc.text_processing.markup_processing import find_all_elements, get_element_bbox, get_element_text
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 class OcrCommentary(Commentary):

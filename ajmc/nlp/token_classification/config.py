@@ -6,9 +6,9 @@ from typing import Dict, Any
 import torch
 from transformers import TrainingArguments
 
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 def create_default_config() -> Dict[str, Any]:
     """Creates a default token-classification config."""

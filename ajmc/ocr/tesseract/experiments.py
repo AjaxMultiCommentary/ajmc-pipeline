@@ -6,13 +6,13 @@ import pandas as pd
 
 import ajmc.ocr.evaluation as ocr_eval
 from ajmc.commons.file_management import walk_dirs
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.config import CONFIGS
 from ajmc.ocr.preprocessing import data_preparation
 from ajmc.ocr.tesseract.models import make_model, run
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 def make_experiment_dir(experiment_id: str):

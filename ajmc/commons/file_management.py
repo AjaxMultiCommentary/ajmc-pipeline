@@ -12,9 +12,9 @@ import pandas as pd
 
 from ajmc.commons import variables as vs
 from ajmc.commons.docstrings import docstring_formatter, docstrings
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 def int_to_x_based_code(number: int,

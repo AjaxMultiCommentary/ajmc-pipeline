@@ -14,13 +14,13 @@ import torch
 import transformers
 from torch.utils.data import DataLoader, RandomSampler
 
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.nlp.token_classification.config import parse_config_from_json
 from ajmc.nlp.token_classification.data_preparation.hipe_iob import prepare_datasets
 from ajmc.nlp.token_classification.evaluation import evaluate_dataset, seqeval_to_df, evaluate_hipe
 from ajmc.nlp.token_classification.model import predict_and_write_tsv
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 def set_seed(seed):
@@ -186,7 +186,7 @@ def main(config: Union[str, Dict[str, Any]]):
         config = parse_config_from_json(config)
     
     # Get the logger 
-    logger = get_custom_logger(__name__)
+    logger = get_ajmc_logger(__name__)
     logger.info(f"""Runing pipeline on {config['output_dir'].split("/")[-1]}""")
 
     create_dirs(config)

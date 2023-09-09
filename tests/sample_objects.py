@@ -1,12 +1,12 @@
 """This module contains sample objects which are sent to ``sample_objects.json`` and used as fixtures elsewhere."""
 
 from ajmc.commons import geometry, image, variables as vs
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.variables import PACKAGE_DIR
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from ajmc.text_processing.ocr_classes import OcrCommentary
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 logger.parent.setLevel('DEBUG')
 logger.setLevel('DEBUG')
 

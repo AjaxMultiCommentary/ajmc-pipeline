@@ -10,12 +10,12 @@ from PIL import Image as PILImage
 from tqdm import tqdm
 
 from ajmc.commons import variables as vs
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.unicode_utils import count_chars_by_charset, is_charset_string
 from ajmc.ocr import variables as ocr_vs
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 def controle_overwrite(output_dir: Path, overwrite: bool):

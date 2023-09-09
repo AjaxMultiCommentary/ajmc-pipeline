@@ -2,10 +2,10 @@ from typing import Any, Dict, List
 
 from ajmc.commons import variables
 from ajmc.commons.arithmetic import compute_interval_overlap
-from ajmc.commons.miscellaneous import aligned_print, get_custom_logger
+from ajmc.commons.miscellaneous import aligned_print, get_ajmc_logger
 from ajmc.text_processing.cas_utils import import_page_annotations_from_xmi
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 logger.handlers[0].setLevel('ERROR')
 
 # VARIABLES

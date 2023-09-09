@@ -11,12 +11,12 @@ from typing import List, Optional
 
 import pandas as pd
 
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.unicode_utils import is_charset_string
 from ajmc.ocr import variables as ocr_vs
 from ajmc.ocr.tesseract.tesseract_utils import run_tess_command
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 
 def merge_wordlists(*wordlists: List[str]) -> List[str]:

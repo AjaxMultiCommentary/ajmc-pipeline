@@ -7,12 +7,12 @@
 
 import argparse
 
-from ajmc.commons.miscellaneous import get_custom_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr.preprocessing import data_preparation
 from ajmc.ocr.tesseract.experiments import make_experiments
 from ajmc.ocr.tesseract.models import make_models
 
-logger = get_custom_logger(__name__)
+logger = get_ajmc_logger(__name__)
 
 # Argument parsing
 parser = argparse.ArgumentParser()

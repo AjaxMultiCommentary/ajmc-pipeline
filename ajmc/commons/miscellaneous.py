@@ -62,11 +62,11 @@ def validate_json_schema(schema_path: Path = vs.SCHEMA_PATH):
     Draft6Validator.check_schema(json.loads(schema_path.read_text(encoding='utf-8')))
 
 
-def get_custom_logger(name: Optional[str]):
+def get_ajmc_logger(name: Optional[str]):
     """Custom logging wraper, called each time a logger is declared in the package.
 
     Note:
-        Please make sure to call ``get_custom_logger`` rather than ``logging.getLogger``, so as to centralize the logging configuration and make \
+        Please make sure to call ``get_ajmc_logger`` rather than ``logging.getLogger``, so as to centralize the logging configuration and make \
         sure ``ROOT_LOGGER`` is defined. To change the logging level, please import change ``ROOT_LOGGER`` directly.
 
     """
