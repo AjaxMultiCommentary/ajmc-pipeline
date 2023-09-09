@@ -1,6 +1,5 @@
 """Model classes for torch based ocr models."""
 
-import logging
 from collections import OrderedDict
 from typing import Iterable, List
 
@@ -13,8 +12,7 @@ from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.ocr.pytorch.ctc_decoder_torch import GreedyDecoder
 from ajmc.ocr.pytorch.data_processing import recompose_batched_chunks
 
-logger = get_custom_logger(__name__, level=logging.DEBUG)
-
+logger = get_custom_logger(__name__)
 
 class OcrTorchModel(nn.Module):
 

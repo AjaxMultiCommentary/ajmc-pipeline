@@ -40,7 +40,9 @@ def test_recompose_chunks():
 
 def test_OcrIterDataset_iter():
     test_dataset = get_and_write_sample_dataset(3)
-    for i, batch in enumerate(test_dataset):
+
+    for i in range(10):
+        batch = next(iter(test_dataset))
         print(f'---------------- batch {i} ----------------')
         print('batch_shape', batch.chunks.shape)
         print('batch_text', batch.texts)

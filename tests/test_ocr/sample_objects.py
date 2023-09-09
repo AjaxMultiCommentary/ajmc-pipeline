@@ -10,17 +10,21 @@ from ajmc.ocr.pytorch.data_processing import OcrIterDataset
 
 
 def get_sample_config(mode='cpu') -> dict:
-    config = get_config(PACKAGE_DIR / 'tests/test_ocr/config.json')
+    config = get_config(PACKAGE_DIR / 'tests/test_ocr/config_test.json')
     config['train_data_dir'] = PACKAGE_DIR / 'tests/test_ocr/data'
     config['test_data_dir'] = PACKAGE_DIR / 'tests/test_ocr/data'
     config['snapshot_path'] = PACKAGE_DIR / 'tests/test_ocr/data/test_snapshot.pt'
+    config['evaluation_rate'] = 2
+    config['snapshot_rate'] = 2
+    config['scheduler_step_rate'] = 2
+
 
     if mode == 'cpu':
-        config['num_workers'] = 0
+        config['num_workers'] = 1
         config['device'] = 'cpu'
 
     if mode == 'single_gpu':
-        config['num_workers'] = 0
+        config['num_workers'] = 1
         config['device'] = 'cuda'
 
     if mode == 'multi_gpu':
@@ -68,3 +72,15 @@ def get_and_write_sample_dataset(num_images,
                           chunk_overlap=config['chunk_overlap'],
                           classes_to_indices=config['classes_to_indices'],
                           indices_to_classes=config['indices_to_classes'])
+
+
+dataset = get_and_write_sample_dataset(10, get_sample_config())
+#%%
+from ajmc.ocr.pytorch.data_processing import get_custom_dataloader
+
+dataloader = get_custom_dataloader(dataset, 1)
+
+#%%
+for i in range(15):
+    batch = next(iter(dataloader))
+    print(batch.texts)

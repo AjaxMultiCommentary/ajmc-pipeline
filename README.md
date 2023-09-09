@@ -15,7 +15,9 @@ These steps are covered by the `ajmc`'s sub-packages:
   annotation with [VIA2](https://www.robots.ox.ac.uk/~vgg/software/via/).
 - `ajmc.text_processing` offers a general framework to deal with ocr-output and store them as canonical jsons.
 
-For a more detailed description of the codebase's architecture and innerworkings, please refer to the documetation.
+For a more detailed description of the codebase's architecture and innerworkings, please refer to
+the [documentation](https://ajaxmulticommentary.github.io/ajmc/). Introductory notebooks provided in the docs can also
+be found in `docs/other_pages`
 
 # Setup
 

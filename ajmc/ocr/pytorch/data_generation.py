@@ -4,7 +4,6 @@ import issues. """
 
 import argparse
 import json
-import logging
 import random
 import re
 import shutil
@@ -24,7 +23,7 @@ from ajmc.commons.unicode_utils import get_char_charset
 from ajmc.corpora.corpora_classes import Corpus
 from ajmc.ocr.font_utils import Font, walk_through_font_dir
 
-logger = get_custom_logger(__name__, level=logging.INFO)
+logger = get_custom_logger(__name__)
 
 def pil2array(im: Image.Image, alpha: int = 0) -> np.ndarray:
     """Kraken linegen code."""
@@ -652,26 +651,27 @@ def do_gibberish(line_count_per_font=5):
 
 
 def create_sample_dir():
-    main_dir = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data')
-    test_dir = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data_test')
+    main_dir = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data/augmented')
+    test_dir = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data_test_augmented')
 
     shutil.rmtree(test_dir, ignore_errors=True)
 
     for dir_ in main_dir.iterdir():
-        if dir_.is_dir():
+        if dir_.is_dir() and dir_.name:
             files = list(dir_.glob('*.png'))
-            files = random.sample(files, k=min(500, len(files)))
+            files = random.sample(files, k=min(50, len(files)))
             test_subdir = test_dir / dir_.name
             test_subdir.mkdir(exist_ok=True, parents=True)
             for file in files:
                 (test_subdir / file.name).write_bytes(file.read_bytes())
-                (test_subdir / file.with_suffix('.txt').name).write_text(file.with_suffix('.txt').read_text('utf-8'), encoding='utf-8')
+                # (test_subdir / file.with_suffix('.txt').name).write_text(file.with_suffix('.txt').read_text('utf-8'), encoding='utf-8')
 
 
 def check_file_count():
     for dir_ in BASE_OUTPUT_DIR.iterdir():
         if dir_.is_dir():
             print(dir_.name, len(list(dir_.glob('*.png'))))
+
 
 
 #%%
@@ -747,7 +747,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=0)
     args = parser.parse_args()
     random.seed(args.seed)
-    BASE_OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
+    # BASE_OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
     if args.all_purpose:
         do_all_purpose_fonts(1000)
     if args.latin:

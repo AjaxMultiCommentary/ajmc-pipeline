@@ -1,17 +1,23 @@
 import math
 import random
-import time
+import unicodedata
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Tuple, Generator
 
 import torch
+from lazy_objects.lazy_objects import lazy_property
 from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
 from torchvision.io import read_image, ImageReadMode
 
+from ajmc.commons.miscellaneous import get_custom_logger
 from ajmc.commons.unicode_utils import harmonise_unicode
 from ajmc.ocr import variables as ocr_vs
 
+logger = get_custom_logger(__name__)
+
+
+# Todo add a training mode where the text is not given
 
 class OcrLine:
     """A custom class for OCR lines.
@@ -32,7 +38,6 @@ class OcrLine:
 
     """
 
-    # Todo test this for speed
     def __init__(self,
                  img_path: Path,
                  img_height: int,
@@ -40,15 +45,16 @@ class OcrLine:
                  chunk_overlap: int,
                  classes_to_indices: dict
                  ):
-        start_time = time.time()
         img_tensor = prepare_img(img_path, img_height=img_height)
         self.img_width = img_tensor.shape[2]
         self.chunks = chunk_img_tensor(img_tensor, chunk_width, chunk_overlap)
 
         text = img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION).read_text(encoding='utf-8')  # Todo change store this ??
-        self.text = harmonise_unicode(text)
-        self.text_tensor = torch.tensor([classes_to_indices[c] for c in text])
+        self.text = unicodedata.normalize('NFD', harmonise_unicode(text))
+        self.text_tensor = torch.tensor([classes_to_indices[c] for c in self.text])
 
+        # Todo change this later for efficiency
+        self.img_path = img_path
 
 class OcrBatch:
 
@@ -120,9 +126,13 @@ def compute_n_chunks(img_tensor,
     Returns:
         The number of chunks that can be extracted from the image tensor.
     """
-    remainder = (img_tensor.shape[2] - chunk_overlap) % (chunk_width - chunk_overlap)
 
-    return (img_tensor.shape[2] - chunk_overlap) // (chunk_width - chunk_overlap) + (1 if remainder else 0)
+    # We use max to avoid negative numbers for very tiny images.
+    diff_img_width_overlap = max(img_tensor.shape[2] - chunk_overlap, 1)
+
+    remainder = diff_img_width_overlap % (chunk_width - chunk_overlap)
+
+    return diff_img_width_overlap // (chunk_width - chunk_overlap) + (1 if remainder else 0)
 
 
 def compute_padding(img_tensor,
@@ -186,7 +196,11 @@ def prepare_img(img_path: Path,
 
     img_tensor = read_image(str(img_path), mode=ImageReadMode.GRAY)
     img_tensor = invert_image_tensor(img_tensor)
-    img_tensor = transforms.Resize(img_height, antialias=True)(img_tensor)
+
+    # We calculate the entire size to be able to cope with images longer than large
+    # See docs on resize (https://pytorch.org/vision/stable/generated/torchvision.transforms.Resize.html)
+    resized_size = (img_height, int((img_height / img_tensor.shape[1]) * img_tensor.shape[2]))
+    img_tensor = transforms.Resize(resized_size, antialias=True)(img_tensor)
     img_tensor = crop_image_tensor_to_nonzero(img_tensor)
     img_tensor = normalize_image_tensor(img_tensor)
 
@@ -203,20 +217,20 @@ def recompose_chunks(chunks: torch.Tensor,
         chunk_overlap: The overlap between the chunks.
 
     Returns:
-        The reassembled image tensor, in shape (width, height).
+        The reassembled tensor, in shape (width, height).
     """
 
     # take the first chunk, remove the overlap
-    reassembled_img = chunks[0][:-int(chunk_overlap / 2), :].squeeze(0)
+    reassembled = chunks[0][:-int(chunk_overlap / 2), :].squeeze(0)
     for i in range(1, len(chunks)):
         if i == len(chunks) - 1:  # for the last chunk, we dont cut the end overlap as there is none
-            reassembled_img = torch.cat([reassembled_img, chunks[i][int(chunk_overlap / 2):, :]], dim=0)
+            reassembled = torch.cat([reassembled, chunks[i][int(chunk_overlap / 2):, :]], dim=0)
         else:  # for the other chunks, we cut the begin and end overlap
-            reassembled_img = torch.cat([reassembled_img, chunks[i][int(chunk_overlap / 2):-int(chunk_overlap / 2), :]], dim=0)
+            reassembled = torch.cat([reassembled, chunks[i][int(chunk_overlap / 2):-int(chunk_overlap / 2), :]], dim=0)
 
     # Todo 👁️ the end of this tensor could be chunked to non-zero values to recut the introduced padding
     # This will have to be done somehow, imgs offsets requires it.
-    return reassembled_img
+    return reassembled
 
 
 def recompose_batched_chunks(batched_chunks: torch.Tensor, mapping: List[int], chunk_overlap: int) -> torch.Tensor:
@@ -242,6 +256,30 @@ def recompose_batched_chunks(batched_chunks: torch.Tensor, mapping: List[int], c
 
 
 class OcrIterDataset(torch.utils.data.IterableDataset):
+    """Dataset for OCR training.
+
+    Warning:
+        ``OcrIterDataset`` is an infinite iterable dataset, and as such, it does not have a ``__len__`` method. This means that:
+
+            * ``OcrIterDataset`` it cannot be used with a ``torch.utils.data.DataLoader`` with ``batch_size > 1``. Actually, \
+            ``OcrIterDataset.__iter__()`` already returns batches of size inferior to ``max_batch_size`` at each iteration.
+            * ``OcrIterDataset`` is infinite: Use it with ``next(iter())`` in a ``for`` loop, or with a defined range.
+
+    Args:
+        data_dir: The directory containing the images to train on.
+        classes: The classes to train on.
+        max_batch_size: The maximum batch size to return at each iteration.
+        img_height: The height to which to resize the images.
+        chunk_width: The width of the chunks to extract from the images.
+        chunk_overlap: The overlap between the chunks.
+        classes_to_indices: A mapping from the classes to their indices.
+        indices_to_classes: A mapping from the indices to their classes.
+        is_training: Whether the dataset is used for training or validation.
+        shuffle: Whether to shuffle the dataset.
+        per_worker_steps_run: The number of steps already run by each worker. This is used to compute the number of chunks to
+            skip at the beginning of the dataset, so that each worker starts at a different point in the dataset.
+
+    """
 
     def __init__(self,
                  data_dir: Path,
@@ -269,83 +307,135 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
 
         self.is_training = is_training  # Todo see how we handle this
         self.per_worker_steps_run = per_worker_steps_run
+        self.custom_iterator = self.yield_batches()
 
+    @lazy_property
+    def data_len(self) -> int:
+        """The length of the dataset.
 
-    def distribute(self):
-        """Distributes the datasets accross workers, see https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset"""
-        worker_start = self.per_worker_steps_run
-        worker_end = len(self.img_paths)
+        Warning:
+            ``date_len`` is not the length of the dataset, but the length of the list of images the dataset will infinitely iterate on. It is therefore not the same as ``__len__``.
+        """
+        return len(self.img_paths)
 
+    def distribute(self) -> Tuple[int, int, int]:
+        """Distributes the datasets accross workers.
+
+        Note:
+            See https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset for more information.
+
+        Returns:
+            The default start, re-start (which corresponds to the defaults + the number of steps already run) and end indices for the current worker.
+        """
+
+        data_len = len(self.img_paths)
         worker_info = torch.utils.data.get_worker_info()
 
-        if worker_info is not None:
-            samples_per_worker = int(math.ceil(worker_end / float(worker_info.num_workers)))
+        if worker_info is None:  # single-process data loading, return the full iterator
+            worker_default_start = 0
+            worker_restart = self.per_worker_steps_run
+            worker_end = data_len
+
+        else:  # Multi-process data loading, split the dataset
+            logger.info(f'Worker {worker_info.id} is starting at step {self.per_worker_steps_run}')
             worker_id = worker_info.id
-            worker_start = worker_id * samples_per_worker + self.per_worker_steps_run
-            worker_end = min(worker_start + samples_per_worker - self.per_worker_steps_run, worker_end)
+            samples_per_worker = int(math.ceil(data_len / float(worker_info.num_workers)))
+            worker_default_start = worker_id * samples_per_worker
+            worker_restart = worker_default_start + self.per_worker_steps_run
+            worker_end = min(worker_default_start + samples_per_worker, data_len)
 
-        return worker_start, worker_end
+        return worker_default_start, worker_restart, worker_end
 
-    def _custom_iterator(self):
+
+    def yield_files(self, default_start: int, restart: int, end: int) -> Generator[Path, None, None]:
+        """Yields files infinitely, starting at the given start index.
+
+        Note:
+            For the first iteration, the start index is the worker's actual re-start index. For the following iterations,
+            the start index is the default start index (ie the start index for the first iteration). If ``restart == default_start`` then exactly
+            the same happens.
+
+        Args:
+            default_start: The default start index.
+            restart: The worker's actual re-start index (in case of restarting from checkpoint).
+            end: The end index.
+
+        Yields:
+            The files in the dataset, starting at the given start index.
         """
-        We keep tensors in the following form:
-            id_bs0.pt
-            id_bs0.txt
 
+        for i in range(restart, end):  # We start at the worker's actual re-start index
+            yield self.img_paths[i]
+
+        while True:
+            for i in range(default_start, end):
+                yield self.img_paths[i]
+
+
+    @lazy_property
+    def files_generator(self) -> Generator[Path, None, None]:
+        """Instantiates an infinite iterator over the files."""
+        return self.yield_files(*self.distribute())
+
+
+    def yield_batches(self) -> Generator[OcrBatch, None, None]:
+        """Yields batches of chunks infinitely.
+
+        # Todo : docs
         """
-        start, end = self.distribute()
-        next_index = start
 
         # Create the first line
-        ocr_line = OcrLine(self.img_paths[next_index],
+        ocr_line = OcrLine(next(self.files_generator),
                            img_height=self.img_height,
                            chunk_overlap=self.chunk_overlap,
                            chunk_width=self.chunk_width,
                            classes_to_indices=self.classes_to_indices)
 
-        while next_index < end:
+        while True:
 
-            if ocr_line.chunks.shape[0] > self.max_batch_size:  # If there are more chunks that batch_size, skip
-                next_index += 1
-                if next_index < end:
-                    ocr_line = OcrLine(self.img_paths[next_index],
-                                       img_height=self.img_height,
-                                       chunk_overlap=self.chunk_overlap,
-                                       chunk_width=self.chunk_width,
-                                       classes_to_indices=self.classes_to_indices)
-                    continue
-                else:
-                    break
-
-            chunks_count: int = ocr_line.chunks.shape[0]
-            ocr_lines = [ocr_line]
-            next_index += 1
-
-            # we get the number of chunks (=shape[0]) in the next tensor
-
-            while next_index < end:
-                ocr_line = OcrLine(self.img_paths[next_index],
+            if ocr_line.chunks.shape[0] > self.max_batch_size:  # If there are more chunks that batch_size, skip the line
+                ocr_line = OcrLine(next(self.files_generator),
                                    img_height=self.img_height,
                                    chunk_overlap=self.chunk_overlap,
                                    chunk_width=self.chunk_width,
                                    classes_to_indices=self.classes_to_indices)
+                continue
+
+            chunks_count: int = ocr_line.chunks.shape[0]
+            ocr_lines = [ocr_line]
+
+            while True:
+                ocr_line = OcrLine(next(self.files_generator),
+                                   img_height=self.img_height,
+                                   chunk_overlap=self.chunk_overlap,
+                                   chunk_width=self.chunk_width,
+                                   classes_to_indices=self.classes_to_indices)
+
                 if ocr_line.chunks.shape[0] + chunks_count > self.max_batch_size:
                     break
-                else:
-                    ocr_lines.append(ocr_line)
-                    chunks_count += ocr_line.chunks.shape[0]
-                    next_index += 1
 
-            yield OcrBatch(ocr_lines)  # Will this have to be converted to tuple ?
+                ocr_lines.append(ocr_line)
+                chunks_count += ocr_line.chunks.shape[0]
+
+            yield OcrBatch(ocr_lines)
+
+
+    @lazy_property
+    def batch_generator(self) -> Generator[OcrBatch, None, None]:
+        """Instantiate an infinite iterator over batches."""
+        return self.yield_batches()
+
 
     def __iter__(self):
-        return self._custom_iterator()
+        return self.custom_iterator
 
 
 def get_custom_dataloader(train_dataset: torch.utils.data.Dataset,
                           num_workers: int) -> torch.utils.data.DataLoader:
+    torch_num_workers = 0 if num_workers <= 1 else num_workers  # ``DataLoader``\s start distributing at any int > 0, which we do not want.
+
     return torch.utils.data.DataLoader(train_dataset,
                                        batch_size=None,
                                        batch_sampler=None,
-                                       num_workers=num_workers,
+                                       num_workers=torch_num_workers,
                                        collate_fn=lambda x: x, )

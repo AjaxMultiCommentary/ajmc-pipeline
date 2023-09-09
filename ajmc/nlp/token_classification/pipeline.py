@@ -3,7 +3,6 @@
 It runs on a single GPU."""
 
 import json
-import logging
 import os
 import random
 import time
@@ -187,7 +186,7 @@ def main(config: Union[str, Dict[str, Any]]):
         config = parse_config_from_json(config)
     
     # Get the logger 
-    logger = get_custom_logger(__name__, level=logging.DEBUG)
+    logger = get_custom_logger(__name__)
     logger.info(f"""Runing pipeline on {config['output_dir'].split("/")[-1]}""")
 
     create_dirs(config)

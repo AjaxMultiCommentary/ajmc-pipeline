@@ -5,17 +5,21 @@ import logging
 import re
 import timeit
 from pathlib import Path
-from typing import Generator, Iterable, List, Type
+from typing import Generator, Iterable, List, Type, Optional
 
 from jsonschema import Draft6Validator
 
 from ajmc.commons import variables as vs
 
-formatter = logging.Formatter("%(levelname)s - %(name)s -   %(message)s")
 
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.DEBUG)
-stream_handler.setFormatter(formatter)
+ROOT_FORMATTER = logging.Formatter("%(levelname)s - %(name)s -   %(message)s")
+
+ROOT_STREAM_HANDLER = logging.StreamHandler()
+ROOT_STREAM_HANDLER.setLevel(logging.DEBUG)
+ROOT_STREAM_HANDLER.setFormatter(ROOT_FORMATTER)
+ROOT_LOGGER = logging.getLogger()
+ROOT_LOGGER.setLevel(logging.DEBUG)
+ROOT_LOGGER.addHandler(ROOT_STREAM_HANDLER)
 
 
 def timer(iterations: int = 3, number: int = 1_000):
@@ -58,15 +62,15 @@ def validate_json_schema(schema_path: Path = vs.SCHEMA_PATH):
     Draft6Validator.check_schema(json.loads(schema_path.read_text(encoding='utf-8')))
 
 
-def get_custom_logger(name: str,
-                      level: int = logging.INFO):
-    """Custom logging wraper, called each time a logger is declared in the package."""
+def get_custom_logger(name: Optional[str]):
+    """Custom logging wraper, called each time a logger is declared in the package.
 
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    logger.addHandler(stream_handler)
+    Note:
+        Please make sure to call ``get_custom_logger`` rather than ``logging.getLogger``, so as to centralize the logging configuration and make \
+        sure ``ROOT_LOGGER`` is defined. To change the logging level, please import change ``ROOT_LOGGER`` directly.
 
-    return logger
+    """
+    return logging.getLogger(name)
 
 
 def split_list(list_: list, n: int, pad: object = False) -> List[List[object]]:

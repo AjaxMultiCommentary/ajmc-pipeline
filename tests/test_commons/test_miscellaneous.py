@@ -1,5 +1,3 @@
-import logging
-
 import pytest
 
 import ajmc.commons.file_management
@@ -23,7 +21,3 @@ def test_read_google_sheet(sheet_name):
     assert df['test_int'][0] == 108
     assert df['test_str'][1] == 'coucou'
     assert len(df['test_str']) == 2
-
-
-def test_get_custom_logger():
-    assert isinstance(misc.get_custom_logger('test'), logging.Logger)

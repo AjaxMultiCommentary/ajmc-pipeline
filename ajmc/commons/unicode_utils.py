@@ -135,6 +135,19 @@ def harmonise_unicode(text: str,
                       harmonise_functions: Tuple[Callable[[str], str]] = (
                               harmonise_punctuation, harmonise_miscellaneous_symbols, harmonise_ligatures),
                       harmonise_space_chars: bool = True) -> str:
+    """Harmonise unicode characters.
+
+    Note:
+        This function takes an ``NFC`` string and returns an ``NFC`` string.
+
+    Args:
+        text (str): The text to harmonise.
+        harmonise_functions (tuple): A tuple of functions to apply to the text. Each function should take an NFC string as input and return an NFC string as output.
+        harmonise_space_chars (bool): Whether to harmonise space characters.
+
+    Returns:
+        str: The harmonised text (an ``NFC`` string).
+    """
     for function in harmonise_functions:
         text = function(text)
     if harmonise_space_chars:
