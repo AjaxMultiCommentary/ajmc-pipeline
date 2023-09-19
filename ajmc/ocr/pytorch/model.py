@@ -14,6 +14,7 @@ from ajmc.ocr.pytorch.data_processing import recompose_batched_chunks
 
 logger = get_ajmc_logger(__name__)
 
+
 class OcrTorchModel(nn.Module):
 
     def __init__(self, config: dict):
@@ -23,15 +24,17 @@ class OcrTorchModel(nn.Module):
         self.indices_to_classes = config['indices_to_classes']
 
         if config.get('densenetbackbone', False):
-            self.backbone = DenseNetBackbone.from_config(config=config)
+            self.backbone = DenseNetBackbone(chunk_width=config['chunk_width'],
+                                             encoder_d_model=config['encoder']["TransformerEncoderLayer"]["d_model"],
+                                             **config['densenetbackbone'])
 
         elif config.get('resnetbackbone', False):
             raise NotImplementedError
         else:
             self.backbone = None
 
-        self.backbone = None
-        logger.warning('No backbone implemented')
+        # self.backbone = None
+        # logger.warning('No backbone implemented')
 
         self.encoder = nn.TransformerEncoder(encoder_layer=nn.TransformerEncoderLayer(**config['encoder']["TransformerEncoderLayer"]),
                                              **config['encoder']["TransformerEncoder"])
@@ -73,7 +76,7 @@ class OcrTorchModel(nn.Module):
                                            mapping=chunks_to_img_mapping,
                                            chunk_overlap=self.chunk_overlap)  # Weird to store this here
 
-        outputs = torch.nn.functional.log_softmax(outputs, dim=2)
+        outputs = torch.nn.functional.softmax(outputs, dim=2)
 
         strings, offsets = self.ctc_decoder.decode(outputs)
 
@@ -88,6 +91,8 @@ class DenseNetBackbone(nn.Module):
     """
 
     def __init__(self,
+                 chunk_width: int,
+                 encoder_d_model: int,
                  growth_rate: int = 32,
                  block_config: Iterable[int] = (6, 12, 24, 16),
                  num_init_features: int = 32,
@@ -95,6 +100,8 @@ class DenseNetBackbone(nn.Module):
                  drop_rate: float = 0,
                  memory_efficient: bool = False) -> None:
         super().__init__()
+        self.chunk_width = chunk_width
+        self.encoder_d_model = encoder_d_model
 
         # First convolution
         self.features = nn.Sequential(
@@ -140,20 +147,13 @@ class DenseNetBackbone(nn.Module):
             elif isinstance(m, nn.Linear):
                 nn.init.constant_(m.bias, 0)
 
-
-    @classmethod
-    def from_config(cls, config: dict):
-        net = cls(**config['densenetbackbone'])
-        net.config = config
-        return net
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # x = self.features(x)
         for i, feature in enumerate(self.features):
             logger.debug(f'Shape at feature {i}: {x.shape}')
             x = feature(x)
         x = x.view(x.shape[0], x.shape[1], x.shape[3])
-        x = F.adaptive_avg_pool2d(x, (self.config['input_shape'][2], self.config['encoder']['TransformerEncoderLayer']['d_model']))
+        x = F.adaptive_avg_pool2d(x, (self.chunk_width, self.encoder_d_model))
         x = F.relu(x, inplace=True)
 
         return x

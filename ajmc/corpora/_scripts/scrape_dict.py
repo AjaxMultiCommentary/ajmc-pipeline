@@ -65,7 +65,3 @@ def getDict(URL: str) -> dict:
     return outing_value
 
 # test = getDict('http://stephanus.tlg.uci.edu/lsj/')
-
-# todo : diviser la boucle générale en sous boucle de ~250 iter et écrire le dico dans un json
-# Todo : récuperer trois définitions d'un coup [blbal](https://.)
-# todo Vérifier pour l'obtention des liens (si ce n'est pas trop compliqué).

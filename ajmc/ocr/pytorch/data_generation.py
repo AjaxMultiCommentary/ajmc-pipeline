@@ -7,11 +7,11 @@ import json
 import random
 import re
 import shutil
-import unicodedata
 from pathlib import Path
 from typing import Tuple, List, Dict, Optional, Generator
 
 import numpy as np
+import unicodedata
 from PIL import Image, ImageDraw, ImageOps
 from scipy.ndimage import gaussian_filter, distance_transform_cdt, binary_closing, affine_transform, geometric_transform
 from tqdm import tqdm
@@ -24,6 +24,7 @@ from ajmc.corpora.corpora_classes import Corpus
 from ajmc.ocr.font_utils import Font, walk_through_font_dir
 
 logger = get_ajmc_logger(__name__)
+
 
 def pil2array(im: Image.Image, alpha: int = 0) -> np.ndarray:
     """Kraken linegen code."""
@@ -650,28 +651,47 @@ def do_gibberish(line_count_per_font=5):
                    )
 
 
-def create_sample_dir():
-    main_dir = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data/augmented')
-    test_dir = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data_test_augmented')
+def sample_data(source_dir: Path,
+                target_dir: Path,
+                num_samples: int,
+                respect_subdirs: bool = True):
+    """Creates sample data from a directory of images.
 
-    shutil.rmtree(test_dir, ignore_errors=True)
+    Warning:
+        This function will delete the target directory before recreating it if it exists.
 
-    for dir_ in main_dir.iterdir():
-        if dir_.is_dir() and dir_.name:
-            files = list(dir_.glob('*.png'))
-            files = random.sample(files, k=min(50, len(files)))
-            test_subdir = test_dir / dir_.name
-            test_subdir.mkdir(exist_ok=True, parents=True)
+    Args:
+        source_dir: The directory containing the images.
+        target_dir: The directory to write the sampled images to.
+        num_samples: The number of images to sample.
+        respect_subdirs: If True, creates a similar folder structure in the target directory as in the source directory.
+    """
+    shutil.rmtree(target_dir, ignore_errors=True)
+    target_dir.mkdir(exist_ok=True, parents=True)
+
+    if respect_subdirs:
+        subdirs = [dir_ for dir_ in source_dir.iterdir() if dir_.is_dir() and dir.name]
+        line_count_per_subdir = num_samples // len(subdirs)
+        for subdir in subdirs:
+            files = list(subdir.glob('*.png'))
+            files = random.sample(files, k=min(line_count_per_subdir, len(files)))
+            target_subdir = target_dir / subdir.name
+            target_subdir.mkdir(exist_ok=True, parents=True)
             for file in files:
-                (test_subdir / file.name).write_bytes(file.read_bytes())
-                # (test_subdir / file.with_suffix('.txt').name).write_text(file.with_suffix('.txt').read_text('utf-8'), encoding='utf-8')
+                (target_subdir / file.name).write_bytes(file.read_bytes())
+                (target_subdir / file.with_suffix('.txt').name).write_text(file.with_suffix('.txt').read_text('utf-8'), encoding='utf-8')
+    else:
+        files = list(source_dir.rglob('*.png'))
+        files = random.sample(files, k=min(num_samples, len(files)))
+        for file in files:
+            (target_dir / file.name).write_bytes(file.read_bytes())
+            (target_dir / file.with_suffix('.txt').name).write_text(file.with_suffix('.txt').read_text('utf-8'), encoding='utf-8')
 
 
 def check_file_count():
     for dir_ in BASE_OUTPUT_DIR.iterdir():
         if dir_.is_dir():
             print(dir_.name, len(list(dir_.glob('*.png'))))
-
 
 
 #%%
@@ -760,4 +780,3 @@ if __name__ == '__main__':
         do_capitals(1500)
     if args.gibberish:
         do_gibberish(60)
-

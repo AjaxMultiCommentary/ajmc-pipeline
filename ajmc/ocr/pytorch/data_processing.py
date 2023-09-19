@@ -1,11 +1,11 @@
-import math
+import os
 import random
-import unicodedata
 from pathlib import Path
 from typing import List, Dict, Tuple, Generator
 
+import math
 import torch
-from lazy_objects.lazy_objects import lazy_property
+import unicodedata
 from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
 from torchvision.io import read_image, ImageReadMode
@@ -48,42 +48,23 @@ class OcrLine:
         img_tensor = prepare_img(img_path, img_height=img_height)
         self.img_width = img_tensor.shape[2]
         self.chunks = chunk_img_tensor(img_tensor, chunk_width, chunk_overlap)
+        self.img_path = img_path
 
-        text = img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION).read_text(encoding='utf-8')  # Todo change store this ??
+        text = img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION).read_text(encoding='utf-8')
         self.text = unicodedata.normalize('NFD', harmonise_unicode(text))
         self.text_tensor = torch.tensor([classes_to_indices[c] for c in self.text])
 
-        # Todo change this later for efficiency
-        self.img_path = img_path
 
 class OcrBatch:
 
     def __init__(self, ocr_lines: List[OcrLine]):
         self.ocr_lines = ocr_lines
-
-    @property
-    def img_widths(self) -> tuple:
-        return tuple(l.img_width for l in self.ocr_lines)
-
-    @property
-    def chunks(self) -> torch.Tensor:
-        return torch.cat([l.chunks for l in self.ocr_lines], dim=0)
-
-    @property
-    def chunks_to_img_mapping(self) -> List[int]:
-        return [len(l.chunks) for l in self.ocr_lines]
-
-    @property
-    def text_lengths(self) -> tuple:
-        return tuple(l.text_tensor.shape[0] for l in self.ocr_lines)
-
-    @property
-    def texts_tensor(self) -> torch.Tensor:
-        return pad_sequence([l.text_tensor for l in self.ocr_lines], batch_first=True)
-
-    @property
-    def texts(self) -> List[str]:
-        return [l.text for l in self.ocr_lines]
+        self.img_widths = tuple(l.img_width for l in self.ocr_lines)
+        self.chunks = torch.cat([l.chunks for l in self.ocr_lines], dim=0)
+        self.chunks_to_img_mapping = [len(l.chunks) for l in self.ocr_lines]
+        self.text_lengths = tuple(l.text_tensor.shape[0] for l in self.ocr_lines)
+        self.texts_tensor = pad_sequence([l.text_tensor for l in self.ocr_lines], batch_first=True)
+        self.texts = tuple(l.text for l in self.ocr_lines)
 
 
 def invert_image_tensor(image_tensor):
@@ -196,12 +177,12 @@ def prepare_img(img_path: Path,
 
     img_tensor = read_image(str(img_path), mode=ImageReadMode.GRAY)
     img_tensor = invert_image_tensor(img_tensor)
+    img_tensor = crop_image_tensor_to_nonzero(img_tensor)
 
     # We calculate the entire size to be able to cope with images longer than large
     # See docs on resize (https://pytorch.org/vision/stable/generated/torchvision.transforms.Resize.html)
     resized_size = (img_height, int((img_height / img_tensor.shape[1]) * img_tensor.shape[2]))
     img_tensor = transforms.Resize(resized_size, antialias=True)(img_tensor)
-    img_tensor = crop_image_tensor_to_nonzero(img_tensor)
     img_tensor = normalize_image_tensor(img_tensor)
 
     return img_tensor
@@ -264,6 +245,8 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
             * ``OcrIterDataset`` it cannot be used with a ``torch.utils.data.DataLoader`` with ``batch_size > 1``. Actually, \
             ``OcrIterDataset.__iter__()`` already returns batches of size inferior to ``max_batch_size`` at each iteration.
             * ``OcrIterDataset`` is infinite: Use it with ``next(iter())`` in a ``for`` loop, or with a defined range.
+            * ``OcrIterDataset.date_len`` is **not** the length of the dataset, but the length of the list of images the dataset will infinitely iterate on. It is therefore not the same as ``__len__``.
+
 
     Args:
         data_dir: The directory containing the images to train on.
@@ -292,7 +275,9 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
                  indices_to_classes: Dict[int, str],
                  is_training: bool = True,
                  shuffle: bool = True,
+                 num_workers: int = 1,
                  per_worker_steps_run: int = 0):
+        super().__init__()
         self.data_dir = data_dir
         self.classes = classes
         self.max_batch_size = max_batch_size
@@ -301,22 +286,21 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
         self.chunk_overlap = chunk_overlap
         self.classes_to_indices = classes_to_indices
         self.indices_to_classes = indices_to_classes
+        self.is_training = is_training  # Todo see how we handle this
+        self.shuffle = shuffle
+        self.num_workers = num_workers
+        self.per_worker_steps_run = per_worker_steps_run
+
+        # Get the paths of the images
         self.img_paths = list(self.data_dir.rglob('*' + ocr_vs.IMG_EXTENSION))
-        if shuffle:
+        if self.shuffle:
             random.shuffle(self.img_paths)
 
-        self.is_training = is_training  # Todo see how we handle this
-        self.per_worker_steps_run = per_worker_steps_run
-        self.custom_iterator = self.yield_batches()
-
-    @lazy_property
-    def data_len(self) -> int:
-        """The length of the dataset.
-
-        Warning:
-            ``date_len`` is not the length of the dataset, but the length of the list of images the dataset will infinitely iterate on. It is therefore not the same as ``__len__``.
-        """
-        return len(self.img_paths)
+        # Distribute the dataset accross workers
+        self.worker_id = int(os.environ.get('RANK', 0))
+        self.data_len = len(self.img_paths)
+        self.files_generator = self.yield_files(*self.distribute())
+        self.batch_generator = self.yield_batches()
 
     def distribute(self) -> Tuple[int, int, int]:
         """Distributes the datasets accross workers.
@@ -328,24 +312,22 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
             The default start, re-start (which corresponds to the defaults + the number of steps already run) and end indices for the current worker.
         """
 
-        data_len = len(self.img_paths)
-        worker_info = torch.utils.data.get_worker_info()
-
-        if worker_info is None:  # single-process data loading, return the full iterator
+        if self.num_workers == 1:  # single-process data loading, return the full iterator
             worker_default_start = 0
             worker_restart = self.per_worker_steps_run
-            worker_end = data_len
+            worker_end = self.data_len
 
         else:  # Multi-process data loading, split the dataset
-            logger.info(f'Worker {worker_info.id} is starting at step {self.per_worker_steps_run}')
-            worker_id = worker_info.id
-            samples_per_worker = int(math.ceil(data_len / float(worker_info.num_workers)))
+            logger.info(f'Distributing data across {self.num_workers} workers')
+            worker_id = self.worker_id
+            samples_per_worker = int(math.ceil(self.data_len / float(self.num_workers)))
             worker_default_start = worker_id * samples_per_worker
             worker_restart = worker_default_start + self.per_worker_steps_run
-            worker_end = min(worker_default_start + samples_per_worker, data_len)
+            worker_end = min(worker_default_start + samples_per_worker, self.data_len)
+
+            logger.info(f'Worker {self.worker_id} is starting at step {worker_restart}')
 
         return worker_default_start, worker_restart, worker_end
-
 
     def yield_files(self, default_start: int, restart: int, end: int) -> Generator[Path, None, None]:
         """Yields files infinitely, starting at the given start index.
@@ -363,20 +345,14 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
         Yields:
             The files in the dataset, starting at the given start index.
         """
-
         for i in range(restart, end):  # We start at the worker's actual re-start index
+            logger.debug(f'Worker {self.worker_id} Yielding file {self.img_paths[i].stem}')
             yield self.img_paths[i]
 
         while True:
             for i in range(default_start, end):
+                logger.debug(f'Worker {self.worker_id} Yielding file {self.img_paths[i].stem}')
                 yield self.img_paths[i]
-
-
-    @lazy_property
-    def files_generator(self) -> Generator[Path, None, None]:
-        """Instantiates an infinite iterator over the files."""
-        return self.yield_files(*self.distribute())
-
 
     def yield_batches(self) -> Generator[OcrBatch, None, None]:
         """Yields batches of chunks infinitely.
@@ -419,23 +395,13 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
 
             yield OcrBatch(ocr_lines)
 
-
-    @lazy_property
-    def batch_generator(self) -> Generator[OcrBatch, None, None]:
-        """Instantiate an infinite iterator over batches."""
-        return self.yield_batches()
-
-
     def __iter__(self):
-        return self.custom_iterator
+        return self.batch_generator
 
 
-def get_custom_dataloader(train_dataset: torch.utils.data.Dataset,
-                          num_workers: int) -> torch.utils.data.DataLoader:
-    torch_num_workers = 0 if num_workers <= 1 else num_workers  # ``DataLoader``\s start distributing at any int > 0, which we do not want.
-
+def get_custom_dataloader(train_dataset: torch.utils.data.Dataset) -> torch.utils.data.DataLoader:
     return torch.utils.data.DataLoader(train_dataset,
                                        batch_size=None,
                                        batch_sampler=None,
-                                       num_workers=torch_num_workers,
+                                       num_workers=0,
                                        collate_fn=lambda x: x, )

@@ -13,18 +13,18 @@ config = so.get_sample_config()
 single_img_tensor = so.get_single_img_tensor(config)
 img_width = single_img_tensor.shape[2]
 img_height = single_img_tensor.shape[1]
-chunk_width = config['input_shape'][2]
+chunk_width = config['chunk_width']
 chunk_overlap = config['chunk_overlap']
 
-n_chunks = dp.compute_n_chunks(single_img_tensor, config['input_shape'][2], config['chunk_overlap'])
-padding = dp.compute_padding(single_img_tensor, n_chunks, config['input_shape'][2], config['chunk_overlap'])
-single_image_chunks = dp.chunk_img_tensor(single_img_tensor, config['input_shape'][2], config['chunk_overlap'])
+n_chunks = dp.compute_n_chunks(single_img_tensor, config['chunk_width'], config['chunk_overlap'])
+padding = dp.compute_padding(single_img_tensor, n_chunks, config['chunk_width'], config['chunk_overlap'])
+single_image_chunks = dp.chunk_img_tensor(single_img_tensor, config['chunk_width'], config['chunk_overlap'])
 
 
 def test_chunk_img_tensor_with_overlap():
     assert sum([chunk.shape[2] for chunk in single_image_chunks]) >= single_img_tensor.shape[2]
-    assert sum([chunk.shape[2] for chunk in single_image_chunks]) - padding < single_img_tensor.shape[2] + config['input_shape'][2]
-    assert n_chunks * config['input_shape'][2] - (n_chunks - 1) * config['chunk_overlap'] - single_img_tensor.shape[2] == padding
+    assert sum([chunk.shape[2] for chunk in single_image_chunks]) - padding < single_img_tensor.shape[2] + config['chunk_width']
+    assert n_chunks * config['chunk_width'] - (n_chunks - 1) * config['chunk_overlap'] - single_img_tensor.shape[2] == padding
 
 
 # rebuild single_image_chunks
@@ -34,8 +34,6 @@ def test_recompose_chunks():
     reassembled = reassembled.transpose(0, 1).unsqueeze(0)
     assert dp.compute_padding(reassembled, n_chunks, chunk_width, chunk_overlap) == 0
     assert reassembled.shape[-1] == single_img_tensor.shape[-1] + padding
-
-
 
 
 def test_OcrIterDataset_iter():
@@ -63,6 +61,7 @@ def test_OcrDataset_with_dataloader():
         print(batch[1])
         print("--------------------------------------------")
 
+
 # def test_reassemble_chunks_batch():
 #     dataset = get_and_write_sample_dataset(3)
 #     test_batch = next(iter(dataset))
@@ -71,3 +70,29 @@ def test_OcrDataset_with_dataloader():
 #     assert reassembled.shape[1] == 1
 #     assert reassembled.shape[2] == img_height
 #     assert reassembled.shape[3] == img_width + padding
+
+#%%
+
+dataset = get_and_write_sample_dataset(300, so.get_sample_config())
+
+from ajmc.commons.miscellaneous import get_ajmc_logger
+
+logger = get_ajmc_logger(__name__)
+
+for i in range(10):
+    logger.info(f'---------------- batch {i} ----------------')
+    next(iter(dataset))
+
+#%%
+
+dataset = get_and_write_sample_dataset(300, so.get_sample_config())
+
+dataloader = torch.utils.data.DataLoader(dataset,
+                                         batch_size=None,
+                                         batch_sampler=None,
+                                         num_workers=0,
+                                         collate_fn=lambda x: x, )
+
+for i in range(10):
+    logger.info(f'---------------- batch {i} ----------------')
+    batch = next(iter(dataloader))

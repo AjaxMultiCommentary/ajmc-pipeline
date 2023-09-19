@@ -1,14 +1,8 @@
 {
   "classes": "@;·́̈΄ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψω`´̀̄̆̓̔͂ͅ᾽᾿῾˙̣̅ϚϛϜϝϞϟϠϡ‖ℵ⏑⏒⏓⏔⏕⏖⏗⏘⏙〈〉𝔐ACEGHIJKLMNOSTUYZaceghijklmnostuyz°Ʒʒ̧̨̱̂̃̌̕ !\"%&'()*+,-./0123456789:<=>?BDFPQRVWX[\\]^_bdfpqrvwx{|}~¡§ª«¯¶¸º»¿ÆÐßæð÷øŒœˇ˘̦̇̊̒ẞ–—‘’‚“”„•…‹›¦¬±²³¹¼½¾†‡⁴⁵⁶⁷⁸⁹₁₂₃₄₅₆₇₈₉¤ϲϹᵃᵅᵇᵈᵉᵍᵏᵐᵒᵖᵗᵘᵛᵝᶜᶠ⁰ⁱ⁽⁾ⁿ₀∠♃𝒢𝔄𝔅𝔙𝔚𝔣𝔮ſℳ",
   "blank_class": "@",
-  "evaluation_output_dir": "/scratch/sven/ocr_exp/att_model_tests/",
-  "evaluation_rate": 200,
-  "input_shape": [
-    1,
-    32,
-    248
-  ],
-  "chunk_overlap": 20,
+  "evaluation_output_dir": "/scratch/sven/ocr_exp/att_model_tests/outputs_w_backbone",
+  "evaluation_rate": 5000,
   "densenetbackbone": {
     "growth_rate": 32,
     "block_config": [
@@ -34,25 +28,26 @@
     }
   },
   "max_batch_size": 16,
-  "total_steps": 1000,
+  "total_steps": 100000,
   "momentum": 0.9,
-  "learning_rate": 0.001,
+  "learning_rate": 0.0001,
   "device": "cuda",
-  "num_workers": 2,
-  "train_data_dir": "/scratch/sven/ocr_exp/source_datasets/artificial_data/gibberish/",
-  "test_data_dir": "/scratch/sven/ocr_exp/source_datasets/artificial_data/gibberish/",
-  "snapshot_rate": 200,
-  "snapshot_path": "/scratch/sven/ocr_exp/att_model_tests/snapshot.pt",
+  "train_data_dir": "/scratch/sven/ocr_exp/att_model_tests/data/train",
+  "test_data_dir": "/scratch/sven/ocr_exp/att_model_tests/data/eval",
+  "snapshot_rate": 1000,
+  "snapshot_path": "/scratch/sven/ocr_exp/att_model_tests/outputs_w_backbone/snapshot.pt",
   "random_seed": 42,
   "scheduler_gamma": 0.25,
   "scheduler_patience": 4,
-  "scheduler_step_rate": 200,
+  "scheduler_step_rate": 1000,
   "num_classes": 292,
   "decoder": {
     "in_features": 32,
     "out_features": 292
   },
-  "chunk_width": 248,
+  "chunk_height": 40,
+  "chunk_width": 320,
+  "chunk_overlap": 20,
   "classes_to_indices": {
     "@": 0,
     ";": 1,

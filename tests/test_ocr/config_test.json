@@ -8,7 +8,6 @@
     32,
     248
   ],
-  "chunk_overlap": 20,
   "densenetbackbone": {
     "growth_rate": 32,
     "block_config": [
@@ -34,14 +33,13 @@
     }
   },
   "max_batch_size": 16,
-  "total_steps": 5,
+  "total_steps": 10,
   "momentum": 0.9,
   "learning_rate": 0.001,
   "device": "cuda",
-  "num_workers": 2,
   "train_data_dir": "tests/test_dataset",
   "test_data_dir": "tests/test_dataset",
-  "snapshot_rate": 1,
+  "snapshot_rate": 2,
   "snapshot_path": "tests/test_dataset/test_snapshot.pt",
   "random_seed": 42,
   "scheduler_gamma": 0.25,
@@ -52,7 +50,9 @@
     "in_features": 32,
     "out_features": 292
   },
+  "chunk_height": 32,
   "chunk_width": 248,
+  "chunk_overlap": 20,
   "classes_to_indices": {
     "@": 0,
     ";": 1,

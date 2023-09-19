@@ -20,34 +20,31 @@ def get_sample_config(mode='cpu') -> dict:
 
 
     if mode == 'cpu':
-        config['num_workers'] = 1
         config['device'] = 'cpu'
 
     if mode == 'single_gpu':
-        config['num_workers'] = 1
         config['device'] = 'cuda'
 
     if mode == 'multi_gpu':
-        config['num_workers'] = 2
         config['device'] = 'cuda'
 
     return config
 
 
 def get_single_img_tensor(config):
-    img_width = int(2.5 * config['input_shape'][2])
-    return torch.tensor(list(range(config['input_shape'][1] * img_width))).reshape(1, config['input_shape'][1], img_width)
+    img_width = int(2.5 * config['chunk_width'])
+    return torch.tensor(list(range(config['chunk_height'] * img_width))).reshape(1, config['chunk_height'], img_width)
 
 
 def get_batch_img_tensor(config, num_images=3):
-    img_width = int(2.5 * config['input_shape'][2])
-    img_height = config['input_shape'][1]
+    img_width = int(2.5 * config['chunk_width'])
+    img_height = config['chunk_height']
     return torch.tensor(list(range(num_images * img_width * img_height))).reshape(num_images, 1, img_height, img_width)
 
 
 def get_sample_img(config):
-    img_width = random.randint(int(0.5 * config['input_shape'][2]), int(3 * config['input_shape'][2]))
-    img_height = config['input_shape'][1]
+    img_width = random.randint(int(0.5 * config['chunk_width']), int(3 * config['chunk_width']))
+    img_height = config['chunk_height']
     img_tensor = torch.rand((1, img_height, img_width))
     return img_tensor
 
@@ -67,20 +64,9 @@ def get_and_write_sample_dataset(num_images,
     return OcrIterDataset(data_dir=config['train_data_dir'],
                           classes=config['classes'],
                           max_batch_size=config['max_batch_size'],
-                          img_height=config['input_shape'][1],
+                          img_height=config['chunk_height'],
                           chunk_width=config['chunk_width'],
                           chunk_overlap=config['chunk_overlap'],
                           classes_to_indices=config['classes_to_indices'],
-                          indices_to_classes=config['indices_to_classes'])
-
-
-dataset = get_and_write_sample_dataset(10, get_sample_config())
-#%%
-from ajmc.ocr.pytorch.data_processing import get_custom_dataloader
-
-dataloader = get_custom_dataloader(dataset, 1)
-
-#%%
-for i in range(15):
-    batch = next(iter(dataloader))
-    print(batch.texts)
+                          indices_to_classes=config['indices_to_classes'],
+                          num_workers=config['num_workers'])
