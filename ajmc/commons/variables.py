@@ -151,7 +151,9 @@ ALL_COMM_IDS = ['Colonna1975',
 EXTERNAL_COMM_IDS = ['thukydides02thuc', 'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
 
 PD_COMM_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894',
-               'SchneidewinNauckRadermacher1913']
+               'SchneidewinNauckRadermacher1913', 'Hermann1851', 'lestragdiesdeso00tourgoog']
+
+COPYRIGHT_COMM_IDS = list(set(ALL_COMM_IDS) - set(EXTERNAL_COMM_IDS) - set(PD_COMM_IDS))
 
 SAMPLE_PAGES = ['bsb10234118_0096', 'sophokle1v3soph_0126', 'cu31924087948174_0063', 'cu31924087948174_0063',
                 'Wecklein1894_0087']
