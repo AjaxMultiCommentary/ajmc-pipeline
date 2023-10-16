@@ -171,3 +171,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# direnv (https://direnv.net/)
+.envrc
