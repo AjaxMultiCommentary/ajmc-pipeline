@@ -69,7 +69,7 @@ class OcrCommentary(Commentary):
 
     @classmethod
     @docstring_formatter(**docstrings)
-    def from_ajmc_data(cls, id: str, ocr_run_id: str = '*_tess_base'):
+    def from_ajmc_data(cls, id: str, ocr_run_id: str = '*_tess_retrained'):
         """Use this method to construct a ``OcrCommentary``-object using ajmc's data folder structure.
 
         Args:
