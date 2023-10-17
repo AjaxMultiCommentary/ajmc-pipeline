@@ -326,3 +326,16 @@ def get_char_unicode_name(char: str) -> str:
         return unicodedata.name(char)
     except:
         return ''
+    
+"""
+Removes diacritical marks via NFKD normalization and recombination.
+Useful for building search indexes (and searching against them).
+
+Example:
+
+>>> remove_diacritics("μῆνιν ἄειδε, θεά")
+'μηνιν αειδε θεα'
+"""
+def remove_diacritics(s: str) -> str:
+    nfkd_form = unicodedata.normalize("NFKD", s)
+    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
