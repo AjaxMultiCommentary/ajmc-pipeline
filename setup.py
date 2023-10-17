@@ -130,6 +130,7 @@ setup(
             'jsonschema',
             'lazy_objects @ git+https://github.com/sven-nm/lazy_objects.git',
             'Levenshtein',
+            'lunr',
             'lxml',
             'mean-average-precision',
             'numpy',

@@ -33,3 +33,20 @@ Please install `ajmc` using `git clone https://github.com/AjaxMultiCommentary/aj
 ```shell
 python -m pip install git+'https://github.com/AjaxMultiCommentary/ajmc'
 ```
+
+
+# Running tests
+
+Make sure that you have a local virtualenv activated and pytest installed.
+
+You can then run all tests by invoking:
+
+```bash
+$ python -m pytest
+```
+
+You can also test a single file (or a single test --- see the [pytest docs](https://docs.pytest.org/en/stable/how-to/usage.html#usage)):
+
+```bash
+$ python -m pytest "ajmc/search/index.py"
+```
