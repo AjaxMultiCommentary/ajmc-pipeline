@@ -44,6 +44,9 @@ COMM_SECTIONS_REL_PATH = Path('sections.json')
 COMM_NER_ANN_REL_DIR = Path('ner/annotation')
 COMM_LEMLINK_ANN_REL_DIR = Path('lemlink/annotation')
 
+# CURRENT BEST OCR GLOB
+COMM_BEST_OCR_GLOB = "*tess_retrained"
+
 
 def get_comm_base_dir(comm_id: str) -> Path:
     return COMMS_DATA_DIR / comm_id
