@@ -1,4 +1,5 @@
 import ajmc.text_processing.canonical_classes as canonical_classes
+import ajmc.commons.unicode_utils as unicode_utils
 import ajmc.commons.variables as variables
 import lunr
 
@@ -17,14 +18,26 @@ class Index:
     @lazy_property
     def search_index(self):
         documents = [
-            {"id": page.id, "text": "\n".join([l.text for l in page.children.lines])}
+            {"id": page.id, "text": "\n".join([unicode_utils.remove_diacritics(l.text) for l in page.children.lines])}
             for page in self.canonical_commentary.children.pages
         ]
         return lunr.lunr(ref="id", fields=("text",), documents=documents)
+    
+    def search(self, search_string: str) -> list[dict]:
+        cleaned_string = unicode_utils.remove_diacritics(search_string)
+
+        return self.search_index.search(cleaned_string)
 
 
 def test_search_index():
     index = Index("sophoclesplaysa05campgoog")
 
-    assert type(index.canonical_commentary) == canonical_classes.CanonicalCommentary
-    assert len(index.search_index.search('Ajax')) > 0
+    assert type(index.canonical_commentary) == canonical_classes.CanonicalCommentary    
+    
+    results = index.search('Ajax')
+
+    assert len(results) > 0
+
+    grc_results = index.search('Αἶας')
+
+    assert len(grc_results) > 0
