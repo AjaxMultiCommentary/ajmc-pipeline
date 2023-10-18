@@ -82,12 +82,14 @@ class CanonicalCommentary(Commentary):
         ]
 
         # Set its children
-        commentary.children = LazyObject(
-                compute_function=lambda x: x,
-                constrained_attrs=vs.CHILD_TYPES,
-                **{tc_type: [get_tc_type_class(tc_type)(commentary=commentary, **tc)
-                             for tc in can_json['children'][tc_type]]
-                   for tc_type in vs.CHILD_TYPES})
+        commentary.children = LazyObject(compute_function=lambda x: x, constrained_attrs=vs.CHILD_TYPES,
+                                         **{tc_type: [get_tc_type_class(tc_type)(commentary=commentary, **tc)
+                                                      for tc in can_json['children'][tc_type]]
+                                            for tc_type in vs.CHILD_TYPES if tc_type != 'words'})
+
+        # Special case of words which have no index in the canonical json
+        commentary.children.words = [get_tc_type_class('words')(commentary=commentary, index=i, word_range=(i, i), **tc)
+                                     for i, tc in enumerate(can_json['children']['words'])]
 
         return commentary
 
