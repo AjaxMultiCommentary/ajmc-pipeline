@@ -31,7 +31,7 @@ else:
 
 DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
 COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries/commentaries_data'
-NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus'
+NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus-0.4'
 LEMLINK_XMI_DIR = DRIVE_DATA_DIR / 'lemma-linkage-corpus/data/preparation/corpus/annotated'
 
 # RELATIVE PATHS
