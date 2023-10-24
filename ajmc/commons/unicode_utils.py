@@ -133,8 +133,7 @@ def harmonise_miscellaneous_symbols(text: str) -> str:
 
 def harmonise_unicode(text: str,
                       harmonise_functions: Tuple[Callable[[str], str]] = (
-                              harmonise_punctuation, harmonise_miscellaneous_symbols, harmonise_ligatures),
-                      harmonise_space_chars: bool = True) -> str:
+                              harmonise_punctuation, harmonise_miscellaneous_symbols, harmonise_ligatures)) -> str:
     """Harmonise unicode characters.
 
     Note:
@@ -150,9 +149,7 @@ def harmonise_unicode(text: str,
     """
     for function in harmonise_functions:
         text = function(text)
-    if harmonise_space_chars:
-        text = harmonise_spaces(text)
-    return text
+    return harmonise_spaces(text)
 
 
 def get_all_chars_from_range(start: str, end: str) -> str:

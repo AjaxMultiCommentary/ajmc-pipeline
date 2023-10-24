@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 from time import strftime
-from typing import Dict, List, Type
+from typing import Dict, List, Type, Optional
 
 from cassis import Cas, load_cas_from_xmi, load_typesystem
 from cassis.typesystem import FeatureStructure
@@ -283,16 +283,16 @@ def import_page_rebuild(page_id: str, annotation_type: str = 'ner'):
     """
     comm_id = page_id.split('_')[0]
 
-    if annotation_type == 'ner':
+    if annotation_type in ['entities', 'sentences', 'hyphenations']:
 
-        rebuild_path = vs.get_comm_ner_jsons_dir(comm_id, vs.IDS_TO_RUNS[comm_id]) / (page_id + '.json')
+        rebuild_path = vs.get_comm_ner_jsons_dir(comm_id, vs.IDS_TO_NER_RUNS[comm_id]) / (page_id + '.json')
         if comm_id == 'sophoclesplaysa05campgoog' and page_id in vs.MINIREF_PAGES:
             rebuild_path = vs.get_comm_ner_jsons_dir(comm_id, '1bm0b4_tess_final') / (page_id + '.json')
         return basic_rebuild(page=json.loads(rebuild_path.read_text('utf-8')),
                              region_types=vs.IDS_TO_REGIONS[comm_id])
 
-    elif annotation_type == 'lemlink':
-        run_dir = next((vs.get_comm_base_dir(comm_id) / vs.COMM_LEMLINK_ANN_REL_DIR).glob('*'))
+    elif annotation_type == 'lemmas':
+        run_dir = [dir_ for dir_ in (vs.get_comm_base_dir(comm_id) / vs.COMM_LEMLINK_ANN_REL_DIR).glob('*') if dir_.is_dir()][0]
         rebuild_path = run_dir / 'jsons' / (page_id + '.json')
         metadata = json.loads((run_dir / 'xmis' / 'metadata.json').read_text('utf-8'))
 
@@ -300,12 +300,23 @@ def import_page_rebuild(page_id: str, annotation_type: str = 'ner'):
                              region_types=metadata['region_types'])
 
 
-def import_page_cas(page_id: str, ajmc_ne_corpus_path: Path = vs.NE_CORPUS_DIR):
-    xml_path = ajmc_ne_corpus_path / 'data/preparation/TypeSystem.xml'
+def import_page_cas(page_id: str,
+                    annotation_type: str) -> Optional[Cas]:
+    """Finds and rebuild the inception ``.xmi`` of the fgiven ``page_id``, returning ``None`` if not found."""
 
-    candidate_xmi_paths = list(ajmc_ne_corpus_path.glob(f'data/preparation/corpus/*/curated/{page_id}.xmi'))
-    if candidate_xmi_paths:
-        xmi_path = candidate_xmi_paths[0]
+    if annotation_type in ['entities', 'sentences', 'hyphenations']:
+        xml_path = vs.NE_CORPUS_DIR / 'data/preparation/TypeSystem.xml'
+        candidate_xmi_paths = list(vs.NE_CORPUS_DIR.glob(f'data/preparation/corpus/*/curated/{page_id}.xmi'))
+        if candidate_xmi_paths:
+            xmi_path = candidate_xmi_paths[0]
+            return get_cas(xmi_path, xml_path)
+        else:
+            return
+
+    elif annotation_type == 'lemmas':
+        xml_path = vs.LEMLINK_XMI_DIR / 'TypeSystem.xml'
+        xmi_path = vs.LEMLINK_XMI_DIR / (f'{page_id}.xmi')
+
         return get_cas(xmi_path, xml_path)
 
 

@@ -374,6 +374,7 @@ class CanonicalEntity(CanonicalAnnotation):
                 'wikidata_id': self.wikidata_id}
 
     def bbox(self) -> None:
+        # Todo: should this raise an error?
         logger.warning('``CanonicalEntity``s have no bbox.')
         return None
 
@@ -423,3 +424,28 @@ class CanonicalHyphenation(CanonicalAnnotation):
     def bbox(self) -> None:
         logger.warning('``CanonicalHyphenation``s have no bbox.')
         return None
+
+
+class CanonicalLemma(CanonicalAnnotation):
+
+    def __init__(self,
+                 commentary: 'CanonicalCommentary',
+                 word_range: Tuple[int, int],
+                 shifts: Tuple[int, int],
+                 label: str,
+                 transcript: Optional[str],
+                 anchor_target: Optional[dict],
+                 ):
+        super().__init__(word_range=word_range,
+                         commentary=commentary,
+                         shifts=shifts,
+                         label=label,
+                         transcript=transcript,
+                         anchor_target=anchor_target)
+
+    def to_json(self):
+        return {'word_range': self.word_range,
+                'shifts': self.shifts,
+                'transcript': self.transcript,
+                'label': self.label,
+                'anchor_target': self.anchor_target}

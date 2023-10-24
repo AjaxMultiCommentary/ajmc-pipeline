@@ -32,6 +32,7 @@ else:
 DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
 COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries/commentaries_data'
 NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus'
+LEMLINK_XMI_DIR = DRIVE_DATA_DIR / 'lemma-linkage-corpus/data/preparation/corpus/annotated'
 
 # RELATIVE PATHS
 COMM_IMG_REL_DIR = Path('images/png')
@@ -95,6 +96,7 @@ def get_comm_lemlink_xmis_dir(comm_id: str, ocr_run_id: str) -> Path:
 def get_comm_canonical_dir(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_CANONICAL_REL_DIR
 
+
 def get_comm_canonical_path_from_pattern(comm_id: str, ocr_run_pattern: str) -> Path:
     canonical_dir = get_comm_canonical_dir(comm_id)
     try:
@@ -153,7 +155,11 @@ ALL_COMM_IDS = ['Colonna1975',
 
 EXTERNAL_COMM_IDS = ['thukydides02thuc', 'pvergiliusmaroa00virggoog', 'annalsoftacitusp00taci']
 
-PD_COMM_IDS = ['bsb10234118', 'cu31924087948174', 'sophoclesplaysa05campgoog', 'sophokle1v3soph', 'Wecklein1894',
+PD_COMM_IDS = ['bsb10234118',
+               'cu31924087948174',
+               'sophoclesplaysa05campgoog',
+               'sophokle1v3soph',
+               'Wecklein1894',
                'SchneidewinNauckRadermacher1913', 'Hermann1851', 'lestragdiesdeso00tourgoog']
 
 COPYRIGHT_COMM_IDS = list(set(ALL_COMM_IDS) - set(EXTERNAL_COMM_IDS) - set(PD_COMM_IDS))
@@ -315,6 +321,7 @@ TEXTCONTAINER_TYPES = ['commentary',
                        'line',
                        'hyphenation',
                        'entity',
+                       'lemma',
                        'word']
 
 TC_TYPES_TO_CHILD_TYPES = {t: t + 's' if t[-1] != 'y' else t[:-1] + 'ies' for t in TEXTCONTAINER_TYPES}
@@ -374,7 +381,7 @@ LINKAGE_MINIREF_PAGES = [
     'Wecklein1894_0024',
 ]
 
-IDS_TO_RUNS = {  # Maps commentary_ids to the ocr_run_id used as a base in the annotation campaign.
+IDS_TO_NER_RUNS = {  # Maps commentary_ids to the ocr_run_id used as a base in the NER annotation campaign.
     'cu31924087948174': '1bm0b3_tess_final',
     'lestragdiesdeso00tourgoog': '21i0dA_tess_hocr',
     'sophokle1v3soph': '1bm0b5_tess_final',
@@ -395,6 +402,7 @@ ANNOTATION_LAYERS = {
     'sentences': 'webanno.custom.GoldSentences',
     'hyphenations': 'webanno.custom.GoldHyphenation',
     'tokens': 'de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token',
+    'lemmas': 'webanno.custom.AjMCLemmaLinkage'
 }
 
 # ======================================================================================================================

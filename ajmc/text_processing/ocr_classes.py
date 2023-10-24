@@ -26,7 +26,7 @@ from ajmc.ocr.utils import guess_ocr_format
 from ajmc.olr.utils import get_page_region_dicts_from_via, sort_to_reading_order
 from ajmc.text_processing import cas_utils
 from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalEntity, CanonicalHyphenation, \
-    CanonicalLine, CanonicalPage, CanonicalRegion, CanonicalSection, CanonicalSentence, CanonicalWord
+    CanonicalLine, CanonicalPage, CanonicalRegion, CanonicalSection, CanonicalSentence, CanonicalWord, CanonicalLemma
 from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
 from ajmc.text_processing.markup_processing import find_all_elements, get_element_bbox, get_element_text
 
@@ -177,25 +177,35 @@ class OcrCommentary(Commentary):
                                                  commentary=can,
                                                  shifts=h.shifts))
 
-            # We reset the page to free up memory, only we keep the words.
-            del p.children.regions
-            del p.children.lines
-            del p.children.entities
-            del p.children.sentences
-            del p.children.hyphenations
-            del p.image
+            for l in p.children.lemmas:
+                if l.children.words:
+                    children['lemmas'].append(CanonicalLemma(word_range=(l.children.words[0].index, l.children.words[-1].index),
+                                                             commentary=can,
+                                                             shifts=l.shifts,
+                                                             label=l.value,
+                                                             transcript=l.transcript,
+                                                             anchor_target=l.anchor_target))
 
-        # Adding sections
-        for s in self.children.sections:
-            children['sections'].append(
-                    CanonicalSection(word_range=(s.children.words[0].index, s.children.words[-1].index),
-                                     commentary=can,
-                                     section_types=s.section_types,
-                                     section_title=s.section_title))
+                    # We reset the page to free up memory, only we keep the words.
+                    del p.children.regions
+                    del p.children.lines
+                    del p.children.entities
+                    del p.children.lemmas
+                    del p.children.sentences
+                    del p.children.hyphenations
+                    del p.image
 
-        can.children = LazyObject((lambda x: x), constrained_attrs=vs.CHILD_TYPES, **children)
+                    # Adding sections
+                    for s in self.children.sections:
+                        children['sections'].append(
+                                CanonicalSection(word_range=(s.children.words[0].index, s.children.words[-1].index),
+                                                 commentary=can,
+                                                 section_types=s.section_types,
+                                                 section_title=s.section_title))
 
-        self.reset()
+                    can.children = LazyObject((lambda x: x), constrained_attrs=vs.CHILD_TYPES, **children)
+
+                    self.reset()
 
         return can
 
@@ -284,11 +294,11 @@ class OcrPage(Page, TextContainer):
 
         elif children_type in ['entities', 'sentences', 'hyphenations']:
             try:
-                rebuild = cas_utils.import_page_rebuild(self.id)
+                rebuild = cas_utils.import_page_rebuild(self.id, annotation_type=children_type)
             except:
                 logger.debug(f'No rebuild file found for page {self.id}')
                 return []
-            cas = cas_utils.import_page_cas(self.id)
+            cas = cas_utils.import_page_cas(self.id, children_type)
             if cas is not None:
                 annotations = cas_utils.safe_import_page_annotations(self.id, cas, rebuild,
                                                                      vs.ANNOTATION_LAYERS[children_type])
@@ -300,11 +310,22 @@ class OcrPage(Page, TextContainer):
                 elif children_type == 'hyphenations':
                     return [RawHyphenation.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
 
-            elif children_type == 'anchors':
-                raise NotImplementedError('Anchors are not yet implemented')
-
-            else:  # page has no CAS
+        elif children_type == 'lemmas':
+            try:
+                rebuild = cas_utils.import_page_rebuild(self.id, annotation_type=children_type)
+            except:
+                logger.debug(f'No rebuild file found for page {self.id}')
                 return []
+
+            cas = cas_utils.import_page_cas(self.id, children_type)
+
+            if cas is not None:
+                annotations = cas_utils.safe_import_page_annotations(page_id=self.id,
+                                                                     cas=cas,
+                                                                     rebuild=rebuild,
+                                                                     annotation_layer=vs.ANNOTATION_LAYERS[children_type])
+
+                return [RawLemma.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
 
         else:
             return []
@@ -345,7 +366,7 @@ class OcrPage(Page, TextContainer):
         schema = json.loads(schema_path.read_text('utf-8'))
         jsonschema.validate(instance=inception_dict, schema=schema)
         ((output_dir / self.id).with_suffix('.json')).write_text(
-            json.dumps(inception_dict, indent=4, ensure_ascii=False), encoding='utf-8')
+                json.dumps(inception_dict, indent=4, ensure_ascii=False), encoding='utf-8')
 
     def reset(self):
         """Resets the page to free up memory."""
@@ -702,3 +723,21 @@ class RawHyphenation(RawAnnotation):
                    shifts=shifts,
                    text_window=text_window,
                    warnings=warnings)
+
+
+class RawLemma(RawAnnotation):
+    """Class for cas imported entities."""
+
+    @classmethod
+    def from_cas_annotation(cls, page, cas_annotation, rebuild, verbose: bool = False):
+        # Get general text-alignment-related about the annotation
+        bboxes, shifts, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
+                                                                               rebuild=rebuild, verbose=verbose)
+
+        return cls(page,
+                   bboxes=[Shape.from_xywh(*bbox) for bbox in bboxes],
+                   shifts=shifts,
+                   text_window=text_window,
+                   warnings=warnings,
+                   **{attr_: getattr(cas_annotation, attr_, None) for attr_ in ['anchor_target', 'value', 'transcript']}
+                   )
