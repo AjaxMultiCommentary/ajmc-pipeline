@@ -173,3 +173,6 @@ dmypy.json
 
 # direnv (https://direnv.net/)
 .envrc
+
+# Commentaries search index
+search_index.json

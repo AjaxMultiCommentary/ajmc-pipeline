@@ -1,9 +1,12 @@
 import ajmc.text_processing.canonical_classes as canonical_classes
 import ajmc.commons.unicode_utils as unicode_utils
 import ajmc.commons.variables as variables
+import json
 import lunr
 
 from lazy_objects.lazy_objects import lazy_property
+
+DEFAULT_SEARCH_INDEX_EXPORT_LOCATION = "."
 
 
 class CommentaryIndex:
@@ -22,12 +25,10 @@ class CommentaryIndex:
         return [
             {
                 "id": page.id,
-                "text": "\n".join(
-                    [
-                        unicode_utils.remove_diacritics(l.text)
-                        for l in page.children.lines
-                    ]
-                ),
+                "raw_text": unicode_utils.remove_diacritics(page.text),
+                "text": page.text,
+                "regions": [region.to_json() for region in page.children.regions],
+                "words": [(word.index, word.to_json()) for word in page.children.words],
             }
             for page in self.canonical_commentary.children.pages
         ]
@@ -46,10 +47,16 @@ class SearchIndex:
             docs = docs + commentary_index.documents
 
         return docs
+    
+    def export(self, to=DEFAULT_SEARCH_INDEX_EXPORT_LOCATION):
+        serialized_index = self.search_index.serialize()
+
+        with open(f"{to}/search_index.json", "w") as f:
+            json.dump(serialized_index, f)
 
     @lazy_property
     def search_index(self):
-        return lunr.lunr(ref="id", fields=("text",), documents=self.documents)
+        return lunr.lunr(ref="id", fields=("raw_text",), documents=self.documents)
 
     def search(self, search_string: str) -> list[dict]:
         cleaned_string = unicode_utils.remove_diacritics(search_string)
