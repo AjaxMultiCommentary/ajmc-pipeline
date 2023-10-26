@@ -10,13 +10,15 @@ from tqdm import tqdm
 
 from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr import variables as ocr_vs
-from ajmc.ocr.config import CONFIGS
-from ajmc.ocr.preprocessing.get_source_datasets import make_clean_ajmc_dataset, make_clean_pogretra_dataset, compute_dataset_metadata
+from ajmc.ocr.data_processing.get_source_datasets import make_clean_ajmc_dataset, make_clean_pogretra_dataset, compute_dataset_metadata
+from ajmc.ocr.tesseract.config import CONFIGS
 
 logger = get_ajmc_logger(__name__)
 
+
 def split_root_dataset_metadata(metadata: pd.DataFrame) -> pd.DataFrame:
     """This function is a custom split for ajmc and pog."""
+
     from simple_splitter.split import split
 
     # Get the metadata

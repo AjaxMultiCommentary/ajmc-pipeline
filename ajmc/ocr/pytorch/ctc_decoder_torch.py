@@ -110,6 +110,7 @@ class GreedyDecoder(Decoder):
         super(GreedyDecoder, self).__init__(labels, blank_index)
 
 
+    #@profile
     def convert_to_strings(self,
                            sequences,
                            sizes=None,
@@ -129,6 +130,8 @@ class GreedyDecoder(Decoder):
         else:
             return strings
 
+
+    #@profile
     def process_string(self,
                        sequence,
                        size,
@@ -149,6 +152,7 @@ class GreedyDecoder(Decoder):
                     offsets.append(i)
         return string, torch.tensor(offsets, dtype=torch.int)
 
+    #@profile
     def decode(self, probs, sizes=None) -> (List[str], List[torch.tensor]):
         """
         Returns the argmax decoding given the probability matrix. Removes

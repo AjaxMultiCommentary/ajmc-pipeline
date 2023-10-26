@@ -1,18 +1,20 @@
 import os
 import random
-from pathlib import Path
-from typing import List, Dict, Tuple, Generator
-
-import math
-import torch
+import shutil
 import unicodedata
+from pathlib import Path
+from typing import List, Dict, Tuple, Generator, Optional, Any
+
+import torch
 from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
 from torchvision.io import read_image, ImageReadMode
+from tqdm import tqdm
 
 from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.unicode_utils import harmonise_unicode
 from ajmc.ocr import variables as ocr_vs
+
 
 logger = get_ajmc_logger(__name__)
 
@@ -38,33 +40,55 @@ class OcrLine:
 
     """
 
+    # #@profile
     def __init__(self,
                  img_path: Path,
                  img_height: int,
                  chunk_width: int,
                  chunk_overlap: int,
-                 classes_to_indices: dict
+                 classes_to_indices: dict,
                  ):
         img_tensor = prepare_img(img_path, img_height=img_height)
-        self.img_width = img_tensor.shape[2]
+        self.img_width: int = img_tensor.shape[2]
         self.chunks = chunk_img_tensor(img_tensor, chunk_width, chunk_overlap)
-        self.img_path = img_path
-
-        text = img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION).read_text(encoding='utf-8')
-        self.text = unicodedata.normalize('NFD', harmonise_unicode(text))
-        self.text_tensor = torch.tensor([classes_to_indices[c] for c in self.text])
+        self.text = unicodedata.normalize('NFD', harmonise_unicode(img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION).read_text(encoding='utf-8')))
+        self.text_tensor = torch.tensor([classes_to_indices.get(c, 1) for c in self.text])
 
 
 class OcrBatch:
 
-    def __init__(self, ocr_lines: List[OcrLine]):
-        self.ocr_lines = ocr_lines
-        self.img_widths = tuple(l.img_width for l in self.ocr_lines)
-        self.chunks = torch.cat([l.chunks for l in self.ocr_lines], dim=0)
-        self.chunks_to_img_mapping = [len(l.chunks) for l in self.ocr_lines]
-        self.text_lengths = tuple(l.text_tensor.shape[0] for l in self.ocr_lines)
-        self.texts_tensor = pad_sequence([l.text_tensor for l in self.ocr_lines], batch_first=True)
-        self.texts = tuple(l.text for l in self.ocr_lines)
+    # #@profile
+    def __init__(self,
+                 img_widths: Tuple[int],
+                 chunks: torch.Tensor,
+                 chunks_to_img_mapping: List[int],
+                 text_lengths: Tuple[Any],
+                 texts_tensor: torch.Tensor,
+                 texts: Tuple[str],
+                 ):
+        self.img_widths = img_widths
+        self.chunks = chunks
+        self.chunks_to_img_mapping = chunks_to_img_mapping
+        self.text_lengths = text_lengths
+        self.texts_tensor = texts_tensor
+        self.texts = texts
+
+    @classmethod
+    def from_lines(cls, ocr_lines: List[OcrLine]):
+        return cls(img_widths=tuple(l.img_width for l in ocr_lines),
+                   chunks=torch.cat([l.chunks for l in ocr_lines], dim=0),
+                   chunks_to_img_mapping=[len(l.chunks) for l in ocr_lines],
+                   text_lengths=tuple(l.text_tensor.shape[0] for l in ocr_lines),
+                   texts_tensor=pad_sequence([l.text_tensor for l in ocr_lines], batch_first=True),
+                   texts=tuple(l.text for l in ocr_lines))
+
+    def to_dict(self):
+        return {'img_widths': self.img_widths,
+                'chunks': self.chunks,
+                'chunks_to_img_mapping': self.chunks_to_img_mapping,
+                'text_lengths': self.text_lengths,
+                'texts_tensor': self.texts_tensor,
+                'texts': self.texts}
 
 
 def invert_image_tensor(image_tensor):
@@ -163,6 +187,7 @@ def chunk_img_tensor(img_tensor,
     return torch.stack(chunks, dim=0)
 
 
+# #@profile
 def prepare_img(img_path: Path,
                 img_height: int) -> torch.Tensor:
     """Prepares an image tensor for training.
@@ -175,9 +200,9 @@ def prepare_img(img_path: Path,
         The prepared image tensor, in shape (1, img_height, resized_width).
     """
 
-    img_tensor = read_image(str(img_path), mode=ImageReadMode.GRAY)
+    img_tensor = read_image(str(img_path), mode=ImageReadMode.GRAY).requires_grad_(False)
     img_tensor = invert_image_tensor(img_tensor)
-    img_tensor = crop_image_tensor_to_nonzero(img_tensor)
+    # img_tensor = crop_image_tensor_to_nonzero(img_tensor)
 
     # We calculate the entire size to be able to cope with images longer than large
     # See docs on resize (https://pytorch.org/vision/stable/generated/torchvision.transforms.Resize.html)
@@ -255,9 +280,6 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
         img_height: The height to which to resize the images.
         chunk_width: The width of the chunks to extract from the images.
         chunk_overlap: The overlap between the chunks.
-        classes_to_indices: A mapping from the classes to their indices.
-        indices_to_classes: A mapping from the indices to their classes.
-        is_training: Whether the dataset is used for training or validation.
         shuffle: Whether to shuffle the dataset.
         per_worker_steps_run: The number of steps already run by each worker. This is used to compute the number of chunks to
             skip at the beginning of the dataset, so that each worker starts at a different point in the dataset.
@@ -265,42 +287,52 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
     """
 
     def __init__(self,
-                 data_dir: Path,
                  classes: str,
+                 classes_to_indices: Dict[str, int],
                  max_batch_size: int,
                  img_height: int,
                  chunk_width: int,
                  chunk_overlap: int,
-                 classes_to_indices: Dict[str, int],
-                 indices_to_classes: Dict[int, str],
-                 is_training: bool = True,
+                 data_dir: Path = None,
+                 img_paths: Optional[List[Path]] = None,
+                 loop_infinitely: bool = True,
                  shuffle: bool = True,
                  num_workers: int = 1,
                  per_worker_steps_run: int = 0):
+
         super().__init__()
-        self.data_dir = data_dir
         self.classes = classes
+        self.classes_to_indices = classes_to_indices
         self.max_batch_size = max_batch_size
         self.img_height = img_height
         self.chunk_width = chunk_width
         self.chunk_overlap = chunk_overlap
-        self.classes_to_indices = classes_to_indices
-        self.indices_to_classes = indices_to_classes
-        self.is_training = is_training  # Todo see how we handle this
+        self.loop_infinitely = loop_infinitely
         self.shuffle = shuffle
         self.num_workers = num_workers
         self.per_worker_steps_run = per_worker_steps_run
+        self.data_dir = data_dir
 
         # Get the paths of the images
-        self.img_paths = list(self.data_dir.rglob('*' + ocr_vs.IMG_EXTENSION))
+        if img_paths is not None:
+            logger.info(f'Using {len(img_paths)} images from given list of paths.')
+            self.img_paths = img_paths
+
+        else:
+            self.img_paths = sorted(self.data_dir.rglob('*' + ocr_vs.IMG_EXTENSION), key=lambda x: x.stem)
+            logger.info(f'Using {len(self.img_paths)} images from {self.data_dir}.')
+
         if self.shuffle:
             random.shuffle(self.img_paths)
 
         # Distribute the dataset accross workers
         self.worker_id = int(os.environ.get('RANK', 0))
-        self.data_len = len(self.img_paths)
-        self.files_generator = self.yield_files(*self.distribute())
-        self.batch_generator = self.yield_batches()
+        self.data_len = len(img_paths)
+        self.start, self.restart, self.end = self.distribute()
+        self.batch_iterator = iter(self.yield_batches(self.restart, self.end))
+
+    def reset(self):
+        self.batch_iterator = iter(self.yield_batches(self.start, self.end))
 
     def distribute(self) -> Tuple[int, int, int]:
         """Distributes the datasets accross workers.
@@ -311,97 +343,226 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
         Returns:
             The default start, re-start (which corresponds to the defaults + the number of steps already run) and end indices for the current worker.
         """
+        logger.info(f'Distributing data across {self.num_workers} workers')
 
-        if self.num_workers == 1:  # single-process data loading, return the full iterator
-            worker_default_start = 0
-            worker_restart = self.per_worker_steps_run
-            worker_end = self.data_len
+        # Compute the number of samples per worker, leaving the last worker with the remainder
+        samples_per_worker = self.data_len // self.num_workers
+        if self.worker_id == self.num_workers - 1:
+            samples_per_worker += self.data_len % self.num_workers
+        # Compute the start, re-start and end indices for the current worker
+        worker_default_start = self.worker_id * samples_per_worker
+        worker_restart = worker_default_start + self.per_worker_steps_run
+        worker_end = min(worker_default_start + samples_per_worker, self.data_len - 1)
 
-        else:  # Multi-process data loading, split the dataset
-            logger.info(f'Distributing data across {self.num_workers} workers')
-            worker_id = self.worker_id
-            samples_per_worker = int(math.ceil(self.data_len / float(self.num_workers)))
-            worker_default_start = worker_id * samples_per_worker
-            worker_restart = worker_default_start + self.per_worker_steps_run
-            worker_end = min(worker_default_start + samples_per_worker, self.data_len)
-
-            logger.info(f'Worker {self.worker_id} is starting at step {worker_restart}')
+        logger.info(f'Worker {self.worker_id} is starting at step {worker_restart}')
 
         return worker_default_start, worker_restart, worker_end
 
-    def yield_files(self, default_start: int, restart: int, end: int) -> Generator[Path, None, None]:
-        """Yields files infinitely, starting at the given start index.
 
-        Note:
-            For the first iteration, the start index is the worker's actual re-start index. For the following iterations,
-            the start index is the default start index (ie the start index for the first iteration). If ``restart == default_start`` then exactly
-            the same happens.
+    def yield_batches(self, start: int, end: int) -> Generator[OcrBatch, None, None]:
+        """Yields batches of data, starting at the given start index.
 
         Args:
-            default_start: The default start index.
-            restart: The worker's actual re-start index (in case of restarting from checkpoint).
-            end: The end index.
-
-        Yields:
-            The files in the dataset, starting at the given start index.
+            start: The start index.
+            end: The end index (i.e. the index of the last file to be processed).
         """
-        for i in range(restart, end):  # We start at the worker's actual re-start index
-            logger.debug(f'Worker {self.worker_id} Yielding file {self.img_paths[i].stem}')
-            yield self.img_paths[i]
+        logger.info(f'Instantiating the batch generator')
+        batch_size = 0
+        ocr_lines = []
 
-        while True:
-            for i in range(default_start, end):
-                logger.debug(f'Worker {self.worker_id} Yielding file {self.img_paths[i].stem}')
-                yield self.img_paths[i]
+        for img_path in self.img_paths[start:end]:
+            ocr_line = OcrLine(img_path, self.img_height, self.chunk_width, self.chunk_overlap, self.classes_to_indices)
 
-    def yield_batches(self) -> Generator[OcrBatch, None, None]:
-        """Yields batches of chunks infinitely.
-
-        # Todo : docs
-        """
-
-        # Create the first line
-        ocr_line = OcrLine(next(self.files_generator),
-                           img_height=self.img_height,
-                           chunk_overlap=self.chunk_overlap,
-                           chunk_width=self.chunk_width,
-                           classes_to_indices=self.classes_to_indices)
-
-        while True:
-
-            if ocr_line.chunks.shape[0] > self.max_batch_size:  # If there are more chunks that batch_size, skip the line
-                ocr_line = OcrLine(next(self.files_generator),
-                                   img_height=self.img_height,
-                                   chunk_overlap=self.chunk_overlap,
-                                   chunk_width=self.chunk_width,
-                                   classes_to_indices=self.classes_to_indices)
-                continue
-
-            chunks_count: int = ocr_line.chunks.shape[0]
-            ocr_lines = [ocr_line]
-
-            while True:
-                ocr_line = OcrLine(next(self.files_generator),
-                                   img_height=self.img_height,
-                                   chunk_overlap=self.chunk_overlap,
-                                   chunk_width=self.chunk_width,
-                                   classes_to_indices=self.classes_to_indices)
-
-                if ocr_line.chunks.shape[0] + chunks_count > self.max_batch_size:
-                    break
-
+            if batch_size + ocr_line.chunks.shape[0] > self.max_batch_size:
+                yield OcrBatch.from_lines(ocr_lines)
+                ocr_lines = [ocr_line]
+                batch_size = ocr_line.chunks.shape[0]
+            else:
                 ocr_lines.append(ocr_line)
-                chunks_count += ocr_line.chunks.shape[0]
+                batch_size += ocr_line.chunks.shape[0]
 
-            yield OcrBatch(ocr_lines)
+        if self.loop_infinitely:
+            self.reset()
+
+        yield OcrBatch.from_lines(ocr_lines)
+
 
     def __iter__(self):
-        return self.batch_generator
+        return self.batch_iterator
 
 
-def get_custom_dataloader(train_dataset: torch.utils.data.Dataset) -> torch.utils.data.DataLoader:
-    return torch.utils.data.DataLoader(train_dataset,
+def get_custom_dataloader(dataset: torch.utils.data.Dataset) -> torch.utils.data.DataLoader:
+    return torch.utils.data.DataLoader(dataset,
                                        batch_size=None,
                                        batch_sampler=None,
                                        num_workers=0,
+                                       # prefetch_factor=2,
                                        collate_fn=lambda x: x, )
+
+
+def get_weighted_filelists(filelists_dir: Path,
+                           datasets_weights: Dict[str, int],
+                           root_dir: Path,
+                           splits: Tuple[str] = ('train', 'val', 'test')) -> Dict[str, List[Path]]:
+    """Gets the filelists from the given directory, with the given weights.
+
+    Note:
+        Each filelist is a .txt file containing the RELATIVE paths to the images in the dataset.
+
+    Args:
+        filelists_dir: The directory containing the filelists as .txt files.
+        datasets_weights: The weights to apply to each dataset.
+        root_dir: The root directory containing the datasets.
+
+    Returns:
+        A dictionary containing the absolute paths as `pathlib.Path` for each split.
+    """
+
+    logger.info(f'Getting filelists from {filelists_dir} with weights {datasets_weights}')
+    imgs_paths = {split: [] for split in splits}
+
+    for txt_path in sorted(filelists_dir.glob('*.txt'), key=lambda x: x.stem):
+        split = [s for s in splits if txt_path.stem.endswith(s)][0]
+        dataset_name = txt_path.stem.replace(f'_{split}', '')
+        dataset_imgs_paths = [root_dir / p for p in txt_path.read_text(encoding='utf-8').splitlines()]
+
+        if split == 'train':
+            dataset_imgs_paths *= datasets_weights.get(dataset_name, 1)
+        imgs_paths[split] += dataset_imgs_paths
+
+    return imgs_paths
+
+
+def pre_batch(config: dict,
+              output_dir: Path,
+              shuffle: bool = True,
+              splits=('test', 'val', 'train'),
+              ):
+    """Pre-batch the dataset."""
+
+    # Create the splits directories
+    splits_dir = {split: output_dir / split for split in splits}
+    for split in splits:
+        splits_dir[split].mkdir(exist_ok=True, parents=True)
+
+    # Get the filelists
+    split_filelists = get_weighted_filelists(filelists_dir=config['filelists_dir'],
+                                             datasets_weights=config['datasets_weights'],
+                                             root_dir=config['datasets_root_dir'], )
+
+    if shuffle:
+        random.seed(config['random_seed'])
+        for split in splits:
+            random.shuffle(split_filelists[split])
+
+    for split in splits:
+        dataset = OcrIterDataset(classes=config['classes'],
+                                 classes_to_indices=config['classes_to_indices'],
+                                 max_batch_size=config['max_batch_size'],
+                                 img_height=config['chunk_height'],
+                                 chunk_width=config['chunk_width'],
+                                 chunk_overlap=config['chunk_overlap'],
+                                 img_paths=split_filelists[split],
+                                 num_workers=config['num_workers'],
+                                 per_worker_steps_run=0,
+                                 loop_infinitely=False,
+                                 shuffle=False)
+
+        for i, batch in tqdm(dataset, desc=f'Pre-batching split {split}'):
+            torch.save(batch.to_dict(), splits_dir[split] / f'{i}.pt')
+
+
+class BatchedDataset(torch.utils.data.Dataset):
+    def __init__(self,
+                 source_dir: Path,
+                 cache_dir: Optional[Path] = None,
+                 num_workers: int = 1,
+                 per_worker_steps_run: int = 0, ):
+        self.source_dir = source_dir
+        self.cache_dir = cache_dir
+        self.num_workers = num_workers
+        self.per_worker_steps_run = per_worker_steps_run
+
+        self.batch_paths = sorted(source_dir.glob('*.pt'), key=lambda x: int(x.stem))
+        self.worker_id = int(os.environ.get('RANK', 0))
+
+        if self.num_workers > 1:
+            self.distribute()
+
+        self.uses_cached_batches = False
+
+        if self.cache_dir is not None:
+            self.fetch_function = self.fetch_and_cache_batch
+        else:
+            self.fetch_function = self.fetch_batch
+
+
+    #@profile
+    def __getitem__(self, idx):
+        return self.fetch_function(idx)
+
+    def __len__(self):
+        return len(self.batch_paths)
+
+    def fetch_batch(self, idx):
+        return OcrBatch(**torch.load(self.batch_paths[idx]))
+
+
+    def fetch_and_cache_batch(self, idx):
+        return OcrBatch(**torch.load(shutil.copyfile(self.batch_paths[idx], self.cache_dir / self.batch_paths[idx].name)))
+
+    def use_cached_batches(self):
+        """Uses the cached batches if they are available."""
+        if self.cache_dir is not None:
+            logger.info(f'Using cached batches from {self.cache_dir}')
+            cached_batch_names = [p.name for p in self.cache_dir.glob('*.pt')]
+
+            # Caching missing files
+            for p in tqdm(self.batch_paths, desc='Caching missing batches'):
+                cached_file = self.cache_dir / p.name
+                if p.name not in cached_batch_names:
+                    shutil.copyfile(p, cached_file)
+                try:
+                    torch.load(cached_file)
+                except RuntimeError:
+                    logger.warning(f'Corrupted cached file at {p}')
+                    shutil.copyfile(p, cached_file)
+
+            self.batch_paths = [self.cache_dir / p.name for p in self.batch_paths]
+            self.fetch_function = self.fetch_batch
+            self.uses_cached_batches = True
+
+
+    def reset(self):
+        """Resets the dataset, so that the next call to __getitem__ will return the first batch again."""
+        self.batch_paths = sorted(self.source_dir.glob('*.pt'), key=lambda x: int(x.stem))
+        self.per_worker_steps_run = 0
+
+        if self.num_workers > 1:
+            self.distribute()
+
+        if self.uses_cached_batches:
+            self.use_cached_batches()
+
+    def distribute(self):
+        """Distributes the datasets accross workers.
+
+        Note:
+            See https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset for more information.
+
+        Returns:
+            The default start, re-start (which corresponds to the defaults + the number of steps already run) and end indices for the current worker.
+        """
+        logger.info(f'Distributing data across {self.num_workers} workers')
+
+        # Compute the number of samples per worker, leaving the last worker with the remainder
+        samples_per_worker = len(self.batch_paths) // self.num_workers
+        start = self.worker_id * samples_per_worker
+
+        if self.worker_id == self.num_workers - 1:
+            samples_per_worker += len(self.batch_paths) % self.num_workers
+
+        end = start + samples_per_worker
+        start += self.per_worker_steps_run
+
+        self.batch_paths = self.batch_paths[start:end]

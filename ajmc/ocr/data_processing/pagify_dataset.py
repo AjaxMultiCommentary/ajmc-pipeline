@@ -1,4 +1,4 @@
-"""⚙️ WIP module to pagify an OCRdataset"""
+"""⚙️ WIP module to pagify (i.e. to have several lines on single page) an OCRdataset"""
 from pathlib import Path
 
 import cv2

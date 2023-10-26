@@ -20,21 +20,16 @@ class OcrTorchModel(nn.Module):
     def __init__(self, config: dict):
         super().__init__()
         self.classes = config['classes']
-        self.chunk_overlap = config['chunk_overlap']
         self.indices_to_classes = config['indices_to_classes']
+        self.chunk_overlap = config['chunk_overlap']
 
         if config.get('densenetbackbone', False):
             self.backbone = DenseNetBackbone(chunk_width=config['chunk_width'],
                                              encoder_d_model=config['encoder']["TransformerEncoderLayer"]["d_model"],
                                              **config['densenetbackbone'])
-
-        elif config.get('resnetbackbone', False):
-            raise NotImplementedError
         else:
-            self.backbone = None
-
-        # self.backbone = None
-        # logger.warning('No backbone implemented')
+            self.backbone = self.reshape_input
+            logger.warning('No backbone implemented')
 
         self.encoder = nn.TransformerEncoder(encoder_layer=nn.TransformerEncoderLayer(**config['encoder']["TransformerEncoderLayer"]),
                                              **config['encoder']["TransformerEncoder"])
@@ -42,6 +37,11 @@ class OcrTorchModel(nn.Module):
         self.decoder = nn.Linear(**config['decoder'])
 
         self.ctc_decoder = GreedyDecoder(labels=self.classes, blank_index=0)
+
+
+    def reshape_input(self, x: torch.Tensor) -> torch.Tensor:
+        return torch.reshape(x, (x.shape[0], x.shape[3], x.shape[2]))
+
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -51,20 +51,21 @@ class OcrTorchModel(nn.Module):
         """
 
         logger.debug(f'input shape: {x.shape}')
-        x = self.backbone(x) if self.backbone is not None else x.view(x.shape[0], x.shape[3], x.shape[2])
+        x = self.backbone(x)
         logger.debug(f'backbone output shape: {x.shape}')
         x = self.encoder(x)
         logger.debug(f'encoder output shape: {x.shape}')
         x = self.decoder(x)
         logger.debug(f'decoder output shape: {x.shape}')
 
-        return x  # (batch_size, seq_len, num_classes)
+        return x
 
     def predict(self, x, chunks_to_img_mapping) -> List[str]:
         """Predicts the text in a batch of image tensors.
 
         Args:
             x: A torch tensor of shape (batch_size, width, height).
+            chunks_to_img_mapping:
 
         Returns:
             A list of strings representing the predicted text.
@@ -74,9 +75,9 @@ class OcrTorchModel(nn.Module):
 
         outputs = recompose_batched_chunks(outputs,
                                            mapping=chunks_to_img_mapping,
-                                           chunk_overlap=self.chunk_overlap)  # Weird to store this here
+                                           chunk_overlap=self.chunk_overlap)
 
-        outputs = torch.nn.functional.softmax(outputs, dim=2)
+        outputs = torch.nn.functional.log_softmax(outputs, dim=2)
 
         strings, offsets = self.ctc_decoder.decode(outputs)
 
@@ -150,7 +151,7 @@ class DenseNetBackbone(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # x = self.features(x)
         for i, feature in enumerate(self.features):
-            logger.debug(f'Shape at feature {i}: {x.shape}')
+            # logger.debug(f'Shape at feature {i}: {x.shape}')
             x = feature(x)
         x = x.view(x.shape[0], x.shape[1], x.shape[3])
         x = F.adaptive_avg_pool2d(x, (self.chunk_width, self.encoder_d_model))

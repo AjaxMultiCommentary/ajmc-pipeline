@@ -1,19 +1,13 @@
-"""This scripts contains function for generating synthetic data. ``pil2array``, ``array2pil``,
-``ocropy_degrade``, ``degrade_line`` and ``distort_line`` are directly copied from kraken to avoid
-import issues. """
-
 import argparse
 import json
 import random
 import re
 import shutil
+import unicodedata
 from pathlib import Path
 from typing import Tuple, List, Dict, Optional, Generator
 
-import numpy as np
-import unicodedata
 from PIL import Image, ImageDraw, ImageOps
-from scipy.ndimage import gaussian_filter, distance_transform_cdt, binary_closing, affine_transform, geometric_transform
 from tqdm import tqdm
 
 from ajmc.commons import unicode_utils
@@ -21,127 +15,9 @@ from ajmc.commons.file_management import int_to_x_based_code
 from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.unicode_utils import get_char_charset
 from ajmc.corpora.corpora_classes import Corpus
-from ajmc.ocr.font_utils import Font, walk_through_font_dir
+from ajmc.ocr.data_processing.font_utils import Font, walk_through_font_dir
 
 logger = get_ajmc_logger(__name__)
-
-
-def pil2array(im: Image.Image, alpha: int = 0) -> np.ndarray:
-    """Kraken linegen code."""
-    if im.mode == '1':
-        return np.array(im.convert('L'))
-    return np.array(im)
-
-
-def array2pil(a: np.ndarray) -> Image.Image:
-    if a.dtype == np.dtype("B"):
-        if a.ndim == 2:
-            return Image.frombytes("L", (a.shape[1], a.shape[0]),
-                                   a.tobytes())
-        elif a.ndim == 3:
-            return Image.frombytes("RGB", (a.shape[1], a.shape[0]),
-                                   a.tobytes())
-        else:
-            raise Exception("bad image rank")
-    elif a.dtype == np.dtype('float32'):
-        return Image.frombytes("F", (a.shape[1], a.shape[0]), a.tobytes())
-    else:
-        raise Exception("unknown image type")
-
-
-def degrade_line(im, eta=0.0, alpha=1.5, beta=1.5, alpha_0=1.0, beta_0=1.0):
-    """
-    Degrades a line image by adding noise.
-
-    For parameter meanings consult "A statistical, nonparametric methodology for document degradation model validation" (2000) by Tanugo et al.
-
-    Args:
-        im (PIL.Image): Input image
-        eta (float): Between 0 and 1. And jitters to image. Recommend staying to max 0.05
-        alpha (float): Seems to be the concentration of the noise around letters. The higher the more concentrated.Go between 0.1 and 3.
-        beta (float): the amount of holes in letters. Try a few 0.1, 0.3 and default.
-        alpha_0 (float): No clue what these do, leave default or see paper.
-        beta_0 (float): No clue what these do, leave default or see paper.
-
-    Returns:
-        PIL.Image in mode '1'
-    """
-    logger.debug('Inverting and normalizing input image')
-    im = pil2array(im)
-    im = np.amax(im) - im
-    im = im * 1.0 / np.amax(im)
-
-    logger.debug('Calculating foreground distance transform')
-    fg_dist = distance_transform_cdt(1 - im, metric='taxicab')
-    logger.debug('Calculating flip to white probability')
-    fg_prob = alpha_0 * np.exp(-alpha * (fg_dist ** 2)) + eta
-    fg_prob[im == 1] = 0
-    fg_flip = np.random.binomial(1, fg_prob)
-
-    logger.debug('Calculating background distance transform')
-    bg_dist = distance_transform_cdt(im, metric='taxicab')
-    logger.debug('Calculating flip to black probability')
-    bg_prob = beta_0 * np.exp(-beta * (bg_dist ** 2)) + eta
-    bg_prob[im == 0] = 0
-    bg_flip = np.random.binomial(1, bg_prob)
-
-    # flip
-    logger.debug('Flipping')
-    im -= bg_flip
-    im += fg_flip
-
-    logger.debug('Binary closing')
-    sel = np.array([[1, 1], [1, 1]])
-    im = binary_closing(im, sel)
-    logger.debug('Converting to image')
-    return array2pil(255 - im.astype('B') * 255)
-
-
-def distort_line(im, distort=3.0, sigma=10, eps=0.03, delta=0.3):
-    """
-    Distorts a line image.
-
-    Run BEFORE degrade_line as a white border of 5 pixels will be added.
-
-    Args:
-        im (PIL.Image): Input image
-        distort (float): Distorting of the image set between 1.5 and 4.0, with majority around 2.5
-        sigma (float): distorting of the strokes, set between 0.5, 1.5 for 5% of image, else default
-        eps (float): set default to 80%, else random between 0.01 and 0.1
-        delta (float):
-
-    Returns:
-        PIL.Image in mode 'L'
-    """
-    w, h = im.size
-    # XXX: determine correct output shape from transformation matrices instead
-    # of guesstimating.
-    logger.debug('Pasting source image into canvas')
-    image = Image.new('L', (int(1.5 * w), 4 * h), 255)
-    image.paste(im, (int((image.size[0] - w) / 2), int((image.size[1] - h) / 2)))
-    line = pil2array(image.convert('L'))
-
-    # shear in y direction with factor eps * randn(), scaling with 1 + eps *
-    # randn() in x/y axis (all offset at d)
-    logger.debug('Performing affine transformation')
-    m = np.array([[1 + eps * np.random.randn(), 0.0], [eps * np.random.randn(), 1.0 + eps * np.random.randn()]])
-    c = np.array([w / 2.0, h / 2])
-    d = c - np.dot(m, c) + np.array([np.random.randn() * delta, np.random.randn() * delta])
-    line = affine_transform(line, m, offset=d, order=1, mode='constant', cval=255)
-
-    hs = gaussian_filter(np.random.randn(4 * h, int(1.5 * w)), sigma)
-    ws = gaussian_filter(np.random.randn(4 * h, int(1.5 * w)), sigma)
-    hs *= distort / np.amax(hs)
-    ws *= distort / np.amax(ws)
-
-    def _f(p):
-        return (p[0] + hs[p[0], p[1]], p[1] + ws[p[0], p[1]])
-
-    logger.debug('Performing geometric transformation')
-    im = array2pil(geometric_transform(line, _f, order=1, mode='nearest'))
-    logger.debug('Cropping canvas to content box')
-    im = im.crop(ImageOps.invert(im).getbbox())
-    return im
 
 
 def draw_textline(textline: str,
@@ -694,19 +570,7 @@ def check_file_count():
             print(dir_.name, len(list(dir_.glob('*.png'))))
 
 
-#%%
 
-# shutil.rmtree(BASE_OUTPUT_DIR, ignore_errors=True)
-# BASE_OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
-# random.seed(0)
-# do_all_purpose_fonts(2, True)
-# do_latin_fonts(3)
-# do_greek_fonts(3)
-# do_capitals(1)
-# do_mixed_fonts(1)
-# do_gibberish(1)
-
-#%%
 if __name__ == '__main__':
     # all_purpose(10): 3300 images --> 1000 = 300000
     # latin(10): 5400 images --> 550 = 300000

@@ -90,7 +90,7 @@ def compute_dataset_metadata(dts_dir: Path,
         metadata['total_words'].append(len(text.split()))
         metadata['grc_chars'].append(count_chars_by_charset(text, charset='greek'))
         metadata['lat_chars'].append(count_chars_by_charset(text, charset='latin'))
-        metadata['num_chars'].append(count_chars_by_charset(text, charset='numbers'))
+        metadata['num_chars'].append(count_chars_by_charset(text, charset='numeral'))
 
         script = 'grc' if is_charset_string(text, charset='greek', threshold=1, strict=False) else \
             'lat' if is_charset_string(text, charset='latin', threshold=1, strict=False) else \
@@ -134,8 +134,8 @@ def clean_source_dataset(dts_dir: Union[Path, str],
                          output_dir: Union[Path, str],
                          root_dataset_name: str,
                          unicode_form: str = 'NFC',
-                         img_extension: str = '.png',
-                         txt_extension: str = '.txt',
+                         img_extension: str = ocr_vs.IMG_EXTENSION,
+                         txt_extension: str = ocr_vs.GT_TEXT_EXTENSION,
                          double_line_threshold: float = -1,
                          rename_with_parents_dir=False):
     """What this function does is:

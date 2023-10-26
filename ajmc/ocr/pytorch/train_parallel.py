@@ -22,7 +22,6 @@ from ajmc.ocr.pytorch.model import OcrTorchModel
 
 ROOT_LOGGER.setLevel('INFO')
 logger = get_ajmc_logger(__name__)
-TIME = 0
 
 
 class OcrModelTrainer:

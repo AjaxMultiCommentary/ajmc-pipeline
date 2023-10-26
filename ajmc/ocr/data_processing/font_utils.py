@@ -1,6 +1,7 @@
 from pathlib import Path
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Optional
 
+import pandas as pd
 from fontTools.ttLib import TTFont, TTCollection
 from lazy_objects.lazy_objects import lazy_property
 from PIL import ImageFont
@@ -157,3 +158,64 @@ class Font:
             return self.path.stem
         else:
             return self.path.stem.replace(f'-{self.font_variant}', '')
+
+
+def get_missing_glyphs_table(chars_to_test: str,
+                             fonts_dir: Path,
+                             output_path: Optional[Path] = None, ):
+    """Tests all the fonts in ``fonts_dir`` for the glyphs in ``chars_to_test``.
+
+    Additionally, it tests for common characters in the Latin, Greek, and Modern Greek alphabets.
+
+    Args:
+        chars_to_test (str): A string of characters to test for.
+        fonts_dir (Path): The directory containing the fonts to test.
+        output_path (Path, optional): The path to save the output table to.
+
+    Returns:
+        A pandas DataFrame containing the results of the tests for each font and the set of missing chars.
+
+
+    """
+
+    fonts_check = {
+        'path': [],
+        'name': [],
+        'chars_to_test': [],
+        'chars_to_test_missing': [],
+        'latin': [],
+        'latin_missing': [],
+        'greek': [],
+        'greek_missing': [],
+        'modern_greek': [],
+    }
+
+    all_missing_chars = set(chars_to_test)
+
+    for font_path in walk_through_font_dir(fonts_dir):
+
+        font = Font(font_path, size=100, font_variant='Regular')
+
+        fonts_check['path'].append(font.path)
+        fonts_check['name'].append(font.name)
+
+        fonts_check['chars_to_test'].append(font.has_glyphs(chars_to_test))
+        fonts_check['chars_to_test_missing'].append(' '.join(sorted(font.get_missing_glyphs(chars_to_test))))
+
+        for charset in ['latin', 'modern_greek', 'greek', ]:
+            if charset == 'modern_greek':
+                fonts_check[charset].append(font.has_glyphs('ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω'))
+            else:
+                fonts_check[charset].append(font.has_charset_glyphs(charset))
+            if charset != 'modern_greek':
+                fonts_check[f'{charset}_missing'].append(' '.join(sorted(font.get_missing_glyphs(unicode_utils.CHARSETS_CHARS_NFC[charset]))))
+
+        present = set([char for char in chars_to_test if font.has_glyph(char)])
+        all_missing_chars -= present
+
+    df = pd.DataFrame.from_dict(fonts_check, orient='columns')
+
+    if output_path is not None:
+        df.to_excel((fonts_dir.parent / 'glyphs/fonts_glyphs.xlsx'), index=False, encoding='utf-8')
+
+    return df, all_missing_chars

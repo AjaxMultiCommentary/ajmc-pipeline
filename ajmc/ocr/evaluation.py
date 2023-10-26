@@ -125,7 +125,7 @@ def count_errors_by_charset(gt_string: str, pred_string: str, charset: str) -> i
     Args:
         pred_string: prediction/source string
         gt_string: groundtruth/destination string
-        charset: should be ``'greek'``, ``'latin'``, ``'numbers'``, ``'punctuation'`` or a valid ``re``\ -pattern,
+        charset: should be ``'greek'``, ``'latin'``, ``'numeral'``, ``'punctuation'`` or a valid ``re``\ -pattern,
                  for instance ``r'([\u00F4-\u00FF])'``
 
     Returns:
