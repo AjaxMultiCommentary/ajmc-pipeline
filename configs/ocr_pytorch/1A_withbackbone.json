@@ -1,0 +1,53 @@
+{
+  "chunk_height": 40,
+  "chunk_overlap": 20,
+  "chunk_width": 320,
+  "classes": "@#;·́̈΄ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψω`´̀̄̆̓̔͂ͅ᾽᾿῾˙̣̅ϚϛϜϝϞϟϠϡ‖ℵ⏑⏒⏓⏔⏕⏖⏗⏘⏙〈〉𝔐ACEGHIJKLMNOSTUYZaceghijklmnostuyz°Ʒʒ̧̨̱̂̃̌̕ !\"%&'()*+,-./0123456789:<=>?BDFPQRVWX[\\]^_bdfpqrvwx{|}~¡§ª«¯¶¸º»¿ÆÐßæð÷øŒœˇ˘̦̇̊̒ẞ–—‘’‚“”„•…‹›¦¬±²³¹¼½¾†‡⁴⁵⁶⁷⁸⁹₁₂₃₄₅₆₇₈₉¤ϲϹᵃᵅᵇᵈᵉᵍᵏᵐᵒᵖᵗᵘᵛᵝᶜᶠ⁰ⁱ⁽⁾ⁿ₀∠♃𝒢𝔄𝔅𝔙𝔚𝔣𝔮ſℳ",
+  "decoder": {
+    "in_features": 40,
+    "out_features": 292
+  },
+  "densenetbackbone": {
+    "block_config": [
+      6,
+      12,
+      24,
+      16
+    ],
+    "bn_size": 4,
+    "drop_rate": 0,
+    "growth_rate": 32,
+    "memory_efficient": false,
+    "num_init_features": 64
+  },
+  "device": "cuda:0",
+  "encoder": {
+    "TransformerEncoder": {
+      "num_layers": 4
+    },
+    "TransformerEncoderLayer": {
+      "batch_first": true,
+      "d_model": 40,
+      "dim_feedforward": 256,
+      "dropout": 0.1,
+      "nhead": 4
+    }
+  },
+  "learning_rate": 0.00005,
+  "load_from_path": "/home/najem/dhlab-data/data/najem-data/outputs/2023-10-19_withbackbone/last_model.pt",
+  "max_batch_size": 512,
+  "momentum": 0.9,
+  "num_classes": 292,
+  "num_workers": 1,
+  "output_dir": "/home/najem/dhlab-data/data/najem-data/outputs/2023-10-19_withbackbone",
+  "random_seed": 42,
+  "save_to_path": null,
+  "scheduler_gamma": 0.25,
+  "scheduler_patience": 4,
+  "epochs": 10,
+  "train_data_dir": "/home/najem/batched_dataset/train",
+  "val_data_dir": "/home/najem/batched_dataset/val",
+  "cache_dir": null,
+  "validation_rate": 5000,
+  "save_rate": 150
+}
