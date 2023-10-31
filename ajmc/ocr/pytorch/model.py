@@ -149,10 +149,10 @@ class DenseNetBackbone(nn.Module):
                 nn.init.constant_(m.bias, 0)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x = self.features(x)
-        for i, feature in enumerate(self.features):
-            # logger.debug(f'Shape at feature {i}: {x.shape}')
-            x = feature(x)
+        x = self.features(x)
+        # for i, feature in enumerate(self.features):
+        #     # logger.debug(f'Shape at feature {i}: {x.shape}')
+        #     x = feature(x)
         x = x.view(x.shape[0], x.shape[1], x.shape[3])
         x = F.adaptive_avg_pool2d(x, (self.chunk_width, self.encoder_d_model))
         x = F.relu(x, inplace=True)
