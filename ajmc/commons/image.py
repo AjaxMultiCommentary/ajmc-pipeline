@@ -91,6 +91,13 @@ def binarize(img_matrix: np.ndarray,
     return cv2.threshold(gray, 0, 255, type=binarization_type)[1]
 
 
+def binarize_image_dir(img_dir: Path, glob_pattern: str = '*.png', inverted: bool = False):
+    """Binarizes all images in ``img_dir``."""
+    for img_path in img_dir.glob('*.png'):
+        img = cv2.imread(str(img_path))
+        img = binarize(img, inverted=inverted)
+        cv2.imwrite(str(img_path), img)
+
 def rgb_to_bgr(rgb: Tuple[int, int, int]) -> Tuple[int, int, int]:
     """Converts an RGB tuple to BGR."""
     return rgb[2], rgb[1], rgb[0]
