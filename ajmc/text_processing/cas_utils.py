@@ -316,8 +316,10 @@ def import_page_cas(page_id: str,
     elif annotation_type == 'lemmas':
         xml_path = vs.LEMLINK_XMI_DIR / 'TypeSystem.xml'
         xmi_path = vs.LEMLINK_XMI_DIR / (f'{page_id}.xmi')
-
-        return get_cas(xmi_path, xml_path)
+        if xmi_path.exists():
+            return get_cas(xmi_path, xml_path)
+        else:
+            return
 
 
 def safe_import_page_annotations(page_id,

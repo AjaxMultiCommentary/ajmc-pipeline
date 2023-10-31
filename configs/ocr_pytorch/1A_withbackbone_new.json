@@ -1,0 +1,88 @@
+{
+  "cache_dir": "/home/najem/batched_dataset_cached/",
+  "chunk_height": 40,
+  "chunk_overlap": 20,
+  "chunk_width": 320,
+  "classes": ";·́̈΄ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψω`´̀̄̆̓̔͂ͅ᾽᾿῾˙̣̅ϚϛϜϝϞϟϠϡ‖ℵ⏑⏒⏓⏔⏕⏖⏗⏘⏙〈〉𝔐ACEGHIJKLMNOSTUYZaceghijklmnostuyz°Ʒʒ̧̨̱̂̃̌̕ !\"%&'()*+,-./0123456789:<=>?BDFPQRVWX[\\]^_bdfpqrvwx{|}~¡§«¯¶¸º»¿ÆÐßæð÷øŒœˇ˘̦̇̊̒ẞ–—‘’‚“”„•…‹›¦¬±¼½¾†‡¤ϲϹ∠♃𝒢𝔄𝔅𝔙𝔚𝔣𝔮ſℳ",
+  "config_name": "1A_withbackbone_v2",
+  "decoder": {
+    "in_features": 40,
+    "out_features": 293
+  },
+  "densenetbackbone": {
+    "block_config": [
+      6,
+      12,
+      24,
+      16
+    ],
+    "bn_size": 4,
+    "drop_rate": 0,
+    "growth_rate": 32,
+    "memory_efficient": false,
+    "num_init_features": 64
+  },
+  "device": "cuda:0",
+  "encoder": {
+    "TransformerEncoder": {
+      "num_layers": 4
+    },
+    "TransformerEncoderLayer": {
+      "batch_first": true,
+      "d_model": 40,
+      "dim_feedforward": 256,
+      "dropout": 0.1,
+      "nhead": 4
+    }
+  },
+  "epochs": 1,
+  "learning_rate": 5e-05,
+  "load_from_path": "/home/najem/dhlab-data/data/najem-data/outputs/withbackbone_v2/last_model.pt",
+  "max_batch_size": 512,
+  "momentum": 0.9,
+  "num_classes": 293,
+  "num_workers": 1,
+  "output_dir": "/home/najem/dhlab-data/data/najem-data/outputs/withbackbone_v2",
+  "random_seed": 42,
+  "save_rate": 100,
+  "save_to_path": null,
+  "scheduler_gamma": 0.25,
+  "scheduler_patience": 4,
+  "special_classes": [
+    [
+      "blank",
+      "\u0000"
+    ],
+    [
+      "unknown",
+      "\u0001"
+    ],
+    [
+      "superscript",
+      "\u0002"
+    ],
+    [
+      "subscript",
+      "\u0003"
+    ],
+    [
+      "reserved_1",
+      "\u0004"
+    ],
+    [
+      "reserved_2",
+      "\u0005"
+    ],
+    [
+      "reserved_3",
+      "\u0006"
+    ],
+    [
+      "reserved_4",
+      "\u0007"
+    ]
+  ],
+  "train_data_dir": "/home/najem/dhlab-data/data/najem-data/batched_dataset/train",
+  "val_data_dir": "/home/najem/dhlab-data/data/najem-data/batched_dataset/val",
+  "validation_rate": 5000
+}

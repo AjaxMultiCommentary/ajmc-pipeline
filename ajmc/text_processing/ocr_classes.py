@@ -22,7 +22,6 @@ from ajmc.commons.geometry import adjust_bbox_to_included_contours, get_bbox_fro
     is_bbox_within_bbox_with_threshold, Shape
 from ajmc.commons.image import AjmcImage
 from ajmc.commons.miscellaneous import get_ajmc_logger
-from ajmc.ocr.utils import guess_ocr_format
 from ajmc.olr.utils import get_page_region_dicts_from_via, sort_to_reading_order
 from ajmc.text_processing import cas_utils
 from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalEntity, CanonicalHyphenation, \
@@ -186,35 +185,33 @@ class OcrCommentary(Commentary):
                                                              transcript=l.transcript,
                                                              anchor_target=l.anchor_target))
 
-                    # We reset the page to free up memory, only we keep the words.
-                    del p.children.regions
-                    del p.children.lines
-                    del p.children.entities
-                    del p.children.lemmas
-                    del p.children.sentences
-                    del p.children.hyphenations
-                    del p.image
+            # # We reset the page to free up memory, only we keep the words.
+            # del p.children.regions
+            # del p.children.lines
+            # del p.children.entities
+            # del p.children.lemmas
+            # del p.children.sentences
+            # del p.children.hyphenations
+            # del p.image
 
-                    # Adding sections
-                    for s in self.children.sections:
-                        children['sections'].append(
-                                CanonicalSection(word_range=(s.children.words[0].index, s.children.words[-1].index),
-                                                 commentary=can,
-                                                 section_types=s.section_types,
-                                                 section_title=s.section_title))
+        # Adding sections
+        for s in self.children.sections:
+            children['sections'].append(
+                    CanonicalSection(word_range=(s.children.words[0].index, s.children.words[-1].index),
+                                     commentary=can,
+                                     section_types=s.section_types,
+                                     section_title=s.section_title))
 
-                    can.children = LazyObject((lambda x: x), constrained_attrs=vs.CHILD_TYPES, **children)
+        can.children = LazyObject((lambda x: x), constrained_attrs=vs.CHILD_TYPES, **children)
 
-                    self.reset()
+        self.reset()
 
         return can
 
     def _get_children(self, children_type):
 
         if children_type == 'pages':
-            pages = [OcrPage.from_ajmc_data(ocr_path=p, commentary=self)
-                     for p in self.ocr_dir.glob('*') if p.suffix in vs.OCR_OUTPUT_EXTENSIONS]
-
+            pages = [OcrPage.from_ajmc_data(ocr_path=p, commentary=self) for p in self.ocr_dir.glob('*') if p.suffix in vs.OCR_OUTPUT_EXTENSIONS]
             return sorted(pages, key=lambda x: x.id)
 
         elif children_type == 'sections':
@@ -309,6 +306,8 @@ class OcrPage(Page, TextContainer):
                     return [RawSentence.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
                 elif children_type == 'hyphenations':
                     return [RawHyphenation.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
+            else:
+                return []
 
         elif children_type == 'lemmas':
             try:
@@ -326,6 +325,9 @@ class OcrPage(Page, TextContainer):
                                                                      annotation_layer=vs.ANNOTATION_LAYERS[children_type])
 
                 return [RawLemma.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
+
+            else:
+                return []
 
         else:
             return []
@@ -499,8 +501,7 @@ class RawSection(TextContainer):
 
     def _get_children(self, children_type) -> List[Optional[Type['TextContainer']]]:
         if children_type == 'pages':
-            return [p for p in self.parents.commentary.children.pages
-                    if self.start <= p.number <= self.end]
+            return [p for p in self.parents.commentary.children.pages if self.start <= p.number <= self.end]
 
         else:
             return [child for p in self.children.pages for child in getattr(p.children, children_type)]
@@ -508,8 +509,7 @@ class RawSection(TextContainer):
     def _get_parent(self, parent_type) -> Optional[Type['TextContainer']]:
         if parent_type == 'commentary':
             return self.parents.commentary
-        else:
-            return None
+
 
 
 class OcrTextContainer(TextContainer):
@@ -741,3 +741,25 @@ class RawLemma(RawAnnotation):
                    warnings=warnings,
                    **{attr_: getattr(cas_annotation, attr_, None) for attr_ in ['anchor_target', 'value', 'transcript']}
                    )
+
+
+@docstring_formatter(**docstrings)
+def guess_ocr_format(ocr_path: Path) -> str:
+    """Guesses the ocr-format of a file.
+
+    Args:
+        ocr_path: {ocr_path}
+
+    Returns:
+        The ocr-format of the file, either 'pagexml', 'krakenhocr' or 'tesshocr'.
+    """
+
+    if ocr_path.suffix.endswith('xml'):
+        return 'pagexml'
+    elif ocr_path.suffix == '.html':
+        return 'krakenhocr'
+    elif ocr_path.suffix == '.hocr':
+        return 'tesshocr'
+    else:
+        raise NotImplementedError("""The format could not be identified. It looks like the format is neither 
+        ``tesshocr``, nor ``krakenhocr`` nor ``pagexml``, which are the only formats this module deals with.""")

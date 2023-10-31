@@ -3,12 +3,34 @@
   "chunk_overlap": 20,
   "chunk_width": 320,
   "classes": "@#;·́̈΄ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψω`´̀̄̆̓̔͂ͅ᾽᾿῾˙̣̅ϚϛϜϝϞϟϠϡ‖ℵ⏑⏒⏓⏔⏕⏖⏗⏘⏙〈〉𝔐ACEGHIJKLMNOSTUYZaceghijklmnostuyz°Ʒʒ̧̨̱̂̃̌̕ !\"%&'()*+,-./0123456789:<=>?BDFPQRVWX[\\]^_bdfpqrvwx{|}~¡§ª«¯¶¸º»¿ÆÐßæð÷øŒœˇ˘̦̇̊̒ẞ–—‘’‚“”„•…‹›¦¬±²³¹¼½¾†‡⁴⁵⁶⁷⁸⁹₁₂₃₄₅₆₇₈₉¤ϲϹᵃᵅᵇᵈᵉᵍᵏᵐᵒᵖᵗᵘᵛᵝᶜᶠ⁰ⁱ⁽⁾ⁿ₀∠♃𝒢𝔄𝔅𝔙𝔚𝔣𝔮ſℳ",
+  "datasets_root_dir": "/Users/sven/Desktop/test_dataset",
+  "datasets_weights": {
+    "ajmc": 20,
+    "archiscribe": 2,
+    "artificial_data": 1,
+    "artificial_data_augmented": 1,
+    "gt4histocr": 0,
+    "pog": 3,
+    "porta_fontium": 1
+  },
   "decoder": {
     "in_features": 40,
     "out_features": 292
   },
-  "densenetbackbone": false,
-  "device": "cpu",
+  "densenetbackbone": {
+    "block_config": [
+      6,
+      12,
+      24,
+      16
+    ],
+    "bn_size": 4,
+    "drop_rate": 0,
+    "growth_rate": 32,
+    "memory_efficient": false,
+    "num_init_features": 64
+  },
+  "device": "cuda:0",
   "encoder": {
     "TransformerEncoder": {
       "num_layers": 4
@@ -21,21 +43,21 @@
       "nhead": 4
     }
   },
+  "filelists_dir": null,
   "learning_rate": 0.00005,
   "load_from_path": null,
-  "max_batch_size": 512,
+  "max_batch_size": 32,
   "momentum": 0.9,
   "num_classes": 292,
   "num_workers": 1,
-  "output_dir": "/home/najem/dhlab-data/data/najem-data/outputs/2023-10-19_withbackbone",
+  "output_dir": "/Users/sven/Desktop/test_outputs",
   "random_seed": 42,
   "save_to_path": null,
   "scheduler_gamma": 0.25,
   "scheduler_patience": 4,
-  "epochs": 1,
-  "train_data_dir": "/scratch/sven/batched_dataset/test",
-  "val_data_dir": "/scratch/sven/batched_dataset/test",
-  "cache_dir": null,
-  "validation_rate": 16,
-  "save_rate": 16
+  "test_data_dir": null,
+  "epochs": 2,
+  "train_data_dir": null,
+  "val_data_dir": null,
+  "validation_rate": 5000
 }

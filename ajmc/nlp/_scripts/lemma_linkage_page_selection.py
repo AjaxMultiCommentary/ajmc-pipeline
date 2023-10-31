@@ -41,7 +41,7 @@ dict_ = {x: [] for x in
           'annotate_linking', 'annotated', 'annotator', 'remarks']}
 
 for comm_id in vs.ALL_COMM_IDS:
-    comm = OcrCommentary.from_ajmc_data(id=comm_id)
+    comm = OcrCommentary.from_ajmc_data(id=comm_id, ocr_run_id='*_tess_base')
 
     olr_page_ids = get_olr_splits_page_ids(comm_id)
     comm_section = comm.get_section('commentary')

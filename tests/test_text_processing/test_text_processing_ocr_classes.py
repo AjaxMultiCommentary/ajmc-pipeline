@@ -57,7 +57,7 @@ def test_ocrcommentary_to_canonical():
                     assert ocr_w.bbox.xywh == can_w.bbox.xywh
                     assert ocr_w.text == can_w.text
 
-        ocr_p.reset()
+        ocr_p.mreset()
 
 
 # test_ocrcommentary_to_canonical()

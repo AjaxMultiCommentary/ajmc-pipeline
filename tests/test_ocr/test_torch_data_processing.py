@@ -49,6 +49,17 @@ def test_OcrIterDataset_iter():
         assert sum(batch.chunks_to_img_mapping) == batch.chunks.shape[0]
 
 
+def test_OcrIterDataset_yield_batches_once():
+    test_dataset = get_and_write_sample_dataset(10, loop_infinitely=False, shuffle=False)
+
+    test_dataset.loop_infinitely = False
+    generator = test_dataset.yield_batches_once()
+
+    for i, batch in enumerate(generator):
+        print('batch_text', batch.texts)
+
+
+
 @pytest.mark.skip(reason='Not implemented yet, just a manual tester')
 def test_OcrDataset_with_dataloader():
     test_dataset = get_and_write_sample_dataset(3)
@@ -61,38 +72,3 @@ def test_OcrDataset_with_dataloader():
         print(batch[1])
         print("--------------------------------------------")
 
-
-# def test_reassemble_chunks_batch():
-#     dataset = get_and_write_sample_dataset(3)
-#     test_batch = next(iter(dataset))
-#     reassembled = dp.recompose_batched_chunks(test_batch.chunks, test_batch.chunks_to_img_mapping, chunk_overlap=chunk_overlap)
-#     assert reassembled.shape[0] == len(test_batch.chunks_to_img_mapping)
-#     assert reassembled.shape[1] == 1
-#     assert reassembled.shape[2] == img_height
-#     assert reassembled.shape[3] == img_width + padding
-
-#%%
-
-dataset = get_and_write_sample_dataset(300, so.get_sample_config())
-
-from ajmc.commons.miscellaneous import get_ajmc_logger
-
-logger = get_ajmc_logger(__name__)
-
-for i in range(10):
-    logger.info(f'---------------- batch {i} ----------------')
-    next(iter(dataset))
-
-#%%
-
-dataset = get_and_write_sample_dataset(300, so.get_sample_config())
-
-dataloader = torch.utils.data.DataLoader(dataset,
-                                         batch_size=None,
-                                         batch_sampler=None,
-                                         num_workers=0,
-                                         collate_fn=lambda x: x, )
-
-for i in range(10):
-    logger.info(f'---------------- batch {i} ----------------')
-    batch = next(iter(dataloader))

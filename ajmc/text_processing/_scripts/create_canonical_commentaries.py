@@ -4,21 +4,21 @@ import argparse
 from tqdm import tqdm
 
 from ajmc.commons import variables as vs
-from ajmc.commons.miscellaneous import stream_handler
+from ajmc.commons.miscellaneous import ROOT_LOGGER
 from ajmc.text_processing.ocr_classes import OcrCommentary
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--commentary_ids', nargs='+', help='Commentaries to process', default=vs.ALL_COMM_IDS)
 parser.add_argument('--ocr_run_pattern', type=str, help='OCR run pattern to process, eg. *_tess_base',
-                    default='*_tess_base')
+                    default='*_tess_retrained')
 parser.add_argument('--ocr_gt_comms_only', action='store_true', help='Process only commentaries with OCR ground truth')
 parser.add_argument('--non_ocr_gt_comms_only', action='store_true',
                     help='Process only commentaries with OCR ground truth')
 parser.add_argument('--stream_handler_level', type=str, help='Stream handler level', default='ERROR')
 args = parser.parse_args()
 
-stream_handler.setLevel(args.stream_handler_level)
+ROOT_LOGGER.setLevel(args.stream_handler_level)
 
 for comm_id in tqdm(args.commentary_ids, desc='Processing commentaries'):
 
