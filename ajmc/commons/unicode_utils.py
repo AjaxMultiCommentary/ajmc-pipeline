@@ -6,6 +6,12 @@ from typing import List, Tuple, Callable
 
 from ajmc.commons.arithmetic import safe_divide
 
+SUPERSCRIPT_MAPPING = {'⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁺': '+', '⁻': '-',
+                       '⁼': '=', '⁽': '(', '⁾': ')', 'ⁿ': 'n', 'ª': 'a', 'ᵃ': 'a', 'ᵅ': 'a', 'ᵇ': 'b', 'ᵝ': 'b', 'ᶜ': 'c', 'ᵈ': 'd', 'ᵉ': 'e',
+                       'ᶠ': 'f', 'ᵍ': 'g', 'ⁱ': 'i', 'ᵏ': 'k', 'ᵐ': 'm', 'ᵒ': 'o', 'ᵖ': 'p', 'ᵗ': 't', 'ᵘ': 'u', 'ᵛ': 'v', }
+SUBSCRIPT_MAPPING = {'₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9', '₊': '+', '₋': '-',
+                     '₌': '=', '₍': '(', '₎': ')', 'ₐ': 'a', 'ₑ': 'e', 'ₒ': 'o', 'ᵢ': 'i', 'ⱼ': 'j', 'ₖ': 'k', 'ₗ': 'l', 'ₘ': 'm', 'ₙ': 'n',
+                     'ₚ': 'p', 'ᵣ': 'r', 'ₛ': 's', 'ₜ': 't', 'ᵤ': 'u', 'ᵥ': 'v', 'ₓ': 'x', }
 
 def harmonise_ligatures(text: str) -> str:
     text = text.replace('ﬁ', 'fi')
@@ -56,6 +62,15 @@ def harmonise_punctuation(text: str) -> str:
 
 
 def harmonise_non_printable(text: str) -> str:
+    text = text.replace('\x00', '')
+    text = text.replace('\x01', '')
+    text = text.replace('\x02', '')
+    text = text.replace('\x03', '')
+    text = text.replace('\x04', '')
+    text = text.replace('\x05', '')
+    text = text.replace('\x06', '')
+    text = text.replace('\x07', '')
+    text = text.replace('\x08', '')
     text = text.replace('\x92', "'")
     text = text.replace('', 'ï')
     text = text.replace('', 'ï')
@@ -323,16 +338,18 @@ def get_char_unicode_name(char: str) -> str:
         return unicodedata.name(char)
     except:
         return ''
-    
-"""
-Removes diacritical marks via NFKD normalization and recombination.
-Useful for building search indexes (and searching against them).
 
-Example:
 
->>> remove_diacritics("μῆνιν ἄειδε, θεά")
-'μηνιν αειδε θεα'
-"""
 def remove_diacritics(s: str) -> str:
+    """
+    Removes diacritical marks via NFKD normalization and recombination.
+    Useful for building search indexes (and searching against them).
+
+    Example:
+
+    >>> remove_diacritics("μῆνιν ἄειδε, θεά")
+    'μηνιν αειδε θεα'
+    """
     nfkd_form = unicodedata.normalize("NFKD", s)
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
