@@ -37,8 +37,6 @@ def detect_regions(img_path: Path, dilation_kernel_size: int, dilation_iteration
         artifact_size_threshold: {artifact_size_threshold}
     """
 
-    img_name = img_path.name
-
     # Preparing image
     img_matrix = cv2.imread(str(img_path))
     copy = img_matrix.copy()
@@ -72,7 +70,7 @@ def detect_regions(img_path: Path, dilation_kernel_size: int, dilation_iteration
             dilated_contours_shrinked.append(contained_stacked)
 
     for i, c in enumerate(dilated_contours_shrinked):
-        via_csv_dict["filename"].append(img_name)
+        via_csv_dict["filename"].append(img_path.name)
         via_csv_dict["file_size"].append(img_path.stat().st_size)
         via_csv_dict["file_attributes"].append("{}")
         via_csv_dict["region_count"].append(len(dilated_contours_shrinked))
@@ -96,7 +94,7 @@ def detect_regions(img_path: Path, dilation_kernel_size: int, dilation_iteration
                                           (c.bbox[1][0], c.bbox[1][1]),
                                           (0, 0, 255), 4)
 
-        cv2.imwrite(str(img_output_dir / img_name), copy)
+        cv2.imwrite(str(img_output_dir / img_path.name), copy)
 
     return via_csv_dict
 
@@ -190,6 +188,7 @@ def main(img_dir: Union[str, Path],
     img_dir = Path(img_dir)
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True, parents=True)
+    via_csv_dict = {k: v for k, v in variables.VIA_CSV_DICT_TEMPLATE.items()}
 
     for img_path in tqdm(sorted(list(img_dir.glob(f'*{img_extension}'))), desc='Processing images '):
         via_csv_dict = detect_regions(img_path=img_path,
@@ -197,7 +196,7 @@ def main(img_dir: Union[str, Path],
                                       dilation_iterations=dilation_iterations,
                                       draw_image=draw_images,
                                       img_output_dir=output_dir,
-                                      via_csv_dict=variables.VIA_CSV_DICT_TEMPLATE,
+                                      via_csv_dict=via_csv_dict,
                                       artifact_size_threshold=artifact_size_threshold)
 
     write_csv_manually('detected_annotations.csv', via_csv_dict, str(output_dir))

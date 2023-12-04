@@ -546,10 +546,10 @@ def sample_data(source_dir: Path,
     target_dir.mkdir(exist_ok=True, parents=True)
 
     if respect_subdirs:
-        subdirs = [dir_ for dir_ in source_dir.iterdir() if dir_.is_dir() and dir.name]
+        subdirs = [dir_ for dir_ in source_dir.iterdir() if dir_.is_dir() and dir_.name]
         line_count_per_subdir = num_samples // len(subdirs)
         for subdir in subdirs:
-            files = list(subdir.glob('*.png'))
+            files = list(subdir.rglob('*.png'))
             files = random.sample(files, k=min(line_count_per_subdir, len(files)))
             target_subdir = target_dir / subdir.name
             target_subdir.mkdir(exist_ok=True, parents=True)

@@ -109,10 +109,10 @@ def get_olr_splits_page_ids(commentary_id: 'OcrCommentary',
     olr_gt = get_olr_gt_spreadsheet()
 
     if splits is not None:
-        filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits) for i in
-                   range(len(olr_gt['page_id']))]
+        filter_ = [(olr_gt['commentary_id'][i] == commentary_id and olr_gt['split'][i] in splits)
+                   for i in range(len(olr_gt['page_id']))]
     else:
-        filter_ = [(olr_gt['commentary_id'][i] == commentary_id) for i in
-                   range(len(olr_gt['page_id']))]
+        filter_ = [(olr_gt['commentary_id'][i] == commentary_id)
+                   for i in range(len(olr_gt['page_id']))]
 
     return list(olr_gt['page_id'][filter_])

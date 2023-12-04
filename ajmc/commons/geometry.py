@@ -47,12 +47,25 @@ class Shape:
         return cls([(x, y), (x + w, y + h)])
 
     @classmethod
+    def from_xxyy(cls, x1: int, x2: int, y1: int, y2: int):
+        """Creates a Shape from ``x1``, ``x2``, ``y1``, ``y2``, where ``x1`` and ``y1`` are the coordinates of the upper left corner,
+        while ``x2`` and ``y2`` represent the coordinates of the lower right corner respectively."""
+        return cls([(x1, y1), (x2, y2)])
+
+    @classmethod
+    def from_xyxy(cls, x1: int, y1: int, x2: int, y2: int):
+        """Creates a Shape from ``x1``, ``y1``, ``x2``, ``y2``, where ``x1`` and ``y1`` are the coordinates of the upper left corner,
+        while ``x2`` and ``y2`` represent the coordinates of the lower right corner respectively."""
+        return cls([(x1, y1), (x2, y2)])
+
+    @classmethod
     def from_center_w_h(cls, center_x: int, center_y: int, w: int, h: int):
         """Creates a Shape from ``center_x``, ``center_y``, ``w``, ``h``, where ``center_x`` and ``center_y`` are the coordinates
         of the center and ``w`` and ``h`` represent width and height respectively."""
         x = center_x - int(w / 2)
         y = center_y - int(h / 2)
         return cls.from_xywh(x, y, w, h)
+
 
     @lazy_property
     @docstring_formatter(**docstrings)
