@@ -31,7 +31,8 @@ else:
 
 DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
 COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries/commentaries_data'
-NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus-0.4'
+NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus'
+LEMLINK_CORPUS_DIR = DRIVE_DATA_DIR / 'lemma-linkage-corpus'
 LEMLINK_XMI_DIR = DRIVE_DATA_DIR / 'lemma-linkage-corpus/data/preparation/corpus/annotated'
 
 # RELATIVE PATHS
@@ -308,6 +309,14 @@ SEGMONTO_TO_VALUE_IDS = {
     'CustomZone:line_region': 'BT20',
     'CustomZone:weird': 'BT21',
 }
+
+GENERIC_COARSE_ENTITY_TYPES = ['pers', 'loc', 'org', 'date', 'work', 'scope', 'object', 'O']
+GENERIC_FINE_ENTITY_TYPES = ['pers.author', 'pers.editor', 'pers.myth', 'pers.other',
+                             'work.primlit', 'work.seclit', 'work.other', 'work.fragm', 'work.journal',
+                             'object.manuscr',
+                             'loc', 'org', 'date', 'scope',
+                             'O']
+BIBLIOGRAPHIC_ENTITY_TYPES = ['primary-full', 'primary-partial', 'secondary-full', 'secondary-meta', 'secondary-partial', 'O']
 
 # ======================================================================================================================
 #                                                 TEXT CONTAINERS
