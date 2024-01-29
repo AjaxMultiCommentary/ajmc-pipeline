@@ -30,7 +30,7 @@ else:
     in your .bashrc."""))
 
 DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
-COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries/commentaries_data'
+COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries_data'
 NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus'
 LEMLINK_CORPUS_DIR = DRIVE_DATA_DIR / 'lemma-linkage-corpus'
 LEMLINK_XMI_DIR = DRIVE_DATA_DIR / 'lemma-linkage-corpus/data/preparation/corpus/annotated'
@@ -63,7 +63,8 @@ def get_comm_img_dir(comm_id: str) -> Path:
 
 
 def get_comm_via_path(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_VIA_REL_PATH
+    # return get_comm_base_dir(comm_id) / COMM_VIA_REL_PATH
+    return get_comm_base_dir(comm_id) / 'via.json'
 
 
 def get_comm_ocr_runs_dir(comm_id: str) -> Path:
@@ -477,3 +478,4 @@ PARAMETERS = {
 # ======================================================================================================================
 #                                                 LOGGING
 # ======================================================================================================================
+OLR_PREFIX = '_OLR_'

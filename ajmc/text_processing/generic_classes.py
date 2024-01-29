@@ -11,7 +11,6 @@ from ajmc.commons import variables as vs, image as ajmc_img
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr import variables as ocr_vs
-from ajmc.olr.utils import get_olr_splits_page_ids
 
 logger = get_ajmc_logger(__name__)
 
@@ -99,12 +98,6 @@ class Commentary(TextContainer):
         except IndexError:
             return None
 
-    @lazy_property
-    def olr_gt_pages(self) -> List[vs.PageType]:
-        """A list of ``CanonicalPage`` objects containing the groundtruth of the OLR."""
-        page_ids = get_olr_splits_page_ids(self.id)
-        return [p for p in self.children.pages if p.id in page_ids]
-
     def export_ocr_gt_file_pairs(self,
                                  output_dir: Optional[Union[str, Path]] = None,
                                  unicode_format: str = 'NFC'):
@@ -127,6 +120,28 @@ class Commentary(TextContainer):
                 line.image.write(output_dir / f'{page.id}_{i}{ocr_vs.IMG_EXTENSION}')
                 (output_dir / f'{page.id}_{i}{ocr_vs.GT_TEXT_EXTENSION}').write_text(unicodedata.normalize(unicode_format, line.text),
                                                                                      encoding='utf-8')
+
+    @lazy_property
+    def ocr_gt_pages(self) -> List[vs.PageType]:
+        """A list of ``CanonicalPage`` objects containing the groundtruth of the OLR."""
+        return [p for p in self.children.pages if p.id in self.ocr_gt_page_ids]
+
+    @lazy_property
+    def olr_gt_pages(self) -> List[vs.PageType]:
+        """A list of ``CanonicalPage`` objects containing the groundtruth of the OLR."""
+        return [p for p in self.children.pages if p.id in self.olr_gt_page_ids]
+
+    @lazy_property
+    def ner_gt_pages(self) -> List[vs.PageType]:
+        """A list of ``CanonicalPage`` objects containing the groundtruth of the NER."""
+
+        return [p for p in self.children.pages if p.id in self.ner_gt_page_ids]
+
+    @lazy_property
+    def lemlink_gt_pages(self) -> List[vs.PageType]:
+        """A list of ``CanonicalPage`` objects containing the groundtruth of the lemmatization."""
+
+        return [p for p in self.children.pages if p.id in self.lemlink_gt_page_ids]
 
 
 class Page:

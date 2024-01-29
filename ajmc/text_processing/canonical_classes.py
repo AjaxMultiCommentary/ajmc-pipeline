@@ -14,6 +14,7 @@ from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import get_bbox_from_points, Shape
 from ajmc.commons.image import AjmcImage
 from ajmc.commons.miscellaneous import get_ajmc_logger
+from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
 
 logger = get_ajmc_logger(__name__)
@@ -28,6 +29,10 @@ class CanonicalCommentary(Commentary):
                  images: Optional[List[AjmcImage]],
                  ocr_run_id: Optional[str] = None,
                  ocr_gt_page_ids: Optional[List[str]] = None,
+                 olr_gt_page_ids: Optional[List[str]] = None,
+                 ner_gt_page_ids: Optional[List[str]] = None,
+                 lemlink_gt_page_ids: Optional[List[str]] = None,
+                 metadata: Optional[Dict] = None,
                  **kwargs):
         """Initialize a ``CanonicalCommentary``.
 
@@ -47,6 +52,10 @@ class CanonicalCommentary(Commentary):
                          images=images,
                          ocr_run_id=ocr_run_id,
                          ocr_gt_page_ids=ocr_gt_page_ids,
+                         olr_gt_page_ids=olr_gt_page_ids,
+                         ner_gt_page_ids=ner_gt_page_ids,
+                         lemlink_gt_page_ids=lemlink_gt_page_ids,
+                         metadata=metadata,
                          **kwargs)
 
     @classmethod
@@ -65,11 +74,19 @@ class CanonicalCommentary(Commentary):
         can_json = json.loads(json_path.read_text(encoding='utf-8'))
 
         # Create the (empty) commentary and populate its info
+        # TODO remove this hack once commentaries have been re-canonified
+        ocr_gt_page_ids = [p.stem for p in vs.get_comm_ocr_gt_dir(can_json['id']).glob('*.html')]
+        olr_gt_page_ids = get_olr_splits_page_ids(can_json['id'])
+
         commentary = cls(id=can_json['id'],
                          children=None,
                          images=None,
-                         ocr_run_id=can_json['ocr_run_id'],
-                         ocr_gt_page_ids=can_json['ocr_gt_page_ids'])
+                         ocr_run_id=can_json['metadata']['ocr_run_id'],
+                         ocr_gt_page_ids=ocr_gt_page_ids,
+                         olr_gt_page_ids=olr_gt_page_ids,
+                         ner_gt_page_ids=[],
+                         lemlink_gt_page_ids=[],
+                         metadata=can_json['metadata'])
 
         # Automatically determinates paths
         commentary.base_dir = vs.get_comm_base_dir(commentary.id)
@@ -104,8 +121,11 @@ class CanonicalCommentary(Commentary):
         """
 
         data = {'id': self.id,
-                'ocr_run_id': self.ocr_run_id,
+                'metadata': self.metadata,
                 'ocr_gt_page_ids': self.ocr_gt_page_ids,
+                'olr_gt_page_ids': self.olr_gt_page_ids,
+                'ner_gt_page_ids': self.ner_gt_page_ids,
+                'lem_link_gt_page_ids': self.lemlink_gt_page_ids,
                 'children': {child_type: [tc.to_json() for tc in getattr(self.children, child_type)]
                              for child_type in vs.CHILD_TYPES}}
 
@@ -252,7 +272,10 @@ class CanonicalPage(Page, CanonicalTextContainer):
         super().__init__(id=id, word_range=word_range, commentary=commentary, **kwargs)
 
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
-        return {'id': self.id, 'word_range': self.word_range}
+        can_dict = {'id': self.id, 'word_range': self.word_range}
+        if hasattr(self, 'via_notes'):
+            can_dict['via_notes'] = self.via_notes
+        return can_dict
 
     def to_alto(self,
                 output_path: Path,

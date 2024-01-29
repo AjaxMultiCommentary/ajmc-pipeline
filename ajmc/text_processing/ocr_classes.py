@@ -18,11 +18,12 @@ from tqdm import tqdm
 
 from ajmc.commons import variables as vs
 from ajmc.commons.docstrings import docstring_formatter, docstrings
+from ajmc.commons.file_management import get_commit_hash
 from ajmc.commons.geometry import adjust_bbox_to_included_contours, get_bbox_from_points, is_bbox_within_bbox, \
     is_bbox_within_bbox_with_threshold, Shape
 from ajmc.commons.image import AjmcImage
 from ajmc.commons.miscellaneous import get_ajmc_logger
-from ajmc.olr.utils import get_page_region_dicts_from_via, sort_to_reading_order
+from ajmc.olr.utils import get_page_region_dicts_from_via, sort_to_reading_order, get_olr_splits_page_ids
 from ajmc.text_processing import cas_utils
 from ajmc.text_processing.canonical_classes import CanonicalCommentary, CanonicalEntity, CanonicalHyphenation, \
     CanonicalLine, CanonicalPage, CanonicalRegion, CanonicalSection, CanonicalSentence, CanonicalWord, CanonicalLemma
@@ -45,6 +46,7 @@ class OcrCommentary(Commentary):
                  ocr_gt_dir: Optional[Path] = None,
                  ocr_run_id: Optional[str] = None,
                  sections_path: Optional[Path] = None,
+                 is_legacy: bool = False,
                  **kwargs):
         """Default constructor, where custom paths can be provided.
 
@@ -64,11 +66,13 @@ class OcrCommentary(Commentary):
             sections_path: {sections_path}
         """
         super().__init__(id=id, ocr_dir=ocr_dir, base_dir=base_dir, via_path=via_path, img_dir=img_dir,
-                         ocr_gt_dir=ocr_gt_dir, ocr_run_id=ocr_run_id, sections_path=sections_path, **kwargs)
+                         ocr_gt_dir=ocr_gt_dir, ocr_run_id=ocr_run_id, sections_path=sections_path, is_legacy=is_legacy, **kwargs)
 
     @classmethod
     @docstring_formatter(**docstrings)
-    def from_ajmc_data(cls, id: str, ocr_run_id: str = '*_tess_retrained'):
+    def from_ajmc_data(cls, id: str,
+                       ocr_run_id: str = '*_tess_retrained',
+                       is_legacy: bool = False):
         """Use this method to construct a ``OcrCommentary``-object using ajmc's data folder structure.
 
         Args:
@@ -93,7 +97,8 @@ class OcrCommentary(Commentary):
                    img_dir=vs.get_comm_img_dir(id),
                    ocr_gt_dir=vs.get_comm_ocr_gt_dir(id),
                    ocr_run_id=ocr_run_id,
-                   sections_path=vs.get_comm_sections_path(id))
+                   sections_path=vs.get_comm_sections_path(id),
+                   is_legacy=is_legacy)
 
     def to_canonical(self, include_ocr_gt: bool = True) -> CanonicalCommentary:
         """Export the commentary to a ``CanonicalCommentary`` object.
@@ -109,16 +114,20 @@ class OcrCommentary(Commentary):
         self.reset()
 
         if include_ocr_gt:
-            self.children.pages = [
-                p if p.id not in self.ocr_gt_page_ids else self.ocr_gt_pages[self.ocr_gt_page_ids.index(p.id)]
-                for p in self.children.pages]
+            self.children.pages = [p if p.id not in self.ocr_gt_page_ids
+                                   else self.ocr_gt_pages[self.ocr_gt_page_ids.index(p.id)]
+                                   for p in self.children.pages]
 
         # We start by creating an empty ``CanonicalCommentary``
         can = CanonicalCommentary(id=self.id,
                                   children=None,
                                   images=[],
                                   ocr_run_id=self.ocr_run_id,
-                                  ocr_gt_page_ids=self.ocr_gt_page_ids)
+                                  ocr_gt_page_ids=self.ocr_gt_page_ids,
+                                  olr_gt_page_ids=self.olr_gt_page_ids,
+                                  ner_gt_page_ids=self.ner_gt_page_ids,
+                                  lemlink_gt_page_ids=self.lemlink_gt_page_ids,
+                                  metadata=self.metadata, )
 
         # We now populate the children and images
         children = {k: [] for k in vs.CHILD_TYPES}
@@ -142,7 +151,10 @@ class OcrCommentary(Commentary):
                                                            commentary=can,
                                                            region_type=r.region_type))
 
-            children['pages'].append(CanonicalPage(id=p.id, word_range=(p_start, w_count - 1), commentary=can))
+            can_page = CanonicalPage(id=p.id, word_range=(p_start, w_count - 1), commentary=can)
+            if hasattr(p, 'via_notes'):
+                can_page.via_notes = p.via_notes
+            children['pages'].append(can_page)
 
             # Adding images
             can.images.append(AjmcImage(id=p.id, path=Path(p.img_path), word_range=(p_start, w_count - 1)))
@@ -224,13 +236,54 @@ class OcrCommentary(Commentary):
     @lazy_property
     def ocr_gt_page_ids(self) -> List[str]:
         """The ids of the commentary's pages which have a groundtruth file in ``self.ocr_gt_dir``."""
-        return sorted([p.stem for p in self.ocr_gt_dir.glob('*.html')])
+        if self.is_legacy:
+            return sorted([p.stem for p in self.ocr_gt_dir.glob('*.html')])
+        else:
+            return sorted([r['filename'].split('.')[0] for r in self.via_project['_via_img_metadata'].values()
+                           if r['file_attributes']['is_ground_truth']['ocr']])
 
     @lazy_property
     def ocr_gt_pages(self) -> Union[List['OcrPage'], list]:
-        """The commentary's pages which have a groundtruth file in ``self.paths['groundtruth']``."""
-        return [OcrPage.from_ajmc_data(self.ocr_gt_dir / f'{p_id}.html', commentary=self) for p_id in
-                self.ocr_gt_page_ids]
+        """The commentary's pages which have a groundtruth file."""
+        if self.is_legacy:
+            return [OcrPage.from_ajmc_data(self.ocr_gt_dir / f'{p_id}.html', commentary=self) for p_id in
+                    self.ocr_gt_page_ids]
+        else:
+            groundtruth_pages = []
+            for r in self.via_project['_via_img_metadata'].values():
+                if r['file_attributes']['is_ground_truth']['ocr']:
+                    groundtruth_pages.append(OcrPage.from_via_data(r, commentary=self))
+            return groundtruth_pages
+
+    @lazy_property
+    def olr_gt_page_ids(self) -> List[str]:
+        """A list of page ids containing the groundtruth of the OLR."""
+        if self.is_legacy:
+            return get_olr_splits_page_ids(self.id)
+        else:
+            return sorted([r['filename'].split('.')[0] for r in self.via_project['_via_img_metadata'].values()
+                           if r['file_attributes']['is_ground_truth']['olr']])
+
+
+    @lazy_property
+    def ner_gt_page_ids(self) -> List[str]:
+        """A list of page ids containing the groundtruth of the NER."""
+
+        return [p.stem for p in vs.NE_CORPUS_DIR.rglob(f'**/curated/{self.id}*.xmi')]
+
+    @lazy_property
+    def lemlink_gt_page_ids(self) -> List[str]:
+        """A list of page ids containing the groundtruth of the lemmatization."""
+
+        return [p.stem for p in vs.LEMLINK_XMI_DIR.rglob(f'{self.id}*.xmi')]
+
+    @lazy_property
+    def metadata(self) -> Dict[str, str]:
+        """The metadata of the commentary."""
+        return {'ne_corpus_commit': get_commit_hash(vs.NE_CORPUS_DIR),
+                'ocr_run_id': self.ocr_run_id,
+                'lemlink_corpus_commit': get_commit_hash(vs.LEMLINK_XMI_DIR),
+                'commentaries_data_commit': 'INITIAL_COMMIT', }  # TODO CHANGE THIS TO ``get_commit_hash(vs.commentaries_data_dir)``
 
     @lazy_property
     def via_project(self) -> dict:
@@ -253,7 +306,9 @@ class OcrCommentary(Commentary):
 class OcrPage(Page, TextContainer):
     """A class representing a commentary page."""
 
-    def __init__(self, ocr_path: Path, page_id: Optional[str] = None, img_path: Optional[Path] = None,
+    def __init__(self, ocr_path: Optional[Path],
+                 page_id: Optional[str] = None,
+                 img_path: Optional[Path] = None,
                  commentary: Optional[OcrCommentary] = None, **kwargs):
         super().__init__(ocr_path=ocr_path, id=page_id, img_path=img_path, commentary=commentary, **kwargs)
 
@@ -263,12 +318,53 @@ class OcrPage(Page, TextContainer):
         return cls(ocr_path=ocr_path,
                    page_id=ocr_path.stem,
                    img_path=commentary.img_dir / f'{ocr_path.stem}{vs.DEFAULT_IMG_EXTENSION}',
-                   commentary=commentary, **kwargs)
+                   commentary=commentary, is_from_via_data=False, **kwargs)
+
+    @classmethod
+    def from_via_data(cls, via_dict: dict, commentary: OcrCommentary):
+        """Initialises an OcrPage from a VIA data file."""
+        page = cls(ocr_path=None,
+                   page_id=via_dict['filename'],
+                   img_path=commentary.img_dir / f'{via_dict["filename"]}{vs.DEFAULT_IMG_EXTENSION}',
+                   commentary=commentary, is_from_via_data=True)
+
+        page.children = LazyObject((lambda x: x), constrained_attrs=vs.CHILD_TYPES, **via_dict)
+        page.children.regions = []
+        page.children.lines = []
+        page.children.words = []
+
+        word_count = 0
+        for r in via_dict['regions']:
+            if not r['region_attributes']['label'].startswith(vs.OLR_PREFIX):
+                page.children.words.append(OcrWord.from_via(id=word_count, via_dict=r, page=page))
+                word_count += 1
+            else:
+                r['region_attributes']['label'] = r['region_attributes']['label'][len(vs.OLR_PREFIX):]
+                if r['region_attributes']['label'] == 'line':
+                    page.children.lines.append(OcrLine.from_via(via_dict=r, page=page))
+                else:
+                    page.children.regions.append(OlrRegion.from_via(via_dict=r, page=page))
+
+        page.via_notes = via_dict['file_attributes']['notes']
+
+        return page
+
 
     def _get_children(self, children_type):
+        """Returns the children of the page of the given type.
+
+        Note:
+            This method is not going to be used by groundtruth pages.
+        """
         if children_type == 'regions':
-            return [OlrRegion.from_via(via_dict=r, page=self)
-                    for r in get_page_region_dicts_from_via(self.id, self.parents.commentary.via_project)]
+            if self.parents.commentary.is_legacy:
+                return [OlrRegion.from_via(via_dict=r, page=self)
+                        for r in get_page_region_dicts_from_via(self.id, self.parents.commentary.via_project)]
+            else:
+                page_key = [k for k in self.parents.commentary.via_project['_via_img_metadata'].keys() if k.startswith(self.id)][0]
+                return [OlrRegion.from_via(via_dict=r, page=self)
+                        for r in self.parents.commentary.via_project['_via_img_metadata'][page_key]['regions']
+                        if r['region_attributes'].get('olr', False)]
 
         # Lines and words must be retrieved together
         elif children_type in ['lines', 'words']:
@@ -397,7 +493,8 @@ class OcrPage(Page, TextContainer):
             _ = self.draw_textcontainers(output_path=debug_dir / f'{self.id}_raw.png')
 
         logger.warning("You are optimising a page, bboxes and children are going to be changed")
-        self.reset()
+        if not self.is_from_via_data:
+            self.reset()
 
         # Process words
         self.children.words = [w for w in self.children.words if re.sub(r'\s+', '', w.text) != '']
@@ -511,7 +608,6 @@ class RawSection(TextContainer):
             return self.parents.commentary
 
 
-
 class OcrTextContainer(TextContainer):
 
     def __init__(self, **kwargs):
@@ -584,7 +680,9 @@ class OlrRegion(OcrTextContainer):
             via_dict: {via_dict}
             page: {parent_page}
         """
-        return cls(region_type=via_dict['region_attributes']['text'],
+        assert via_dict['region_attributes'][
+                   'label'] in vs.ORDERED_OLR_REGION_TYPES, f'Unknown region type: {via_dict["region_attributes"]["label"]} in page {page.id}'
+        return cls(region_type=via_dict['region_attributes']['label'],
                    bbox=Shape.from_xywh(x=via_dict['shape_attributes']['x'],
                                         y=via_dict['shape_attributes']['y'],
                                         w=via_dict['shape_attributes']['width'],
@@ -602,15 +700,30 @@ class OcrLine(OcrTextContainer):
     """Class for OCR lines."""
 
     def __init__(self,
-                 markup: 'bs4.element.Tag',
+                 markup: Optional['bs4.element.Tag'],
                  page: OcrPage,
                  word_ids: Optional[List[Union[str, int]]] = None,
                  **kwargs):
         super().__init__(markup=markup, page=page, word_ids=word_ids, **kwargs)
 
+    @classmethod
+    def from_via(cls, via_dict: Dict[str, dict], page: 'OcrPage'):
+        line = cls(markup=None, page=page)
+        line.bbox = Shape.from_xywh(x=via_dict['shape_attributes']['x'],
+                                    y=via_dict['shape_attributes']['y'],
+                                    w=via_dict['shape_attributes']['width'],
+                                    h=via_dict['shape_attributes']['height'])
+        return line
+
     def _get_children(self, children_type):
-        return [w for w in self.parents.page.children.words if
-                w.id in self.word_ids] if children_type == 'words' else []
+        if self.word_ids is None:
+            return [w for w in self.parents.page.children.words if
+                    is_bbox_within_bbox_with_threshold(contained=w.bbox.bbox,
+                                                       container=self.bbox.bbox,
+                                                       threshold=vs.PARAMETERS['ocr_line_inclusion_threshold'])]
+        else:
+            return [w for w in self.parents.page.children.words if
+                    w.id in self.word_ids] if children_type == 'words' else []
 
 
 class OcrWord(OcrTextContainer):
@@ -618,10 +731,24 @@ class OcrWord(OcrTextContainer):
 
     def __init__(self,
                  id: Union[int, str],
-                 markup: 'bs4.element.Tag',
+                 markup: Optional['bs4.element.Tag'],
                  page: OcrPage,
                  **kwargs):
         super().__init__(id=id, markup=markup, page=page, **kwargs)
+
+    @classmethod
+    def from_via(cls, id: Union[int, str], via_dict: Dict[str, dict], page: 'OcrPage'):
+        word = cls(id=id, markup=None, page=page)
+
+        word.bbox = Shape.from_xywh(x=via_dict['shape_attributes']['x'],
+                                    y=via_dict['shape_attributes']['y'],
+                                    w=via_dict['shape_attributes']['width'],
+                                    h=via_dict['shape_attributes']['height'])
+
+        word.text = via_dict['region_attributes']['label']
+
+        return word
+
 
     def _get_children(self, children_type: str):
         return []  # Words have no children
