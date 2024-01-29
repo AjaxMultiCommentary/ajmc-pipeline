@@ -3,6 +3,7 @@
 import json
 import os
 import shutil
+import subprocess
 from datetime import datetime
 from pathlib import Path
 from string import ascii_letters
@@ -182,6 +183,7 @@ def find_replace_in_all_comm_dirs(file_rel_path: str,
             file_path.write_text(text, encoding='utf-8')
 
 
+
 @docstring_formatter(**docstrings)
 def check_via_spreadsheet_conformity(comm_id: str,
                                      check_comm_only: bool = False) -> Tuple[Set[str], Set[str]]:
@@ -359,3 +361,46 @@ def get_metadata_spreadsheet() -> pd.DataFrame:
     if _METADATA_SPREADSHEET is None:
         _METADATA_SPREADSHEET = read_google_sheet(vs.SPREADSHEETS['metadata'], 'metadata')
     return _METADATA_SPREADSHEET
+
+
+def get_commit_hash(dir_: Path) -> str:
+    """Returns the commit hash of a directory."""
+    return subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=dir_).decode().strip()
+
+
+def has_file_changed(repo_path: Union[str, Path], file_path: Union[str, Path], commit_hash1: str, commit_hash2: str):
+    """
+    Check if a specific file has changed between two commits using subprocess.
+
+    Args:
+    - repo_path (str): Path to the Git repository.
+    - file_path (str): Path to the file in the repository.
+    - commit_hash1 (str): Hash of the first commit.
+    - commit_hash2 (str): Hash of the second commit.
+
+    Returns:
+    - bool: True if the file has changed, False otherwise.
+    """
+    diff_output = subprocess.check_output(f"git -C {repo_path} diff {commit_hash1} {commit_hash2} -- {file_path}",
+                                          shell=True,
+                                          stderr=subprocess.STDOUT,
+                                          text=True)
+
+    # If there are changes, the diff_output will not be empty
+    return bool(diff_output)
+
+
+def check_change_in_commentary_data(comm_id: str, current_commit: str, last_commit: str):
+    """Checks if the commentary data has changed between two commits"""
+    return has_file_changed(vs.COMMS_DATA_DIR, vs.get_comm_via_path(comm_id), current_commit, last_commit)
+
+
+def check_change_in_ne(comm_id: str, current_commit: str, last_commit: str):
+    """Checks if the files related to a specific in the NE corpus has changed between two commits"""
+    return any([has_file_changed(vs.NE_CORPUS_DIR, p, current_commit, last_commit)
+                for p in vs.NE_CORPUS_DIR.glob(f'{comm_id}*.xmi')])
+
+
+def check_change_in_lemlink(comm_id: str, current_commit: str, last_commit: str):
+    return any([has_file_changed(vs.LEMLINK_CORPUS_DIR, p, current_commit, last_commit)
+                for p in vs.LEMLINK_CORPUS_DIR.glob(f'{comm_id}*.xmi')])
