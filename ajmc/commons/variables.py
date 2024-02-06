@@ -21,19 +21,19 @@ TYPESYSTEM_PATH = PACKAGE_DIR / 'ajmc/data/templates/TypeSystem.xml'
 # AJMC DATA DIR AND STRUCTURE
 EXEC_ENV = platform.uname().node
 
-if os.getenv('AJMC_GDRIVE_BASE_DIR'):
-    DRIVE_BASE_DIR = Path(os.getenv('AJMC_GDRIVE_BASE_DIR'))
+if os.getenv('AJMC_DATA_DIR'):
+    AJMC_DATA_DIR = Path(os.getenv('AJMC_DATA_DIR'))
 else:
-    DRIVE_BASE_DIR = Path(input("""WARNING: Unknown execution environment!
-    Please enter the drive base directory below (e.g. ``/content/drive/MyDrive/_AJAX/AjaxMultiCommentary/``):
-    (Note: you can change this permanently by adding ``export AJMC_GDRIVE_BASE_DIR="/your/drive/base/dir"`` 
-    in your .bashrc."""))
+    AJMC_DATA_DIR = Path(input("""WARNING: Unknown execution environment!
+    Please enter the root directory to AjMC data (i.e. the directory containing the 'commentaries_data', 'AjMC-NE-corpus' and `lemma-linkage-corpus` 
+    directories). Note: you can change this permanently by adding ``export AJMC_DATA_DIR="/your/data/root/dir"`` 
+    in your .bashrc.
+    """))
 
-DRIVE_DATA_DIR = DRIVE_BASE_DIR / 'data'
-COMMS_DATA_DIR = DRIVE_DATA_DIR / 'commentaries_data'
-NE_CORPUS_DIR = DRIVE_DATA_DIR / 'AjMC-NE-corpus'
-LEMLINK_CORPUS_DIR = DRIVE_DATA_DIR / 'lemma-linkage-corpus'
-LEMLINK_XMI_DIR = DRIVE_DATA_DIR / 'lemma-linkage-corpus/data/preparation/corpus/annotated'
+COMMS_DATA_DIR = AJMC_DATA_DIR / 'commentaries_data'
+NE_CORPUS_DIR = AJMC_DATA_DIR / 'AjMC-NE-corpus'
+LEMLINK_CORPUS_DIR = AJMC_DATA_DIR / 'lemma-linkage-corpus'
+LEMLINK_XMI_DIR = LEMLINK_CORPUS_DIR / 'data/preparation/corpus/annotated'
 
 # RELATIVE PATHS
 COMM_IMG_REL_DIR = Path('images/png')
