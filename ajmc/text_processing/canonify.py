@@ -21,8 +21,6 @@ def canonify():
     parser.add_argument('--force', action='store_true', help='Force recanonification')
     args = parser.parse_args()
 
-    args.commentary_ids = ['sophoclesplaysa05campgoog']
-    args.force = True
 
     ROOT_LOGGER.setLevel(args.stream_handler_level)
 
