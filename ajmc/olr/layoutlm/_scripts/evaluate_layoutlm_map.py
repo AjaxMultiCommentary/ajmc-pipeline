@@ -17,6 +17,7 @@ from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
 RUNS_DIR = Path('/scratch/sven/layoutlm/experiments')
+FONTS_DIR = Path('/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/dissemination/media/fonts')
 
 results = pd.DataFrame()
 
@@ -113,7 +114,7 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
                                    width=10)
 
         img = draw_caption(img, labels_to_colors=labels_to_colors,
-                           font_dir=vs.DRIVE_BASE_DIR / 'dissemination/media/fonts')
+                           font_dir=FONTS_DIR)
 
         img_pred_dir =RUNS_DIR / xp_name / 'predictions/images'
         img_pred_dir.mkdir(exist_ok=True, parents=True)

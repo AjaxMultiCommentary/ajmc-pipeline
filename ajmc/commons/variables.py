@@ -472,6 +472,7 @@ REGION_TYPES_TO_COLORS = {l: c for l, c in zip(ORDERED_OLR_REGION_TYPES,
 
 PARAMETERS = {
     'ocr_region_inclusion_threshold': 0.7,
+    'words_line_inclusion_threshold': 0.7,
     'entity_inclusion_threshold': 0.8,
 }
 
@@ -479,3 +480,4 @@ PARAMETERS = {
 #                                                 LOGGING
 # ======================================================================================================================
 OLR_PREFIX = '_OLR_'
+OCR_GT_PREFIX = 'OCRGT_'

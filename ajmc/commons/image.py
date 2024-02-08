@@ -290,7 +290,7 @@ def remove_artifacts_from_contours(contours: List[Shape],
     """Removes contours if the perimeter of their bounding box is inferior to ``artifact_perimeter_threshold``"""
 
     contours_ = [c for c in contours if (2 * (c.width + c.height)) > artifact_perimeter_threshold]
-    logger.info(f"""Removed {len(contours) - len(contours_)} artifacts""")
+    logger.debug(f"""Removed {len(contours) - len(contours_)} artifacts""")
 
     return contours_
 
