@@ -18,11 +18,13 @@ def get_config(config_path: Path) -> dict:
 
     # Handle classes
     config['classes'] = unicodedata.normalize('NFD', config['classes'])  # Makes sure we have no combining chars issues with json
-    config['classes'] = ''.join([c[1] for c in config['special_classes']]) + config['classes']  # Add special classes to the beginning
+    special_classes = ''.join([c[1] for c in config.get('special_classes', [])])  # Get the special classes
+    if not config['classes'].startswith(special_classes):
+        config['classes'] = special_classes + config['classes']  # Add special classes to the beginning
     config['num_classes'] = len(config['classes'])
 
-    # Create mappings from chars to special classes and vice versa
-    config['special_classes_dict'] = {c[0]: c[1] for c in config['special_classes']}  # Create a dictionary of special classes for easy access
+    # Create mappings from chars to special classes and vice versa # TODO uncomment this
+    config['special_classes_dict'] = {c[0]: c[1] for c in config.get('special_classes', [])}  # Create a dictionary of special classes for easy access
     # Get the mappings for superscript and subscript
     config['chars_to_special_classes'] = {k: config['special_classes_dict']['superscript'] + v for k, v in SUPERSCRIPT_MAPPING.items()}
     config['chars_to_special_classes'].update({k: config['special_classes_dict']['subscript'] + v for k, v in SUBSCRIPT_MAPPING.items()})
@@ -32,8 +34,8 @@ def get_config(config_path: Path) -> dict:
 
     # Create mappings from chars to indices and vice versa
     # We do not want the blank and unknown characters to be in the mapping
-    config['classes_to_indices'] = {class_: i for i, class_ in enumerate(config['classes'])}
-    config['indices_to_classes'] = {i: class_ for i, class_ in enumerate(config['classes'])}
+    config['classes_to_indices'] = {class_: i for i, class_ in enumerate(config['classes'][2:])}
+    config['indices_to_classes'] = {i: class_ for i, class_ in enumerate(config['classes'][2:])}
 
     # Handle paths
     for k, v in config.items():

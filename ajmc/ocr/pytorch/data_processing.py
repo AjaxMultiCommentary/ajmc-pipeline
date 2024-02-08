@@ -164,7 +164,7 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
 
         # Distribute the dataset accross workers
         self.worker_id = int(os.environ.get('RANK', 0))
-        self.data_len = len(img_paths)
+        self.data_len = len(self.img_paths)
         self.start, self.restart, self.end = self.distribute()
         self.batch_iterator = iter(self.yield_batches(self.restart, self.end))
 
@@ -598,11 +598,16 @@ def pre_batch_dataset(config: dict,
             last_file_index = 0
 
         # Start the main for loop to create the batches
+        # Todo: this should be done using an ``OcrIterDataset``
         batch_size = 0
         ocr_lines = []
 
         for i, img_path in tqdm(enumerate(img_paths, start=last_file_index)):
-            ocr_line = OcrLine(img_path, config['img_height'], config['chunk_width'], config['chunk_overlap'], config['classes_to_indices'],
+            if not img_path.exists():
+                continue
+            if not img_path.with_suffix('.txt').exists():
+                continue
+            ocr_line = OcrLine(img_path, config['chunk_height'], config['chunk_width'], config['chunk_overlap'], config['classes_to_indices'],
                                special_mapping=config['chars_to_special_classes'])
 
             if batch_size + ocr_line.chunks.shape[0] > config['max_batch_size']:

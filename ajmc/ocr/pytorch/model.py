@@ -60,7 +60,7 @@ class OcrTorchModel(nn.Module):
 
         return x
 
-    def predict(self, x, chunks_to_img_mapping) -> List[str]:
+    def predict(self, x, chunks_to_img_mapping, img_widths) -> List[str]:
         """Predicts the text in a batch of image tensors.
 
         Args:
@@ -79,7 +79,7 @@ class OcrTorchModel(nn.Module):
 
         outputs = torch.nn.functional.log_softmax(outputs, dim=2)
 
-        strings, offsets = self.ctc_decoder.decode(outputs)
+        strings, offsets = self.ctc_decoder.decode(outputs, sizes=img_widths)
 
         return strings
 
