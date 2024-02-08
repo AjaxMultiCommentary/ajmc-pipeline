@@ -6,21 +6,40 @@ from tqdm import tqdm
 
 from ajmc.commons import variables as vs
 from ajmc.commons.file_management import get_commit_hash, check_change_in_lemlink, check_change_in_ne
-from ajmc.commons.miscellaneous import ROOT_LOGGER, get_ajmc_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger, ROOT_LOGGER
 from ajmc.text_processing.ocr_classes import OcrCommentary
 
-logger = get_ajmc_logger(__name__)
+ROOT_LOGGER.setLevel('DEBUG')
 
-
-def canonify():
+if __name__ == '__main__':
+    logger = get_ajmc_logger(__name__)
     parser = argparse.ArgumentParser()
-    parser.add_argument('--commentary_ids', nargs='+', help='Commentaries to process', default=vs.ALL_COMM_IDS)
-    parser.add_argument('--ocr_run_pattern', type=str, help='OCR run pattern to process, eg. *_tess_base',
-                        default='*_tess_retrained')
-    parser.add_argument('--stream_handler_level', type=str, help='Stream handler level', default='ERROR')
-    parser.add_argument('--force', action='store_true', help='Force recanonification')
+
+    parser.add_argument('--commentary_ids',
+                        nargs='+',
+                        help='Commentaries to process',
+                        default=vs.ALL_COMM_IDS,
+                        required=False)
+    parser.add_argument('--ocr_run_pattern',
+                        type=str,
+                        help='OCR run pattern to process, eg. *_tess_base',
+                        default='*_tess_retrained',
+                        required=False)
+    parser.add_argument('--stream_handler_level',
+                        type=str,
+                        help='Stream handler level',
+                        default='ERROR',
+                        required=False)
+    parser.add_argument('--force',
+                        action='store_true',
+                        help='Force recanonification',
+                        required=False)
+
     args = parser.parse_args()
 
+    # args.commentary_ids = ['sophoclesplaysa05campgoog', 'Hermann1851']
+    # args.force = True
+    # args.stream_handler_level = 'DEBUG'
 
     ROOT_LOGGER.setLevel(args.stream_handler_level)
 
@@ -42,7 +61,3 @@ def canonify():
                 continue
 
         OcrCommentary.from_ajmc_data(id=comm_id, ocr_run_id=args.ocr_run_pattern).to_canonical().to_json()
-
-
-if __name__ == '__main__':
-    canonify()

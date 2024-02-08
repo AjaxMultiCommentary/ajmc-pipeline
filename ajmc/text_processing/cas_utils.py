@@ -17,6 +17,7 @@ from ajmc.commons.arithmetic import compute_interval_overlap
 from ajmc.commons.miscellaneous import aligned_print, get_ajmc_logger
 
 logger = get_ajmc_logger(__name__)
+AJMC_METADATA_TYPE = 'webanno.custom.AjMCDocumentmetadata'
 
 
 def basic_rebuild(page: dict,
@@ -161,9 +162,8 @@ def rebuild_to_xmi(page: dict,
     word = typesystem.get_type('de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token')
 
     img_link_type = 'webanno.custom.AjMCImages'
-    ajmc_metadata_type = 'webanno.custom.AjMCDocumentmetadata'
     image_link = typesystem.get_type(img_link_type)
-    ajmc_metadata = typesystem.get_type(ajmc_metadata_type)
+    ajmc_metadata = typesystem.get_type(AJMC_METADATA_TYPE)
 
     # create metadata annotations
     metadata = ajmc_metadata(ocr_run_id=ocr_run_id,
@@ -274,7 +274,15 @@ def align_cas_annotation(cas_annotation, rebuild, verbose: bool = False):
     return bboxes, shifts, text_window, warnings
 
 
-def import_page_rebuild(page_id: str, annotation_type: str = 'ner'):
+def get_cas_metadata(cas: Cas):
+    metadata = cas.select(AJMC_METADATA_TYPE)[0]
+    return {'ocr_run_id': metadata.ocr_run_id,
+            'xmi_creation_date': metadata.xmi_creation_date,
+            'xmiID': metadata.xmiID,
+            'region_types': metadata.region_types.split(', ')}
+
+
+def import_page_rebuild(page_id: str, annotation_type: str):
     """Finds and rebuild the inception json of the fgiven ``page_id``.
 
     Args:
@@ -294,10 +302,20 @@ def import_page_rebuild(page_id: str, annotation_type: str = 'ner'):
     elif annotation_type == 'lemmas':
         run_dir = [dir_ for dir_ in (vs.get_comm_base_dir(comm_id) / vs.COMM_LEMLINK_ANN_REL_DIR).glob('*') if dir_.is_dir()][0]
         rebuild_path = run_dir / 'jsons' / (page_id + '.json')
-        metadata = json.loads((run_dir / 'xmis' / 'metadata.json').read_text('utf-8'))
+        try:
+            metadata = json.loads((run_dir / 'xmis' / 'metadata.json').read_text('utf-8'))
+            region_types = metadata['region_types']
+        except FileNotFoundError:
+            xml_path = vs.LEMLINK_XMI_DIR / 'TypeSystem.xml'
+            xmi_path = run_dir / 'xmis' / (page_id + '.xmi')
+            cas = get_cas(xmi_path, xml_path)
+            if cas:
+                region_types = get_cas_metadata(cas)['region_types']
+            else:
+                raise FileNotFoundError(f'No metadata file nor xmi found for {page_id}')
 
         return basic_rebuild(page=json.loads(rebuild_path.read_text('utf-8')),
-                             region_types=metadata['region_types'])
+                             region_types=region_types)
 
 
 def import_page_cas(page_id: str,

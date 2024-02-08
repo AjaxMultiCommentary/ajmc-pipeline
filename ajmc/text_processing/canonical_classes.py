@@ -14,7 +14,6 @@ from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import get_bbox_from_points, Shape
 from ajmc.commons.image import AjmcImage
 from ajmc.commons.miscellaneous import get_ajmc_logger
-from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
 
 logger = get_ajmc_logger(__name__)
@@ -74,18 +73,14 @@ class CanonicalCommentary(Commentary):
         can_json = json.loads(json_path.read_text(encoding='utf-8'))
 
         # Create the (empty) commentary and populate its info
-        # TODO remove this hack once commentaries have been re-canonified
-        ocr_gt_page_ids = [p.stem for p in vs.get_comm_ocr_gt_dir(can_json['id']).glob('*.html')]
-        olr_gt_page_ids = get_olr_splits_page_ids(can_json['id'])
-
         commentary = cls(id=can_json['id'],
                          children=None,
                          images=None,
                          ocr_run_id=can_json['metadata']['ocr_run_id'],
-                         ocr_gt_page_ids=ocr_gt_page_ids,
-                         olr_gt_page_ids=olr_gt_page_ids,
-                         ner_gt_page_ids=[],
-                         lemlink_gt_page_ids=[],
+                         ocr_gt_page_ids=can_json['ocr_gt_page_ids'],
+                         olr_gt_page_ids=can_json['olr_gt_page_ids'],
+                         ner_gt_page_ids=can_json['ner_gt_page_ids'],
+                         lemlink_gt_page_ids=can_json['lem_link_gt_page_ids'],
                          metadata=can_json['metadata'])
 
         # Automatically determinates paths
@@ -273,8 +268,6 @@ class CanonicalPage(Page, CanonicalTextContainer):
 
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
         can_dict = {'id': self.id, 'word_range': self.word_range}
-        if hasattr(self, 'via_notes'):
-            can_dict['via_notes'] = self.via_notes
         return can_dict
 
     def to_alto(self,
@@ -315,11 +308,11 @@ class CanonicalPage(Page, CanonicalTextContainer):
 
 class CanonicalRegion(CanonicalTextContainer):
 
-    def __init__(self, word_range: Tuple[int, int], commentary: CanonicalCommentary, region_type: str, **kwargs):
-        super().__init__(word_range=word_range, commentary=commentary, region_type=region_type, **kwargs)
+    def __init__(self, word_range: Tuple[int, int], commentary: CanonicalCommentary, region_type: str, is_ocr_gt: bool = True, **kwargs):
+        super().__init__(word_range=word_range, commentary=commentary, region_type=region_type, is_ocr_gt=is_ocr_gt, **kwargs)
 
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
-        return {'word_range': self.word_range, 'region_type': self.region_type}
+        return {'word_range': self.word_range, 'region_type': self.region_type, 'is_ocr_gt': self.is_ocr_gt}
 
 
 class CanonicalLine(CanonicalTextContainer):

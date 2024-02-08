@@ -146,8 +146,7 @@ def create_via_project(comm: 'CanonicalCommentary') -> ViaProject:
                              [
                                  {'name': 'label', 'level': 'region', 'type': 'text', 'default_value': ''},
                                  {'name': 'is_ground_truth', 'level': 'file', 'type': 'checkbox',
-                                  'options': {'ocr': '', 'olr': '', 'ocr_partial': ''}},
-                                 {'name': 'via_notes', 'level': 'file', 'type': 'text', 'default_value': ''},
+                                  'options': {'ocr': '', 'olr': ''}},
                              ])
     for page in comm.children.pages:
         region_shapes = []
@@ -171,7 +170,6 @@ def create_via_project(comm: 'CanonicalCommentary') -> ViaProject:
         file_attributes['is_ground_truth'] = {'ocr': page in comm.ocr_gt_pages,
                                               'olr': page in comm.olr_gt_pages}
 
-        file_attributes['via_notes'] = {'text': page.via_notes if hasattr(page, 'via_notes') else ''}
 
         via_project.add_image(page.image.path.relative_to(base_path),
                               region_shapes=region_shapes,
