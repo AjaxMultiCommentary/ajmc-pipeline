@@ -264,7 +264,7 @@ class OcrCommentary(Commentary):
     def olr_gt_page_ids(self) -> List[str]:
         """A list of page ids containing the groundtruth of the OLR."""
         return sorted([Path(p['filename']).stem for p in self.via_project['_via_img_metadata'].values()
-                       if r['file_attributes']['is_ground_truth']['olr']])
+                       if p['file_attributes']['is_ground_truth']['olr']])
 
 
     @lazy_property
