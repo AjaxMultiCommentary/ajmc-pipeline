@@ -31,8 +31,8 @@ class OcrTorchModel(nn.Module):
             self.backbone = self.reshape_input
             logger.warning('No backbone implemented')
 
-        self.encoder = nn.TransformerEncoder(encoder_layer=nn.TransformerEncoderLayer(**config['encoder']["TransformerEncoderLayer"]),
-                                             **config['encoder']["TransformerEncoder"])
+        self.encoder = nn.TransformerEncoder(encoder_layer=nn.TransformerEncoderLayer(**config['encoder']['TransformerEncoderLayer']),
+                                             **config['encoder']['TransformerEncoder'])
 
         self.decoder = nn.Linear(**config['decoder'])
 
@@ -60,7 +60,7 @@ class OcrTorchModel(nn.Module):
 
         return x
 
-    def predict(self, x, chunks_to_img_mapping, img_widths) -> List[str]:
+    def predict(self, x, chunks_to_img_mapping: List[int], img_widths: List[int]) -> List[str]:
         """Predicts the text in a batch of image tensors.
 
         Args:
@@ -70,8 +70,8 @@ class OcrTorchModel(nn.Module):
         Returns:
             A list of strings representing the predicted text.
         """
-        with torch.no_grad():
-            outputs = self.forward(x)
+        self.eval()
+        outputs = self(x)
 
         outputs = recompose_batched_chunks(outputs,
                                            mapping=chunks_to_img_mapping,
@@ -80,6 +80,7 @@ class OcrTorchModel(nn.Module):
         outputs = torch.nn.functional.log_softmax(outputs, dim=2)
 
         strings, offsets = self.ctc_decoder.decode(outputs, sizes=img_widths)
+        self.train()
 
         return strings
 

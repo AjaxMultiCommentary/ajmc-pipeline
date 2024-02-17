@@ -1,10 +1,10 @@
 import os
 import random
-import unicodedata
 from pathlib import Path
 from typing import List, Dict, Tuple, Generator, Optional, Any
 
 import torch
+import unicodedata
 from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
 from torchvision.io import read_image, ImageReadMode
@@ -18,7 +18,7 @@ from ajmc.ocr import variables as ocr_vs
 logger = get_ajmc_logger(__name__)
 
 
-# Todo add a training mode where the text is not given
+# Todo add a inference mode where the text is not given
 
 class OcrLine:
     """A custom class for OCR lines.
@@ -189,7 +189,7 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
         # Compute the start, re-start and end indices for the current worker
         worker_default_start = self.worker_id * samples_per_worker
         worker_restart = worker_default_start + self.per_worker_steps_run
-        worker_end = min(worker_default_start + samples_per_worker, self.data_len - 1)
+        worker_end = min(worker_default_start + samples_per_worker, self.data_len)
 
         logger.info(f'Worker {self.worker_id} is starting at step {worker_restart}')
 
@@ -563,6 +563,49 @@ def get_weighted_filelists(filelists_dir: Path,
         imgs_paths[split] += dataset_imgs_paths
 
     return imgs_paths
+
+
+def pre_batch_filelist(filelist: List[Path],
+                       config: Dict[str, Any],
+                       output_dir: Path,
+                       shuffle: bool = True,
+                       restart: bool = True):
+    """A fault-resistent function to pre-batch a dataset to ``.pt`` files given a config file."""
+
+    if shuffle:
+        random.seed(config['random_seed'])
+        random.shuffle(filelist)
+
+    if restart:
+        last_file_index = max([int(p.stem) for p in output_dir.glob('*.pt')]) + 1
+        filelist = filelist[last_file_index:]
+        logger.info(f'Restarting from {last_file_index}')
+    else:
+        last_file_index = 0
+
+    # Start the main for loop to create the batches
+    # Todo: this should be done using an ``OcrIterDataset``
+    batch_size = 0
+    ocr_lines = []
+
+    for i, img_path in tqdm(enumerate(filelist, start=last_file_index)):
+        if not img_path.exists():
+            continue
+        if not img_path.with_suffix('.txt').exists():
+            continue
+        ocr_line = OcrLine(img_path, config['chunk_height'], config['chunk_width'], config['chunk_overlap'], config['classes_to_indices'],
+                           special_mapping=config['chars_to_special_classes'])
+
+        if batch_size + ocr_line.chunks.shape[0] > config['max_batch_size']:
+            torch.save(OcrBatch.from_lines(ocr_lines).to_dict(), output_dir / f'{i}.pt')
+            ocr_lines = [ocr_line]
+            batch_size = ocr_line.chunks.shape[0]
+        else:
+            ocr_lines.append(ocr_line)
+            batch_size += ocr_line.chunks.shape[0]
+
+    if ocr_lines:
+        torch.save(OcrBatch.from_lines(ocr_lines).to_dict(), output_dir / f'{i}.pt')
 
 
 def pre_batch_dataset(config: dict,

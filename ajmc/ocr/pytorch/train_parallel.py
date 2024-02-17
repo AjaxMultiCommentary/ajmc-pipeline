@@ -102,18 +102,18 @@ class OcrModelTrainer:
         worker_running_val_loss = 0.0
 
         # ========================= Evaluation on validation set =========================
-        with torch.no_grad():
-            for batch in self.progress_bar(self.val_dataloader, desc=f'Evaluating model on validation set at step {self.total_steps_run}...'):
-                outputs = self.compute_batch_outputs(batch.chunks, batch.chunks_to_img_mapping)
-                worker_running_val_loss += self.compute_outputs_loss(outputs, batch).item()
+        self.model.eval()
+        for batch in self.progress_bar(self.val_dataloader, desc=f'Evaluating model on validation set at step {self.total_steps_run}...'):
+            outputs = self.compute_batch_outputs(batch.chunks, batch.chunks_to_img_mapping)
+            worker_running_val_loss += self.compute_outputs_loss(outputs, batch).item()
 
-                if self.is_distributed:
-                    predicted_lines += self.model.module.ctc_decoder.decode(outputs, sizes=batch.img_widths)[0]
-                else:
-                    predicted_lines += self.model.ctc_decoder.decode(outputs, sizes=batch.img_widths)[0]
+            if self.is_distributed:
+                predicted_lines += self.model.module.ctc_decoder.decode(outputs, sizes=batch.img_widths)[0]
+            else:
+                predicted_lines += self.model.ctc_decoder.decode(outputs, sizes=batch.img_widths)[0]
 
-                groundtruth_lines += batch.texts
-
+            groundtruth_lines += batch.texts
+        self.model.train()
         # ========================= Compute average validation loss =========================
         worker_avg_val_loss = worker_running_val_loss / len(self.val_dataloader)
 
@@ -138,8 +138,8 @@ class OcrModelTrainer:
             all_gather_object(all_groundtruth_lines, groundtruth_lines)
 
         else:
-            all_groundtruth_lines = groundtruth_lines
-            all_predicted_lines = predicted_lines
+            all_groundtruth_lines = [groundtruth_lines]
+            all_predicted_lines = [predicted_lines]
 
         if self.is_main_process:
             # Log the predictions and the results to wandb
