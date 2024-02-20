@@ -9,8 +9,8 @@ from transformers import LayoutLMv3FeatureExtractor, LayoutLMv3ForTokenClassific
 
 from ajmc.commons.file_management import walk_dirs
 from ajmc.commons.geometry import is_bbox_within_bbox_with_threshold
+from ajmc.olr.evaluation import initialize_general_results, update_general_results
 from ajmc.olr.layoutlm.layoutlm import align_predicted_page, create_olr_config
-from ajmc.olr.map_utils import initialize_general_results, update_general_results
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.olr.yolo.utils import parse_yolo_txt
 # Constants

@@ -10,9 +10,9 @@ from transformers import LayoutLMv3FeatureExtractor, LayoutLMv3ForTokenClassific
 from ajmc.commons import variables as vs
 from ajmc.commons.file_management import walk_dirs
 from ajmc.commons.geometry import is_bbox_within_bbox, Shape
+from ajmc.olr.evaluation import initialize_general_results, update_general_results
 from ajmc.olr.layoutlm.draw import draw_caption, draw_page_labels
 from ajmc.olr.layoutlm.layoutlm import align_predicted_page, create_olr_config
-from ajmc.olr.map_utils import initialize_general_results, update_general_results
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 

@@ -8,7 +8,7 @@ import yaml
 from mean_average_precision import MetricBuilder
 
 from ajmc.commons.image import AjmcImage
-from ajmc.olr.map_utils import initialize_general_results, update_general_results
+from ajmc.olr.evaluation import initialize_general_results, update_general_results
 from ajmc.olr.yolo.utils import parse_yolo_txt
 
 

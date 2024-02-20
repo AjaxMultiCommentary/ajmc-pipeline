@@ -117,7 +117,7 @@ def draw_box(box: variables.BoxType,
     Args:
         box: A bbox or list of points.
         img_matrix: The image matrix on which to draw the box.
-        stroke_color: The color of the box contour.
+        stroke_color: The color of the box contour, in RGB.
         stroke_thickness: The thickness of the box contour.
         fill_color: The color of the box fill.
         fill_opacity: The opacity of the box fill.

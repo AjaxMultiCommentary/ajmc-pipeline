@@ -79,6 +79,10 @@ def get_comm_ocr_gt_pairs_dir(comm_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_OCR_GT_PAIRS_REL_DIR
 
 
+def get_comm_olr_lines_dir(comm_id: str) -> Path:
+    return get_comm_base_dir(comm_id) / 'olr/lines'
+
+
 def get_comm_ner_jsons_dir(comm_id: str, ocr_run_id: str) -> Path:
     return get_comm_base_dir(comm_id) / COMM_NER_ANN_REL_DIR / ocr_run_id / 'jsons'
 

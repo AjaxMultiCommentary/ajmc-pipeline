@@ -23,7 +23,7 @@ def get_config(config_path: Path) -> dict:
         config['classes'] = special_classes + config['classes']  # Add special classes to the beginning
     config['num_classes'] = len(config['classes'])
 
-    # Create mappings from chars to special classes and vice versa # TODO uncomment this
+    # Create mappings from chars to special classes and vice versa
     config['special_classes_dict'] = {c[0]: c[1] for c in config.get('special_classes', [])}  # Create a dictionary of special classes for easy access
     # Get the mappings for superscript and subscript
     config['chars_to_special_classes'] = {k: config['special_classes_dict']['superscript'] + v for k, v in SUPERSCRIPT_MAPPING.items()}
