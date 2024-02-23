@@ -176,3 +176,6 @@ dmypy.json
 
 # Commentaries search index
 search_index.json
+
+# TEI ODD example for export_to_tei.py
+tei_bare.odd
