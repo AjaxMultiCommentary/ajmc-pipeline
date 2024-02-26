@@ -20,6 +20,7 @@ TEI_REGION_TYPES = [
     "introduction",
     "preface",
     "primary_text",
+    "printed_marginalia",
     "table_of_contents",
     "title",
     "translation",
@@ -41,8 +42,12 @@ class TEIDocument:
         ][0]
         json_path = canonical_path / filename
 
+        self.ajmc_id = ajmc_id
         self.commentary = cc.CanonicalCommentary.from_json(json_path=json_path)
         self.filename = f"{ajmc_id}.xml"
+
+    def facsimile(self, page):
+        return f"//ajmc.unil.ch/iiif/{self.ajmc_id}/{page.id}/full/max/0/default.png"
 
     def to_tei(self):
         sections = []
@@ -50,16 +55,31 @@ class TEIDocument:
             pages = []
 
             for page in section.children.pages:
-                regions = []
+                pages.append(E.pb(n=page.id, facs=self.facsimile(page)))
 
                 for region in page.children.regions:
                     if region.region_type in TEI_REGION_TYPES:
-                        regions.append(E.div(region.text, type=region.region_type))
-                pages.append(E.div(*regions, type="page", n=page.id))
+                        pages.append(
+                            E.p(
+                                region.text,
+                                type=region.region_type,
+                                n="-".join(
+                                    [
+                                        str(region.word_range[0]),
+                                        str(region.word_range[1]),
+                                    ]
+                                ),
+                            )
+                        )
 
-            sections.append(
-                E.div(*pages, type=" ".join(section.section_types), n=section.id)
+            section_el = E.div(
+                *pages,
+                type="textpart",
+                subtype="section",
+                n=" ".join(section.section_types),
             )
+            section_el.attrib["{http://www.w3.org/XML/1998/namespace}id"] = section.id
+            sections.append(section_el)
 
         commentary_data = COMMENTARIES_DATA[self.commentary.id]  # type: ignore
 
