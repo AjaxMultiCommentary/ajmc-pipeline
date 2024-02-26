@@ -47,7 +47,7 @@ class TEIDocument:
         self.filename = f"{ajmc_id}.xml"
 
     def facsimile(self, page):
-        return f"//ajmc.unil.ch/iiif/{self.ajmc_id}/{page.id}/full/max/0/default.png"
+        return f"{self.ajmc_id}/{page.id}/full/max/0/default.png"
 
     def to_tei(self):
         sections = []
@@ -73,6 +73,7 @@ class TEIDocument:
                         )
 
             section_el = E.div(
+                E.head(section.section_title),
                 *pages,
                 type="textpart",
                 subtype="section",
@@ -106,8 +107,12 @@ class TEIDocument:
             ),
             E.text(
                 E.body(
-                    E.title(commentary_data["title"]),
-                    *sections,
+                    E.div(
+                        E.title(commentary_data["title"]),
+                        *sections,
+                        type="textpart",
+                        subtype="commentary",
+                    )
                 )
             ),
         )

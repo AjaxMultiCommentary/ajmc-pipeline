@@ -179,3 +179,6 @@ search_index.json
 
 # TEI ODD example for export_to_tei.py
 tei_bare.odd
+
+# TEI XML exports
+sophoclesplaysa05campgoog.xml
