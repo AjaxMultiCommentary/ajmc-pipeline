@@ -73,6 +73,42 @@ class TEIDocument:
     def facsimile(self, page):
         return f"{self.ajmc_id}/{page.id}"
 
+    def page_transcription(self, page):
+        page_el = E.div(E.pb(n=page.id, facs=self.facsimile(page)))
+
+        # If there are no regions with text on the page, fall back to
+        # the page's text
+        if "".join([r.text for r in page.children.regions]).strip() == "":
+            page_el.append(
+                E.p(
+                    page.text,
+                    type="page",
+                    n="-".join(
+                        [
+                            str(page.word_range[0]),
+                            str(page.word_range[1]),
+                        ]
+                    ),
+                )
+            )
+        else:
+            for region in page.children.regions:
+                if region.region_type in TEI_REGION_TYPES:
+                    page_el.append(
+                        E.p(
+                            region.text,
+                            type=region.region_type,
+                            n="-".join(
+                                [
+                                    str(region.word_range[0]),
+                                    str(region.word_range[1]),
+                                ]
+                            ),
+                        )
+                    )
+
+        return page_el
+
     def title(self):
         return self.bibliographic_data["title"]
 
@@ -82,27 +118,7 @@ class TEIDocument:
 
         sections = []
         for section in self.commentary.children.sections:
-            pages = []
-
-            for page in section.children.pages:
-                page_el = E.div(E.pb(n=page.id, facs=self.facsimile(page)))
-
-                for region in page.children.regions:
-                    if region.region_type in TEI_REGION_TYPES:
-                        page_el.append(
-                            E.p(
-                                region.text,
-                                type=region.region_type,
-                                n="-".join(
-                                    [
-                                        str(region.word_range[0]),
-                                        str(region.word_range[1]),
-                                    ]
-                                ),
-                            )
-                        )
-
-                pages.append(page_el)
+            pages = [self.page_transcription(page) for page in section.children.pages]
 
             section_el = E.div(
                 E.head(section.section_title),
