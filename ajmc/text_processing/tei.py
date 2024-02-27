@@ -5,6 +5,21 @@ import lxml.etree as lxml_etree
 import requests
 import os
 
+"""
+This module --- which is really more of a script --- enables exporting
+public domain commentaries to their TEI representation. You can run it
+from the command line with `python ajmc/text_processing/tei.py`, or you
+can import it (`import ajmc.text_processing.tei as tei`) and use it in
+your own script.
+
+It expects a few environment variables to be set:
+
+- `AJMC_DATA_DIR`: As with the bulk of this `ajmc` library, you'll need to point to a local copy of the AjMC canonical commentaries data directory.
+- `AJMC_API_URL`: This module uses the AjMC API to get information about the commentaries. It's most likely easiest to point to a local version.
+- `ZOTERO_API_URL`: The URL for the AjMC Zotero group. The example URL uses the string `GROUP` to indicate that you should subsitute in the group ID.
+- `ZOTERO_API_TOKEN`: Your Zotero API token for accessing the Zotero group.
+"""
+
 E = lxml_builder.ElementMaker(
     namespace="http://www.tei-c.org/ns/1.0",
     nsmap={None: "http://www.tei-c.org/ns/1.0"},
@@ -29,7 +44,7 @@ TEI_REGION_TYPES = [
 
 def get_zotero_data(zotero_id):
     resp = requests.get(
-        f'{os.getenv("ZOTERO_API_URL", "https://api.zotero.org/groups/GROUP/")}/items/{zotero_id}',
+        f'{os.getenv("ZOTERO_API_URL", "https://api.zotero.org/groups/GROUP")}/items/{zotero_id}',
         headers={"Authorization": f"Bearer {os.getenv('ZOTERO_API_TOKEN', '')}"},
     )
     return resp.json()["data"]
@@ -144,7 +159,7 @@ class TEIDocument:
 
 if __name__ == "__main__":
     commentaries = requests.get(
-        f"{os.getenv('AJMC_API_URL', '')}/commentaries?public=true"
+        f"{os.getenv('AJMC_API_URL', 'https://ajmc.unil.ch/api')}/commentaries?public=true"
     )
 
     for commentary in commentaries.json()["data"]:
