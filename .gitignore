@@ -181,4 +181,4 @@ search_index.json
 tei_bare.odd
 
 # TEI XML exports
-sophoclesplaysa05campgoog.xml
+tei/*.xml

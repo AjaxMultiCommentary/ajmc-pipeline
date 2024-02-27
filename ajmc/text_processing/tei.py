@@ -2,8 +2,8 @@ import ajmc.text_processing.canonical_classes as cc
 import ajmc.commons.variables as vars
 import lxml.builder as lxml_builder
 import lxml.etree as lxml_etree
+import requests
 import os
-
 
 E = lxml_builder.ElementMaker(
     namespace="http://www.tei-c.org/ns/1.0",
@@ -26,16 +26,17 @@ TEI_REGION_TYPES = [
     "translation",
 ]
 
-COMMENTARIES_DATA = {
-    "sophoclesplaysa05campgoog": {
-        "title": "Sophocles: The Plays and Fragments: Volume 7: The Ajax",
-        "author": "R. C. Jebb",
-    }
-}
+
+def get_zotero_data(zotero_id):
+    resp = requests.get(
+        f'{os.getenv("ZOTERO_API_URL", "https://api.zotero.org/groups/GROUP/")}/items/{zotero_id}',
+        headers={"Authorization": f"Bearer {os.getenv('ZOTERO_API_TOKEN', '')}"},
+    )
+    return resp.json()["data"]
 
 
 class TEIDocument:
-    def __init__(self, ajmc_id) -> None:
+    def __init__(self, ajmc_id, bibliographic_data) -> None:
         canonical_path = vars.COMMS_DATA_DIR / ajmc_id / "canonical"
         filename = [
             f for f in os.listdir(canonical_path) if f.endswith("_tess_retrained.json")
@@ -43,13 +44,27 @@ class TEIDocument:
         json_path = canonical_path / filename
 
         self.ajmc_id = ajmc_id
+        self.bibliographic_data = bibliographic_data
         self.commentary = cc.CanonicalCommentary.from_json(json_path=json_path)
-        self.filename = f"{ajmc_id}.xml"
+        self.filename = f"tei/{ajmc_id}.xml"
+        self.tei = None
+
+    def authors(self):
+        return [
+            E.author(f"{a['firstName']} {a['lastName']}")
+            for a in self.bibliographic_data["creators"]
+        ]
 
     def facsimile(self, page):
         return f"{self.ajmc_id}/{page.id}"
 
+    def title(self):
+        return self.bibliographic_data["title"]
+
     def to_tei(self):
+        if self.tei is not None:
+            return self.tei
+
         sections = []
         for section in self.commentary.children.sections:
             pages = []
@@ -84,14 +99,12 @@ class TEIDocument:
             section_el.attrib["{http://www.w3.org/XML/1998/namespace}id"] = section.id
             sections.append(section_el)
 
-        commentary_data = COMMENTARIES_DATA[self.commentary.id]  # type: ignore
-
-        return E.TEI(
+        self.tei = E.TEI(
             E.teiHeader(
                 E.fileDesc(
                     E.titleStmt(
-                        E.title(commentary_data["title"]),
-                        E.author(commentary_data["author"]),
+                        E.title(self.title()),
+                        *self.authors(),
                     ),
                     E.publicationStmt(
                         E.publisher("Ajax Multi-Commentary"),
@@ -110,7 +123,7 @@ class TEIDocument:
             E.text(
                 E.body(
                     E.div(
-                        E.title(commentary_data["title"]),
+                        E.title(self.title()),
                         *sections,
                         type="textpart",
                         subtype="commentary",
@@ -119,9 +132,23 @@ class TEIDocument:
             ),
         )
 
+        return self.tei
+
     def export(self):
         tei = self.to_tei()
 
         with open(self.filename, "wb") as f:
             lxml_etree.indent(tei, space="\t")
             f.write(lxml_etree.tostring(tei, encoding="utf-8", xml_declaration=True))  # type: ignore
+
+
+if __name__ == "__main__":
+    commentaries = requests.get(
+        f"{os.getenv('AJMC_API_URL', '')}/commentaries?public=true"
+    )
+
+    for commentary in commentaries.json()["data"]:
+        zotero_data = get_zotero_data(commentary["zotero_id"])
+        doc = TEIDocument(commentary["pid"], zotero_data)
+
+        doc.export()
