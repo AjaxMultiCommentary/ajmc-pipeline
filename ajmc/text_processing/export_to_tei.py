@@ -47,7 +47,7 @@ class TEIDocument:
         self.filename = f"{ajmc_id}.xml"
 
     def facsimile(self, page):
-        return f"{self.ajmc_id}/{page.id}/full/max/0/default.png"
+        return f"{self.ajmc_id}/{page.id}"
 
     def to_tei(self):
         sections = []
@@ -55,11 +55,11 @@ class TEIDocument:
             pages = []
 
             for page in section.children.pages:
-                pages.append(E.pb(n=page.id, facs=self.facsimile(page)))
+                page_el = E.div(E.pb(n=page.id, facs=self.facsimile(page)))
 
                 for region in page.children.regions:
                     if region.region_type in TEI_REGION_TYPES:
-                        pages.append(
+                        page_el.append(
                             E.p(
                                 region.text,
                                 type=region.region_type,
@@ -71,6 +71,8 @@ class TEIDocument:
                                 ),
                             )
                         )
+
+                pages.append(page_el)
 
             section_el = E.div(
                 E.head(section.section_title),
