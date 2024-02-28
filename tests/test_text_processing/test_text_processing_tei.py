@@ -1,4 +1,5 @@
 import ajmc.text_processing.tei as tei
+import lxml.etree as lxml_etree
 import pytest
 import random
 
@@ -66,6 +67,11 @@ class TestTEIDocument:
 
     def test_to_tei(self, document):
         assert document.to_tei() is not None
+
+        with open(f"tests/data/sample_tei/{sample_commentary_id}.xml", "rb") as f:
+            lxml_etree.indent(document.tei, space="\t")
+            output = lxml_etree.tostring(document.tei, encoding="utf-8", xml_declaration=True)  # type: ignore
+            assert output == f.read()
 
     def test_facsimile(self, document):
         page = random.choice(document.commentary.children.pages)
