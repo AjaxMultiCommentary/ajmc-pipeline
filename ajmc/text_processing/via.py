@@ -165,11 +165,15 @@ def create_via_project(comm: 'CanonicalCommentary') -> ViaProject:
 
         for r in page.children.regions:
             region_shapes.append(r.bbox)
-            region_attributes.append({'label': vs.OLR_PREFIX + r.region_type})
 
-        file_attributes['is_ground_truth'] = {'ocr': page in comm.ocr_gt_pages,
-                                              'olr': page in comm.olr_gt_pages}
+            if page.id in comm.ocr_gt_page_ids and r.region_type not in ['undefined', 'line_region']:
+                region_attributes.append({'label': vs.OLR_PREFIX + vs.OCR_GT_PREFIX + r.region_type})
 
+            else:
+                region_attributes.append({'label': vs.OLR_PREFIX + r.region_type})
+
+        file_attributes['is_ground_truth'] = {'ocr': page.id in comm.ocr_gt_page_ids,
+                                              'olr': page.id in comm.olr_gt_page_ids}
 
         via_project.add_image(page.image.path.relative_to(base_path),
                               region_shapes=region_shapes,

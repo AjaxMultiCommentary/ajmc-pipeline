@@ -1,10 +1,12 @@
+# TODO : revise the docs
 import os
 import random
-import unicodedata
+from abc import abstractmethod
 from pathlib import Path
-from typing import List, Dict, Tuple, Generator, Optional, Any
+from typing import List, Dict, Tuple, Generator, Optional, Any, Callable, Iterable
 
 import torch
+import unicodedata
 from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
 from torchvision.io import read_image, ImageReadMode
@@ -18,10 +20,8 @@ from ajmc.ocr import variables as ocr_vs
 logger = get_ajmc_logger(__name__)
 
 
-# Todo add a training mode where the text is not given
-
-class OcrLine:
-    """A custom class for OCR lines.
+class TorchTrainingLine:
+    """A custom class for OCR training lines
 
     Note:
         - A line corresponds both to a txt and an img if in train mode, only an image if not.
@@ -48,14 +48,64 @@ class OcrLine:
                  classes_to_indices: Dict[str, int],
                  special_mapping: Dict[str, str],
                  unknown_char_index: int = 1):
-        img_tensor = prepare_img(img_path, img_height=img_height)
+        img_tensor = read_image(str(img_path), mode=ImageReadMode.GRAY).requires_grad_(False)
+        img_tensor = prepare_img_tensor(img_tensor, img_height=img_height)
         self.img_width: int = img_tensor.shape[2]
         self.chunks = chunk_img_tensor(img_tensor, chunk_width, chunk_overlap)
         self.text = prepare_text(img_path.with_suffix(ocr_vs.GT_TEXT_EXTENSION).read_text(encoding='utf-8'), special_mapping=special_mapping)
         self.text_tensor = torch.tensor([classes_to_indices.get(c, unknown_char_index) for c in self.text])
 
 
-class OcrBatch:
+class TorchInferenceLine:
+    """A custom class for torch lines at inference time, were the text is not given and where the line image
+    is provided directly as a ``torch.Tensor``.
+
+    Note:
+        - A line corresponds both to a txt and an img if in train mode, only an image if not.
+        - img : the image of the line
+            - img_width: The width of the original image
+            - img_height: The height of the original image
+            - img_padding_length: The length of padding added for batching in the decoder
+        - Chunks : the chunks of the image of the line
+            - chunks_width: The widths of chunks
+            - chunks_height = img height
+            - chunks_count: The number of chunks
+            - last_chunk_padding: The length of the padding added to the last chunk.
+        - text : the text corresponding to the image.
+            - text_length: The length of the text
+
+    """
+
+    # #@profile
+    def __init__(self,
+                 line_id: str,
+                 img_tensor: torch.Tensor,
+                 img_height: int,
+                 chunk_width: int,
+                 chunk_overlap: int):
+        """Initializes a ``TorchInferenceLine`` instance.
+
+        Note:
+            This class is different from the ``TorchTrainingLine``, notably because:
+                - The text is not given, as it is to be inferred.
+                - The image is given as a ``torch.Tensor`` and not as a file path.
+
+        Args:
+            line_id (str): The id of the line (e.g. ``{page_id}_{x1}_{y1}_{x2}_{y2}``)
+            img_tensor (torch.Tensor): The image tensor of the line, in shape (1, line_height, line_width),
+            as read by ``read_image(str(img_tensor), mode=ImageReadMode.GRAY).requires_grad_(False)``
+            img_height (int): The desired resizing height of the image (a model parameter)
+            chunk_width (int): The width of the chunks to be created from the image
+            chunk_overlap (int): The overlap between the chunks to be created from the image
+        """
+
+        self.line_id = line_id
+        self.img_tensor = prepare_img_tensor(img_tensor, img_height=img_height)
+        self.img_width: int = self.img_tensor.shape[2]
+        self.chunks = chunk_img_tensor(self.img_tensor, chunk_width, chunk_overlap)
+
+
+class TorchTrainingBatch:
 
     # #@profile
     def __init__(self,
@@ -74,7 +124,7 @@ class OcrBatch:
         self.texts = texts
 
     @classmethod
-    def from_lines(cls, ocr_lines: List[OcrLine]):
+    def from_lines(cls, ocr_lines: List[TorchTrainingLine]):
         return cls(img_widths=tuple(l.img_width for l in ocr_lines),
                    chunks=torch.cat([l.chunks for l in ocr_lines], dim=0),
                    chunks_to_img_mapping=[len(l.chunks) for l in ocr_lines],
@@ -96,59 +146,45 @@ class OcrBatch:
         self.text_lengths = tuple(len(t) for t in self.texts)
 
 
-class OcrIterDataset(torch.utils.data.IterableDataset):
-    """Dataset for OCR training.
+class TorchInferenceBatch:
 
-    Warning:
-        ``OcrIterDataset`` is an infinite iterable dataset, and as such, it does not have a ``__len__`` method. This means that:
+    # #@profile
+    def __init__(self,
+                 line_ids: List[str],
+                 img_widths: Tuple[int],
+                 chunks: torch.Tensor,
+                 chunks_to_img_mapping: List[int],
+                 ):
+        self.line_ids = line_ids
+        self.img_widths = img_widths
+        self.chunks = chunks
+        self.chunks_to_img_mapping = chunks_to_img_mapping
 
-            * ``OcrIterDataset`` it cannot be used with a ``torch.utils.data.DataLoader`` with ``batch_size > 1``. Actually, \
-            ``OcrIterDataset.__iter__()`` already returns batches of size inferior to ``max_batch_size`` at each iteration.
-            * ``OcrIterDataset`` is infinite: Use it with ``next(iter())`` in a ``for`` loop, or with a defined range.
-            * ``OcrIterDataset.date_len`` is **not** the length of the dataset, but the length of the list of images the dataset will infinitely iterate on. It is therefore not the same as ``__len__``.
+    @classmethod
+    def from_lines(cls, ocr_lines: List[TorchInferenceLine]):
+        return cls(line_ids=[l.line_id for l in ocr_lines],
+                   img_widths=tuple(l.img_width for l in ocr_lines),
+                   chunks=torch.cat([l.chunks for l in ocr_lines], dim=0),
+                   chunks_to_img_mapping=[len(l.chunks) for l in ocr_lines])
 
 
-    Args:
-        data_dir: The directory containing the images to train on.
-        classes: The classes to train on.
-        max_batch_size: The maximum ocr_batch size to return at each iteration.
-        img_height: The height to which to resize the images.
-        chunk_width: The width of the chunks to extract from the images.
-        chunk_overlap: The overlap between the chunks.
-        shuffle: Whether to shuffle the dataset.
-        per_worker_steps_run: The number of steps already run by each worker. This is used to compute the number of chunks to
-            skip at the beginning of the dataset, so that each worker starts at a different point in the dataset.
-
-    """
+class TorchOcrDataset(torch.utils.data.Dataset):
 
     def __init__(self,
-                 classes: str,
-                 classes_to_indices: Dict[str, int],
                  max_batch_size: int,
                  img_height: int,
                  chunk_width: int,
                  chunk_overlap: int,
-                 special_mapping: Dict[str, str] = None,
-                 data_dir: Path = None,
+                 data_dir: Optional[Path] = None,
                  img_paths: Optional[List[Path]] = None,
-                 loop_infinitely: bool = True,
-                 shuffle: bool = True,
                  num_workers: int = 1,
                  per_worker_steps_run: int = 0):
-
         super().__init__()
-        self.classes = classes
-        self.classes_to_indices = classes_to_indices
         self.max_batch_size = max_batch_size
         self.img_height = img_height
         self.chunk_width = chunk_width
         self.chunk_overlap = chunk_overlap
-        self.special_mapping = special_mapping
-        self.loop_infinitely = loop_infinitely
-        self.shuffle = shuffle
-        self.num_workers = num_workers
         self.per_worker_steps_run = per_worker_steps_run
-        self.data_dir = data_dir
 
         # Get the paths of the images
         if img_paths is not None:
@@ -156,20 +192,28 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
             self.img_paths = img_paths
 
         else:
-            self.img_paths = sorted(self.data_dir.rglob('*' + ocr_vs.IMG_EXTENSION), key=lambda x: x.stem)
-            logger.info(f'Using {len(self.img_paths)} images from {self.data_dir}.')
+            self.img_paths = sorted(data_dir.rglob('*' + ocr_vs.IMG_EXTENSION), key=lambda x: x.stem)
+            logger.info(f'Using {len(self.img_paths)} images from {data_dir}.')
 
-        if self.shuffle:
-            random.shuffle(self.img_paths)
+        self.data_len = len(self.img_paths)
+        self.num_workers = num_workers
+        self.worker_id = int(os.environ.get('RANK', 0))
+        self.start, self.restart, self.end = self.distribute()
 
         # Distribute the dataset accross workers
-        self.worker_id = int(os.environ.get('RANK', 0))
-        self.data_len = len(self.img_paths)
-        self.start, self.restart, self.end = self.distribute()
         self.batch_iterator = iter(self.yield_batches(self.restart, self.end))
+
+
+    @abstractmethod
+    def yield_batches(self, start: int, end: int) -> Generator[TorchTrainingBatch, None, None]:
+        pass
+
+    def __iter__(self):
+        return self.batch_iterator
 
     def reset(self):
         self.batch_iterator = iter(self.yield_batches(self.start, self.end))
+
 
     def distribute(self) -> Tuple[int, int, int]:
         """Distributes the datasets accross workers.
@@ -189,47 +233,155 @@ class OcrIterDataset(torch.utils.data.IterableDataset):
         # Compute the start, re-start and end indices for the current worker
         worker_default_start = self.worker_id * samples_per_worker
         worker_restart = worker_default_start + self.per_worker_steps_run
-        worker_end = min(worker_default_start + samples_per_worker, self.data_len - 1)
+        worker_end = min(worker_default_start + samples_per_worker, self.data_len)
 
         logger.info(f'Worker {self.worker_id} is starting at step {worker_restart}')
 
         return worker_default_start, worker_restart, worker_end
 
 
-    def yield_batches(self, start: int, end: int) -> Generator[OcrBatch, None, None]:
+class TorchTrainingDataset(TorchOcrDataset):
+    """Dataset for OCR training.
+
+    Warning:
+        ``TorchTrainingDataset`` is an infinite iterable dataset, and as such, it does not have a ``__len__`` method. This means that:
+
+            * ``TorchTrainingDataset`` it cannot be used with a ``torch.utils.data.DataLoader`` with ``batch_size > 1``. Actually, \
+            ``TorchTrainingDataset.__iter__()`` already returns batches of size inferior to ``max_batch_size`` at each iteration.
+            * ``TorchTrainingDataset`` is infinite: Use it with ``next(iter())`` in a ``for`` loop, or with a defined range.
+            * ``TorchTrainingDataset.date_len`` is **not** the length of the dataset, but the length of the list of images the dataset will infinitely iterate on. It is therefore not the same as ``__len__``.
+
+
+    Args:
+        data_dir: The directory containing the images to train on.
+        max_batch_size: The maximum ocr_batch size to return at each iteration.
+        img_height: The height to which to resize the images.
+        chunk_width: The width of the chunks to extract from the images.
+        chunk_overlap: The overlap between the chunks.
+        shuffle: Whether to shuffle the dataset.
+        per_worker_steps_run: The number of steps already run by each worker. This is used to compute the number of chunks to
+            skip at the beginning of the dataset, so that each worker starts at a different point in the dataset.
+
+    """
+
+    def __init__(self,
+                 classes_to_indices: Dict[str, int],
+                 max_batch_size: int,
+                 img_height: int,
+                 chunk_width: int,
+                 chunk_overlap: int,
+                 special_mapping: Dict[str, str] = None,
+                 data_dir: Path = None,
+                 img_paths: Optional[List[Path]] = None,
+                 loop_infinitely: bool = True,
+                 shuffle: bool = True,
+                 num_workers: int = 1,
+                 per_worker_steps_run: int = 0):
+
+        super().__init__(max_batch_size=max_batch_size,
+                         img_height=img_height,
+                         chunk_width=chunk_width,
+                         chunk_overlap=chunk_overlap,
+                         data_dir=data_dir,
+                         img_paths=img_paths,
+                         num_workers=num_workers,
+                         per_worker_steps_run=per_worker_steps_run)
+
+        self.classes_to_indices = classes_to_indices
+        self.special_mapping = special_mapping
+        self.loop_infinitely = loop_infinitely
+
+        if shuffle:
+            random.shuffle(self.img_paths)
+
+
+    def yield_batches(self, start: int, end: int) -> Generator[TorchTrainingBatch, None, None]:
         """Yields batches of data, starting at the given start index.
 
         Args:
             start: The start index.
             end: The end index (i.e. the index of the last file to be processed).
         """
-        logger.info(f'Instantiating the ocr_batch generator')
         batch_size = 0
-        ocr_lines = []
+        batch_lines = []
 
         for img_path in self.img_paths[start:end]:
-            ocr_line = OcrLine(img_path, self.img_height, self.chunk_width, self.chunk_overlap, self.classes_to_indices,
-                               special_mapping=self.special_mapping)
+            ocr_line = TorchTrainingLine(img_path, self.img_height, self.chunk_width, self.chunk_overlap, self.classes_to_indices,
+                                         special_mapping=self.special_mapping)
 
             if batch_size + ocr_line.chunks.shape[0] > self.max_batch_size:
-                yield OcrBatch.from_lines(ocr_lines)
-                ocr_lines = [ocr_line]
+                yield TorchTrainingBatch.from_lines(batch_lines)
+                batch_lines = [ocr_line]
                 batch_size = ocr_line.chunks.shape[0]
             else:
-                ocr_lines.append(ocr_line)
+                batch_lines.append(ocr_line)
                 batch_size += ocr_line.chunks.shape[0]
 
         if self.loop_infinitely:
             self.reset()
 
-        yield OcrBatch.from_lines(ocr_lines)
+        yield TorchTrainingBatch.from_lines(batch_lines)
 
 
-    def __iter__(self):
-        return self.batch_iterator
+class TorchInferenceDataset(TorchOcrDataset):
+
+    def __init__(self,
+                 max_batch_size: int,
+                 img_height: int,
+                 chunk_width: int,
+                 chunk_overlap: int,
+                 line_detector: Callable,
+                 img_paths: Optional[List[Path]] = None,
+                 data_dir: Optional[Path] = None,
+                 num_workers: int = 1):
+
+        super().__init__(max_batch_size=max_batch_size,
+                         img_height=img_height,
+                         chunk_width=chunk_width,
+                         chunk_overlap=chunk_overlap,
+                         data_dir=data_dir,
+                         img_paths=img_paths,
+                         num_workers=num_workers)
+
+        self.line_detector = line_detector
+
+    def yield_batches(self, start: int, end: int) -> Generator[TorchInferenceBatch, None, None]:
+        """Yields batches of data, starting at the given start index.
+
+        Args:
+            start: The start index.
+            end: The end index (i.e. the index of the last file to be processed).
+        """
+
+        batch_size = 0
+        batch_lines = []
+
+        for img_path in self.img_paths[start:end]:
+
+            img_tensor = read_image(str(img_path), mode=ImageReadMode.GRAY).requires_grad_(False)
+            line_boxes: List['Shape'] = self.line_detector(img_path)
+
+            page_lines = {f'{img_path.stem}_{"_".join(l.xyxy)}': img_tensor[l.ymin:l.ymax, l.xmin:l.xmax].clone()
+                          for l in line_boxes}
+
+            page_lines = [TorchInferenceLine(line_id=k, img_tensor=v, img_height=self.img_height, chunk_width=self.chunk_width)
+                          for k, v in page_lines.items()]
+
+            for ocr_line in page_lines:
+
+                if batch_size + ocr_line.chunks.shape[0] > self.max_batch_size:
+                    yield TorchInferenceBatch.from_lines(batch_lines)
+                    batch_lines = [ocr_line]
+                    batch_size = ocr_line.chunks.shape[0]
+                else:
+                    batch_lines.append(ocr_line)
+                    batch_size += ocr_line.chunks.shape[0]
+
+        if batch_lines:
+            yield TorchInferenceBatch.from_lines(batch_lines)
 
 
-class OcrBatchedDataset(torch.utils.data.Dataset):
+class TorchBatchedTrainingDataset(torch.utils.data.Dataset):
     def __init__(self,
                  source_dir: Path,
                  cache_dir: Optional[Path] = None,
@@ -248,6 +400,7 @@ class OcrBatchedDataset(torch.utils.data.Dataset):
             chars_to_special_classes: A mapping from characters to special classes.
             classes_to_indices: A mapping from classes to indices.
         """
+        super().__init__()
         self.source_dir = source_dir
         self.cache_dir = cache_dir
         self.num_workers = num_workers
@@ -279,7 +432,7 @@ class OcrBatchedDataset(torch.utils.data.Dataset):
         return len(self.batch_paths)
 
     def fetch_batch(self, idx):
-        return OcrBatch(**torch.load(self.batch_paths[idx]))
+        return TorchTrainingBatch(**torch.load(self.batch_paths[idx]))
 
 
     def fetch_and_cache_batch(self, idx):
@@ -421,7 +574,7 @@ def compute_padding(img_tensor,
     return n_chunks * chunk_width - (n_chunks - 1) * chunk_overlap - img_tensor.shape[2]
 
 
-def chunk_img_tensor(img_tensor,
+def chunk_img_tensor(img_tensor: torch.Tensor,
                      chunk_width: int,
                      chunk_overlap: int) -> torch.Tensor:
     """Chunks an image tensor of shape (1, height, width) into chunks of shape (N_chunks, height, chunk_width).
@@ -449,20 +602,19 @@ def chunk_img_tensor(img_tensor,
     return torch.stack(chunks, dim=0)
 
 
+
 # #@profile
-def prepare_img(img_path: Path,
-                img_height: int) -> torch.Tensor:
+def prepare_img_tensor(img_tensor: torch.Tensor,
+                       img_height: int) -> torch.Tensor:
     """Prepares an image tensor for training.
 
     Args:
-        img_path: The path to a grayscale image of shape (1, initial_height, initial_width).
+        img_tensor: The tensor of a grayscale image tensor of shape (1, initial_height, initial_width).
         img_height: The height to which to resize the image.
 
     Returns:
         The prepared image tensor, in shape (1, img_height, resized_width).
     """
-
-    img_tensor = read_image(str(img_path), mode=ImageReadMode.GRAY).requires_grad_(False)
     img_tensor = invert_image_tensor(img_tensor)
     # img_tensor = crop_image_tensor_to_nonzero(img_tensor)
 
@@ -565,6 +717,49 @@ def get_weighted_filelists(filelists_dir: Path,
     return imgs_paths
 
 
+def pre_batch_filelist(filelist: List[Path],
+                       config: Dict[str, Any],
+                       output_dir: Path,
+                       shuffle: bool = True,
+                       restart: bool = True):
+    """A fault-resistent function to pre-batch a dataset to ``.pt`` files given a config file."""
+
+    if shuffle:
+        random.seed(config['random_seed'])
+        random.shuffle(filelist)
+
+    if restart:
+        last_file_index = max([int(p.stem) for p in output_dir.glob('*.pt')]) + 1
+        filelist = filelist[last_file_index:]
+        logger.info(f'Restarting from {last_file_index}')
+    else:
+        last_file_index = 0
+
+    # Start the main for loop to create the batches
+    # Todo: this should be done using an ``TorchTrainingDataset``
+    batch_size = 0
+    ocr_lines = []
+
+    for i, img_path in tqdm(enumerate(filelist, start=last_file_index)):
+        if not img_path.exists():
+            continue
+        if not img_path.with_suffix('.txt').exists():
+            continue
+        ocr_line = TorchTrainingLine(img_path, config['chunk_height'], config['chunk_width'], config['chunk_overlap'], config['classes_to_indices'],
+                                     special_mapping=config['chars_to_special_classes'])
+
+        if batch_size + ocr_line.chunks.shape[0] > config['max_batch_size']:
+            torch.save(TorchTrainingBatch.from_lines(ocr_lines).to_dict(), output_dir / f'{i}.pt')
+            ocr_lines = [ocr_line]
+            batch_size = ocr_line.chunks.shape[0]
+        else:
+            ocr_lines.append(ocr_line)
+            batch_size += ocr_line.chunks.shape[0]
+
+    if ocr_lines:
+        torch.save(TorchTrainingBatch.from_lines(ocr_lines).to_dict(), output_dir / f'{i}.pt')
+
+
 def pre_batch_dataset(config: dict,
                       splits: List[str],
                       output_dir: Path,
@@ -598,7 +793,7 @@ def pre_batch_dataset(config: dict,
             last_file_index = 0
 
         # Start the main for loop to create the batches
-        # Todo: this should be done using an ``OcrIterDataset``
+        # Todo: this should be done using an ``TorchTrainingDataset``
         batch_size = 0
         ocr_lines = []
 
@@ -607,11 +802,12 @@ def pre_batch_dataset(config: dict,
                 continue
             if not img_path.with_suffix('.txt').exists():
                 continue
-            ocr_line = OcrLine(img_path, config['chunk_height'], config['chunk_width'], config['chunk_overlap'], config['classes_to_indices'],
-                               special_mapping=config['chars_to_special_classes'])
+            ocr_line = TorchTrainingLine(img_path, config['chunk_height'], config['chunk_width'], config['chunk_overlap'],
+                                         config['classes_to_indices'],
+                                         special_mapping=config['chars_to_special_classes'])
 
             if batch_size + ocr_line.chunks.shape[0] > config['max_batch_size']:
-                torch.save(OcrBatch.from_lines(ocr_lines).to_dict(), split_output_dir / f'{i}.pt')
+                torch.save(TorchTrainingBatch.from_lines(ocr_lines).to_dict(), split_output_dir / f'{i}.pt')
                 ocr_lines = [ocr_line]
                 batch_size = ocr_line.chunks.shape[0]
             else:
@@ -619,4 +815,31 @@ def pre_batch_dataset(config: dict,
                 batch_size += ocr_line.chunks.shape[0]
 
         if ocr_lines:
-            torch.save(OcrBatch.from_lines(ocr_lines).to_dict(), split_output_dir / f'{i}.pt')
+            torch.save(TorchTrainingBatch.from_lines(ocr_lines).to_dict(), split_output_dir / f'{i}.pt')
+
+
+def batch_builder(ocr_lines: Iterable['TorchLine'],
+                  max_batch_size: int,
+                  batch_class=TorchTrainingBatch):
+    """A generator that yields batches of lines from the given iterable of lines.
+
+    Args:
+        ocr_lines: The iterable of ocr lines to batch.
+        max_batch_size: The maximum size of the batch.
+        batch_class: The class to use to create the batches (should be a ``TorchTrainingBatch`` or a ``TorchInferenceBatch``).
+    """
+
+    batch_size = 0
+    batch_lines = []
+
+    for ocr_line in ocr_lines:
+        if batch_size + ocr_line.chunks.shape[0] > max_batch_size:
+            yield batch_class.from_lines(batch_lines)
+            batch_lines = [ocr_line]
+            batch_size = ocr_line.chunks.shape[0]
+        else:
+            batch_lines.append(ocr_line)
+            batch_size += ocr_line.chunks.shape[0]
+
+    if batch_lines:
+        yield batch_class.from_lines(batch_lines)

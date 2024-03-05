@@ -79,6 +79,27 @@ class Shape:
         return self.bbox[0][0], self.bbox[0][1], self.bbox[1][0], self.bbox[1][1]
 
     @lazy_property
+    def xmin(self) -> int:
+        """Returns the x-coordinate of the upper left corner."""
+        return self.bbox[0][0]
+
+    @lazy_property
+    def ymin(self) -> int:
+        """Returns the y-coordinate of the upper left corner."""
+        return self.bbox[0][1]
+
+    @lazy_property
+    def xmax(self) -> int:
+        """Returns the x-coordinate of the lower right corner."""
+        return self.bbox[1][0]
+
+    @lazy_property
+    def ymax(self) -> int:
+        """Returns the y-coordinate of the lower right corner."""
+        return self.bbox[1][1]
+
+
+    @lazy_property
     def xywh(self) -> Tuple[int, int, int, int]:
         """Gets the bounding box in ``[x,y,w,h]`` format, where ``x`` and ``y`` are the coordinates of the upper-left
         corner."""

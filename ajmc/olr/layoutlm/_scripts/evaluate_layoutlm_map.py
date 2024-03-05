@@ -10,9 +10,9 @@ from transformers import LayoutLMv3FeatureExtractor, LayoutLMv3ForTokenClassific
 from ajmc.commons import variables as vs
 from ajmc.commons.file_management import walk_dirs
 from ajmc.commons.geometry import is_bbox_within_bbox, Shape
+from ajmc.olr.evaluation import initialize_general_results, update_general_results
 from ajmc.olr.layoutlm.draw import draw_caption, draw_page_labels
 from ajmc.olr.layoutlm.layoutlm import align_predicted_page, create_olr_config
-from ajmc.olr.map_utils import initialize_general_results, update_general_results
 from ajmc.olr.utils import get_olr_splits_page_ids
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
@@ -72,8 +72,8 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
             if j == 0:
                 region = {'words': [words[j]]}
             else:
-                if labels[j] != labels[j - 1] or words[j].bbox.xyxy[-1] < (
-                        words[j - 1].bbox.xyxy[1] - 50):  # for double col
+                if labels[j] != labels[j - 1] or words[j].bbox.ymax < (
+                        words[j - 1].bbox.ymin - 50):  # for double col
                     region['label'] = labels[j - 1]
                     pred_regions.append(region)
                     region = {'words': [words[j]]}

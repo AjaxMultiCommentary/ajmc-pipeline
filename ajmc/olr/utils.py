@@ -5,22 +5,6 @@ from ajmc.commons.arithmetic import compute_interval_overlap
 from ajmc.commons.file_management import get_olr_gt_spreadsheet
 
 
-def get_page_region_dicts_from_via(page_id: str, via_project: dict) -> List[dict]:
-    """Extract region-dicts of a page from``via_project``."""
-    regions = []
-    for key in via_project["_via_img_metadata"].keys():
-        if page_id in key:
-            regions = via_project["_via_img_metadata"][key]["regions"]
-            break
-
-    return regions
-
-
-def select_page_regions_by_types(page: 'OcrPage',
-                                 region_types: List[str]) -> List['OlrRegion']:
-    return [r for r in page.children.regions if r.region_type in region_types]
-
-
 def sort_to_reading_order(elements: list,
                           overlap_thresh: float = 0.6):
     """Orders elements according to reading order.

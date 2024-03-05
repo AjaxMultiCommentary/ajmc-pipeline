@@ -22,6 +22,7 @@ config['datasets_weights'] = {
 
 output_dir = Path('/scratch/sven/ocr_exp/batched_testset_delok')
 
+#%% Batch the test set in the usual way
 pre_batch_dataset(config,
                   splits=['test'],
                   output_dir=output_dir,
