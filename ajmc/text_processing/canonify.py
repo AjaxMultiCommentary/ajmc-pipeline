@@ -37,9 +37,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    args.commentary_ids = ['sophoclesplaysa05campgoog']
-    args.force = True
-    args.stream_handler_level = 'DEBUG'
+    # args.commentary_ids = ['sophoclesplaysa05campgoog']
+    # args.force = True
+    # args.stream_handler_level = 'DEBUG'
 
     ROOT_LOGGER.setLevel(args.stream_handler_level)
 
