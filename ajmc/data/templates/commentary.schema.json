@@ -1,0 +1,296 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://ajmc.unil.ch/commentary.schema.json",
+    "title": "Canonical Commentary",
+    "description": "A representation of a canonical commentary in AjMC",
+    "type": "object",
+    "$defs": {
+        "entity": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "enum": [
+                        "date",
+                        "loc",
+                        "O",
+                        "object.manuscr",
+                        "org",
+                        "pers.author",
+                        "pers.editor",
+                        "pers.myth",
+                        "pers.other",
+                        "primary-full",
+                        "primary-partial",
+                        "scope",
+                        "secondary-full",
+                        "secondary-meta",
+                        "secondary-partial",
+                        "work.fragm",
+                        "work.journal",
+                        "work.other",
+                        "work.primlit",
+                        "work.seclit"
+                    ]
+                },
+                "shifts": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "transcript": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "wikidata_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "word_range": {
+                    "$ref": "#/$defs/word_range"
+                }
+            },
+            "required": [
+                "label",
+                "word_range"
+            ]
+        },
+        "lemma": {
+            "type": "object",
+            "properties": {
+                "anchor_target": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "label": {
+                    "enum": [
+                        "note",
+                        "scope-anchor",
+                        "word-anchor"
+                    ]
+                },
+                "shifts": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "transcript": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "word_range": {
+                    "$ref": "#/$defs/word_range"
+                }
+            },
+            "required": [
+                "label",
+                "word_range"
+            ]
+        },
+        "line": {
+            "type": "object",
+            "properties": {
+                "word_range": {
+                    "$ref": "#/$defs/word_range"
+                }
+            }
+        },
+        "page": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "word_range": {
+                    "$ref": "#/$defs/word_range"
+                }
+            }
+        },
+        "region": {
+            "type": "object",
+            "properties": {
+                "region_type": {
+                    "enum": [
+                        "app_crit",
+                        "appendix",
+                        "bibliography",
+                        "commentary",
+                        "footnote",
+                        "handwritten_marginalia",
+                        "index",
+                        "introduction",
+                        "line_number_commentary",
+                        "line_number_text",
+                        "line_region",
+                        "other",
+                        "page_number",
+                        "preface",
+                        "primary_text",
+                        "printed_marginalia",
+                        "running_header",
+                        "table_of_contents",
+                        "title",
+                        "translation",
+                        "undefined"
+                    ]
+                },
+                "is_ocr_gt": {
+                    "type": "boolean"
+                },
+                "word_range": {
+                    "$ref": "#/$defs/word_range"
+                }
+            }
+        },
+        "section": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "section_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "section_title": {
+                    "type": "string"
+                },
+                "word_range": {
+                    "$ref": "#/$defs/word_range"
+                }
+            },
+            "required": [
+                "id",
+                "section_types",
+                "word_range"
+            ]
+        },
+        "word": {
+            "type": "object",
+            "properties": {
+                "bbox": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "word_range": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        }
+    },
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "ne_corpus_commit": {
+                    "type": "string"
+                },
+                "ocr_run_id": {
+                    "type": "string"
+                },
+                "lemlink_corpus_commit": {
+                    "type": "string"
+                },
+                "commentaries_data_commit": {
+                    "type": "string"
+                }
+            }
+        },
+        "ocr_gt_page_ids": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "olr_gt_page_ids": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "net_gt_page_ids": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "lem_link_gt_page_ids": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "children": {
+            "type": "object",
+            "properties": {
+                "commentaries": {
+                    "type": "array"
+                },
+                "entities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/entity"
+                    }
+                },
+                "hyphenations": {
+                    "type": "array"
+                },
+                "lemmas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/lemma"
+                    }
+                },
+                "lines": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/line"
+                    }
+                },
+                "pages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/page"
+                    }
+                },
+                "regions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/region"
+                    }
+                },
+                "sections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/section"
+                    }
+                },
+                "sentences": {
+                    "type": "array"
+                }
+            }
+        }
+    }
+}
