@@ -72,8 +72,8 @@ for i, xp_name in enumerate(walk_dirs(RUNS_DIR)):
             if j == 0:
                 region = {'words': [words[j]]}
             else:
-                if labels[j] != labels[j - 1] or words[j].bbox.xyxy[-1] < (
-                        words[j - 1].bbox.xyxy[1] - 50):  # for double col
+                if labels[j] != labels[j - 1] or words[j].bbox.ymax < (
+                        words[j - 1].bbox.ymin - 50):  # for double col
                     region['label'] = labels[j - 1]
                     pred_regions.append(region)
                     region = {'words': [words[j]]}

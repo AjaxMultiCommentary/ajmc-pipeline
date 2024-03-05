@@ -17,7 +17,7 @@ from tqdm import tqdm
 from ajmc.commons.miscellaneous import get_ajmc_logger, ROOT_LOGGER
 from ajmc.ocr.evaluation import line_based_evaluation
 from ajmc.ocr.pytorch.config import get_config, write_config_to_output_dir
-from ajmc.ocr.pytorch.data_processing import OcrBatch, recompose_batched_chunks, get_custom_dataloader, OcrBatchedDataset
+from ajmc.ocr.pytorch.data_processing import TorchTrainingBatch, recompose_batched_chunks, get_custom_dataloader, TorchBatchedTrainingDataset
 from ajmc.ocr.pytorch.model import OcrTorchModel
 
 
@@ -74,15 +74,15 @@ class OcrModelTrainer:
         # We apply the logsoftmax
         return F.log_softmax(x, 2)
 
-    def compute_outputs_loss(self, x: torch.Tensor, batch: OcrBatch) -> torch.Tensor:
+    def compute_outputs_loss(self, x: torch.Tensor, batch: TorchTrainingBatch) -> torch.Tensor:
         # Here we need to transpose the outputs to be of shape T x N x C
         return self.criterion(x.permute(1, 0, 2), batch.texts_tensor.to(self.device), batch.img_widths, batch.text_lengths)
 
-    def compute_batch_loss(self, batch: OcrBatch) -> torch.Tensor:
+    def compute_batch_loss(self, batch: TorchTrainingBatch) -> torch.Tensor:
         """Forward a ocr_batch through the model."""
         return self.compute_outputs_loss(self.compute_batch_outputs(batch.chunks, batch.chunks_to_img_mapping), batch)
 
-    def run_batch(self, batch: OcrBatch) -> float:
+    def run_batch(self, batch: TorchTrainingBatch) -> float:
         self.optimizer.zero_grad()
         loss = self.compute_batch_loss(batch)
         loss.backward()
@@ -310,19 +310,19 @@ if __name__ == '__main__':
         model = model.to(device)
 
     # ============= CREATE DATASETS AND DATALOADERS ==================
-    train_dataset = OcrBatchedDataset(source_dir=config['train_data_dir'],
-                                      cache_dir=config['cache_dir'] / 'train' if config['cache_dir'] is not None else None,
-                                      num_workers=num_workers,
-                                      epoch_steps_run_per_worker=epoch_steps_run // num_workers,
-                                      chars_to_special_classes=config['chars_to_special_classes'],
-                                      classes_to_indices=config['classes_to_indices'],
-                                      drop_remainding_batches=True)
+    train_dataset = TorchBatchedTrainingDataset(source_dir=config['train_data_dir'],
+                                                cache_dir=config['cache_dir'] / 'train' if config['cache_dir'] is not None else None,
+                                                num_workers=num_workers,
+                                                epoch_steps_run_per_worker=epoch_steps_run // num_workers,
+                                                chars_to_special_classes=config['chars_to_special_classes'],
+                                                classes_to_indices=config['classes_to_indices'],
+                                                drop_remainding_batches=True)
 
-    val_dataset = OcrBatchedDataset(source_dir=config['val_data_dir'],
-                                    cache_dir=config['cache_dir'] / 'val' if config['cache_dir'] is not None else None,
-                                    num_workers=num_workers,
-                                    chars_to_special_classes=config['chars_to_special_classes'],
-                                    classes_to_indices=config['classes_to_indices'])
+    val_dataset = TorchBatchedTrainingDataset(source_dir=config['val_data_dir'],
+                                              cache_dir=config['cache_dir'] / 'val' if config['cache_dir'] is not None else None,
+                                              num_workers=num_workers,
+                                              chars_to_special_classes=config['chars_to_special_classes'],
+                                              classes_to_indices=config['classes_to_indices'])
 
     train_dataloader = get_custom_dataloader(train_dataset)
     val_dataloader = get_custom_dataloader(val_dataset)

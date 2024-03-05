@@ -4,7 +4,7 @@ from pathlib import Path
 import torch
 
 from ajmc.ocr.pytorch.config import get_config
-from ajmc.ocr.pytorch.data_processing import pre_batch_filelist, OcrIterDataset
+from ajmc.ocr.pytorch.data_processing import pre_batch_filelist, TorchTrainingDataset
 
 MODEL_DIR = Path('/scratch/sven/withbackbone_v2')
 DATASETS_DIR = Path('/scratch/sven/ocr_exp/testing_data/test_datasets/')
@@ -32,16 +32,15 @@ for bs in [8, 64]:
     shutil.rmtree(output_dir, ignore_errors=True)
     output_dir.mkdir(exist_ok=True)
 
-    unbatched_dataset = OcrIterDataset(classes=config['classes'],
-                                       classes_to_indices=config['classes_to_indices'],
-                                       max_batch_size=config['max_batch_size'],
-                                       img_height=config['chunk_height'],
-                                       chunk_width=config['chunk_width'],
-                                       chunk_overlap=config['chunk_overlap'],
-                                       special_mapping=config.get('chars_to_special_classes', {}),
-                                       img_paths=filelist,
-                                       loop_infinitely=False,
-                                       shuffle=False)
+    unbatched_dataset = TorchTrainingDataset(classes_to_indices=config['classes_to_indices'],
+                                             max_batch_size=config['max_batch_size'],
+                                             img_height=config['chunk_height'],
+                                             chunk_width=config['chunk_width'],
+                                             chunk_overlap=config['chunk_overlap'],
+                                             special_mapping=config.get('chars_to_special_classes', {}),
+                                             img_paths=filelist,
+                                             loop_infinitely=False,
+                                             shuffle=False)
 
     for i, batch in enumerate(unbatched_dataset):
         torch.save(batch.to_dict(), output_dir / f'{i}.pt')

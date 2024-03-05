@@ -12,17 +12,17 @@ class Decoder:
     helper functions. Subclasses should implement the decode() method.
 
     Arguments:
-        labels (list): mapping from integers to characters.
+        classes (list): mapping from integers to characters.
         blank_index (int, optional): index for the blank '_' character. Defaults to 0.
     """
 
-    def __init__(self, labels, blank_index=0):
-        self.labels = labels
-        self.int_to_char = dict([(i, c) for (i, c) in enumerate(labels)])
+    def __init__(self, classes, blank_index=0):
+        self.classes = classes
+        self.indices_to_classes = dict([(i, c) for (i, c) in enumerate(classes)])
         self.blank_index = blank_index
-        space_index = len(labels)  # To prevent errors in decode, we add an out of bounds index for the space
-        if ' ' in labels:
-            space_index = labels.index(' ')
+        space_index = len(classes)  # To prevent errors in decode, we add an out of bounds index for the space
+        if ' ' in classes:
+            space_index = classes.index(' ')
         self.space_index = space_index
 
     def decode(self, probs, sizes=None):
@@ -42,7 +42,7 @@ class Decoder:
 
 class BeamCTCDecoder(Decoder):
     def __init__(self,
-                 labels,
+                 classes,
                  lm_path=None,
                  alpha=0,
                  beta=0,
@@ -51,13 +51,13 @@ class BeamCTCDecoder(Decoder):
                  beam_width=100,
                  num_processes=4,
                  blank_index=0):
-        super(BeamCTCDecoder, self).__init__(labels)
+        super(BeamCTCDecoder, self).__init__(classes)
         try:
             from ctcdecode import CTCBeamDecoder
         except ImportError:
             raise ImportError("BeamCTCDecoder requires paddledecoder package.")
-        labels = list(labels)  # Ensure labels are a list before passing to decoder
-        self._decoder = CTCBeamDecoder(labels, lm_path, alpha, beta, cutoff_top_n, cutoff_prob, beam_width,
+        classes = list(classes)  # Ensure classes are a list before passing to decoder
+        self._decoder = CTCBeamDecoder(classes, lm_path, alpha, beta, cutoff_top_n, cutoff_prob, beam_width,
                                        num_processes, blank_index)
 
     def convert_to_strings(self, out, seq_len):
@@ -67,7 +67,7 @@ class BeamCTCDecoder(Decoder):
             for p, utt in enumerate(batch):
                 size = seq_len[b][p]
                 if size > 0:
-                    transcript = ''.join(map(lambda x: self.int_to_char[x.item()], utt[0:size]))
+                    transcript = ''.join(map(lambda x: self.indices_to_classes[x.item()], utt[0:size]))
                 else:
                     transcript = ''
                 utterances.append(transcript)
@@ -106,54 +106,49 @@ class BeamCTCDecoder(Decoder):
 
 
 class GreedyDecoder(Decoder):
-    def __init__(self, labels, blank_index=0):
-        super(GreedyDecoder, self).__init__(labels, blank_index)
+    def __init__(self, classes, blank_index=0):
+        super(GreedyDecoder, self).__init__(classes, blank_index)
 
 
     #@profile
     def convert_to_strings(self,
                            sequences,
                            sizes=None,
-                           remove_repetitions=False,
-                           return_offsets=False) -> (List[str], List[torch.tensor]):
+                           remove_repetitions=False) -> (List[str], List[List[int]]):
         """Given a list of numeric sequences, returns the corresponding strings"""
         strings = []
-        offsets = [] if return_offsets else None
+        offsets = []
         for x in xrange(len(sequences)):
             seq_len = sizes[x] if sizes is not None else len(sequences[x])
             string, string_offsets = self.process_string(sequences[x], seq_len, remove_repetitions)
             strings.append(string)  # We only return one path
-            if return_offsets:
-                offsets.append(string_offsets)
-        if return_offsets:
-            return strings, offsets
-        else:
-            return strings
+            offsets.append(string_offsets)
 
+        return strings, offsets
 
     #@profile
     def process_string(self,
-                       sequence,
-                       size,
+                       sequence: torch.tensor,
+                       size: int,
                        remove_repetitions=False) -> (str, torch.tensor):
         string = ''
         offsets = []
         for i in range(size):
-            char = self.int_to_char[sequence[i].item()]
-            if char != self.int_to_char[self.blank_index]:
+            char = self.indices_to_classes[sequence[i].item()]
+            if char != self.indices_to_classes[self.blank_index]:
                 # if this char is a repetition and remove_repetitions=true, then skip
-                if remove_repetitions and i != 0 and char == self.int_to_char[sequence[i - 1].item()]:
+                if remove_repetitions and i != 0 and char == self.indices_to_classes[sequence[i - 1].item()]:
                     pass
-                elif char == self.labels[self.space_index]:
+                elif char == self.classes[self.space_index]:
                     string += ' '
                     offsets.append(i)
                 else:
-                    string = string + char
+                    string += char
                     offsets.append(i)
-        return string, torch.tensor(offsets, dtype=torch.int)
+        return string, offsets
 
     #@profile
-    def decode(self, probs, sizes=None, return_offsets=False) -> (List[str], List[torch.tensor]):
+    def decode(self, probs, sizes=None, remove_repetitions: bool = True) -> (List[str], List[torch.tensor]):
         """
         Returns the argmax decoding given the probability matrix. Removes
         repeated elements in the sequence, as well as blanks.
@@ -167,7 +162,6 @@ class GreedyDecoder(Decoder):
         """
         max_probs = torch.argmax(probs, 2)
 
-        return self.convert_to_strings(max_probs.view(max_probs.size(0), max_probs.size(1)),
-                                       sizes,
-                                       remove_repetitions=True,
-                                       return_offsets=return_offsets)
+        return self.convert_to_strings(sequences=max_probs.view(max_probs.size(0), max_probs.size(1)),
+                                       sizes=sizes,
+                                       remove_repetitions=remove_repetitions)

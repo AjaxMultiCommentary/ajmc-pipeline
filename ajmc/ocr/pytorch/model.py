@@ -1,7 +1,7 @@
 """Model classes for torch based ocr models."""
 
 from collections import OrderedDict
-from typing import Iterable, List
+from typing import Iterable, List, Tuple
 
 import torch
 import torch.nn as nn
@@ -36,7 +36,7 @@ class OcrTorchModel(nn.Module):
 
         self.decoder = nn.Linear(**config['decoder'])
 
-        self.ctc_decoder = GreedyDecoder(labels=self.classes, blank_index=0)
+        self.ctc_decoder = GreedyDecoder(classes=self.classes, blank_index=0)
 
 
     def reshape_input(self, x: torch.Tensor) -> torch.Tensor:
@@ -60,7 +60,10 @@ class OcrTorchModel(nn.Module):
 
         return x
 
-    def predict(self, x, chunks_to_img_mapping: List[int], img_widths: List[int]) -> List[str]:
+    def predict(self, x: torch.Tensor,
+                chunks_to_img_mapping: List[int],
+                img_widths: List[int],
+                remove_repetitions: bool = True) -> Tuple[List[str], List[List[int]]]:
         """Predicts the text in a batch of image tensors.
 
         Args:
@@ -79,10 +82,10 @@ class OcrTorchModel(nn.Module):
 
         outputs = torch.nn.functional.log_softmax(outputs, dim=2)
 
-        strings, offsets = self.ctc_decoder.decode(outputs, sizes=img_widths)
+        outputs = self.ctc_decoder.decode(outputs, sizes=img_widths, remove_repetitions=remove_repetitions)
         self.train()
 
-        return strings
+        return outputs
 
 
 class DenseNetBackbone(nn.Module):

@@ -6,7 +6,7 @@ from torchvision.transforms import transforms
 
 from ajmc.commons.variables import PACKAGE_DIR
 from ajmc.ocr.pytorch.config import get_config
-from ajmc.ocr.pytorch.data_processing import OcrIterDataset
+from ajmc.ocr.pytorch.data_processing import TorchTrainingDataset
 
 
 def get_sample_config(mode='cpu') -> dict:
@@ -62,12 +62,11 @@ def get_and_write_sample_dataset(num_images,
         transforms.ToPILImage()(img_tensor).save(config['train_data_dir'] / f'{i}.png')
         (config['train_data_dir'] / f'{i}.txt').write_text(f'{i}-{i}', encoding='utf-8')
 
-    return OcrIterDataset(classes=config['classes'],
-                          max_batch_size=config['max_batch_size'],
-                          img_height=config['chunk_height'],
-                          chunk_width=config['chunk_width'],
-                          chunk_overlap=config['chunk_overlap'],
-                          data_dir=config['train_data_dir'],
-                          loop_infinitely=loop_infinitely,
-                          shuffle=shuffle,
-                          num_workers=config['num_workers'])
+    return TorchTrainingDataset(max_batch_size=config['max_batch_size'],
+                                img_height=config['chunk_height'],
+                                chunk_width=config['chunk_width'],
+                                chunk_overlap=config['chunk_overlap'],
+                                data_dir=config['train_data_dir'],
+                                loop_infinitely=loop_infinitely,
+                                shuffle=shuffle,
+                                num_workers=config['num_workers'])
