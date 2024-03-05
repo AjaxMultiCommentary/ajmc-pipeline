@@ -46,7 +46,6 @@ class OcrCommentary(Commentary):
                  ocr_gt_dir: Optional[Path] = None,
                  ocr_run_id: Optional[str] = None,
                  sections_path: Optional[Path] = None,
-                 is_legacy: bool = False,
                  **kwargs):
         """Default constructor, where custom paths can be provided.
 
@@ -66,13 +65,12 @@ class OcrCommentary(Commentary):
             sections_path: {sections_path}
         """
         super().__init__(id=id, ocr_dir=ocr_dir, base_dir=base_dir, via_path=via_path, img_dir=img_dir,
-                         ocr_gt_dir=ocr_gt_dir, ocr_run_id=ocr_run_id, sections_path=sections_path, is_legacy=is_legacy, **kwargs)
+                         ocr_gt_dir=ocr_gt_dir, ocr_run_id=ocr_run_id, sections_path=sections_path, **kwargs)
 
     @classmethod
     @docstring_formatter(**docstrings)
     def from_ajmc_data(cls, id: str,
-                       ocr_run_id: str = '*_tess_retrained',
-                       is_legacy: bool = False):
+                       ocr_run_id: str = '*_tess_retrained'):
         """Use this method to construct a ``OcrCommentary``-object using ajmc's data folder structure.
 
         Args:
@@ -97,8 +95,7 @@ class OcrCommentary(Commentary):
                    img_dir=vs.get_comm_img_dir(id),
                    ocr_gt_dir=vs.get_comm_ocr_gt_dir(id),
                    ocr_run_id=ocr_run_id,
-                   sections_path=vs.get_comm_sections_path(id),
-                   is_legacy=is_legacy)
+                   sections_path=vs.get_comm_sections_path(id))
 
     def to_canonical(self, include_ocr_gt: bool = True) -> CanonicalCommentary:
         """Export the commentary to a ``CanonicalCommentary`` object.
@@ -291,11 +288,7 @@ class OcrCommentary(Commentary):
 
     @lazy_property
     def via_project(self) -> dict:
-        via_project = json.loads(self.via_path.read_text(encoding='utf-8'))
-        for p in via_project['_via_img_metadata'].values():
-            for r in p['regions']:
-                r['region_attributes']['label'] = r['region_attributes']['text']
-        return via_project
+        return json.loads(self.via_path.read_text(encoding='utf-8'))
 
 
     @lazy_property
@@ -378,7 +371,11 @@ class OcrPage(Page, TextContainer):
                 if r['region_attributes']['label'].startswith(vs.OLR_PREFIX):
                     r['region_attributes']['label'] = r['region_attributes']['label'][len(vs.OLR_PREFIX):]
                     if not r['region_attributes']['label'] == 'line_region':
-                        regions.append(OlrRegion.from_via(via_dict=r, page=self))
+                        if r['region_attributes']['label'].startswith(vs.OCR_GT_PREFIX):
+                            r['region_attributes']['label'] = r['region_attributes']['label'][len(vs.OCR_GT_PREFIX):]
+                            regions.append(OlrRegion.from_via(via_dict=r, page=self, is_ocr_gt=True))
+                        else:
+                            regions.append(OlrRegion.from_via(via_dict=r, page=self))
             return regions
 
         # Lines and words must be retrieved together
@@ -579,19 +576,19 @@ class OcrPage(Page, TextContainer):
 
 
     def get_ocr_gt_page(self) -> 'OcrPage':
-        """Returns the OCR groundtruth of the page."""
+        """Returns the OCR groundtruth of the page if available. If not, returns self."""
         if self.id in self.parents.commentary.ocr_gt_page_ids:
             return self.parents.commentary.ocr_gt_pages[self.parents.commentary.ocr_gt_page_ids.index(self.id)]
         elif self.id in self.parents.commentary.ocr_gt_partial_page_ids:
             self.optimise()
-            partial_gt_page = self.parents.commentary.ocr_gt_partial_pages[self.parents.ocr_gt_partial_page_ids.index(self.id)]
+            partial_gt_page = self.parents.commentary.ocr_gt_partial_pages[self.parents.commentary.ocr_gt_partial_page_ids.index(self.id)]
             partial_gt_regions = []
             for partial_gt_region in partial_gt_page.children.regions:
                 if hasattr(partial_gt_region, 'is_ocr_gt'):
                     partial_gt_regions.append(partial_gt_region)
                 else:
                     for ocr_region in self.children.regions:
-                        if are_bboxes_overlapping_with_threshold(partial_gt_region.bbox, ocr_region.bbox, 0.95):
+                        if are_bboxes_overlapping_with_threshold(partial_gt_region.bbox, ocr_region.bbox, 0.85):
                             partial_gt_regions.append(ocr_region)
                             break
             partial_gt_page.children.regions = partial_gt_regions
@@ -721,9 +718,10 @@ class OlrRegion(OcrTextContainer):
             via_dict: {via_dict}
             page: {parent_page}
         """
-        assert via_dict['region_attributes'][
-                   'label'] in vs.ORDERED_OLR_REGION_TYPES, f'Unknown region type: {via_dict["region_attributes"]["label"]} in page {page.id}'
-        return cls(region_type=via_dict['region_attributes']['label'],
+        region_type = re.sub(r'\s+', ' ', via_dict['region_attributes']['label']).strip()
+
+        assert region_type in vs.ORDERED_OLR_REGION_TYPES, f'Unknown region type: {region_type} in page {page.id}'
+        return cls(region_type=region_type,
                    bbox=Shape.from_xywh(x=via_dict['shape_attributes']['x'],
                                         y=via_dict['shape_attributes']['y'],
                                         w=via_dict['shape_attributes']['width'],
