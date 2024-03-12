@@ -1,9 +1,12 @@
 import ajmc.text_processing.canonical_classes as cc
-import ajmc.commons.variables as vars
+import ajmc.commons.variables as variables
+import json
 import lxml.builder as lxml_builder
 import lxml.etree as lxml_etree
 import requests
 import os
+
+from typing import Tuple
 
 """
 This module --- which is really more of a script --- enables exporting
@@ -33,6 +36,7 @@ TEI_REGION_TYPES = [
     "footnote",
     "index",
     "introduction",
+    "line",
     "preface",
     "primary_text",
     "printed_marginalia",
@@ -40,6 +44,61 @@ TEI_REGION_TYPES = [
     "title",
     "translation",
 ]
+
+WIKIDATA_HUCIT_MAPPINGS = {}
+
+with open("./wikidata_hucit_mappings.json") as f:
+    WIKIDATA_HUCIT_MAPPINGS = json.load(f)
+
+
+def contains_primary_full(entities):
+    return any([is_primary_full(entity) for entity in entities])
+
+
+def is_primary_full(entity):
+    return entity.label == "primary-full"
+
+
+def is_entity_in_range(entity, word_range):
+    return (
+        word_range[0] <= entity.word_range[0] and word_range[1] >= entity.word_range[1]
+    )
+
+
+class PrimaryFullEntity:
+    def __init__(self, cts_urn: str, scopes: list[str]):
+        self.cts_urn = cts_urn
+        self.scopes = scopes
+
+
+def make_primary_full_entities(commentary: cc.CanonicalCommentary):
+    all_entities = commentary.children.entities
+    primary_fulls = []
+
+    for entity in all_entities:
+        if entity.label == "primary-full":
+            related_entities = [
+                e for e in all_entities if is_entity_in_range(e, entity.word_range)
+            ]
+            primlits = [e for e in related_entities if e.label == "work.primlit"]
+            scopes = [e for e in related_entities if e.label == "scope"]
+
+            wikidata_id = next((e.wikidata_id for e in primlits), None)
+
+            if wikidata_id is None:
+                wikidata_id = next((e.wikidata_id for e in scopes), None)
+
+                if wikidata_id is None:
+                    continue
+
+            cts_urn = WIKIDATA_HUCIT_MAPPINGS.get(wikidata_id, {}).get("cts_urn")
+
+            if cts_urn is None:
+                continue
+
+            primary_fulls.append(PrimaryFullEntity(cts_urn, scopes))
+
+    return primary_fulls
 
 
 def get_zotero_data(zotero_id):
@@ -52,7 +111,7 @@ def get_zotero_data(zotero_id):
 
 class TEIDocument:
     def __init__(self, ajmc_id, bibliographic_data) -> None:
-        canonical_path = vars.COMMS_DATA_DIR / ajmc_id / "canonical"
+        canonical_path = variables.COMMS_DATA_DIR / ajmc_id / "canonical"
         filename = [
             f for f in os.listdir(canonical_path) if f.endswith("_tess_retrained.json")
         ][0]
@@ -62,6 +121,7 @@ class TEIDocument:
         self.bibliographic_data = bibliographic_data
         self.commentary = cc.CanonicalCommentary.from_json(json_path=json_path)
         self.filename = f"tei/{ajmc_id}.xml"
+        self.primary_full_entities = make_primary_full_entities(self.commentary)
         self.tei = None
 
     def authors(self):
@@ -73,6 +133,30 @@ class TEIDocument:
     def facsimile(self, page):
         return f"{self.ajmc_id}/{page.id}"
 
+    def get_entities_for_word(self, word):
+        return [
+            entity
+            for entity in self.commentary.children.entities
+            if word.index in range(entity.word_range[0], entity.word_range[1])
+        ]
+
+    def make_cts_urn_from_entities(self, entities):
+        wikidata_id = next(
+            (
+                entity.wikidata_id
+                for entity in entities
+                if entity.label == "work.primlit"
+            ),
+            None,
+        )
+        cts_urn = WIKIDATA_HUCIT_MAPPINGS[wikidata_id]["cts_urn"]
+        scopes = [entity for entity in entities if entity.label == "scope"]
+        scope_words = [
+            self.commentary.children.words[scope.word_range[0] : scope.word_range[1]]
+            for scope in scopes
+        ]
+        return f"{cts_urn}:{'-'.join([w.text for w in scope_words])}"
+
     def page_transcription(self, page):
         page_el = E.div(E.pb(n=page.id, facs=self.facsimile(page)))
 
@@ -81,7 +165,7 @@ class TEIDocument:
         if "".join([r.text for r in page.children.regions]).strip() == "":
             page_el.append(
                 E.p(
-                    page.text,
+                    *self.words(page.word_range),
                     type="page",
                     n="-".join(
                         [
@@ -164,6 +248,27 @@ class TEIDocument:
         )
 
         return self.tei
+
+    """
+    Iterate through the words in `word_range`, checking each word
+    to see if it belongs to a primary full entity.
+
+    If it does, create or update `current_entity` to include the
+    `<w>` element for the word.
+
+    If a new entity is encountered, push the current `current_entity` onto
+    the `words` list and start a new `current_entity`.
+    """
+
+    def words(self, word_range: Tuple[int, int]):
+        words = []
+        current_entity = None
+
+        for word in self.commentary.children.words[word_range[0] : word_range[1]]:
+            entities = self.get_entities_for_word(word)
+
+            if contains_primary_full(entities):
+                cts_urn = self.make_cts_urn_from_entities(entities)
 
     def export(self):
         tei = self.to_tei()
