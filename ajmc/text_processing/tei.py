@@ -65,10 +65,55 @@ def is_entity_in_range(entity, word_range):
     )
 
 
+def remove_trailing_period(s: str) -> str:
+    if s.endswith("."):
+        return s[0:-1]
+
+    return s
+
+
+def transform_f(s: str) -> str:
+    if s.endswith("f."):
+        without_f = s.replace("f.", "")
+
+        try:
+            n = int(without_f)
+            return f"{n}-{n+1}"
+        except ValueError:
+            # Return the scope without "f." because we're using it in a CTS URN
+            return without_f
+
+    return s
+
+
 class PrimaryFullEntity:
-    def __init__(self, cts_urn: str, scopes: list[str]):
+    def __init__(
+        self,
+        cts_urn: str,
+        scopes: list[str],
+        words: list[cc.CanonicalWord],
+    ):
         self.cts_urn = cts_urn
         self.scopes = scopes
+        self.words = words
+
+    def to_url(self):
+        if self.scopes is None:
+            return f"https://scaife.perseus.org/reader/#{self.cts_urn}"
+        else:
+            return f"https://scaife.perseus.org/reader/#{self.cts_urn}#{self.resolve_scopes()}"
+
+    def resolve_scopes(self):
+        s = (
+            "".join([w.text for w in self.words])
+            .replace(";", "")
+            .replace(":", "")
+            .replace("ff.", "")
+        )
+        s = transform_f(s)
+        s = remove_trailing_period(s)
+
+        return s
 
 
 def make_primary_full_entities(commentary: cc.CanonicalCommentary):
@@ -96,7 +141,11 @@ def make_primary_full_entities(commentary: cc.CanonicalCommentary):
             if cts_urn is None:
                 continue
 
-            primary_fulls.append(PrimaryFullEntity(cts_urn, scopes))
+            entity_words = commentary.children.words[
+                entity.word_range[0] : entity.word_range[1]
+            ]
+
+            primary_fulls.append(PrimaryFullEntity(cts_urn, scopes, entity_words))
 
     return primary_fulls
 
