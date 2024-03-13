@@ -177,7 +177,7 @@ def write_editops_record(editops_record: dict, output_dir: Path):
 #                                       EVALUATION METHODS
 # ======================================================================================================================
 
-# todo 👁️ add fuzzy eval
+# 👁️ add fuzzy eval
 def bag_of_word_evaluation(gt_bag: List[str],
                            pred_bag: List[str],
                            error_counts: Optional[Dict[str, Union[int, float]]] = None,

@@ -1,12 +1,12 @@
 # TODO : revise the docs
 import os
 import random
+import unicodedata
 from abc import abstractmethod
 from pathlib import Path
 from typing import List, Dict, Tuple, Generator, Optional, Any, Callable, Iterable
 
 import torch
-import unicodedata
 from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
 from torchvision.io import read_image, ImageReadMode
@@ -648,7 +648,7 @@ def recompose_chunks(chunks: torch.Tensor,
         else:  # for the other chunks, we cut the begin and end overlap
             reassembled = torch.cat([reassembled, chunks[i][int(chunk_overlap / 2):-int(chunk_overlap / 2), :]], dim=0)
 
-    # Todo 👁️ the end of this tensor could be chunked to non-zero values to recut the introduced padding
+    # 👁️ the end of this tensor could be chunked to non-zero values to recut the introduced padding
     # This will have to be done somehow, imgs offsets requires it.
     return reassembled
 
