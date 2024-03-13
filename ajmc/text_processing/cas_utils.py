@@ -187,7 +187,7 @@ def rebuild_to_xmi(page: dict,
     cas.to_xmi((output_dir / f'{page["id"]}.xmi'), pretty_print=True)
 
 
-def export_commentary_to_xmis(commentary: Type['OcrCommentary'],
+def export_commentary_to_xmis(commentary: Type['RawCommentary'],
                               make_jsons: bool,
                               make_xmis: bool,
                               jsons_dir: Path,
@@ -198,7 +198,7 @@ def export_commentary_to_xmis(commentary: Type['OcrCommentary'],
     Main function for the pipeline.
     
     Args:
-        commentary: The commentary to convert to xmis, should be an OcrCommentary object (not a canonical commentary).
+        commentary: The commentary to convert to xmis, should be an RawCommentary object (not a canonical commentary).
         jsons_dir: Absolute path to the directory in which to write the json files or take them from.
         xmis_dir: Absolute path to the directory in which to write the xmi files.
         make_jsons: Whether to create canonical jsons. If false, jsons are grepped from json_dir.

@@ -166,7 +166,7 @@ def page_to_layoutlm_encodings(page,
 
 
 @docstring_formatter(**docstrings)
-def prepare_data(page_sets: Dict[str, List['OcrPage']],
+def prepare_data(page_sets: Dict[str, List['RawPage']],
                  labels_to_ids: Dict[str, int],
                  regions_to_coarse_labels: Dict[str, str],
                  rois: List[str],
@@ -179,7 +179,7 @@ def prepare_data(page_sets: Dict[str, List['OcrPage']],
     """Prepares data for LayoutLMV2.
 
     Args:
-        page_sets: A dict containing a list of ``OcrPage``\ s per split.
+        page_sets: A dict containing a list of ``RawPage``\ s per split.
         labels_to_ids: {labels_to_ids}
         regions_to_coarse_labels:
         rois: The regions to focus on

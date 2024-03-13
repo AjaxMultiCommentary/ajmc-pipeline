@@ -86,7 +86,7 @@ def get_olr_region_counts(commentaries: List['CanonicalCommentary'],
     return region_types_counts
 
 
-def get_olr_splits_page_ids(commentary_id: 'OcrCommentary',
+def get_olr_splits_page_ids(commentary_id: 'RawCommentary',
                             splits: Optional[List[str]] = None) -> List[str]:
     """Gets the data from splits on the olr_gt sheet."""
 

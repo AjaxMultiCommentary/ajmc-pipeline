@@ -7,7 +7,7 @@ from typing import Tuple, Union, Type
 #                                                 TYPES
 # ======================================================================================================================
 BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
-PageType = Union[Type['Page'], Type['CanonicalPage'], Type['OcrPage']]
+PageType = Union[Type['Page'], Type['CanonicalPage'], Type['RawPage']]
 
 # ======================================================================================================================
 #                                                 PATHS
@@ -464,6 +464,7 @@ TEXTCONTAINERS_TYPES_TO_COLORS = {
     'entity': COLORS['hues']['trypan_blue1'],
     'hyphenation': COLORS['hues']['trypan_blue2'],
     'sentence': COLORS['hues']['persian_blue'],
+    'lemma': COLORS['hues']['ultramarine_blue'],
 }
 
 REGION_TYPES_TO_COLORS = {l: c for l, c in zip(ORDERED_OLR_REGION_TYPES,

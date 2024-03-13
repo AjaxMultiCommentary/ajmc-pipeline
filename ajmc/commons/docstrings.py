@@ -108,7 +108,7 @@ docstrings['ocr_run_id'] = """The id of an ocr-run, e.g. '28o09e_tess_base', (ge
 
 docstrings['olr_region_type'] = """The type of the Region (i.e. ``'primary_text'`` or ``'commentary'``)."""
 
-docstrings['parent_page'] = """"The ``OcrPage`` containing the object"""
+docstrings['parent_page'] = """"The ``RawPage`` containing the object"""
 
 docstrings['parent_type'] = """"The type of the parent object. Must be one of ``commentary``, ``page``, ``region`` or ``line``."""
 

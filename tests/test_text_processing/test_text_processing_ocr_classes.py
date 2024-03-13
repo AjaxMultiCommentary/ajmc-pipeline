@@ -4,29 +4,28 @@ import os
 import jsonschema
 
 from ajmc.commons import image, variables
-from ajmc.text_processing import ocr_classes
 from tests import sample_objects as so
 
 
 def test_ocrcommentary():
-    # test OcrCommentary.children
-    assert all([isinstance(p, ocr_classes.OcrPage) for p in so.sample_ocrcommentary.children.pages])
+    # test RawCommentary.children
+    assert all([isinstance(p, ocr_classes.RawPage) for p in so.sample_ocrcommentary.children.pages])
     assert len(so.sample_ocrcommentary.children.pages) == len(list(so.sample_ocr_run_outputs_dir.glob('*.hocr')))
-    assert all([isinstance(r, ocr_classes.OlrRegion) for r in so.sample_ocrcommentary.children.regions])
-    assert all([isinstance(l, ocr_classes.OcrLine) for l in so.sample_ocrcommentary.children.lines])
-    assert all([isinstance(w, ocr_classes.OcrWord) for w in so.sample_ocrcommentary.children.words])
+    assert all([isinstance(r, ocr_classes.RawRegion) for r in so.sample_ocrcommentary.children.regions])
+    assert all([isinstance(l, ocr_classes.RawLine) for l in so.sample_ocrcommentary.children.lines])
+    assert all([isinstance(w, ocr_classes.RawWord) for w in so.sample_ocrcommentary.children.words])
 
-    # test OcrCommentary.images
+    # test RawCommentary.images
     assert all([isinstance(i, image.AjmcImage) for i in so.sample_ocrcommentary.images])
 
-    # Test OcrCommentary.groundtruth_pages
-    assert all([isinstance(p, ocr_classes.OcrPage) for p in so.sample_ocrcommentary.ocr_gt_pages])
+    # Test RawCommentary.groundtruth_pages
+    assert all([isinstance(p, ocr_classes.RawPage) for p in so.sample_ocrcommentary.ocr_gt_pages])
     assert len(so.sample_ocrcommentary.ocr_gt_pages) == len(
             [f for f in os.listdir(so.sample_ocr_gt_dir) if so.sample_ocrcommentary.id in f])
 
     # See test_page() for regions, lines, words
 
-    # Test OcrCommentary.via_project
+    # Test RawCommentary.via_project
     assert type(so.sample_ocrcommentary.via_project) == dict
 
 
@@ -63,16 +62,16 @@ def test_ocrcommentary_to_canonical():
 # test_ocrcommentary_to_canonical()
 
 def test_ocrpage():
-    page = ocr_classes.OcrPage(ocr_path=so.sample_ocr_page_path, page_id=so.sample_page_id,
+    page = ocr_classes.RawPage(ocr_path=so.sample_ocr_page_path, id=so.sample_page_id,
                                img_path=so.sample_img_path, commentary=so.sample_ocrcommentary)
 
     assert isinstance(page.ocr_format, str)
 
     assert isinstance(page.image, image.AjmcImage)
 
-    assert all([isinstance(r, ocr_classes.OlrRegion) for r in page.children.regions])
-    assert all([isinstance(l, ocr_classes.OcrLine) for l in page.children.lines])
-    assert all([isinstance(w, ocr_classes.OcrWord) for w in page.children.words])
+    assert all([isinstance(r, ocr_classes.RawRegion) for r in page.children.regions])
+    assert all([isinstance(l, ocr_classes.RawLine) for l in page.children.lines])
+    assert all([isinstance(w, ocr_classes.RawWord) for w in page.children.words])
 
     # Validate page.json
     schema_path = variables.SCHEMA_PATH

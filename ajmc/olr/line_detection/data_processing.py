@@ -19,10 +19,6 @@ def get_pages_lines(split_page_ids: List[str], via_dict: dict) -> Dict[str, List
     for page_dict in via_dict['_via_img_metadata'].values():
         page_id = Path(page_dict['filename']).stem
         if page_id in split_page_ids:
-            pages_lines[page_id] = [Shape.from_xywh(x=line['shape_attributes']['x'],
-                                                    y=line['shape_attributes']['y'],
-                                                    w=line['shape_attributes']['width'],
-                                                    h=line['shape_attributes']['height'])
-                                    for line in page_dict['regions']]
+            pages_lines[page_id] = [Shape.from_via(line) for line in page_dict['regions']]
 
     return pages_lines

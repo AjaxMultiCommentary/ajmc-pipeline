@@ -182,7 +182,7 @@ def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str,
                                   fill_opacity=.3,
                                   text=tc.region_type)
 
-        elif tc.type in ['entity', 'sentence', 'hyphenation']:
+        elif tc.type in ['entity', 'sentence', 'hyphenation', 'lemma']:
             for i, bbox in enumerate(tc.bboxes):
                 if i == len(
                         tc.bboxes) - 1:  # We write the region label text only if it's the last bbox to avoid overlap
@@ -217,7 +217,7 @@ def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str,
 
 
 def draw_reading_order(img_matrix: np.ndarray,
-                       page: Union['OcrPage', 'CanonicalPage'],
+                       page: Union['RawPage', 'CanonicalPage'],
                        output_path: Optional[Union[str, Path]] = None):
     # Compute word centers
     w_centers = [w.bbox.center for w in page.children.words]

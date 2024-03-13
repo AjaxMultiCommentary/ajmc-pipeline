@@ -79,11 +79,7 @@ from ajmc.commons.geometry import Shape, are_bboxes_overlapping_with_threshold
 
 
 def shape_from_via_region(via_region: dict) -> Shape:
-    return Shape.from_xywh(x=via_region['shape_attributes']['x'],
-                           y=via_region['shape_attributes']['y'],
-                           w=via_region['shape_attributes']['width'],
-                           h=via_region['shape_attributes']['height'])
-
+    return Shape.from_via(via_region)
 
 for temp_region in template_regions:
     temp_region['shape'] = shape_from_via_region(temp_region)

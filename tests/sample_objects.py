@@ -4,7 +4,7 @@ from ajmc.commons import geometry, image, variables as vs
 from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.variables import PACKAGE_DIR
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
-from ajmc.text_processing.ocr_classes import OcrCommentary
+from ajmc.text_processing.raw_classes import RawCommentary
 
 logger = get_ajmc_logger(__name__)
 logger.parent.setLevel('DEBUG')
@@ -51,7 +51,7 @@ sample_img_dir = sample_comm_base_dir / vs.COMM_IMG_REL_DIR
 
 sample_sections_path = sample_comm_base_dir / vs.COMM_SECTIONS_REL_PATH
 
-sample_ocrcommentary = OcrCommentary(id=sample_commentary_id,
+sample_ocrcommentary = RawCommentary(id=sample_commentary_id,
                                      ocr_dir=sample_ocr_run_outputs_dir,
                                      base_dir=sample_comm_base_dir,
                                      via_path=sample_via_path,

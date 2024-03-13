@@ -133,14 +133,14 @@ def map_lines_to_sentences(lines, sentences, ocr_lines, ocr_sentences):
     return result, ocr_result
 
 
-from ajmc.text_processing.ocr_classes import OcrCommentary
+from ajmc.text_processing.raw_classes import RawCommentary
 from ajmc.commons.variables import PD_COMM_IDS
 
 
 output_file = '/Users/sven/Desktop/ajmc_primary.jsonl'
 
 for id_ in PD_COMM_IDS:
-    comm = OcrCommentary.from_ajmc_data(id_, ocr_run_id='*_tess_retrained')
+    comm = RawCommentary.from_ajmc_data(id_, ocr_run_id='*_tess_retrained')
 
     for ocr_page in comm.children.pages:
         if ocr_page.id in comm.ocr_gt_page_ids:
