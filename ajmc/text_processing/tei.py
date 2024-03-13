@@ -63,13 +63,14 @@ def is_primary_full(entity):
 
 
 def is_entity_in_range(entity, word_range):
-    return word_range[0] <= entity.word_range[0] and word_range[1] >= (
-        entity.word_range[1] + 1
+    return (
+        word_range[0] <= entity.word_range[0]
+        and (word_range[1] + 1) >= entity.word_range[1]
     )
 
 
-def remove_trailing_period(s: str) -> str:
-    if s.endswith("."):
+def remove_trailing_character(s: str, c: str) -> str:
+    if s.endswith(c):
         return s[0:-1]
 
     return s
@@ -110,11 +111,12 @@ class PrimaryFullEntity:
 
     def resolve_scopes(self):
         scope_first = self.scopes[0]
+        scope_last = self.scopes[-1]
         scope_words = [
             w
             for w in self.words
             if w.word_range[0]
-            in range(scope_first.word_range[0], scope_first.word_range[1] + 1)
+            in range(scope_first.word_range[0], scope_last.word_range[1] + 1)
         ]
         s = (
             "".join([w.text for w in scope_words])
@@ -125,9 +127,10 @@ class PrimaryFullEntity:
             .replace("ff.", "")
         )
         s = transform_f(s)
-        s = remove_trailing_period(s)
+        s = remove_trailing_character(s, ",")
+        s = remove_trailing_character(s, ".")
 
-        if len(s) != 0:
+        if len(s) > 0:
             return f":{s}"
 
         return ""
