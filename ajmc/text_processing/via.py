@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 from typing import Dict, List, Optional, Union, Any
 
@@ -109,6 +110,14 @@ class ViaProject:
                                   file_attributes=file_attributes)
 
         return via_project
+
+
+    def __getitem__(self, item):
+        return self.project_dict[item]
+
+    def __setitem__(self, key, value):
+        self.project_dict[key] = value
+
 
     def add_attribute(self, name: str,
                       level: str,
@@ -237,32 +246,58 @@ class ViaProject:
         for page_dict in self.project_dict['_via_img_metadata'].values():
             page_dict['regions'] = self.check_page_duplicates(page_dict)
 
-    def safe_check(self, prune_duplicates_first: bool = False):
-        print('Safe checking the project...')
-        if prune_duplicates_first:
-            print('********************** Pruning duplicates **********************')
-            self.prune_duplicates()
-        else:
+    def clean(self):
+        self.prune_duplicates()
+
+        # Automatically clean obvious typos
+        for page_dict in self.project_dict['_via_img_metadata'].values():
+            for region in page_dict['regions']:
+                region['region_attributes']['label'] = re.sub(r'\s+', '', region['region_attributes']['label'])
+
+
+    def safe_check(self, check_duplicates: bool = True,
+                   check_overlapping_regions: bool = True,
+                   check_typos: bool = True):
+        print('Safe-checking the via project, this may take a while....')
+        is_overlap_free = True
+        is_typo_free = True
+
+        if check_duplicates:
             print('********************** Checking for duplicates **********************')
             for page_dict in self.project_dict['_via_img_metadata'].values():
                 self.check_page_duplicates(page_dict)
 
-        print('********************** Checking for overlapping regions **********************')
-        for page_dict in self.project_dict['_via_img_metadata'].values():
-            regions = [r for r in page_dict['regions']
-                       if r['region_attributes']['label'].startswith(vs.OLR_PREFIX)
-                       and not any([r_type in r['region_attributes']['label'] for r_type in vs.EXCLUDED_REGION_TYPES])]
+        if check_overlapping_regions:
+            print('********************** Checking for overlapping regions **********************')
 
-            region_bboxes = []
+            for page_dict in self.project_dict['_via_img_metadata'].values():
+                regions = [r for r in page_dict['regions']
+                           if r['region_attributes']['label'].startswith(vs.OLR_PREFIX)
+                           and not any([r_type in r['region_attributes']['label'] for r_type in vs.EXCLUDED_REGION_TYPES])]
 
-            for region in regions:
-                region_bbox = geom.Shape.from_xywh(region['shape_attributes']['x'],
-                                                   region['shape_attributes']['y'],
-                                                   region['shape_attributes']['width'],
-                                                   region['shape_attributes']['height']).bbox
-                if any(geom.are_bboxes_overlapping(region_bbox, bbox) for bbox in region_bboxes):
-                    print(f'{page_dict["filename"]} - {region["region_attributes"]["label"]} overlaps with another region.')
-                region_bboxes.append(region_bbox)
+                region_bboxes = []
+
+                for region in regions:
+                    region_bbox = geom.Shape.from_via(region)
+                    if any(geom.compute_bbox_overlap_area(region_bbox.bbox, bbox.bbox) > min(region_bbox.area, bbox.area) * 0.4
+                           for bbox in region_bboxes):
+                        print(f'{page_dict["filename"]} - {region["region_attributes"]["label"]} overlaps with another region.')
+                        is_overlap_free = False
+                    region_bboxes.append(region_bbox)
+
+        if check_typos:
+            print('********************** Checking for typos **********************')
+
+            for p in self.project_dict['_via_img_metadata'].values():
+                for r in p['regions']:
+                    region_label = r['region_attributes']['label']
+                    if region_label.startswith(vs.OLR_PREFIX):
+                        region_label = region_label.replace(vs.OLR_PREFIX, '').replace(vs.OCR_GT_PREFIX, '')
+                        if region_label not in vs.ORDERED_OLR_REGION_TYPES:
+                            is_typo_free = False
+                            print(Path(p['filename']).stem, '-', 'Unknown region', r['region_attributes']['label'])
+
+        return is_overlap_free and is_typo_free
 
     def save(self, output_path: Path):
         """Save the project to a JSON file.
@@ -275,9 +310,36 @@ class ViaProject:
 
 
 if __name__ == '__main__':
-    from ajmc.text_processing.canonical_classes import CanonicalCommentary
 
-    for comm_id in vs.ALL_COMM_IDS:
-        can_json_path = vs.get_comm_canonical_path_from_pattern(comm_id, '*tess_retrained')
-        can_com = CanonicalCommentary.from_json(can_json_path)
-        ViaProject.from_canonical_commentary(can_com).save(vs.get_comm_via_path(can_com.id))
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Create, clean and safe-check via projects.')
+
+    parser.add_argument('--com_ids', nargs='+', help='The commentary ids to process.', default=vs.ALL_COMM_IDS)
+    parser.add_argument('--clean', action='store_true', help='Clean the via project, removing duplicates and typos')
+    parser.add_argument('--safe_check', action='store_true', help='Safe-check the via project for duplicates, typos and overlapping regions.')
+    parser.add_argument('--save', action='store_true', help='Save the via project.')
+
+    args = parser.parse_args()
+
+    ##############################
+    # Debugging
+    # args.clean = True
+    # args.safe_check = True
+    # args.save = True
+    ##############################
+
+    for com_id in args.com_ids:
+        via_path = vs.get_comm_via_path(com_id)
+
+        print(f'Processing {com_id}...')
+        via_project = ViaProject.from_json(via_path)
+
+        if args.clean:
+            via_project.clean()
+
+        if args.safe_check:
+            is_safe = via_project.safe_check(check_duplicates=not args.clean)
+
+        if args.save:
+            via_project.save(via_path)
