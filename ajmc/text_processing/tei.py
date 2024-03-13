@@ -28,26 +28,29 @@ E = lxml_builder.ElementMaker(
     nsmap={None: "http://www.tei-c.org/ns/1.0"},
 )
 
-TEI_REGION_TYPES = [
-    "app_crit",
-    "appendix",
-    "bibliography",
-    "commentary",
-    "footnote",
-    "index",
-    "introduction",
-    "line",
-    "preface",
-    "primary_text",
-    "printed_marginalia",
-    "table_of_contents",
-    "title",
-    "translation",
-]
+EXPORTED_ENTITY_LABELS = ["work.primlit", "pers.author"]
+
+TEI_REGION_LABELS = {
+    "app_crit": "Critical Apparatus",
+    "appendix": "Appendix",
+    "bibliography": "Bibliography",
+    "commentary": "Commentary",
+    "footnote": "Footnote",
+    "index": "Index",
+    "introduction": "Introduction",
+    "line": "",
+    "preface": "Preface",
+    "primary_text": "",
+    "printed_marginalia": "",
+    "table_of_contents": "Table of Contents",
+    "title": "Title",
+    "translation": "Translation",
+}
+TEI_REGION_TYPES = TEI_REGION_LABELS.keys()
 
 WIKIDATA_HUCIT_MAPPINGS = {}
 
-with open("./wikidata_hucit_mappings.json") as f:
+with open(os.path.dirname(__file__) + "/wikidata_hucit_mappings.json") as f:
     WIKIDATA_HUCIT_MAPPINGS = json.load(f)
 
 
@@ -60,8 +63,8 @@ def is_primary_full(entity):
 
 
 def is_entity_in_range(entity, word_range):
-    return (
-        word_range[0] <= entity.word_range[0] and word_range[1] >= entity.word_range[1]
+    return word_range[0] <= entity.word_range[0] and word_range[1] >= (
+        entity.word_range[1] + 1
     )
 
 
@@ -90,22 +93,33 @@ class PrimaryFullEntity:
     def __init__(
         self,
         cts_urn: str,
-        scopes: list[str],
+        scopes: list[cc.CanonicalEntity],
         words: list[cc.CanonicalWord],
     ):
         self.cts_urn = cts_urn
         self.scopes = scopes
         self.words = words
+        self.word_range = [words[0].word_range[0], words[-1].word_range[1]]
+        self.url = self.to_url()
 
     def to_url(self):
-        if self.scopes is None:
-            return f"https://scaife.perseus.org/reader/#{self.cts_urn}"
+        if len(self.scopes) == 0:
+            return f"https://scaife.perseus.org/reader/{self.cts_urn}"
         else:
-            return f"https://scaife.perseus.org/reader/#{self.cts_urn}#{self.resolve_scopes()}"
+            return f"https://scaife.perseus.org/reader/{self.cts_urn}{self.resolve_scopes()}"
 
     def resolve_scopes(self):
+        scope_first = self.scopes[0]
+        scope_words = [
+            w
+            for w in self.words
+            if w.word_range[0]
+            in range(scope_first.word_range[0], scope_first.word_range[1] + 1)
+        ]
         s = (
-            "".join([w.text for w in self.words])
+            "".join([w.text for w in scope_words])
+            .replace("(", "")
+            .replace(")", "")
             .replace(";", "")
             .replace(":", "")
             .replace("ff.", "")
@@ -113,7 +127,10 @@ class PrimaryFullEntity:
         s = transform_f(s)
         s = remove_trailing_period(s)
 
-        return s
+        if len(s) != 0:
+            return f":{s}"
+
+        return ""
 
 
 def make_primary_full_entities(commentary: cc.CanonicalCommentary):
@@ -138,12 +155,15 @@ def make_primary_full_entities(commentary: cc.CanonicalCommentary):
 
             cts_urn = WIKIDATA_HUCIT_MAPPINGS.get(wikidata_id, {}).get("cts_urn")
 
-            if cts_urn is None:
+            if cts_urn is None or cts_urn == "":
                 continue
 
             entity_words = commentary.children.words[
-                entity.word_range[0] : entity.word_range[1]
+                entity.word_range[0] : (entity.word_range[1] + 1)
             ]
+
+            if len(entity_words) == 0:
+                continue
 
             primary_fulls.append(PrimaryFullEntity(cts_urn, scopes, entity_words))
 
@@ -182,29 +202,27 @@ class TEIDocument:
     def facsimile(self, page):
         return f"{self.ajmc_id}/{page.id}"
 
-    def get_entities_for_word(self, word):
-        return [
-            entity
-            for entity in self.commentary.children.entities
-            if word.index in range(entity.word_range[0], entity.word_range[1])
-        ]
-
-    def make_cts_urn_from_entities(self, entities):
-        wikidata_id = next(
+    def get_entity_for_word(self, word):
+        primary_full_entity = next(
             (
-                entity.wikidata_id
-                for entity in entities
-                if entity.label == "work.primlit"
+                e
+                for e in self.primary_full_entities
+                if word.index in range(e.word_range[0], e.word_range[1] + 1)
             ),
             None,
         )
-        cts_urn = WIKIDATA_HUCIT_MAPPINGS[wikidata_id]["cts_urn"]
-        scopes = [entity for entity in entities if entity.label == "scope"]
-        scope_words = [
-            self.commentary.children.words[scope.word_range[0] : scope.word_range[1]]
-            for scope in scopes
-        ]
-        return f"{cts_urn}:{'-'.join([w.text for w in scope_words])}"
+
+        if primary_full_entity is not None:
+            return primary_full_entity
+
+        return next(
+            (
+                entity
+                for entity in self.commentary.children.entities
+                if word.index in range(entity.word_range[0], entity.word_range[1])
+            ),
+            None,
+        )
 
     def page_transcription(self, page):
         page_el = E.div(E.pb(n=page.id, facs=self.facsimile(page)))
@@ -229,7 +247,12 @@ class TEIDocument:
                 if region.region_type in TEI_REGION_TYPES:
                     page_el.append(
                         E.p(
-                            region.text,
+                            E.head(
+                                TEI_REGION_LABELS.get(
+                                    region.region_type, region.region_type
+                                )
+                            ),
+                            *self.words(region.word_range),
                             type=region.region_type,
                             n="-".join(
                                 [
@@ -312,12 +335,34 @@ class TEIDocument:
     def words(self, word_range: Tuple[int, int]):
         words = []
         current_entity = None
+        current_el = None
 
-        for word in self.commentary.children.words[word_range[0] : word_range[1]]:
-            entities = self.get_entities_for_word(word)
+        for word in self.commentary.children.words[word_range[0] : word_range[1] + 1]:
+            entity = self.get_entity_for_word(word)
 
-            if contains_primary_full(entities):
-                cts_urn = self.make_cts_urn_from_entities(entities)
+            if entity is not None and (
+                isinstance(entity, PrimaryFullEntity)
+                or (
+                    entity.label in EXPORTED_ENTITY_LABELS
+                    and entity.wikidata_id is not None
+                )
+            ):
+                if entity == current_entity and current_el is not None:
+                    current_el.append(E.w(word.text))
+                else:
+                    current_entity = entity
+
+                    if current_el is not None:
+                        words.append(current_el)
+
+                    if isinstance(entity, PrimaryFullEntity):
+                        current_el = E.ref(E.w(word.text), target=entity.url)
+                    else:
+                        current_el = E.ref(E.w(word.text), target=entity.wikidata_id)
+            else:
+                words.append(E.w(word.text))
+
+        return words
 
     def export(self):
         tei = self.to_tei()
