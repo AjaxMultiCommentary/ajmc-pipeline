@@ -209,7 +209,7 @@ def clean_source_dataset(dts_dir: Union[Path, str],
 def make_clean_ajmc_dataset(output_dir: Path = ocr_vs.get_dataset_dir('ajmc'),
                             comm_ids: List[str] = vs.ALL_COMM_IDS,
                             unicode_form: str = ocr_vs.UNICODE_FORM,
-                            base_dir=Path(vs.COMMS_DATA_DIR),
+                            root_dir=Path(vs.COMMS_DATA_DIR),
                             overwrite=False):
     """Uses``CanonicalCommentary.export_gt_file_pairs`` to export an ocr dataset for given commentary ids."""
 
@@ -218,7 +218,7 @@ def make_clean_ajmc_dataset(output_dir: Path = ocr_vs.get_dataset_dir('ajmc'),
     temp_dir = output_dir / 'temp'
     for commentary_id in tqdm(comm_ids, desc='Importing ajmc commentaries...'):
         try:
-            can_path = next(((base_dir / commentary_id / 'canonical/v2').glob('*tess_base.json')))
+            can_path = next(((root_dir / commentary_id / 'canonical/v2').glob('*tess_base.json')))
         except StopIteration:
             continue
         commentary = CanonicalCommentary.from_json(str(can_path))

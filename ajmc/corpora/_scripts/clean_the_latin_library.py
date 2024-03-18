@@ -3,7 +3,7 @@ from collections import Counter
 
 from ajmc.corpora import variables as vs
 
-raw_path = vs.BASE_STORING_DIR / 'the_latin_library/data/corpus_cleaned.txt'
+raw_path = vs.ROOT_STORING_DIR / 'the_latin_library/data/corpus_cleaned.txt'
 cleaned_path = raw_path.parent / 'corpus_cleaned.txt'
 
 text = raw_path.read_text(encoding='utf-8')

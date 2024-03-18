@@ -1,8 +1,8 @@
 from pathlib import Path
 
-BASE_SCRAPE_DIR = Path('/scratch/sven/scraping')
+ROOT_SCRAPE_DIR = Path('/scratch/sven/scraping')
 
-BASE_STORING_DIR = Path('/mnt/ajmcdata1/data')
+ROOT_STORING_DIR = Path('/mnt/ajmcdata1/data')
 
 SAMPLE_ATTRIBUTES = ['title',
                      'type',

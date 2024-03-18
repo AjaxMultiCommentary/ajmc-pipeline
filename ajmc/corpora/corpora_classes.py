@@ -17,15 +17,15 @@ class Corpus(ABC):
 
     def __init__(self, corpus_id: str):
         self.id = corpus_id
-        self.base_dir = vs.BASE_STORING_DIR / corpus_id
-        self.metadata_path = self.base_dir / 'metadata.json'
+        self.root_dir = vs.ROOT_STORING_DIR / corpus_id
+        self.metadata_path = self.root_dir / 'metadata.json'
         self.metadata = json.loads(self.metadata_path.read_text(encoding='utf-8'))
 
 
     @classmethod
     def auto_init(cls, corpus_id):
         """This classmethod can be used to create the right object from the mother class"""
-        metadata_path = vs.BASE_STORING_DIR / corpus_id / 'metadata.json'
+        metadata_path = vs.ROOT_STORING_DIR / corpus_id / 'metadata.json'
         metadata = json.loads(metadata_path.read_text())
         return globals()[metadata['type']](corpus_id)
 
@@ -84,7 +84,7 @@ class PlainTextCorpus(Corpus):
 
     @property
     def data_dir(self) -> Path:
-        return self.base_dir / 'data'
+        return self.root_dir / 'data'
 
     @property
     def files(self) -> typing.List[Path]:
@@ -101,15 +101,15 @@ class TeiCorpus(Corpus):
 
     @property
     def data_dir(self) -> Path:
-        return self.base_dir / 'data'
+        return self.root_dir / 'data'
 
     @property
     def files(self) -> typing.List[Path]:
         return list(self.data_dir.glob('*.xml'))
 
     def get_plain_text(self) -> str:
-        if (self.base_dir / 'plaintext.txt').exists():
-            return (self.base_dir / 'plaintext.txt').read_text(encoding='utf-8')
+        if (self.root_dir / 'plaintext.txt').exists():
+            return (self.root_dir / 'plaintext.txt').read_text(encoding='utf-8')
 
         full_text = ''
         for file in self.files:
@@ -117,7 +117,7 @@ class TeiCorpus(Corpus):
             for text in soup.find_all(re.compile(r'(?:tei:)?text')):
                 full_text += text.text + '\n\n\n'
 
-        (self.base_dir / 'plaintext.txt').write_text(full_text, encoding='utf-8')
+        (self.root_dir / 'plaintext.txt').write_text(full_text, encoding='utf-8')
         return full_text
 
 
@@ -128,7 +128,7 @@ class OGLCorpus(TeiCorpus):
 
     @property
     def data_dir(self) -> Path:
-        return self.base_dir / self.id / 'data'
+        return self.root_dir / self.id / 'data'
 
     @property
     def files(self) -> typing.List[Path]:
@@ -143,7 +143,7 @@ class PerseusLegacyCorpus(Corpus):
 
     @property
     def data_dir(self) -> Path:
-        return self.base_dir / 'data'
+        return self.root_dir / 'data'
 
     @property
     def files(self) -> typing.List[Path]:
@@ -151,12 +151,12 @@ class PerseusLegacyCorpus(Corpus):
 
 
     def get_plain_text(self) -> str:
-        if (self.base_dir / 'plaintext.txt').exists():
-            return (self.base_dir / 'plaintext.txt').read_text(encoding='utf-8')
+        if (self.root_dir / 'plaintext.txt').exists():
+            return (self.root_dir / 'plaintext.txt').read_text(encoding='utf-8')
 
         text = '\n\n\n'.join([self.read_document(file) for file in self.files])
         text = harmonise_linebreaks(text)
-        (self.base_dir / 'plaintext.txt').write_text(text, encoding='utf-8')
+        (self.root_dir / 'plaintext.txt').write_text(text, encoding='utf-8')
         return text
 
 
@@ -186,7 +186,7 @@ class LogeionCorpus(Corpus):
 
     @property
     def data_dir(self) -> Path:
-        return self.base_dir / 'data'
+        return self.root_dir / 'data'
 
     @property
     def files(self) -> typing.List[Path]:
@@ -194,14 +194,14 @@ class LogeionCorpus(Corpus):
 
 
     def get_plain_text(self) -> str:
-        if (self.base_dir / 'plaintext.txt').exists():
-            return (self.base_dir / 'plaintext.txt').read_text(encoding='utf-8')
+        if (self.root_dir / 'plaintext.txt').exists():
+            return (self.root_dir / 'plaintext.txt').read_text(encoding='utf-8')
         text = ''
         for file in self.files:
             dict_ = json.loads(file.read_text(encoding='utf-8'))
             text += '\n'.join([v if v.endswith('.') else v + '.' for v in dict_.values()]) + '\n\n\n'
 
-        (self.base_dir / 'plaintext.txt').write_text(text, encoding='utf-8')
+        (self.root_dir / 'plaintext.txt').write_text(text, encoding='utf-8')
         return text
 
     def get_lexica(self) -> typing.Dict[str, typing.Dict[str, str]]:

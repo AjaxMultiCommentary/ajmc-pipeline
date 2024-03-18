@@ -23,7 +23,7 @@ AJMC_METADATA_TYPE = 'webanno.custom.AjMCDocumentmetadata'
 def basic_rebuild(page: dict,
                   region_types: List[str],
                   string: str = '') -> dict:
-    # todo 👁️ a light version of this function computing only what you actually need
+    # 👁️ a light version of this function computing only what you actually need could be useful
     """Basic rebuild function"""
 
     coordinates = {'regions': [], 'lines': [], 'words': []}
@@ -300,7 +300,7 @@ def import_page_rebuild(page_id: str, annotation_type: str):
                              region_types=vs.IDS_TO_REGIONS[comm_id])
 
     elif annotation_type == 'lemmas':
-        run_dir = [dir_ for dir_ in (vs.get_comm_base_dir(comm_id) / vs.COMM_LEMLINK_ANN_REL_DIR).glob('*') if dir_.is_dir()][0]
+        run_dir = [dir_ for dir_ in (vs.get_comm_root_dir(comm_id) / vs.COMM_LEMLINK_ANN_REL_DIR).glob('*') if dir_.is_dir()][0]
         rebuild_path = run_dir / 'jsons' / (page_id + '.json')
         try:
             metadata = json.loads((run_dir / 'xmis' / 'metadata.json').read_text('utf-8'))

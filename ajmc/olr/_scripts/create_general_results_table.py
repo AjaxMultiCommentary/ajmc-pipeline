@@ -16,7 +16,7 @@ def bold_highest_per_xp(df):
     return df
 
 
-CLUSTER_BASE_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data'
+CLUSTER_ROOT_DIR = '/mnt/ajmcdata1/drive_cached/AjaxMultiCommentary/data/commentaries/commentaries_data'
 
 CONFIGS_DIR = '/scratch/sven/tmp/ajmc/data/layoutlm/configs'
 
@@ -63,12 +63,12 @@ for xp_name in df.index.get_level_values(level=0):
 
     print('****************** Processing', xp_name, '*******************************')
     config = create_olr_config(json_path=os.path.join(CONFIGS_DIR, xp_name + '.json'),
-                               prefix=CLUSTER_BASE_DIR)
+                               prefix=CLUSTER_ROOT_DIR)
     # Retrieve the eval pages
     eval_pages = []
     for dict_ in config['data']['eval']:
         if dict_['id'] not in commentaries.keys():
-            commentaries[dict_['id']] = CanonicalCommentary.from_json(os.path.join(CLUSTER_BASE_DIR, dict_['id'],
+            commentaries[dict_['id']] = CanonicalCommentary.from_json(os.path.join(CLUSTER_ROOT_DIR, dict_['id'],
                                                                                    'canonical/v2',
                                                                                    dict_['run'] + '.json'))
 
@@ -89,7 +89,7 @@ for xp_name in df.index.get_level_values(level=0):
     # Retrieve the train pages
     train_pages = []
     for dict_ in config['data']['train']:
-        commentary = CanonicalCommentary.from_json(os.path.join(CLUSTER_BASE_DIR, dict_['id'],
+        commentary = CanonicalCommentary.from_json(os.path.join(CLUSTER_ROOT_DIR, dict_['id'],
                                                                 'canonical/v2', dict_['run'] + '.json'))
         page_ids = get_olr_splits_page_ids(commentary.id, [dict_['split']])
         train_pages += [p for p in commentary.children.pages

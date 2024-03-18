@@ -254,7 +254,6 @@ class ViaProject:
             for region in page_dict['regions']:
                 region['region_attributes']['label'] = re.sub(r'\s+', '', region['region_attributes']['label'])
 
-
     def safe_check(self, check_duplicates: bool = True,
                    check_overlapping_regions: bool = True,
                    check_typos: bool = True):
@@ -306,7 +305,7 @@ class ViaProject:
             output_path (Path): The path to save the project to.
 
         """
-        output_path.write_text(json.dumps(self.project_dict, ensure_ascii=False))
+        output_path.write_text(json.dumps(self.project_dict, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':
@@ -315,7 +314,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Create, clean and safe-check via projects.')
 
-    parser.add_argument('--com_ids', nargs='+', help='The commentary ids to process.', default=vs.ALL_COMM_IDS)
+    parser.add_argument('--comm_ids', nargs='+', help='The commentary ids to process.', default=vs.ALL_COMM_IDS)
     parser.add_argument('--clean', action='store_true', help='Clean the via project, removing duplicates and typos')
     parser.add_argument('--safe_check', action='store_true', help='Safe-check the via project for duplicates, typos and overlapping regions.')
     parser.add_argument('--save', action='store_true', help='Save the via project.')
@@ -329,10 +328,10 @@ if __name__ == '__main__':
     # args.save = True
     ##############################
 
-    for com_id in args.com_ids:
-        via_path = vs.get_comm_via_path(com_id)
+    for comm_id in args.comm_ids:
+        via_path = vs.get_comm_via_path(comm_id)
 
-        print(f'Processing {com_id}...')
+        print(f'Processing {comm_id}...')
         via_project = ViaProject.from_json(via_path)
 
         if args.clean:

@@ -98,6 +98,7 @@ def binarize_image_dir(img_dir: Path, glob_pattern: str = '*.png', inverted: boo
         img = binarize(img, inverted=inverted)
         cv2.imwrite(str(img_path), img)
 
+
 def rgb_to_bgr(rgb: Tuple[int, int, int]) -> Tuple[int, int, int]:
     """Converts an RGB tuple to BGR."""
     return rgb[2], rgb[1], rgb[0]
@@ -131,15 +132,15 @@ def draw_box(box: variables.BoxType,
     """
 
     if fill_color is not None:
-        sub_img_matrix = img_matrix[box[0][1]:box[1][1], box[0][0]:box[1][0]]  # Creates the sub-image
+        sub_img_matrix = img_matrix[box[0][1]:box[1][1] + 1, box[0][0]:box[1][0] + 1]  # Creates the sub-image
         box_fill = sub_img_matrix.copy()  # Creates the fill to be added
         box_fill[:] = rgb_to_bgr(fill_color)  # Fills the fill with the desired color
-        img_matrix[box[0][1]:box[1][1], box[0][0]:box[1][0]] = cv2.addWeighted(src1=sub_img_matrix,
-                                                                               # Adds the fill to the image
-                                                                               alpha=1 - fill_opacity,
-                                                                               src2=box_fill,
-                                                                               beta=fill_opacity,
-                                                                               gamma=0)
+        img_matrix[box[0][1]:box[1][1] + 1, box[0][0]:box[1][0] + 1] = cv2.addWeighted(src1=sub_img_matrix,
+                                                                                       # Adds the fill to the image
+                                                                                       alpha=1 - fill_opacity,
+                                                                                       src2=box_fill,
+                                                                                       beta=fill_opacity,
+                                                                                       gamma=0)
 
     img_matrix = cv2.rectangle(img_matrix, pt1=box[0], pt2=box[1],
                                color=rgb_to_bgr(stroke_color),
@@ -203,12 +204,14 @@ def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str,
 
 
         else:
+
             img_matrix = draw_box(box=tc.bbox.bbox,
                                   img_matrix=img_matrix,
                                   stroke_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                   stroke_thickness=1,
-                                  fill_color=None,
-                                  text=tc.type.capitalize())
+                                  fill_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
+                                  fill_opacity=.2,
+                                  text=tc.type)
 
     if output_path is not None:
         cv2.imwrite(str(output_path), img_matrix)
@@ -309,5 +312,5 @@ def resize_image(img: np.ndarray,
 def align_rgb_values(img):
     # input is numpy array
     mean = np.mean(img, axis=2, keepdims=True)
-    mean_img = np.tile(mean, (1,1,3))
+    mean_img = np.tile(mean, (1, 1, 3))
     return np.array(mean_img, dtype='uint8')

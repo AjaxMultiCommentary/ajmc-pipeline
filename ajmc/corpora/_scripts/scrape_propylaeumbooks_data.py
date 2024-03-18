@@ -5,8 +5,8 @@ from tqdm import tqdm
 
 from ajmc.corpora import variables as vs
 
-metadata_dir = vs.BASE_SCRAPE_DIR / 'propylaeum_BOOKS/metadata'
-output_dir = vs.BASE_SCRAPE_DIR / 'propylaeum_BOOKS/data'
+metadata_dir = vs.ROOT_SCRAPE_DIR / 'propylaeum_BOOKS/metadata'
+output_dir = vs.ROOT_SCRAPE_DIR / 'propylaeum_BOOKS/data'
 catalog_base_url = 'https://books.ub.uni-heidelberg.de/propylaeum/catalog/book/'
 download_base_url = 'https://books.ub.uni-heidelberg.de'
 

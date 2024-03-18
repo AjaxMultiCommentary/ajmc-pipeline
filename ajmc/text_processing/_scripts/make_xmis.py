@@ -13,7 +13,7 @@ comm_ids = [
 ]
 
 for comm_id in comm_ids:
-    comm = RawCommentary.from_ajmc_data(id=comm_id, ocr_run_id='*tess_base')
+    comm = RawCommentary(id=comm_id, ocr_run_id='*tess_base')
 
     cas_utils.export_commentary_to_xmis(comm,
                                         make_jsons=True,
