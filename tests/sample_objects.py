@@ -1,14 +1,15 @@
 """This module contains sample objects which are sent to ``sample_objects.json`` and used as fixtures elsewhere."""
 
 from ajmc.commons import geometry, image, variables as vs
-from ajmc.commons.miscellaneous import get_ajmc_logger
-from ajmc.commons.variables import PACKAGE_DIR
+from ajmc.commons.miscellaneous import get_ajmc_logger, ROOT_LOGGER
 from ajmc.text_processing.canonical_classes import CanonicalCommentary
 from ajmc.text_processing.raw_classes import RawCommentary
 
+
+ROOT_LOGGER.setLevel('DEBUG')
 logger = get_ajmc_logger(__name__)
-logger.parent.setLevel('DEBUG')
-logger.setLevel('DEBUG')
+vs.COMMS_DATA_DIR = vs.PACKAGE_DIR / 'tests/data'
+
 
 # Arithmetic
 sample_intervals = {'base': (1, 10),
@@ -33,47 +34,44 @@ sample_points = {'base': [(0, 0), (2, 0), (1, 1), (2, 2), (0, 2)],
 sample_bboxes = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.items()}
 
 # Commentaries, OCR, path and via
-sample_comm_base_dir = PACKAGE_DIR / 'tests/data/sample_commentaries/cu31924087948174'
 
-sample_commentary_id = 'cu31924087948174'
-sample_page_id = sample_commentary_id + '_0083'
 
-sample_via_path = sample_comm_base_dir / vs.COMM_VIA_REL_PATH
+sample_comm_id = 'cu31924087948174'
+sample_comm_root_dir = vs.get_comm_root_dir(sample_comm_id)
 
-sample_ocr_run_id = 'tess_eng_grc'
-sample_ocr_run_outputs_dir = sample_comm_base_dir / vs.COMM_OCR_RUNS_REL_DIR / sample_ocr_run_id / 'outputs'
+sample_page_id = sample_comm_id + '_0083'
+
+sample_via_path = vs.get_comm_via_path(sample_comm_id)
+
+sample_ocr_run_id = '3464N4_tess_retrained'
+sample_ocr_run_outputs_dir = vs.get_comm_ocr_outputs_dir(sample_comm_id, sample_ocr_run_id)
 sample_ocr_page_path = sample_ocr_run_outputs_dir / (sample_page_id + '.hocr')
 
-sample_ocr_gt_dir = sample_comm_base_dir / vs.COMM_OCR_GT_REL_DIR
-sample_gt_page_path = sample_ocr_gt_dir / (sample_page_id + '.hmtl')
+sample_img_dir = sample_comm_root_dir / vs.COMM_IMG_REL_DIR
+sample_sections_path = sample_comm_root_dir / vs.COMM_SECTIONS_REL_PATH
 
-sample_img_dir = sample_comm_base_dir / vs.COMM_IMG_REL_DIR
+sample_raw_commentary = RawCommentary(id=sample_comm_id,
+                                      ocr_dir=sample_ocr_run_outputs_dir,
+                                      base_dir=sample_comm_root_dir,
+                                      via_path=sample_via_path,
+                                      img_dir=sample_img_dir,
+                                      ocr_run_id=sample_ocr_run_id,
+                                      sections_path=sample_sections_path)
 
-sample_sections_path = sample_comm_base_dir / vs.COMM_SECTIONS_REL_PATH
-
-sample_ocrcommentary = RawCommentary(id=sample_commentary_id,
-                                     ocr_dir=sample_ocr_run_outputs_dir,
-                                     base_dir=sample_comm_base_dir,
-                                     via_path=sample_via_path,
-                                     img_dir=sample_img_dir,
-                                     ocr_run_id=sample_ocr_run_id,
-                                     ocr_gt_dir=sample_ocr_gt_dir,
-                                     sections_path=sample_sections_path)
-
-sample_ocr_page = sample_ocrcommentary.get_page(sample_page_id)
+sample_ocr_page = sample_raw_commentary.get_page(sample_page_id)
 sample_raw_entities = sample_ocr_page.children.entities
 
-sample_cancommentary = sample_ocrcommentary.to_canonical(include_ocr_gt=False)
+sample_can_commentary = sample_raw_commentary.to_canonical()
 
-sample_canonical_path = sample_comm_base_dir / vs.COMM_CANONICAL_REL_DIR / (sample_ocr_run_id + '.json')
-sample_cancommentary.to_json(sample_canonical_path)
+sample_canonical_path = vs.get_comm_canonical_path_from_ocr_run_id(sample_comm_id, sample_ocr_run_id)
+sample_can_commentary.to_json(sample_canonical_path)
 
 sample_cancommentary_from_json = CanonicalCommentary.from_json(sample_canonical_path)
 
-sample_page = sample_cancommentary.get_page(sample_page_id)
+sample_page = sample_can_commentary.get_page(sample_page_id)
 
 # Image
-sample_img_path = sample_img_dir / (sample_page_id + '.png')
+sample_img_path = sample_img_dir / (sample_page_id + vs.DEFAULT_IMG_EXTENSION)
 sample_img = image.AjmcImage(id=sample_page_id, path=sample_img_path)
 
 # NLP, NER...

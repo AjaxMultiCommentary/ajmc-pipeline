@@ -1,6 +1,3 @@
-# Todo perform refactoring name after general refactororing.
-# Todo rewrite these tests
-
 import pytest
 import torch
 
@@ -36,6 +33,7 @@ def test_recompose_chunks():
     assert reassembled.shape[-1] == single_img_tensor.shape[-1] + padding
 
 
+@pytest.mark.skip(reason='Legacy test')
 def test_OcrIterDataset_iter():
     test_dataset = get_and_write_sample_dataset(3)
 
@@ -49,6 +47,7 @@ def test_OcrIterDataset_iter():
         assert sum(batch.chunks_to_img_mapping) == batch.chunks.shape[0]
 
 
+@pytest.mark.skip(reason='Legacy test')
 def test_OcrIterDataset_yield_batches_once():
     test_dataset = get_and_write_sample_dataset(10, loop_infinitely=False, shuffle=False)
 

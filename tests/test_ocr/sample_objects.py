@@ -69,4 +69,5 @@ def get_and_write_sample_dataset(num_images,
                                 data_dir=config['train_data_dir'],
                                 loop_infinitely=loop_infinitely,
                                 shuffle=shuffle,
-                                num_workers=config['num_workers'])
+                                num_workers=config['num_workers'],
+                                classes_to_indices=config['classes_to_indices'], )

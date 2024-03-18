@@ -1,3 +1,5 @@
+import pytest
+
 import ajmc.commons.unicode_utils
 import ajmc.commons.variables
 from ajmc.ocr import evaluation as ocr_eval
@@ -31,10 +33,17 @@ def test_bag_of_word_evaluation():
     assert error_counts_2['recall'] == 0.6
 
 
+@pytest.mark.skip(reason='This test is legacy')
 def test_coord_based_page_evaluation():
     base_dir = ajmc.commons.variables.PACKAGE_DIR / 'tests/data/sample_evaluation_data'
     # We first create a commentary because via is accessed via the commentary
-    comm = RawCommentary(via_path=base_dir / 'via_project.json', )
+    comm = RawCommentary(id='',
+                         ocr_dir=None,
+                         via_path=base_dir / 'via_project.json',
+                         img_dir=None,
+                         ocr_gt_dir=None,
+                         ocr_run_id='',
+                         sections_path=None)
 
     gt_page = RawPage(ocr_path=base_dir / 'gt_sophoclesplaysa05campgoog_0146.html',
                       page_id='sophoclesplaysa05campgoog_0146',

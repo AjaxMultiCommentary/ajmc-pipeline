@@ -1,5 +1,4 @@
 import shutil
-from pathlib import Path
 
 import pytest
 
@@ -9,9 +8,9 @@ from ajmc.text_processing import cas_utils as casu
 from tests import sample_objects as so
 
 
-@pytest.mark.parametrize('ocr_commentary', [so.sample_ocrcommentary])
+@pytest.mark.parametrize('ocr_commentary', [so.sample_raw_commentary])
 def test_export_commentary_to_xmis(ocr_commentary):
-    base_xmi_dir = so.sample_comm_base_dir / vs.COMM_NER_ANN_REL_DIR
+    base_xmi_dir = so.sample_comm_root_dir / vs.COMM_NER_ANN_REL_DIR
     output_xmi_dir = base_xmi_dir / so.sample_ocr_run_id / 'xmis'
     output_json_dir = output_xmi_dir.parent / 'jsons'
 
@@ -35,7 +34,7 @@ def test_export_commentary_to_xmis(ocr_commentary):
 
 
 def test_get_cas():
-    test_xmi_path = ajmc.commons.variables.PACKAGE_DIR / 'tests/data/sample_commentaries/cu31924087948174/ner/annotation/xmi/1bm0b3_tess_final/cu31924087948174_0102.xmi'
+    test_xmi_path = ajmc.commons.variables.PACKAGE_DIR / 'tests/data/cu31924087948174/ner/annotation/3464N4_tess_retrained/xmis/cu31924087948174_0102.xmi'
     cas = casu.get_cas(test_xmi_path, vs.TYPESYSTEM_PATH)
 
     ajmc_metadata_type = 'webanno.custom.AjMCDocumentmetadata'
