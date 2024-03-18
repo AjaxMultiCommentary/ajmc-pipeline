@@ -1,6 +1,6 @@
 from ajmc.commons import variables as vs
 from ajmc.text_processing import cas_utils
-from ajmc.text_processing.ocr_classes import OcrCommentary
+from ajmc.text_processing.raw_classes import RawCommentary
 
 comm_ids = [
     'Ferrari1974',
@@ -13,7 +13,7 @@ comm_ids = [
 ]
 
 for comm_id in comm_ids:
-    comm = OcrCommentary.from_ajmc_data(id=comm_id, ocr_run_id='*tess_base')
+    comm = RawCommentary(id=comm_id, ocr_run_id='*tess_base')
 
     cas_utils.export_commentary_to_xmis(comm,
                                         make_jsons=True,

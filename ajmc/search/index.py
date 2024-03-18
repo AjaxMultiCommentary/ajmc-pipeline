@@ -1,10 +1,11 @@
-import ajmc.text_processing.canonical_classes as canonical_classes
+import json
+
+import lunr
+from lazy_objects.lazy_objects import lazy_property
+
 import ajmc.commons.unicode_utils as unicode_utils
 import ajmc.commons.variables as variables
-import json
-import lunr
-
-from lazy_objects.lazy_objects import lazy_property
+import ajmc.text_processing.canonical_classes as canonical_classes
 
 DEFAULT_SEARCH_INDEX_EXPORT_LOCATION = "."
 
@@ -12,7 +13,7 @@ DEFAULT_SEARCH_INDEX_EXPORT_LOCATION = "."
 class CommentaryIndex:
     def __init__(self, commentary_id: str) -> None:
         self.commentary_id = commentary_id
-        self.commentary_path = variables.get_comm_canonical_path_from_pattern(
+        self.commentary_path = variables.get_comm_canonical_path_from_ocr_run_id(
             commentary_id, variables.COMM_BEST_OCR_GLOB
         )
 

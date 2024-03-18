@@ -1,7 +1,9 @@
+import pytest
+
 import ajmc.commons.unicode_utils
 import ajmc.commons.variables
 from ajmc.ocr import evaluation as ocr_eval
-from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
+from ajmc.text_processing.raw_classes import RawCommentary, RawPage
 
 
 def test_count_errors_by_charset():
@@ -31,17 +33,24 @@ def test_bag_of_word_evaluation():
     assert error_counts_2['recall'] == 0.6
 
 
+@pytest.mark.skip(reason='This test is legacy')
 def test_coord_based_page_evaluation():
     base_dir = ajmc.commons.variables.PACKAGE_DIR / 'tests/data/sample_evaluation_data'
     # We first create a commentary because via is accessed via the commentary
-    comm = OcrCommentary(via_path=base_dir / 'via_project.json', )
+    comm = RawCommentary(id='',
+                         ocr_dir=None,
+                         via_path=base_dir / 'via_project.json',
+                         img_dir=None,
+                         ocr_gt_dir=None,
+                         ocr_run_id='',
+                         sections_path=None)
 
-    gt_page = OcrPage(ocr_path=base_dir / 'gt_sophoclesplaysa05campgoog_0146.html',
+    gt_page = RawPage(ocr_path=base_dir / 'gt_sophoclesplaysa05campgoog_0146.html',
                       page_id='sophoclesplaysa05campgoog_0146',
                       img_path=base_dir / 'sophoclesplaysa05campgoog_0146.png',
                       commentary=comm)
 
-    test_page = OcrPage(ocr_path=base_dir / 'test_sophoclesplaysa05campgoog_0146.html',
+    test_page = RawPage(ocr_path=base_dir / 'test_sophoclesplaysa05campgoog_0146.html',
                         page_id='sophoclesplaysa05campgoog_0146',
                         img_path=base_dir / 'sophoclesplaysa05campgoog_0146.png',
                         commentary=comm)

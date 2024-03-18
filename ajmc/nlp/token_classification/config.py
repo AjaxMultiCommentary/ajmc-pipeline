@@ -32,7 +32,7 @@ def create_default_config() -> Dict[str, Any]:
     # ================ DATA RELATED ====================================================================================
     config['labels_column']: str = None  # Name of the tsv col to extract labels from # Required: False
     config['unknownify_tokens']: bool = False  # Sets all tokens to '[UNK]'. Useful for ablation experiments. # Required: False
-    # config['sampling'] # todo 👁️ add ?
+    # config['sampling'] # 👁️ add ?
 
     # ================ MODEL INFO ======================================================================================
     config[

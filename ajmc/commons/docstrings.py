@@ -55,7 +55,7 @@ space"*. The object contains ``data`` and ``encodings``. Data is directly callab
 are model inputs. Encodings is a list of example, containing notably the offsets. Please note that not using a ``TokenizerFast`` (i.e. using a \
 ``Tokenizer`` instead) can lead to the cumbersome situation in which ``self.encodings`` is set to ``None``.""",
 
-docstrings['base_dir'] = """The base directory to commentaries data. Use variables.COMMS_DATA_DIR to access the default value."""
+docstrings['root_dir'] = """``commentaries_data`` root directory. Use variables.COMMS_DATA_DIR to access the default value."""
 
 docstrings['bbox'] = """A tuple of two (x, y) tuples representing upper-left and lower-right coordinates."""
 
@@ -66,8 +66,8 @@ docstrings[
 
 docstrings['coords_single'] = 'A ``Shape`` object representing the coordinates of the object.'
 
-docstrings['comm_base_dir'] = """The base directory a commentaries data, normally ``variables.COMMS_DATA_DIR / [comm_id]``. Use \
-``variables.get_comm_base_dir()`` to retrieve it."""
+docstrings['comms_root_dir'] = """The base directory a commentaries data, normally ``variables.COMMS_DATA_DIR / [comm_id]``. Use \
+``variables.get_comm_root_dir()`` to retrieve it."""
 
 docstrings['custom_dataset'] = """A dataset inheriting from ``torch.utils.data.Dataset``, implementing at least ``__len__`` and \
 ``__getitem__()``, where each item is a dict alike ``{{'model_input': tensor(), ...}}`` corresponding \
@@ -108,7 +108,7 @@ docstrings['ocr_run_id'] = """The id of an ocr-run, e.g. '28o09e_tess_base', (ge
 
 docstrings['olr_region_type'] = """The type of the Region (i.e. ``'primary_text'`` or ``'commentary'``)."""
 
-docstrings['parent_page'] = """"The ``OcrPage`` containing the object"""
+docstrings['parent_page'] = """"The ``RawPage`` containing the object"""
 
 docstrings['parent_type'] = """"The type of the parent object. Must be one of ``commentary``, ``page``, ``region`` or ``line``."""
 

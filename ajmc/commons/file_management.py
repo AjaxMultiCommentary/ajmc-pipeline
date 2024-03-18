@@ -107,16 +107,16 @@ def get_62_based_datecode(date: Optional[datetime] = None) -> str:
 @docstring_formatter(**docstrings)
 def move_files_in_each_commentary_dir(relative_src_path: Union[str, Path],
                                       relative_dst_path: Union[str, Path],
-                                      base_dir: Path = vs.COMMS_DATA_DIR):
+                                      root_dir: Path = vs.COMMS_DATA_DIR):
     """Moves/rename files/folders in the folder structure.
 
     Args:
-        relative_src_path: relative path of the source file/folder, from commentary base_dir (e.g. ``'ocr/groundtruth'``)
-        relative_dst_path: relative path of the destination file/folder,  from commentary base_dir (e.g. ``'ocr/groundtruth'``)
-        base_dir: {base_dir}
+        relative_src_path: relative path of the source file/folder, from commentary root_dir (e.g. ``'ocr/groundtruth'``)
+        relative_dst_path: relative path of the destination file/folder,  from commentary root_dir (e.g. ``'ocr/groundtruth'``)
+        root_dir: {root_dir}
     """
 
-    for dir_ in walk_dirs(base_dir):
+    for dir_ in walk_dirs(root_dir):
         abs_src_path = dir_ / relative_src_path
         abs_dst_path = dir_ / relative_dst_path
         if abs_src_path.exists():
@@ -170,7 +170,7 @@ def find_replace_in_all_comm_dirs(file_rel_path: str,
                                   new_pattern: str,
                                   check: bool = False):
     for dir_ in walk_dirs(vs.COMMS_DATA_DIR):
-        file_path = vs.get_comm_base_dir(dir_.name) / file_rel_path
+        file_path = vs.get_comm_root_dir(dir_.name) / file_rel_path
 
         if file_path.exists():
             text = file_path.read_text(encoding='utf-8')
@@ -181,7 +181,6 @@ def find_replace_in_all_comm_dirs(file_rel_path: str,
                     continue
             print(f'Writing {file_path}')
             file_path.write_text(text, encoding='utf-8')
-
 
 
 @docstring_formatter(**docstrings)
@@ -195,7 +194,7 @@ def check_via_spreadsheet_conformity(comm_id: str,
 
     Args:
         comm_id: {commentary_id}
-        check_comm_only: Whether to check only the pages where only commentary sections are annotated.
+        check_comm_only: Whether to check only the pages where only commentary regions are annotated.
 
     Returns:
          A tuple containing two sets of str:
@@ -208,7 +207,7 @@ def check_via_spreadsheet_conformity(comm_id: str,
     sheet_pages = set(sheet['page_id'][sheet['commentary_id'] == comm_id])
 
     via_full_gt_pages = []  # This contains the pages which are entirely annotated
-    via_comm_gt_pages = []  # This contains the pages where only commentary sections are annotated
+    via_comm_gt_pages = []  # This contains the pages where only commentary regions are annotated
 
     for v in via_project['_via_img_metadata'].values():
 
@@ -244,21 +243,23 @@ def check_ocr_gt_spreadsheet_conformity(comm_id: str):
     """Checks that a commentary's ocr gt directory contains the same pages as the spreadsheet."""
 
     sheet = get_ocr_gt_spreadsheet()
-    sheet_page_ids = set(sheet['page_id'][sheet['commentary_id'] == comm_id])
-    drive_page_ids = set([p.stem for p in vs.get_comm_ocr_gt_dir(comm_id).glob('*.html')])
+    sheet_gt_page_ids = set(sheet['page_id'][sheet['commentary_id'] == comm_id])
 
-    diff_drive_sheet = drive_page_ids.difference(sheet_page_ids)
-    diff_sheet_drive = sheet_page_ids.difference(drive_page_ids)
+    via_project = json.loads(vs.get_comm_via_path(comm_id).read_text(encoding='utf-8'))
+    via_gt_page_ids = set([Path(p['filename']).stem for p in via_project['_via_img_metadata'].values()])
 
-    if diff_drive_sheet:
+    diff_via_sheet = via_gt_page_ids.difference(sheet_gt_page_ids)
+    diff_sheet_via = sheet_gt_page_ids.difference(via_gt_page_ids)
+
+    if diff_via_sheet:
         print(f"""The following pages are in annotated in drive 
-        but not in sheet : \n{diff_drive_sheet}\n""")
+        but not in sheet : \n{diff_via_sheet}\n""")
 
-    if diff_sheet_drive:
+    if diff_sheet_via:
         print(f"""The following pages are in annotated in sheet 
-        but not in drive : \n{diff_sheet_drive}\n""")
+        but not in drive : \n{diff_sheet_via}\n""")
 
-    if not diff_drive_sheet and not diff_sheet_drive:
+    if not diff_via_sheet and not diff_sheet_via:
         print("""OCR checking passed : Pages in drive and sheet are identical.""")
 
 
@@ -281,9 +282,7 @@ def data_sanity_check():
         logger.warning(f"Commentaries ids in the code but not in the drive: {code_comm_ids.difference(drive_comm_ids)}")
 
     # Check that all the commentaries have the right folder structure
-    for comm_dir in sorted(walk_dirs(vs.COMMS_DATA_DIR)):
-
-        comm_id = comm_dir.name
+    for comm_id in vs.ALL_COMM_IDS:
 
         print(f"\n\nChecking commentary {comm_id}...".center(40, '-'))
 
@@ -291,8 +290,6 @@ def data_sanity_check():
             logger.warning(f"Commentary {comm_id} does not have an image folder.")
         if not vs.get_comm_ocr_runs_dir(comm_id).exists():
             logger.warning(f"Commentary {comm_id} does not have an ocr folder.")
-        if not vs.get_comm_ocr_gt_dir(comm_id).exists():
-            logger.warning(f"Commentary {comm_id} does not have an ocr groundtruth folder.")
         if not vs.get_comm_canonical_dir(comm_id).exists():
             logger.warning(f"Commentary {comm_id} does not have a canonical folder.")
 
@@ -301,7 +298,7 @@ def data_sanity_check():
             if img_path.suffix != vs.DEFAULT_IMG_EXTENSION:
                 logger.warning(f"Image {img_path} has a wrong extension.")
 
-        # Check ocr-groundtruth spreadsheet conformity
+        # Check OCR spreadsheet conformity with vias
         check_ocr_gt_spreadsheet_conformity(comm_id)
 
         # Check via-project conformity

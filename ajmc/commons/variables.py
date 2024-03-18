@@ -7,7 +7,7 @@ from typing import Tuple, Union, Type
 #                                                 TYPES
 # ======================================================================================================================
 BoxType = Tuple[Tuple[int, int], Tuple[int, int]]
-PageType = Union[Type['Page'], Type['CanonicalPage'], Type['OcrPage']]
+PageType = Union[Type['Page'], Type['CanonicalPage'], Type['RawPage']]
 
 # ======================================================================================================================
 #                                                 PATHS
@@ -50,73 +50,69 @@ COMM_LEMLINK_ANN_REL_DIR = Path('lemlink/annotation')
 COMM_BEST_OCR_GLOB = "*tess_retrained"
 
 
-def get_comm_base_dir(comm_id: str) -> Path:
+def get_comm_root_dir(comm_id: str) -> Path:
     return COMMS_DATA_DIR / comm_id
 
 
-def get_comm_ocr_gt_dir(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_OCR_GT_REL_DIR
-
-
 def get_comm_img_dir(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_IMG_REL_DIR
+    return get_comm_root_dir(comm_id) / COMM_IMG_REL_DIR
 
 
 def get_comm_via_path(comm_id: str) -> Path:
-    # return get_comm_base_dir(comm_id) / COMM_VIA_REL_PATH
-    return get_comm_base_dir(comm_id) / 'via.json'
+    # return get_comm_root_dir(comm_id) / COMM_VIA_REL_PATH
+    return get_comm_root_dir(comm_id) / 'via.json'
 
 
 def get_comm_ocr_runs_dir(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_OCR_RUNS_REL_DIR
-
-
-def get_comm_ocr_outputs_dir(comm_id: str, ocr_run_id: str) -> Path:
-    return get_comm_ocr_runs_dir(comm_id) / ocr_run_id / 'outputs'
+    return get_comm_root_dir(comm_id) / COMM_OCR_RUNS_REL_DIR
 
 
 def get_comm_ocr_gt_pairs_dir(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_OCR_GT_PAIRS_REL_DIR
+    return get_comm_root_dir(comm_id) / COMM_OCR_GT_PAIRS_REL_DIR
 
 
 def get_comm_olr_lines_dir(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / 'olr/lines'
+    return get_comm_root_dir(comm_id) / 'olr/lines'
 
 
 def get_comm_ner_jsons_dir(comm_id: str, ocr_run_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_NER_ANN_REL_DIR / ocr_run_id / 'jsons'
+    return get_comm_root_dir(comm_id) / COMM_NER_ANN_REL_DIR / ocr_run_id / 'jsons'
 
 
 def get_comm_ner_xmis_dir(comm_id: str, ocr_run_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_NER_ANN_REL_DIR / ocr_run_id / 'xmis'
+    return get_comm_root_dir(comm_id) / COMM_NER_ANN_REL_DIR / ocr_run_id / 'xmis'
 
 
 def get_comm_lemlink_jsons_dir(comm_id: str, ocr_run_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_LEMLINK_ANN_REL_DIR / ocr_run_id / 'jsons'
+    return get_comm_root_dir(comm_id) / COMM_LEMLINK_ANN_REL_DIR / ocr_run_id / 'jsons'
 
 
 def get_comm_lemlink_xmis_dir(comm_id: str, ocr_run_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_LEMLINK_ANN_REL_DIR / ocr_run_id / 'xmis'
+    return get_comm_root_dir(comm_id) / COMM_LEMLINK_ANN_REL_DIR / ocr_run_id / 'xmis'
 
 
 def get_comm_canonical_dir(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_CANONICAL_REL_DIR
+    return get_comm_root_dir(comm_id) / COMM_CANONICAL_REL_DIR
 
 
-def get_comm_canonical_path_from_pattern(comm_id: str, ocr_run_pattern: str) -> Path:
-    canonical_dir = get_comm_canonical_dir(comm_id)
+def get_ocr_run_id_from_pattern(comm_id: str, ocr_run_pattern: str) -> str:
+    ocr_runs_dir = get_comm_ocr_runs_dir(comm_id)
     try:
-        return next(canonical_dir.glob(f'{ocr_run_pattern}.json'))
+        return next(ocr_runs_dir.glob(ocr_run_pattern)).name
     except StopIteration:
-        raise FileNotFoundError(f'No canonical file found for comm_id={comm_id} and ocr_run_pattern={ocr_run_pattern}')
+        raise FileNotFoundError(f'No OCR run found for comm_id={comm_id} and ocr_run_pattern={ocr_run_pattern}')
 
 
-def get_comm_canonical_default_path(comm_id: str, ocr_run_id: str) -> Path:
-    return get_comm_canonical_dir(comm_id) / f'{ocr_run_id}.json'
+def get_comm_ocr_outputs_dir(comm_id: str, ocr_run_id: str) -> Path:
+    return get_comm_ocr_runs_dir(comm_id) / get_ocr_run_id_from_pattern(comm_id, ocr_run_id) / 'outputs'
+
+
+def get_comm_canonical_path_from_ocr_run_id(comm_id: str, ocr_run_pattern: str) -> Path:
+    return get_comm_canonical_dir(comm_id) / f'{get_ocr_run_id_from_pattern(comm_id, ocr_run_pattern)}.json'
 
 
 def get_comm_sections_path(comm_id: str) -> Path:
-    return get_comm_base_dir(comm_id) / COMM_SECTIONS_REL_PATH
+    return get_comm_root_dir(comm_id) / COMM_SECTIONS_REL_PATH
 
 
 # Sheet names corresponds to the dictionary's keys
@@ -127,12 +123,14 @@ SPREADSHEETS = {
 }
 
 # ======================================================================================================================
-#                                                 FORMATS AND EXTENSIONS
+#                                                 FORMATS, EXTENSIONS AND PATTERNS
 # ======================================================================================================================
 
 OCR_OUTPUT_EXTENSIONS = ['.xml', '.hocr', '.html']
-
 DEFAULT_IMG_EXTENSION = '.png'
+OLR_PREFIX = '_OLR_'
+OCR_GT_PREFIX = 'OCRGT_'
+DEFAULT_OCR_RUN_ID = '*_tess_retrained'
 
 # ======================================================================================================================
 #                                                 COMMENTARIES
@@ -324,6 +322,25 @@ GENERIC_FINE_ENTITY_TYPES = ['pers.author', 'pers.editor', 'pers.myth', 'pers.ot
 BIBLIOGRAPHIC_ENTITY_TYPES = ['primary-full', 'primary-partial', 'secondary-full', 'secondary-meta', 'secondary-partial', 'O']
 
 # ======================================================================================================================
+#                                                SECTIONS TYPES
+# ======================================================================================================================
+
+SECTION_TYPES = ['addenda',
+                 'app_crit',
+                 'appendix',
+                 'bibliography',
+                 'commentary',
+                 'hypothesis',
+                 'index',
+                 'introduction',
+                 'other',
+                 'preface',
+                 'text',
+                 'title',
+                 'toc',
+                 'translation']
+
+# ======================================================================================================================
 #                                                 TEXT CONTAINERS
 # ======================================================================================================================
 
@@ -449,6 +466,7 @@ COLORS = {
         'ultramarine_blue': (67, 97, 238),
         'dodger_blue': (72, 149, 239),
         'vivid_sky_blue': (76, 201, 240)
+
     }
     # Other color palettes
     # https://coolors.co/97dffc-93caf6-8eb5f0-858ae3-7364d2-613dc1-5829a7-4e148c-461177-3d0e61
@@ -464,10 +482,11 @@ TEXTCONTAINERS_TYPES_TO_COLORS = {
     'entity': COLORS['hues']['trypan_blue1'],
     'hyphenation': COLORS['hues']['trypan_blue2'],
     'sentence': COLORS['hues']['persian_blue'],
+    'lemma': COLORS['hues']['ultramarine_blue'],
 }
 
 REGION_TYPES_TO_COLORS = {l: c for l, c in zip(ORDERED_OLR_REGION_TYPES,
-                                               list(COLORS['distinct'].values()) + list(COLORS['hues'].values()))}
+                                               list(COLORS['distinct'].values()) + 2 * list(COLORS['hues'].values()))}
 
 # ======================================================================================================================
 #                                                 MISC
@@ -479,9 +498,3 @@ PARAMETERS = {
     'words_line_inclusion_threshold': 0.7,
     'entity_inclusion_threshold': 0.8,
 }
-
-# ======================================================================================================================
-#                                                 LOGGING
-# ======================================================================================================================
-OLR_PREFIX = '_OLR_'
-OCR_GT_PREFIX = 'OCRGT_'

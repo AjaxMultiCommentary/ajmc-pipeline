@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Optional, Type, Union
 
 import cv2
-from lazy_objects.lazy_objects import lazy_property, lazy_init, LazyObject
+from lazy_objects.lazy_objects import lazy_property, LazyObject
 
 from ajmc.commons import variables as vs, image as ajmc_img
 from ajmc.commons.docstrings import docstring_formatter, docstrings
@@ -21,17 +21,20 @@ class TextContainer:
     Note:
         A text container is a container for text. It can be a page, a line, a word, a character, etc.The mother class therefor contains all the
         methods and attributes that are common to all text containers: ``children``, ``parents``, ``type``, ``text``, etc. Please refer to the documentation
-        of each of these attributes and methods for more information. For a general overview of class inheritance in ``ajmc`` please see # Todo, link.
+        of each of these attributes and methods for more information.
 
     Warning:
         The ``TextContainer`` class is abstract and should not be directly instantiated. Instead, use one of its children classes.
     """
 
-    @lazy_init
     def __init__(self, **kwargs):
-        if hasattr(self, 'commentary'):
-            self.parents.commentary = self.commentary
-            del self.commentary
+        """Initializes the ``TextContainer``."""
+        for k, v in kwargs.items():
+            if k in vs.TEXTCONTAINER_TYPES:
+                setattr(self.parents, k, v)
+            else:
+                setattr(self, k, v)
+
 
     @abstractmethod
     @docstring_formatter(**docstrings)
@@ -81,9 +84,6 @@ class TextContainer:
 
 class Commentary(TextContainer):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def _get_parent(self, parent_type: str) -> None:
         return None  # A commentary has no parents, just here to implement abstractmethod
 
@@ -122,9 +122,14 @@ class Commentary(TextContainer):
                                                                                      encoding='utf-8')
 
     @lazy_property
-    def ocr_gt_pages(self) -> List[vs.PageType]:
-        """A list of ``CanonicalPage`` objects containing the groundtruth of the OLR."""
-        return [p for p in self.children.pages if p.id in self.ocr_gt_page_ids]
+    def root_dir(self) -> Path:
+        """The directory containing the commentary's files."""
+        return vs.get_comm_root_dir(self.id)
+
+    @lazy_property
+    def img_dir(self) -> Path:
+        """The directory containing the commentary's images."""
+        return vs.get_comm_img_dir(self.id)
 
     @lazy_property
     def olr_gt_pages(self) -> List[vs.PageType]:
@@ -144,6 +149,54 @@ class Commentary(TextContainer):
         return [p for p in self.children.pages if p.id in self.lemlink_gt_page_ids]
 
 
+    def get_duplicates(self):
+        comm_diffs = {}
+        for page in self.children.pages:
+            page_diffs = {}
+            for child_type in ['regions', 'lines', 'words']:
+                boxes = []
+                for child in getattr(page.children, child_type):
+                    if child.bbox.bbox not in boxes:
+                        boxes.append(child.bbox.bbox)
+                    else:
+                        print(f'Page {page.id} has duplicated {child_type}: {child.text} at {child.bbox.bbox}')
+
+                page_diffs[child_type] = len(getattr(page.children, child_type)) - len(boxes)
+
+            comm_diffs[page.id] = page_diffs
+
+            if any(page_diffs.values()):
+                print(f'************** Page {page.id} ************** ')
+                for k, v in page_diffs.items():
+                    print(f'{k}: {v}')
+        return comm_diffs
+
+    def safe_check_sections(self):
+        errors = 0
+        previous_end = self.children.sections[0].end
+        for s in self.children.sections[1:]:
+            if s.start <= previous_end:
+                print(f'Overlapping sections: {previous_end} and {s.start}')
+                errors += 1
+            elif s.start == previous_end + 1:
+                pass
+            else:
+                print(f'Missing page between {previous_end} and {s.start}')
+                errors += 1
+            previous_end = s.end
+        if s.end != len(self.children.pages):
+            print(f'Missing end pages between {s.end} and {len(self.children.pages)}')
+            errors += 1
+
+        return not errors > 0
+
+
+    def is_safe(self):
+        if any([d for page_diffs in self.get_duplicates().values() for d in page_diffs.values()]):
+            return False
+        return True
+
+
 class Page:
 
     def draw_textcontainers(self,
@@ -157,8 +210,8 @@ class Page:
         """
         draw = self.image.matrix.copy()
 
-        for type in tc_types:
-            draw = ajmc_img.draw_textcontainers(draw, None, *getattr(self.children, type))
+        for type_ in tc_types:
+            draw = ajmc_img.draw_textcontainers(draw, None, *getattr(self.children, type_))
 
         if output_path is not None:
             cv2.imwrite(str(output_path), draw)

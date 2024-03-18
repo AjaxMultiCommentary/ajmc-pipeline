@@ -21,7 +21,7 @@ from ajmc.commons.geometry import are_bboxes_overlapping_with_threshold, is_bbox
 from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.unicode_utils import harmonise_unicode, count_chars_by_charset, CHARSETS_PATTERNS
 from ajmc.ocr import variables as ocr_vs
-from ajmc.text_processing.ocr_classes import OcrCommentary, OcrPage
+from ajmc.text_processing.raw_classes import RawCommentary, RawPage
 
 logger = get_ajmc_logger(__name__)
 
@@ -59,7 +59,7 @@ def initialize_soup(img_width: int, img_height: int) -> "BeautifulSoup":
     return soup
 
 
-def insert_text_in_soup(soup: "BeautifulSoup", word: 'OcrWord', is_gt: bool, is_false: bool) -> "BeautifulSoup":
+def insert_text_in_soup(soup: "BeautifulSoup", word: 'RawWord', is_gt: bool, is_false: bool) -> "BeautifulSoup":
     """Adds content to ``soup`` object.
 
     This function is used to add single words to the ``soup`` object initialized by ``initialize_soup``, thereby
@@ -177,7 +177,7 @@ def write_editops_record(editops_record: dict, output_dir: Path):
 #                                       EVALUATION METHODS
 # ======================================================================================================================
 
-# todo 👁️ add fuzzy eval
+# 👁️ add fuzzy eval
 def bag_of_word_evaluation(gt_bag: List[str],
                            pred_bag: List[str],
                            error_counts: Optional[Dict[str, Union[int, float]]] = None,
@@ -233,8 +233,8 @@ def bag_of_word_evaluation(gt_bag: List[str],
     return error_counts
 
 
-def simple_coordinates_based_evaluation(gt_words: List[Union['CanonicalWord', 'OcrWord']],
-                                        pred_words: List[Union['CanonicalWord', 'OcrWord']],
+def simple_coordinates_based_evaluation(gt_words: List[Union['CanonicalWord', 'RawWord']],
+                                        pred_words: List[Union['CanonicalWord', 'RawWord']],
                                         overlap_threshold: float = 0.8) -> float:
     """Computes edit distance between spacially overlapping words and returns the CER.
 
@@ -243,8 +243,8 @@ def simple_coordinates_based_evaluation(gt_words: List[Union['CanonicalWord', 'O
      (e.g. with crummy groundtruth- or preds-boxes), the word is left out and not counted in the final result.
 
      Args:
-         gt_words: The list of ground truth words (e.g. coming from ``OcrPage.children.words``)
-         pred_words: The list of predicted words (e.g. coming from ``OcrPage.children.words``)
+         gt_words: The list of ground truth words (e.g. coming from ``RawPage.children.words``)
+         pred_words: The list of predicted words (e.g. coming from ``RawPage.children.words``)
          overlap_threshold: The minimal overlap-proportion.
 
      Returns:
@@ -273,8 +273,8 @@ def simple_coordinates_based_evaluation(gt_words: List[Union['CanonicalWord', 'O
     return total_edit_distance / total_characters
 
 
-def coord_based_page_evaluation(gt_page: 'OcrPage',
-                                pred_page: 'OcrPage',
+def coord_based_page_evaluation(gt_page: 'RawPage',
+                                pred_page: 'RawPage',
                                 word_overlap_threshold: Optional[float] = 0.8,
                                 error_counts: Optional[Dict[str, Dict[str, Dict[str, int]]]] = None,
                                 editops_record: Optional[Dict[Tuple[str, str, str], int]] = None
@@ -378,14 +378,14 @@ def coord_based_page_evaluation(gt_page: 'OcrPage',
     return editops_record, error_counts, soup
 
 
-def commentary_evaluation(commentary: 'OcrCommentary',
+def commentary_evaluation(commentary: 'RawCommentary',
                           write_files: bool = True,
                           output_dir: Optional[str] = None,
                           word_overlap_threshold: float = 0.8):
-    """Evaluates all the pages of a ``OcrCommentary`` that have groundtruth.
+    """Evaluates all the pages of a ``RawCommentary`` that have groundtruth.
 
     Args:
-        commentary: The ``OcrCommentary`` object to evaluate.
+        commentary: The ``RawCommentary`` object to evaluate.
         write_files: Whether to write the files or not
         output_dir: Leave to none if you want to write files to the default dir
         word_overlap_threshold: See ``coord_based_page_evaluation``.

@@ -19,6 +19,65 @@ from ajmc.text_processing.generic_classes import Commentary, Page, TextContainer
 logger = get_ajmc_logger(__name__)
 
 
+class CanonicalTextContainer(TextContainer):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @abstractmethod
+    def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
+        pass
+
+    def _get_children(self, children_type: str) -> List[Optional[Type['CanonicalTextContainer']]]:
+        """Fetches the ``TextContainers`` in the parent commentary  which are included in ``self.text_container``.
+
+        Note:
+            - This methods works with word ranges, NOT with coordinates.
+            - This methods does retrieve elements which overlap only partially with ``self``.
+        """
+
+        if children_type == 'words':  # Special efficiency hack for words
+            return self.parents.commentary.children.words[self.word_range[0]:self.word_range[1] + 1]
+
+        # General case
+        return [tc for tc in getattr(self.parents.commentary.children, children_type)
+                if is_interval_within_interval(contained=tc.word_range, container=self.word_range)
+                and self.id != tc.id]
+
+    def _get_parent(self, parent_type: str) -> Optional[Type['CanonicalTextContainer']]:
+
+        if parent_type == 'commentary':
+            raise NotImplementedError('``CanonicalTextContainer.parents.commentary`` must be set at __init__')
+
+        for tc in getattr(self.parents.commentary.children, vs.TC_TYPES_TO_CHILD_TYPES[parent_type]):
+            if is_interval_within_interval(contained=self.word_range, container=tc.word_range) and self.id != tc.id:
+                return tc
+
+    @lazy_property
+    def id(self) -> str:
+        """Generic method to create a ``CanonicalTextContainer``'s id."""
+        return self.type + '_' + str(self.index)
+
+    @lazy_property
+    def index(self) -> int:
+        """Generic method to get a ``CanonicalTextContainer``'s index in its parent commentary's children list."""
+        return getattr(self.parents.commentary.children, vs.TC_TYPES_TO_CHILD_TYPES[self.type]).index(self)
+
+    @lazy_property
+    def word_range(self) -> Tuple[int, int]:
+        return self.word_range
+
+    @lazy_property
+    def bbox(self) -> Shape:
+        """Generic method to get a ``CanonicalTextContainer``'s bbox."""
+        return Shape(get_bbox_from_points([xy for w in self.children.words for xy in w.bbox.bbox]))
+
+    @lazy_property
+    def image(self) -> AjmcImage:
+        """Generic method to create a ``CanonicalTextContainer``'s image."""
+        return self.parents.page.image.crop(self.bbox.bbox)
+
+
 class CanonicalCommentary(Commentary):
 
     @docstring_formatter(**docstrings)
@@ -58,14 +117,24 @@ class CanonicalCommentary(Commentary):
                          **kwargs)
 
     @classmethod
-    def from_json(cls, json_path: Union[str, Path]):
+    def from_json(cls,
+                  json_path: Optional[Union[str, Path]] = None,
+                  id: Optional[str] = None,
+                  ocr_run_id: Optional[str] = vs.DEFAULT_OCR_RUN_ID):
         """Instantiate a ``CanonicalCommentary`` from a json file.
 
         Args:
             json_path: The path to a canonical/v2 json file containing a commentary and respecting the
             ajmc folder structure.
+            id: The id of the commentary.
+            ocr_run_id: The id of the ocr run.
         """
-        json_path = Path(json_path)
+
+        if json_path is None:
+            json_path = vs.get_comm_canonical_path_from_ocr_run_id(id, ocr_run_id)
+        else:
+            json_path = Path(json_path)
+
         if not json_path.match(f'{vs.get_comm_canonical_dir("*") / "*.json"}'):
             logger.warning(f"The provided ``json_path`` ({json_path}) is not compliant with ajmc's folder structure.")
 
@@ -84,12 +153,10 @@ class CanonicalCommentary(Commentary):
                          metadata=can_json['metadata'])
 
         # Automatically determinates paths
-        commentary.base_dir = vs.get_comm_base_dir(commentary.id)
-        img_dir = vs.get_comm_img_dir(commentary.id)
 
         # Set its images
         commentary.images = [
-            AjmcImage(id=img['id'], path=img_dir / (img['id'] + vs.DEFAULT_IMG_EXTENSION), word_range=img['word_range'])
+            AjmcImage(id=img['id'], path=commentary.img_dir / (img['id'] + vs.DEFAULT_IMG_EXTENSION), word_range=img['word_range'])
             for img in can_json['children']['pages']
         ]
 
@@ -125,7 +192,7 @@ class CanonicalCommentary(Commentary):
                              for child_type in vs.CHILD_TYPES}}
 
         if output_path is None:
-            output_path = vs.get_comm_canonical_default_path(self.id, self.ocr_run_id)
+            output_path = vs.get_comm_canonical_path_from_ocr_run_id(self.id, self.ocr_run_id)
 
         output_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
 
@@ -171,75 +238,7 @@ class CanonicalCommentary(Commentary):
     @lazy_property
     def ocr_gt_pages(self) -> List[Type['CanonicalPage']]:
         """A list of ``CanonicalPage`` objects containing the groundtruth of the OCR."""
-
         return [p for p in self.children.pages if p.id in self.ocr_gt_page_ids]
-
-
-class CanonicalTextContainer(TextContainer):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    @abstractmethod
-    def to_json(self) -> Dict[str, Union[str, Tuple[int, int]]]:
-        pass
-
-    def _get_children(self, children_type: str) -> List[Optional[Type['CanonicalTextContainer']]]:
-        """Fetches the ``TextContainers`` in the parent commentary  which are included in ``self.text_container``.
-
-        Note:
-            - This methods works with word ranges, NOT with coordinates.
-            - This methods does retrieve elements which overlap only partially with ``self``.
-        """
-
-        if self.type == 'word':  # Special efficiency hack for words
-            return []
-
-        if children_type == 'words':  # Special efficiency hack for words
-            return self.parents.commentary.children.words[self.word_range[0]:self.word_range[1] + 1]
-
-        # General case
-        return [tc for tc in getattr(self.parents.commentary.children, children_type)
-                if is_interval_within_interval(contained=tc.word_range, container=self.word_range)
-                and self.id != tc.id]
-
-    def _get_parent(self, parent_type: str) -> Optional[Type['CanonicalTextContainer']]:
-
-        if parent_type == 'commentary':
-            raise AttributeError('``parents.commentary`` cannot be computed ex nihilo. It must be set manually.')
-
-        parents = [tc for tc in getattr(self.parents.commentary.children, vs.TC_TYPES_TO_CHILD_TYPES[parent_type])
-                   if is_interval_within_interval(contained=self.word_range, container=tc.word_range)
-                   and self.id != tc.id]
-
-        return parents[0] if len(parents) > 0 else None
-
-    @lazy_property
-    def id(self) -> str:
-        """Generic method to create a ``CanonicalTextContainer``'s id."""
-        return self.type + '_' + str(self.index)
-
-    @lazy_property
-    def index(self) -> int:
-        """Generic method to get a ``CanonicalTextContainer``'s index in its parent commentary's children list."""
-        return getattr(self.parents.commentary.children, vs.TC_TYPES_TO_CHILD_TYPES[self.type]).index(self)
-
-    @lazy_property
-    def word_range(self) -> Tuple[int, int]:
-        return self.word_range
-
-    @lazy_property
-    def bbox(self) -> Shape:
-        """Generic method to get a ``CanonicalTextContainer``'s bbox."""
-        if len(self.children.words) == 0:
-            return Shape([(0, 0), (0, 0)])
-        else:
-            return Shape(get_bbox_from_points([xy for w in self.children.words for xy in w.bbox.bbox]))
-
-    @lazy_property
-    def image(self) -> AjmcImage:
-        """Generic method to create a ``CanonicalTextContainer``'s image."""
-        return self.parents.page.image.crop(self.bbox.bbox)
 
 
 class CanonicalSection(CanonicalTextContainer):
@@ -338,7 +337,7 @@ class CanonicalWord(CanonicalTextContainer):
         return self.index, self.index
 
 
-# todo 👁️ not very elegant. try to revise.
+# 👁️ not very elegant. try to revise.
 def get_tc_type_class(tc_type) -> Type[CanonicalTextContainer]:
     if not tc_type.endswith('s'):
         return globals()[f'Canonical{tc_type.capitalize()}']
@@ -354,6 +353,7 @@ class CanonicalAnnotation(CanonicalTextContainer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @lazy_property
     def text(self):
         return ' '.join([w.text for w in self.children.words])[self.shifts[0]:self.shifts[1]]
 
@@ -361,8 +361,9 @@ class CanonicalAnnotation(CanonicalTextContainer):
         return ' '.join(self.parents.commentary.children.words[
                         self.word_range[0] - window_size:self.word_range[1] + window_size + 1])
 
+    @lazy_property
     def bbox(self) -> None:
-        logger.warning('``CanonicalAnnotation``s have no bbox.')
+        logger.warning(f'``{self.__class__}``s have no bbox.')
         return None
 
 
@@ -389,11 +390,6 @@ class CanonicalEntity(CanonicalAnnotation):
                 'label': self.label,
                 'wikidata_id': self.wikidata_id}
 
-    def bbox(self) -> None:
-        # Todo: should this raise an error?
-        logger.warning('``CanonicalEntity``s have no bbox.')
-        return None
-
 
 class CanonicalSentence(CanonicalAnnotation):
 
@@ -418,10 +414,6 @@ class CanonicalSentence(CanonicalAnnotation):
                 'incomplete_continuing': self.incomplete_continuing,
                 'incomplete_truncated': self.incomplete_truncated}
 
-    def bbox(self) -> None:
-        logger.warning('``CanonicalSentence``s have no bbox.')
-        return None
-
 
 class CanonicalHyphenation(CanonicalAnnotation):
 
@@ -437,9 +429,6 @@ class CanonicalHyphenation(CanonicalAnnotation):
         return {'word_range': self.word_range,
                 'shifts': self.shifts}
 
-    def bbox(self) -> None:
-        logger.warning('``CanonicalHyphenation``s have no bbox.')
-        return None
 
 
 class CanonicalLemma(CanonicalAnnotation):

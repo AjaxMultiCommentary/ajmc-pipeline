@@ -13,9 +13,9 @@ These errors spread over `25` words.
 The page contains a total of :
 
 ```python
-from ajmc.text_processing.ocr_classes import OcrPage
+from ajmc.text_processing.raw_classes import RawPage
 
-page = OcrPage('sophoclesplaysa05campgoog_0146',
+page = RawPage('sophoclesplaysa05campgoog_0146',
                ocr_path='/data/ocr/sample_evaluation_data/gt_sophoclesplaysa05campgoog_0146.html')
 print('Wordcount:  ', len(page.children.words))
 print('Charcount:  ', sum([len(w.text) for w in page.children.words]))

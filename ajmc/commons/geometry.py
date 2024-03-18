@@ -66,6 +66,14 @@ class Shape:
         y = center_y - int(h / 2)
         return cls.from_xywh(x, y, w, h)
 
+    @classmethod
+    def from_via(cls, via_region_dict: dict):
+        """Creates a Shape from a VIA dictionary."""
+        return cls.from_xywh(via_region_dict['shape_attributes']['x'],
+                             via_region_dict['shape_attributes']['y'],
+                             via_region_dict['shape_attributes']['width'],
+                             via_region_dict['shape_attributes']['height'])
+
 
     @lazy_property
     @docstring_formatter(**docstrings)

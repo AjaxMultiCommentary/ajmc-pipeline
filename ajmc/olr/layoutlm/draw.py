@@ -1,12 +1,12 @@
 """Draw utilities, notably to draw word labels."""
 import os
+from typing import List, Dict, Tuple, Optional
 
 from PIL import Image, ImageDraw, ImageFont
-from typing import List, Dict, Tuple, Optional
 
 
 def draw_page_labels(img: 'PIL.Image',
-                     words: List['OcrWord'],
+                     words: List['RawWord'],
                      labels: List[str],
                      labels_to_colors,
                       ):

@@ -119,10 +119,13 @@ def compute_text_len(text:str) -> int:
 ❌ This should be avoided:
 
 ```python
-def compute_line_len(line: 'OcrLine') -> int:
+def compute_line_len(line: 'RawLine') -> int:
     return len(line.text)
 ```
-Here, `compute_line_len` expects an `OcrLine` objets only to retrieve its text. The function is match to specialised and should actually be a method to the object, and not a free function in the loose. On the contrary, `compute_text_len` is much or general and can be easily called by several text containers.
+
+Here, `compute_line_len` expects an `RawLine` objets only to retrieve its text. The function is match to specialised and
+should actually be a method to the object, and not a free function in the loose. On the contrary, `compute_text_len` is
+much or general and can be easily called by several text containers.
 
 More generally, pipeline-like functions should be avoided as much as possible. Something like :
 

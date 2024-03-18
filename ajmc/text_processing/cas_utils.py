@@ -23,7 +23,7 @@ AJMC_METADATA_TYPE = 'webanno.custom.AjMCDocumentmetadata'
 def basic_rebuild(page: dict,
                   region_types: List[str],
                   string: str = '') -> dict:
-    # todo 👁️ a light version of this function computing only what you actually need
+    # 👁️ a light version of this function computing only what you actually need could be useful
     """Basic rebuild function"""
 
     coordinates = {'regions': [], 'lines': [], 'words': []}
@@ -187,7 +187,7 @@ def rebuild_to_xmi(page: dict,
     cas.to_xmi((output_dir / f'{page["id"]}.xmi'), pretty_print=True)
 
 
-def export_commentary_to_xmis(commentary: Type['OcrCommentary'],
+def export_commentary_to_xmis(commentary: Type['RawCommentary'],
                               make_jsons: bool,
                               make_xmis: bool,
                               jsons_dir: Path,
@@ -198,7 +198,7 @@ def export_commentary_to_xmis(commentary: Type['OcrCommentary'],
     Main function for the pipeline.
     
     Args:
-        commentary: The commentary to convert to xmis, should be an OcrCommentary object (not a canonical commentary).
+        commentary: The commentary to convert to xmis, should be an RawCommentary object (not a canonical commentary).
         jsons_dir: Absolute path to the directory in which to write the json files or take them from.
         xmis_dir: Absolute path to the directory in which to write the xmi files.
         make_jsons: Whether to create canonical jsons. If false, jsons are grepped from json_dir.
@@ -300,7 +300,7 @@ def import_page_rebuild(page_id: str, annotation_type: str):
                              region_types=vs.IDS_TO_REGIONS[comm_id])
 
     elif annotation_type == 'lemmas':
-        run_dir = [dir_ for dir_ in (vs.get_comm_base_dir(comm_id) / vs.COMM_LEMLINK_ANN_REL_DIR).glob('*') if dir_.is_dir()][0]
+        run_dir = [dir_ for dir_ in (vs.get_comm_root_dir(comm_id) / vs.COMM_LEMLINK_ANN_REL_DIR).glob('*') if dir_.is_dir()][0]
         rebuild_path = run_dir / 'jsons' / (page_id + '.json')
         try:
             metadata = json.loads((run_dir / 'xmis' / 'metadata.json').read_text('utf-8'))

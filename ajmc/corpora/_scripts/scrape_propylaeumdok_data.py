@@ -4,9 +4,9 @@ from tqdm import tqdm
 
 from ajmc.corpora import variables as vs
 
-oai_files_dir = vs.BASE_SCRAPE_DIR / 'propylaeum_DOK/metadata/oai_files'
-json_output_path = vs.BASE_SCRAPE_DIR / 'propylaeum_DOK/metadata/metadata.json'
-output_dir = vs.BASE_SCRAPE_DIR / 'propylaeum_DOK/data'
+oai_files_dir = vs.ROOT_SCRAPE_DIR / 'propylaeum_DOK/metadata/oai_files'
+json_output_path = vs.ROOT_SCRAPE_DIR / 'propylaeum_DOK/metadata/metadata.json'
+output_dir = vs.ROOT_SCRAPE_DIR / 'propylaeum_DOK/data'
 
 metadata = pd.read_json(json_output_path, orient='records')
 #%%
@@ -30,4 +30,4 @@ for ids in tqdm(metadata['identifier']):
     else:
         missed.append(link)
 
-output_dir = (vs.BASE_SCRAPE_DIR / 'propylaeum_DOK/missed.txt').write_text('\n'.join(missed))
+output_dir = (vs.ROOT_SCRAPE_DIR / 'propylaeum_DOK/missed.txt').write_text('\n'.join(missed))
