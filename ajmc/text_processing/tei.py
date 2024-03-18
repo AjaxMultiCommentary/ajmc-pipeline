@@ -39,6 +39,7 @@ TEI_REGION_LABELS = {
     "index": "Index",
     "introduction": "Introduction",
     "line": "",
+    "line_region": "",
     "preface": "Preface",
     "primary_text": "",
     "printed_marginalia": "",
@@ -248,25 +249,44 @@ class TEIDocument:
         else:
             for region in page.children.regions:
                 if region.region_type in TEI_REGION_TYPES:
-                    page_el.append(
-                        E.p(
-                            E.head(
-                                TEI_REGION_LABELS.get(
-                                    region.region_type, region.region_type
-                                )
-                            ),
-                            *self.words(region.word_range),
-                            type=region.region_type,
-                            n="-".join(
-                                [
-                                    str(region.word_range[0]),
-                                    str(region.word_range[1]),
-                                ]
-                            ),
+                    if region.region_type == "footnote":
+                        page_el.append(
+                            E.note(
+                                self.section_head(region),
+                                *self.words(region.word_range),
+                                place="foot",
+                                n="-".join(
+                                    [
+                                        str(region.word_range[0]),
+                                        str(region.word_range[1]),
+                                    ]
+                                ),
+                            )
                         )
-                    )
+                    else:
+                        page_el.append(
+                            E.p(
+                                self.section_head(region),
+                                *self.words(region.word_range),
+                                type=region.region_type,
+                                n="-".join(
+                                    [
+                                        str(region.word_range[0]),
+                                        str(region.word_range[1]),
+                                    ]
+                                ),
+                            )
+                        )
 
         return page_el
+
+    def section_head(self, region):
+        region_heading = TEI_REGION_LABELS.get(region.region_type)
+
+        if region_heading != "":
+            return E.head(region_heading)
+
+        return ""
 
     def title(self):
         return self.bibliographic_data["title"]
