@@ -47,14 +47,6 @@ class RawTextContainer(TextContainer):
         self.bbox = Shape(get_bbox_from_points([xy for w in self.children.words for xy in w.bbox.bbox]))
 
     @lazy_property
-    def image(self) -> AjmcImage:
-        return self.parents.page.image
-
-    @lazy_property
-    def ocr_format(self) -> str:
-        return self.parents.page.ocr_format
-
-    @lazy_property
     def text(self) -> str:
         return ' '.join([w.text for w in self.children.words])
 
@@ -840,12 +832,12 @@ class RawEntity(RawAnnotation):
     @classmethod
     def from_cas_annotation(cls, page, cas_annotation, rebuild, verbose: bool = False):
         # Get general text-alignment-related about the annotation
-        bboxes, shifts, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
-                                                                               rebuild=rebuild, verbose=verbose)
+        bboxes, shifts, transcript, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
+                                                                                           rebuild=rebuild, verbose=verbose)
         return cls(page,
                    bboxes=[Shape.from_xywh(*bbox) for bbox in bboxes],
                    shifts=shifts,
-                   transcript=cas_annotation.transcript,
+                   transcript=transcript,
                    label=cas_annotation.value,
                    wikidata_id=cas_annotation.wikidata_id,
                    text_window=text_window,
@@ -858,8 +850,8 @@ class RawSentence(RawAnnotation):
     @classmethod
     def from_cas_annotation(cls, page, cas_annotation, rebuild, verbose: bool = False):
         # Get general text-alignment-related about the annotation
-        bboxes, shifts, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
-                                                                               rebuild=rebuild, verbose=verbose)
+        bboxes, shifts, transcript, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
+                                                                                           rebuild=rebuild, verbose=verbose)
         return cls(page,
                    bboxes=[Shape.from_xywh(*bbox) for bbox in bboxes],
                    shifts=shifts,
@@ -876,8 +868,8 @@ class RawHyphenation(RawAnnotation):
     @classmethod
     def from_cas_annotation(cls, page, cas_annotation, rebuild, verbose: bool = False):
         # Get general text-alignment-related about the annotation
-        bboxes, shifts, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
-                                                                               rebuild=rebuild, verbose=verbose)
+        bboxes, shifts, transcript, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
+                                                                                           rebuild=rebuild, verbose=verbose)
         return cls(page,
                    bboxes=[Shape.from_xywh(*bbox) for bbox in bboxes],
                    shifts=shifts,
@@ -891,12 +883,13 @@ class RawLemma(RawAnnotation):
     @classmethod
     def from_cas_annotation(cls, page, cas_annotation, rebuild, verbose: bool = False):
         # Get general text-alignment-related about the annotation
-        bboxes, shifts, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
-                                                                               rebuild=rebuild, verbose=verbose)
+        bboxes, shifts, transcript, text_window, warnings = cas_utils.align_cas_annotation(cas_annotation=cas_annotation,
+                                                                                           rebuild=rebuild, verbose=verbose)
 
         return cls(page,
                    bboxes=[Shape.from_xywh(*bbox) for bbox in bboxes],
                    shifts=shifts,
                    text_window=text_window,
                    warnings=warnings,
-                   **{attr_: getattr(cas_annotation, attr_, None) for attr_ in ['anchor_target', 'value', 'transcript']})
+                   transcript=transcript,
+                   **{attr_: getattr(cas_annotation, attr_, None) for attr_ in ['anchor_target', 'value']})
