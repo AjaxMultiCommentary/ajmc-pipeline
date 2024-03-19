@@ -47,14 +47,6 @@ class RawTextContainer(TextContainer):
         self.bbox = Shape(get_bbox_from_points([xy for w in self.children.words for xy in w.bbox.bbox]))
 
     @lazy_property
-    def image(self) -> AjmcImage:
-        return self.parents.page.image
-
-    @lazy_property
-    def ocr_format(self) -> str:
-        return self.parents.page.ocr_format
-
-    @lazy_property
     def text(self) -> str:
         return ' '.join([w.text for w in self.children.words])
 
