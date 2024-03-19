@@ -244,7 +244,7 @@ def get_cas(xmi_path: Path, xml_path: Path) -> Cas:
 
 
 def align_cas_annotation(cas_annotation, rebuild, verbose: bool = False):
-    # We define an empty dict to store the annotation.
+    # We define empty lists to store the annotation.
     bboxes, shifts, warnings = [], [], []
 
     # We get the annotation's surrounding text
@@ -252,17 +252,18 @@ def align_cas_annotation(cas_annotation, rebuild, verbose: bool = False):
     {cas_annotation.sofa.sofaString[cas_annotation.begin:cas_annotation.end]}|\
     {cas_annotation.sofa.sofaString[cas_annotation.end:cas_annotation.end + 10]}"""
 
+    if hasattr(cas_annotation, 'transcript') and cas_annotation.transcript is not None:
+        transcript = cas_annotation.transcript
+    else:
+        transcript = cas_annotation.sofa.sofaString[cas_annotation.begin:cas_annotation.end]
+
     # We then find the words included in the annotation and retrieve their bboxes
     ann_words = [{'bbox': bbox, 'offsets': offsets}
                  for bbox, offsets in zip(rebuild['bbox']['words'], rebuild['offsets']['words'])
                  if compute_interval_overlap((cas_annotation.begin, cas_annotation.end), offsets) > 0]
 
     # If the annotation words are not found in the page dictionary. This is a problem, should not happen
-    if not ann_words:
-        logger.error(f"""Annotation has no words: {text_window}""")
-        warnings = ['no words']
-
-    else:
+    if ann_words:
         bboxes = [ann_word['bbox'] for ann_word in ann_words]
         shifts = [cas_annotation.begin - ann_words[0]['offsets'][0],
                   cas_annotation.end - ann_words[-1]['offsets'][1]]
@@ -271,7 +272,11 @@ def align_cas_annotation(cas_annotation, rebuild, verbose: bool = False):
             aligned_print(rebuild['fulltext'][ann_words[0]['offsets'][0]:ann_words[-1]['offsets'][1]],
                           cas_annotation.sofa.sofaString[cas_annotation.begin:cas_annotation.end])
 
-    return bboxes, shifts, text_window, warnings
+    else:
+        logger.error(f"""Annotation has no words: {text_window}""")
+        warnings = ['no words']
+
+    return bboxes, shifts, transcript, text_window, warnings
 
 
 def get_cas_metadata(cas: Cas):
