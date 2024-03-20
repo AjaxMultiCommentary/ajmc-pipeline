@@ -249,10 +249,14 @@ class TEIDocument:
         else:
             for region in page.children.regions:
                 if region.region_type in TEI_REGION_TYPES:
+                    section_heading = self.section_head(region)
+
+                    if section_heading is not None:
+                        page_el.append(section_heading)
+
                     if region.region_type == "footnote":
                         page_el.append(
                             E.note(
-                                self.section_head(region),
                                 *self.words(region.word_range),
                                 place="foot",
                                 n="-".join(
@@ -264,19 +268,13 @@ class TEIDocument:
                             )
                         )
                     else:
-                        page_el.append(
-                            E.p(
-                                self.section_head(region),
-                                *self.words(region.word_range),
-                                type=region.region_type,
-                                n="-".join(
-                                    [
-                                        str(region.word_range[0]),
-                                        str(region.word_range[1]),
-                                    ]
-                                ),
-                            )
-                        )
+                        region_el = E.p(type=region.region_type)
+                        for line in region.children.lines:
+                            for w in self.words(line.word_range):
+                                region_el.append(w)
+
+                            region_el.append(E.lb())
+                        page_el.append(region_el)
 
         return page_el
 
@@ -286,7 +284,7 @@ class TEIDocument:
         if region_heading != "":
             return E.head(region_heading)
 
-        return ""
+        return None
 
     def title(self):
         return self.bibliographic_data["title"]
