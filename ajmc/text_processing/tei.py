@@ -1,4 +1,5 @@
 import ajmc.text_processing.canonical_classes as cc
+import ajmc.text_processing.zotero as zotero
 import ajmc.commons.variables as vars
 import lxml.builder as lxml_builder
 import lxml.etree as lxml_etree
@@ -40,14 +41,6 @@ TEI_REGION_TYPES = [
     "title",
     "translation",
 ]
-
-
-def get_zotero_data(zotero_id):
-    resp = requests.get(
-        f'{os.getenv("ZOTERO_API_URL", "https://api.zotero.org/groups/GROUP")}/items/{zotero_id}',
-        headers={"Authorization": f"Bearer {os.getenv('ZOTERO_API_TOKEN', '')}"},
-    )
-    return resp.json()["data"]
 
 
 class TEIDocument:
@@ -179,7 +172,7 @@ if __name__ == "__main__":
     )
 
     for commentary in commentaries.json()["data"]:
-        zotero_data = get_zotero_data(commentary["zotero_id"])
+        zotero_data = zotero.get_zotero_data(commentary["zotero_id"])
         doc = TEIDocument(commentary["pid"], zotero_data)
 
         doc.export()
