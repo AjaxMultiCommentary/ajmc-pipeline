@@ -306,6 +306,7 @@ class ViaProject:
 
         """
         output_path.write_text(json.dumps(self.project_dict, ensure_ascii=False, indent=2))
+        print(f'Saved via file to {output_path}')
 
 
 if __name__ == '__main__':
@@ -330,6 +331,7 @@ if __name__ == '__main__':
 
     for comm_id in args.comm_ids:
         via_path = vs.get_comm_via_path(comm_id)
+        print(f'Using via file {via_path}')
 
         print(f'Processing {comm_id}...')
         via_project = ViaProject.from_json(via_path)
