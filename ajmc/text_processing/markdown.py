@@ -1,3 +1,4 @@
+import ajmc.text_processing.canonical_classes as cc
 import ajmc.text_processing.exportable_commentary as export
 import regex
 
@@ -80,12 +81,15 @@ class Glossa:
     attributes: dict
     content: str
     lemma: str
-    start_offset: int
-    end_offset: int
+    lemma_start_offset: int
+    lemma_end_offset: int
     urn: CTS_URN
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, canonical_lemma: cc.CanonicalLemma) -> None:
+        self.__lemma = canonical_lemma
+
+    def get_content(self):
+        lemma_words = self.__lemma.children.words
 
 
 class MarkdownCommentary(export.ExportableCommentary):
@@ -94,7 +98,7 @@ class MarkdownCommentary(export.ExportableCommentary):
 
         super().__init__(ajmc_id, bibliographic_data)
 
-    def commentary_metadata(self):
+    def frontmatter(self):
         creators = [
             dict(
                 first_name=a["firstName"],
@@ -135,3 +139,16 @@ class MarkdownCommentary(export.ExportableCommentary):
             zotero_id=zotero_id,
             zotero_link=zotero_link,
         )
+
+    def glosses(self):
+        for i, lemma in enumerate(self.commentary.children.lemmas):
+            try:
+                next_lemma = self.commentary.children.lemmas[i + 1]
+                glossa = self.get_words_between_lemmas(lemma, next_lemma)
+            except IndexError:
+                pass
+
+    def get_words_between_lemmas(
+        self, lemma: cc.CanonicalLemma, next_lemma: cc.CanonicalLemma
+    ):
+        pass

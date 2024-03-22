@@ -55,6 +55,28 @@ class TEIDocument(export.ExportableCommentary):
             for a in self.bibliographic_data["creators"]
         ]
 
+    def frontmatter(self):
+        return E.teiHeader(
+            E.fileDesc(
+                E.titleStmt(
+                    E.title(self.title()),
+                    *self.authors(),
+                ),
+                E.publicationStmt(
+                    E.publisher("Ajax Multi-Commentary"),
+                    E.availability(status="free"),
+                ),
+                E.sourceDesc(
+                    E.p(
+                        "Created from public domain scans of the public domain commentary"
+                    )
+                ),
+            ),
+            E.revisionDesc(
+                E.change("Initial TEI export", when="2024-02-23", who="#AjMC")
+            ),
+        )
+
     def page_transcription(self, page):
         page_el = E.div(E.pb(n=page.id, facs=self.facsimile(page)))
 
@@ -110,26 +132,7 @@ class TEIDocument(export.ExportableCommentary):
             sections.append(section_el)
 
         self.tei = E.TEI(
-            E.teiHeader(
-                E.fileDesc(
-                    E.titleStmt(
-                        E.title(self.title()),
-                        *self.authors(),
-                    ),
-                    E.publicationStmt(
-                        E.publisher("Ajax Multi-Commentary"),
-                        E.availability(status="free"),
-                    ),
-                    E.sourceDesc(
-                        E.p(
-                            "Created from public domain scans of the public domain commentary"
-                        )
-                    ),
-                ),
-                E.revisionDesc(
-                    E.change("Initial TEI export", when="2024-02-23", who="#AjMC")
-                ),
-            ),
+            self.frontmatter(),
             E.text(
                 E.body(
                     E.div(

@@ -20,5 +20,10 @@ class ExportableCommentary:
     def facsimile(self, page):
         return f"{self.ajmc_id}/{page.id}"
 
+    def frontmatter(self):
+        raise NotImplementedError(
+            "frontmatter() needs to be implemented in the child class"
+        )
+
     def title(self):
         return self.bibliographic_data["title"]
