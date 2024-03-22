@@ -1,3 +1,4 @@
+import ajmc.text_processing.exportable_commentary as export
 import regex
 
 # note that the `U` and `UNICDOE` flags are redundant
@@ -26,7 +27,8 @@ class CTS_URN:
 
     def __init__(self, urn: str) -> None:
         self.__urn = None
-        self.__parsed = self.__parse__(urn)
+
+        self.__parse__(urn)
 
     def __parse__(self, urn_s: str):
         self.__urn = urn_s.split("#")[0]
@@ -86,6 +88,50 @@ class Glossa:
         pass
 
 
-class MarkdownCommentary:
-    def __init__(self) -> None:
-        pass
+class MarkdownCommentary(export.ExportableCommentary):
+    def __init__(self, ajmc_id, bibliographic_data) -> None:
+        self.markdown = None
+
+        super().__init__(ajmc_id, bibliographic_data)
+
+    def commentary_metadata(self):
+        creators = [
+            dict(
+                first_name=a["firstName"],
+                last_name=a["lastName"],
+                creator_type=a["creatorType"],
+            )
+            for a in self.bibliographic_data["creators"]
+        ]
+        edition = self.bibliographic_data["edition"]
+        languages = self.bibliographic_data["language"].split(", ")
+        place = self.bibliographic_data["place"]
+        publication_date = self.bibliographic_data["date"]
+        public_domain_year = self.bibliographic_data["extra"]["Public Domain Year"]
+        publisher = self.bibliographic_data["publisher"]
+        source_url = self.bibliographic_data["url"]
+        title = self.bibliographic_data["title"]
+        wikidata_qid = self.bibliographic_data["extra"]["QID"]
+        urn = self.bibliographic_data["extra"]["URN"]
+        zotero_id = self.bibliographic_data["key"]
+        zotero_link = (
+            self.bibliographic_data.get("links", {}).get("alternate", {}).get("href")
+        )
+
+        return dict(
+            creators=creators,
+            edition=edition,
+            languages=languages,
+            metadata=self.commentary.metadata,  # type: ignore
+            pid=self.commentary.id,  # type: ignore
+            place=place,
+            publication_date=publication_date,
+            public_domain_year=public_domain_year,
+            publisher=publisher,
+            source_url=source_url,
+            title=title,
+            urn=f"urn:cts:greekLit:{urn}",
+            wikidata_qid=wikidata_qid,
+            zotero_id=zotero_id,
+            zotero_link=zotero_link,
+        )
