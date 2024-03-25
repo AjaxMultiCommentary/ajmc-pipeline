@@ -53,19 +53,9 @@ TEI_REGION_TYPES = TEI_REGION_LABELS.keys()
 
 class TEIDocument(export.ExportableCommentary):
     def __init__(self, ajmc_id, bibliographic_data) -> None:
-        canonical_path = variables.COMMS_DATA_DIR / ajmc_id / "canonical"
-        filename = [
-            f for f in os.listdir(canonical_path) if f.endswith("_tess_retrained.json")
-        ][0]
-        json_path = canonical_path / filename
-
-        self.ajmc_id = ajmc_id
-        self.bibliographic_data = bibliographic_data
-        self.commentary = cc.CanonicalCommentary.from_json(json_path=json_path)
-        self.filename = f"tei/{ajmc_id}.xml"
-        self.tei = None
-
         super().__init__(ajmc_id, bibliographic_data)
+
+        self.tei = None
 
     def authors(self):
         return [

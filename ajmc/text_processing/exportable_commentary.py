@@ -141,7 +141,6 @@ class ExportableCommentary:
         self.commentary = cc.CanonicalCommentary.from_json(json_path=json_path)
         self.filename = f"tei/{ajmc_id}.xml"
         self.primary_full_entities = make_primary_full_entities(self.commentary)
-        self.tei = None
 
     def facsimile(self, page):
         return f"{self.ajmc_id}/{page.id}"
