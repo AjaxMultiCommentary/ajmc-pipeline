@@ -144,11 +144,15 @@ class MarkdownCommentary(export.ExportableCommentary):
         for i, lemma in enumerate(self.commentary.children.lemmas):
             try:
                 next_lemma = self.commentary.children.lemmas[i + 1]
-                glossa = self.get_words_between_lemmas(lemma, next_lemma)
+                glossa_words = self.get_words_between_lemmas(lemma, next_lemma)
+
             except IndexError:
                 pass
 
     def get_words_between_lemmas(
         self, lemma: cc.CanonicalLemma, next_lemma: cc.CanonicalLemma
     ):
-        pass
+        [_lemma_start, lemma_end] = lemma.word_range
+        [next_lemma_start, _next_lemma_end] = next_lemma.word_range
+
+        return self.commentary.children.words[lemma_end + 1 : next_lemma_start]
