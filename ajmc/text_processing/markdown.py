@@ -77,6 +77,38 @@ class CTS_URN:
         return f"{self.text_group}.{self.work}.{self.version}.{self.exemplar}"
 
 
+def calculate_overlays(
+    pages: list[cc.CanonicalPage],
+    lemma: cc.CanonicalLemma,
+    glossa_words: list[cc.CanonicalWord],
+):
+    all_words = lemma.children.words + glossa_words
+    overlays = []
+
+    for page in pages:
+        page_words = all_words[page.word_range[0] : page.word_range[1] + 1]
+        bboxes = [word.bbox for word in page_words]
+        xs = [bbox[0] for bbox in bboxes]
+        ys = [bbox[1] for bbox in bboxes]
+
+        left_most = min(xs)
+        right_most = max(xs)
+        top_most = min(ys)
+        bottom_most = max(ys)
+
+        overlays.append(
+            dict(
+                page_id=page.id,
+                px=left_most,
+                py=top_most,
+                width=(right_most - left_most),
+                height=(bottom_most - top_most),
+            )
+        )
+
+    return overlays
+
+
 class Glossa:
     attributes: dict
     content: str
@@ -85,11 +117,22 @@ class Glossa:
     lemma_end_offset: int
     urn: CTS_URN
 
-    def __init__(self, canonical_lemma: cc.CanonicalLemma) -> None:
+    def __init__(self, canonical_lemma: cc.CanonicalLemma, content: str) -> None:
         self.__lemma = canonical_lemma
+        self.attributes = self.__lemma.to_json()
+        self.content = content
 
-    def get_content(self):
-        lemma_words = self.__lemma.children.words
+
+class LabeledWord:
+    def __init__(self, text, url) -> None:
+        self.text = text
+        self.url = url
+
+    def append(self, text):
+        self.text += f" {text}"
+
+    def __str__(self):
+        return f"[{self.text}]({self.url})"
 
 
 class MarkdownCommentary(export.ExportableCommentary):
@@ -140,13 +183,48 @@ class MarkdownCommentary(export.ExportableCommentary):
             zotero_link=zotero_link,
         )
 
-    def glosses(self):
-        for i, lemma in enumerate(self.commentary.children.lemmas):
-            try:
-                next_lemma = self.commentary.children.lemmas[i + 1]
-                glossa_words = self.get_words_between_lemmas(lemma, next_lemma)
-            except IndexError:
-                pass
+    def add_entities_to_words(self, words):
+        labeled_words = []
+        current_entity = None
+        current_el = None
+
+        for word in words:
+            entity = self.get_entity_for_word(word)
+
+            if entity is not None and (
+                isinstance(entity, export.PrimaryFullEntity)
+                or (
+                    entity.label in export.EXPORTED_ENTITY_LABELS  # type: ignore
+                    and entity.wikidata_id is not None  # type: ignore
+                )
+            ):
+                if entity == current_entity and current_el is not None:
+                    current_el.append(word.text)
+                else:
+                    current_entity = entity
+
+                    if current_el is not None:
+                        labeled_words.append(current_el)
+
+                    if isinstance(entity, export.PrimaryFullEntity):
+                        current_el = LabeledWord(word.text, entity.url)
+                    else:
+                        current_el = LabeledWord(word.text, entity.wikidata_id)  # type: ignore
+            else:
+                labeled_words.append(word.text)
+
+        return " ".join([str(w) for w in labeled_words])
+
+    def get_pages_for_lemmas(
+        self, lemma: cc.CanonicalLemma, next_lemma: cc.CanonicalLemma
+    ):
+        [_lemma_start, lemma_end] = lemma.word_range
+        [next_lemma_start, _next_lemma_end] = next_lemma.word_range
+        return [
+            page
+            for page in self.commentary.children.pages
+            if page.word_range[0] > lemma_end and page.word_range[1] < next_lemma_start
+        ]
 
     def get_words_between_lemmas(
         self, lemma: cc.CanonicalLemma, next_lemma: cc.CanonicalLemma
@@ -154,4 +232,24 @@ class MarkdownCommentary(export.ExportableCommentary):
         [_lemma_start, lemma_end] = lemma.word_range
         [next_lemma_start, _next_lemma_end] = next_lemma.word_range
 
-        return self.commentary.children.words[lemma_end + 1 : next_lemma_start]
+        words = [
+            word
+            for region in self.commentary.children.regions
+            if region.region_type == "commentary"
+            and region.word_range[0] > lemma_end
+            and region.word_range[1] < next_lemma_start
+            for word in region.children.words
+        ]
+
+        return words
+
+    def glosses(self):
+        for i, lemma in enumerate(self.commentary.children.lemmas):
+            if lemma.label in ["scope-anchor", "word-anchor"]:
+                try:
+                    next_lemma = self.commentary.children.lemmas[i + 1]
+                    glossa_words = self.get_words_between_lemmas(lemma, next_lemma)
+                    pages = self.get_pages_for_lemmas(lemma, next_lemma)
+                    overlays = calculate_overlays(pages, lemma, glossa_words)
+                except IndexError:
+                    pass

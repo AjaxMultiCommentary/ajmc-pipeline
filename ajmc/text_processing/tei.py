@@ -29,7 +29,6 @@ E = lxml_builder.ElementMaker(
     nsmap={None: "http://www.tei-c.org/ns/1.0"},
 )
 
-EXPORTED_ENTITY_LABELS = ["work.primlit", "pers.author"]
 
 TEI_REGION_LABELS = {
     "app_crit": "Critical Apparatus",
@@ -83,28 +82,6 @@ class TEIDocument(export.ExportableCommentary):
             E.revisionDesc(
                 E.change("Initial TEI export", when="2024-02-23", who="#AjMC")
             ),
-        )
-
-    def get_entity_for_word(self, word):
-        primary_full_entity = next(
-            (
-                e
-                for e in self.primary_full_entities
-                if word.index in range(e.word_range[0], e.word_range[1] + 1)
-            ),
-            None,
-        )
-
-        if primary_full_entity is not None:
-            return primary_full_entity
-
-        return next(
-            (
-                entity
-                for entity in self.commentary.children.entities
-                if word.index in range(entity.word_range[0], entity.word_range[1])
-            ),
-            None,
         )
 
     def page_transcription(self, page):
@@ -224,8 +201,8 @@ class TEIDocument(export.ExportableCommentary):
             if entity is not None and (
                 isinstance(entity, export.PrimaryFullEntity)
                 or (
-                    entity.label in EXPORTED_ENTITY_LABELS
-                    and entity.wikidata_id is not None
+                    entity.label in export.EXPORTED_ENTITY_LABELS  # type: ignore
+                    and entity.wikidata_id is not None  # type: ignore
                 )
             ):
                 if entity == current_entity and current_el is not None:
@@ -239,7 +216,7 @@ class TEIDocument(export.ExportableCommentary):
                     if isinstance(entity, export.PrimaryFullEntity):
                         current_el = E.ref(E.w(word.text), target=entity.url)
                     else:
-                        current_el = E.ref(E.w(word.text), target=entity.wikidata_id)
+                        current_el = E.ref(E.w(word.text), target=entity.wikidata_id)  # type: ignore
             else:
                 words.append(E.w(word.text))
 

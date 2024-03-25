@@ -3,6 +3,8 @@ import ajmc.commons.variables as vars
 import json
 import os
 
+EXPORTED_ENTITY_LABELS = ["work.primlit", "pers.author"]
+
 WIKIDATA_HUCIT_MAPPINGS = {}
 
 with open(os.path.dirname(__file__) + "/wikidata_hucit_mappings.json") as f:
@@ -148,6 +150,30 @@ class ExportableCommentary:
     def frontmatter(self):
         raise NotImplementedError(
             "frontmatter() needs to be implemented in the child class"
+        )
+
+    def get_entity_for_word(
+        self, word
+    ) -> PrimaryFullEntity | cc.CanonicalEntity | None:
+        primary_full_entity = next(
+            (
+                e
+                for e in self.primary_full_entities
+                if word.index in range(e.word_range[0], e.word_range[1] + 1)
+            ),
+            None,
+        )
+
+        if primary_full_entity is not None:
+            return primary_full_entity
+
+        return next(
+            (
+                entity
+                for entity in self.commentary.children.entities
+                if word.index in range(entity.word_range[0], entity.word_range[1])
+            ),
+            None,
         )
 
     def title(self):
