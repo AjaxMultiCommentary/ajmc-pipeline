@@ -1,10 +1,13 @@
+import ajmc.text_processing.canonical_classes as cc
 import ajmc.text_processing.exportable_commentary as export
 import ajmc.text_processing.zotero as zotero
-import ajmc.commons.variables as vars
+import ajmc.commons.variables as variables
 import lxml.builder as lxml_builder
 import lxml.etree as lxml_etree
 import requests
 import os
+
+from typing import Tuple
 
 """
 This module --- which is really more of a script --- enables exporting
@@ -26,25 +29,40 @@ E = lxml_builder.ElementMaker(
     nsmap={None: "http://www.tei-c.org/ns/1.0"},
 )
 
-TEI_REGION_TYPES = [
-    "app_crit",
-    "appendix",
-    "bibliography",
-    "commentary",
-    "footnote",
-    "index",
-    "introduction",
-    "preface",
-    "primary_text",
-    "printed_marginalia",
-    "table_of_contents",
-    "title",
-    "translation",
-]
+EXPORTED_ENTITY_LABELS = ["work.primlit", "pers.author"]
+
+TEI_REGION_LABELS = {
+    "app_crit": "Critical Apparatus",
+    "appendix": "Appendix",
+    "bibliography": "Bibliography",
+    "commentary": "Commentary",
+    "footnote": "Footnote",
+    "index": "Index",
+    "introduction": "Introduction",
+    "line": "",
+    "line_region": "",
+    "preface": "Preface",
+    "primary_text": "",
+    "printed_marginalia": "",
+    "table_of_contents": "Table of Contents",
+    "title": "Title",
+    "translation": "Translation",
+}
+TEI_REGION_TYPES = TEI_REGION_LABELS.keys()
 
 
 class TEIDocument(export.ExportableCommentary):
     def __init__(self, ajmc_id, bibliographic_data) -> None:
+        canonical_path = variables.COMMS_DATA_DIR / ajmc_id / "canonical"
+        filename = [
+            f for f in os.listdir(canonical_path) if f.endswith("_tess_retrained.json")
+        ][0]
+        json_path = canonical_path / filename
+
+        self.ajmc_id = ajmc_id
+        self.bibliographic_data = bibliographic_data
+        self.commentary = cc.CanonicalCommentary.from_json(json_path=json_path)
+        self.filename = f"tei/{ajmc_id}.xml"
         self.tei = None
 
         super().__init__(ajmc_id, bibliographic_data)
@@ -77,6 +95,28 @@ class TEIDocument(export.ExportableCommentary):
             ),
         )
 
+    def get_entity_for_word(self, word):
+        primary_full_entity = next(
+            (
+                e
+                for e in self.primary_full_entities
+                if word.index in range(e.word_range[0], e.word_range[1] + 1)
+            ),
+            None,
+        )
+
+        if primary_full_entity is not None:
+            return primary_full_entity
+
+        return next(
+            (
+                entity
+                for entity in self.commentary.children.entities
+                if word.index in range(entity.word_range[0], entity.word_range[1])
+            ),
+            None,
+        )
+
     def page_transcription(self, page):
         page_el = E.div(E.pb(n=page.id, facs=self.facsimile(page)))
 
@@ -85,7 +125,7 @@ class TEIDocument(export.ExportableCommentary):
         if "".join([r.text for r in page.children.regions]).strip() == "":
             page_el.append(
                 E.p(
-                    page.text,
+                    *self.words(page.word_range),
                     type="page",
                     n="-".join(
                         [
@@ -98,20 +138,45 @@ class TEIDocument(export.ExportableCommentary):
         else:
             for region in page.children.regions:
                 if region.region_type in TEI_REGION_TYPES:
-                    page_el.append(
-                        E.p(
-                            region.text,
-                            type=region.region_type,
-                            n="-".join(
-                                [
-                                    str(region.word_range[0]),
-                                    str(region.word_range[1]),
-                                ]
-                            ),
+                    section_heading = self.section_head(region)
+
+                    if section_heading is not None:
+                        page_el.append(section_heading)
+
+                    if region.region_type == "footnote":
+                        page_el.append(
+                            E.note(
+                                *self.words(region.word_range),
+                                place="foot",
+                                n="-".join(
+                                    [
+                                        str(region.word_range[0]),
+                                        str(region.word_range[1]),
+                                    ]
+                                ),
+                            )
                         )
-                    )
+                    else:
+                        region_el = E.p(type=region.region_type)
+                        for line in region.children.lines:
+                            for w in self.words(line.word_range):
+                                region_el.append(w)
+
+                            region_el.append(E.lb())
+                        page_el.append(region_el)
 
         return page_el
+
+    def section_head(self, region):
+        region_heading = TEI_REGION_LABELS.get(region.region_type)
+
+        if region_heading != "":
+            return E.head(region_heading)
+
+        return None
+
+    def title(self):
+        return self.bibliographic_data["title"]
 
     def to_tei(self):
         if self.tei is not None:
@@ -146,6 +211,49 @@ class TEIDocument(export.ExportableCommentary):
         )
 
         return self.tei
+
+    """
+    Iterate through the words in `word_range`, checking each word
+    to see if it belongs to a primary full entity.
+
+    If it does, create or update `current_entity` to include the
+    `<w>` element for the word.
+
+    If a new entity is encountered, push the current `current_entity` onto
+    the `words` list and start a new `current_entity`.
+    """
+
+    def words(self, word_range: Tuple[int, int]):
+        words = []
+        current_entity = None
+        current_el = None
+
+        for word in self.commentary.children.words[word_range[0] : word_range[1] + 1]:
+            entity = self.get_entity_for_word(word)
+
+            if entity is not None and (
+                isinstance(entity, export.PrimaryFullEntity)
+                or (
+                    entity.label in EXPORTED_ENTITY_LABELS
+                    and entity.wikidata_id is not None
+                )
+            ):
+                if entity == current_entity and current_el is not None:
+                    current_el.append(E.w(word.text))
+                else:
+                    current_entity = entity
+
+                    if current_el is not None:
+                        words.append(current_el)
+
+                    if isinstance(entity, export.PrimaryFullEntity):
+                        current_el = E.ref(E.w(word.text), target=entity.url)
+                    else:
+                        current_el = E.ref(E.w(word.text), target=entity.wikidata_id)
+            else:
+                words.append(E.w(word.text))
+
+        return words
 
     def export(self):
         tei = self.to_tei()

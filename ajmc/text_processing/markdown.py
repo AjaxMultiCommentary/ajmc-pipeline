@@ -145,7 +145,6 @@ class MarkdownCommentary(export.ExportableCommentary):
             try:
                 next_lemma = self.commentary.children.lemmas[i + 1]
                 glossa_words = self.get_words_between_lemmas(lemma, next_lemma)
-
             except IndexError:
                 pass
 
