@@ -1,6 +1,9 @@
 import ajmc.text_processing.canonical_classes as cc
 import ajmc.text_processing.exportable_commentary as export
+import ajmc.text_processing.zotero as zotero
+import os
 import regex
+import requests
 
 # note that the `U` and `UNICDOE` flags are redundant
 # https://docs.python.org/3/library/re.html#flags
@@ -86,25 +89,31 @@ def calculate_overlays(
     overlays = []
 
     for page in pages:
-        page_words = all_words[page.word_range[0] : page.word_range[1] + 1]
+        page_words = [
+            w
+            for w in all_words
+            if page.word_range[0] < w.index and w.index <= page.word_range[1]
+        ]
         bboxes = [word.bbox for word in page_words]
-        xs = [bbox[0] for bbox in bboxes]
-        ys = [bbox[1] for bbox in bboxes]
 
-        left_most = min(xs)
-        right_most = max(xs)
-        top_most = min(ys)
-        bottom_most = max(ys)
+        if len(bboxes) > 0:
+            xs = [bbox.xmin for bbox in bboxes] + [bbox.xmax for bbox in bboxes]
+            ys = [bbox.ymin for bbox in bboxes] + [bbox.ymax for bbox in bboxes]
 
-        overlays.append(
-            dict(
-                page_id=page.id,
-                px=left_most,
-                py=top_most,
-                width=(right_most - left_most),
-                height=(bottom_most - top_most),
+            left_most = min(xs)
+            right_most = max(xs)
+            top_most = min(ys)
+            bottom_most = max(ys)
+
+            overlays.append(
+                dict(
+                    page_id=page.id,
+                    px=left_most,
+                    py=top_most,
+                    width=(right_most - left_most),
+                    height=(bottom_most - top_most),
+                )
             )
-        )
 
     return overlays
 
@@ -117,10 +126,15 @@ class Glossa:
     lemma_end_offset: int
     urn: CTS_URN
 
-    def __init__(self, canonical_lemma: cc.CanonicalLemma, content: str) -> None:
+    def __init__(
+        self, canonical_lemma: cc.CanonicalLemma, glossa_words, pages, overlays
+    ) -> None:
         self.__lemma = canonical_lemma
         self.attributes = self.__lemma.to_json()
-        self.content = content
+        self.content = glossa_words
+
+    def export(self):
+        print(self.content)
 
 
 class LabeledWord:
@@ -183,7 +197,7 @@ class MarkdownCommentary(export.ExportableCommentary):
             zotero_link=zotero_link,
         )
 
-    def add_entities_to_words(self, words):
+    def add_entities_to_words(self, words: list[cc.CanonicalWord]):
         labeled_words = []
         current_entity = None
         current_el = None
@@ -204,7 +218,8 @@ class MarkdownCommentary(export.ExportableCommentary):
                     current_entity = entity
 
                     if current_el is not None:
-                        labeled_words.append(current_el)
+                        print("SDLKFJDKLFJKLDJFJKL")
+                        labeled_words.append(str(current_el))
 
                     if isinstance(entity, export.PrimaryFullEntity):
                         current_el = LabeledWord(word.text, entity.url)
@@ -215,7 +230,7 @@ class MarkdownCommentary(export.ExportableCommentary):
 
         return " ".join([str(w) for w in labeled_words])
 
-    def get_pages_for_lemmas(
+    def get_pages_between_lemmas(
         self, lemma: cc.CanonicalLemma, next_lemma: cc.CanonicalLemma
     ):
         [_lemma_start, lemma_end] = lemma.word_range
@@ -226,13 +241,22 @@ class MarkdownCommentary(export.ExportableCommentary):
             if page.word_range[0] > lemma_end and page.word_range[1] < next_lemma_start
         ]
 
+    def get_pages_to_end(self, lemma):
+        [_lemma_start, lemma_end] = lemma.word_range
+
+        return [
+            page
+            for page in self.commentary.children.pages
+            if page.word_range[0] > lemma_end
+        ]
+
     def get_words_between_lemmas(
         self, lemma: cc.CanonicalLemma, next_lemma: cc.CanonicalLemma
     ):
         [_lemma_start, lemma_end] = lemma.word_range
         [next_lemma_start, _next_lemma_end] = next_lemma.word_range
 
-        words = [
+        return [
             word
             for region in self.commentary.children.regions
             if region.region_type == "commentary"
@@ -241,15 +265,67 @@ class MarkdownCommentary(export.ExportableCommentary):
             for word in region.children.words
         ]
 
-        return words
+    def get_words_to_end(self, lemma: cc.CanonicalLemma):
+        [_lemma_start, lemma_end] = lemma.word_range
+
+        return [
+            word
+            for region in self.commentary.children.regions
+            if region.region_type == "commentary" and region.word_range[0] > lemma_end
+            for word in region.children.words
+        ]
 
     def glosses(self):
+        glossae = []
+
         for i, lemma in enumerate(self.commentary.children.lemmas):
             if lemma.label in ["scope-anchor", "word-anchor"]:
                 try:
                     next_lemma = self.commentary.children.lemmas[i + 1]
                     glossa_words = self.get_words_between_lemmas(lemma, next_lemma)
-                    pages = self.get_pages_for_lemmas(lemma, next_lemma)
+                    pages = self.get_pages_between_lemmas(lemma, next_lemma)
                     overlays = calculate_overlays(pages, lemma, glossa_words)
+
+                    glossae.append(
+                        Glossa(
+                            lemma,
+                            self.add_entities_to_words(glossa_words),
+                            pages,
+                            overlays,
+                        )
+                    )
                 except IndexError:
-                    pass
+                    glossa_words = self.get_words_to_end(lemma)
+                    pages = self.get_pages_to_end(lemma)
+                    overlays = calculate_overlays(pages, lemma, glossa_words)
+
+                    glossae.append(
+                        Glossa(
+                            lemma,
+                            self.add_entities_to_words(glossa_words),
+                            pages,
+                            overlays,
+                        )
+                    )
+
+        return glossae
+
+    def export(self):
+        return [g.export() for g in self.glosses()]
+
+
+if __name__ == "__main__":
+    commentaries = requests.get(
+        f"{os.getenv('AJMC_API_URL', 'https://ajmc.unil.ch/api')}/commentaries?public=true"
+    )
+
+    commentary = commentaries.json()["data"][2]
+    zotero_data = zotero.get_zotero_data(commentary["zotero_id"])
+    doc = MarkdownCommentary(commentary["pid"], zotero_data)
+    doc.export()
+
+    # for commentary in commentaries.json()["data"]:
+    #     zotero_data = zotero.get_zotero_data(commentary["zotero_id"])
+    #     doc = MarkdownCommentary(commentary["pid"], zotero_data)
+
+    #     doc.export()
