@@ -141,15 +141,17 @@ class ExportableCommentary:
         self.ajmc_id = ajmc_id
         self.bibliographic_data = bibliographic_data
         self.commentary = cc.CanonicalCommentary.from_json(json_path=json_path)
-        self.filename = f"tei/{ajmc_id}.xml"
         self.primary_full_entities = make_primary_full_entities(self.commentary)
 
     def facsimile(self, page):
         return f"{self.ajmc_id}/{page.id}"
 
+    def filename(self):
+        raise NotImplementedError("filename() must be implemented in the child class")
+
     def frontmatter(self):
         raise NotImplementedError(
-            "frontmatter() needs to be implemented in the child class"
+            "frontmatter() must be implemented in the child class"
         )
 
     def get_entity_for_word(

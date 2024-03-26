@@ -7,6 +7,8 @@ import regex
 import requests
 
 from ajmc.commons.miscellaneous import get_ajmc_logger
+from jinja2 import Environment, PackageLoader
+from pathlib import Path
 
 logger = get_ajmc_logger(__name__)
 
@@ -166,27 +168,41 @@ def transcribe_lemma(lemma: cc.CanonicalLemma):
 class Glossa:
     attributes: dict
     canonical_lemma: cc.CanonicalLemma
+    commentary_urn: str
     content: str
     lemma_transcript: str
-    start_line: str
-    end_line: str
+    start_line: str | None
+    end_line: str | None
     start_offset: int | None
     end_offset: int | None
-    urn: CTS_URN
+    urn: str | None
 
     def __init__(
-        self, canonical_lemma: cc.CanonicalLemma, glossa_words, pages, overlays
+        self,
+        commentary_urn,
+        canonical_lemma: cc.CanonicalLemma,
+        glossa_words,
+        pages,
+        overlays,
     ) -> None:
         self.canonical_lemma = canonical_lemma
         self.attributes = self.canonical_lemma.to_json()
+        self.commentary_urn = commentary_urn
         self.content = glossa_words
         self.lemma_transcript = transcribe_lemma(canonical_lemma)
         self.pages = pages
         self.overlays = overlays
-        self.set_offsets()
+        self.start_line = None
+        self.end_line = None
+        self.start_offset = None
+        self.end_offset = None
+        self.set_citation()
+        self.set_urn()
 
-    def set_offsets(self):
+    def set_citation(self):
         if self.attributes.get("anchor_target") is not None:
+            logger.debug(f"Parsing anchor_target: {self.attributes}")
+
             try:
                 anchor_target = json.loads(self.attributes.get("anchor_target"))  # type: ignore
                 selector = anchor_target.get("selector")
@@ -213,7 +229,9 @@ class Glossa:
                     f"Unable to parse anchor_target: {self.attributes.get('anchor_target')}"
                 )
                 pass
-        elif self.attributes.get("scope-anchor") is not None:
+        elif self.attributes.get("label") == "scope-anchor":
+            logger.debug(f"Parsing scope_anchor: {self.attributes}")
+
             scope_anchor = self.lemma_transcript
             scope_anchor = SCOPE_ANCHOR_REPLACEMENT_REGEX.sub("", scope_anchor)
 
@@ -242,9 +260,47 @@ class Glossa:
             except:
                 logger.warn(f"Unable to parse scope_anchor: {scope_anchor}")
                 pass
+        else:
+            logger.warn(f"No eligible targets for citation: {self.attributes}")
 
-    def export(self):
-        print(self.content)
+    def set_urn(self):
+        if (
+            getattr(self, "start_line", None) is None
+            or getattr(self, "end_line", None) is None
+        ):
+            logger.warn(f"Invalid URN: {self.attributes}")
+            self.urn = None
+        else:
+            self.urn = f"{self.commentary_urn}:{self.start_line}{self.__render_start_offset()}{self.__render_end_citation()}"
+
+    def __render_end_citation(self):
+        if self.end_line != self.start_line or self.end_offset != self.start_offset:
+            return f"-{self.end_line}{self.__render_end_offset()}"
+
+        return ""
+
+    def __render_end_offset(self):
+        if self.end_offset is not None:
+            return f"@{self.end_offset}"
+
+        return ""
+
+    def __render_start_offset(self):
+        if self.start_offset is not None:
+            return f"@{self.start_offset}"
+
+        return ""
+
+    def to_markdown(self):
+        env = Environment(
+            loader=PackageLoader("ajmc", "data/templates"),
+            trim_blocks=True,
+            lstrip_blocks=True,
+            autoescape=True,
+        )
+        template = env.get_template("glossa.md.jinja2")
+
+        return template.render(glossa=self)
 
 
 class LabeledWord:
@@ -265,6 +321,12 @@ class MarkdownCommentary(export.ExportableCommentary):
 
         super().__init__(ajmc_id, bibliographic_data)
 
+        urn = self.bibliographic_data["extra"]["URN"]
+        self.urn = f"urn:cts:greekLit:{urn}"
+
+    def filename(self):
+        return f"markdown/{self.ajmc_id}.md"
+
     def frontmatter(self):
         creators = [
             dict(
@@ -283,7 +345,7 @@ class MarkdownCommentary(export.ExportableCommentary):
         source_url = self.bibliographic_data["url"]
         title = self.bibliographic_data["title"]
         wikidata_qid = self.bibliographic_data["extra"]["QID"]
-        urn = self.bibliographic_data["extra"]["URN"]
+
         zotero_id = self.bibliographic_data["key"]
         zotero_link = (
             self.bibliographic_data.get("links", {}).get("alternate", {}).get("href")
@@ -301,7 +363,7 @@ class MarkdownCommentary(export.ExportableCommentary):
             publisher=publisher,
             source_url=source_url,
             title=title,
-            urn=f"urn:cts:greekLit:{urn}",
+            urn=self.urn,
             wikidata_qid=wikidata_qid,
             zotero_id=zotero_id,
             zotero_link=zotero_link,
@@ -328,7 +390,6 @@ class MarkdownCommentary(export.ExportableCommentary):
                     current_entity = entity
 
                     if current_el is not None:
-                        print("SDLKFJDKLFJKLDJFJKL")
                         labeled_words.append(str(current_el))
 
                     if isinstance(entity, export.PrimaryFullEntity):
@@ -398,6 +459,7 @@ class MarkdownCommentary(export.ExportableCommentary):
 
                     glossae.append(
                         Glossa(
+                            self.urn,
                             lemma,
                             self.add_entities_to_words(glossa_words),
                             pages,
@@ -411,6 +473,7 @@ class MarkdownCommentary(export.ExportableCommentary):
 
                     glossae.append(
                         Glossa(
+                            self.urn,
                             lemma,
                             self.add_entities_to_words(glossa_words),
                             pages,
@@ -421,7 +484,11 @@ class MarkdownCommentary(export.ExportableCommentary):
         return glossae
 
     def export(self):
-        return [g.export() for g in self.glosses()]
+        with open(self.filename(), "w") as f:
+            for g in [g for g in self.glosses() if g.urn is not None]:
+                md = g.to_markdown()
+                f.write(md)
+                f.write("\n\n&&&\n\n")
 
 
 if __name__ == "__main__":
@@ -429,13 +496,8 @@ if __name__ == "__main__":
         f"{os.getenv('AJMC_API_URL', 'https://ajmc.unil.ch/api')}/commentaries?public=true"
     )
 
-    commentary = commentaries.json()["data"][2]
-    zotero_data = zotero.get_zotero_data(commentary["zotero_id"])
-    doc = MarkdownCommentary(commentary["pid"], zotero_data)
-    doc.export()
+    for commentary in commentaries.json()["data"]:
+        zotero_data = zotero.get_zotero_data(commentary["zotero_id"])
+        doc = MarkdownCommentary(commentary["pid"], zotero_data)
 
-    # for commentary in commentaries.json()["data"]:
-    #     zotero_data = zotero.get_zotero_data(commentary["zotero_id"])
-    #     doc = MarkdownCommentary(commentary["pid"], zotero_data)
-
-    #     doc.export()
+        doc.export()

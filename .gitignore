@@ -182,3 +182,6 @@ tei_bare.odd
 
 # TEI XML exports
 tei/*.xml
+
+# Markdown exports
+markdown/*.md

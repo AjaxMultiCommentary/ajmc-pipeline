@@ -1,0 +1,15 @@
+---
+attributes: {{glossa.attributes}}
+lemma: {{glossa.lemma_transcript}}
+urn: {{glossa.urn}}
+pages:
+{% for page in glossa.pages %}
+- {{page}}
+{% endfor %}
+overlays:
+{% for overlay in glossa.overlays %}
+- {{overlay}}
+{% endfor %}
+---
+
+{{glossa.content}}

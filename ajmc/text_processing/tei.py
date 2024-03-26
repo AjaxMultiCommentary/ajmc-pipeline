@@ -62,6 +62,9 @@ class TEIDocument(export.ExportableCommentary):
             for a in self.bibliographic_data["creators"]
         ]
 
+    def filename(self):
+        return f"tei/{self.ajmc_id}.xml"
+
     def frontmatter(self):
         return E.teiHeader(
             E.fileDesc(
@@ -225,7 +228,7 @@ class TEIDocument(export.ExportableCommentary):
     def export(self):
         tei = self.to_tei()
 
-        with open(self.filename, "wb") as f:
+        with open(self.filename(), "wb") as f:
             lxml_etree.indent(tei, space="\t")
             f.write(lxml_etree.tostring(tei, encoding="utf-8", xml_declaration=True))  # type: ignore
 
