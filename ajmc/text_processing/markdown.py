@@ -1,13 +1,26 @@
 import ajmc.text_processing.canonical_classes as cc
 import ajmc.text_processing.exportable_commentary as export
 import ajmc.text_processing.zotero as zotero
+import json
 import os
 import regex
 import requests
 
+from ajmc.commons.miscellaneous import get_ajmc_logger
+
+logger = get_ajmc_logger(__name__)
+
 # note that the `U` and `UNICDOE` flags are redundant
 # https://docs.python.org/3/library/re.html#flags
 REFERENCE_REGEX = regex.compile(r"(\w+)(?:\[(\d+)\])?", regex.IGNORECASE)
+
+PASSAGE_REGEX = regex.compile(
+    r"tei-l@n=(?P<first_line_n>\d+)\[(?P<first_line_offset>\d+)\]:tei-l@n=(?P<last_line_n>\d+)\[(?P<last_line_offset>\d+)\]",
+    regex.IGNORECASE,
+)
+
+ALPHA_REGEX = regex.compile(r"[a-zA-Z]", regex.UNICODE)
+SCOPE_ANCHOR_REPLACEMENT_REGEX = regex.compile(r"\.")
 
 
 class CTS_URN:
@@ -118,20 +131,117 @@ def calculate_overlays(
     return overlays
 
 
+def get_citations_from_selector(matches: regex.Match[str]):
+    first_line_n = matches.group("first_line_n")
+    first_line_offset = matches.group("first_line_offset")
+    last_line_n = matches.group("last_line_n")
+    last_line_offset = matches.group("last_line_offset")
+
+    cleaned_first_line_n = ALPHA_REGEX.sub("", first_line_n)
+    cleaned_last_line_n = ALPHA_REGEX.sub("", last_line_n)
+
+    if int(cleaned_first_line_n) > int(cleaned_last_line_n):
+        p = first_line_n
+        first_line_n = last_line_n
+        last_line_n = p
+        p = first_line_offset
+        first_line_offset = last_line_offset
+        last_line_offset = p
+
+    return dict(
+        first_line_n=first_line_n,
+        first_line_offset=int(first_line_offset),
+        last_line_n=last_line_n,
+        last_line_offset=int(last_line_offset),
+    )
+
+
+def transcribe_lemma(lemma: cc.CanonicalLemma):
+    if lemma.transcript is not None:  # type: ignore
+        return lemma.transcript  # type: ignore
+
+    return " ".join([w.text for w in lemma.children.words])
+
+
 class Glossa:
     attributes: dict
+    canonical_lemma: cc.CanonicalLemma
     content: str
-    lemma: str
-    lemma_start_offset: int
-    lemma_end_offset: int
+    lemma_transcript: str
+    start_line: str
+    end_line: str
+    start_offset: int | None
+    end_offset: int | None
     urn: CTS_URN
 
     def __init__(
         self, canonical_lemma: cc.CanonicalLemma, glossa_words, pages, overlays
     ) -> None:
-        self.__lemma = canonical_lemma
-        self.attributes = self.__lemma.to_json()
+        self.canonical_lemma = canonical_lemma
+        self.attributes = self.canonical_lemma.to_json()
         self.content = glossa_words
+        self.lemma_transcript = transcribe_lemma(canonical_lemma)
+        self.pages = pages
+        self.overlays = overlays
+        self.set_offsets()
+
+    def set_offsets(self):
+        if self.attributes.get("anchor_target") is not None:
+            try:
+                anchor_target = json.loads(self.attributes.get("anchor_target"))  # type: ignore
+                selector = anchor_target.get("selector")
+                matches = regex.search(PASSAGE_REGEX, selector)
+
+                if matches is not None:
+                    citations = get_citations_from_selector(matches)
+                    start_line = citations.get("first_line_n")
+
+                    assert isinstance(start_line, str)
+
+                    self.start_line = start_line
+
+                    end_line = citations.get("last_line_n")
+
+                    assert isinstance(end_line, str)
+
+                    self.end_line = end_line
+
+                    self.start_offset = citations.get("first_line_offset")  # type: ignore
+                    self.end_offset = citations.get("last_line_offset")  # type: ignore
+            except:
+                logger.warn(
+                    f"Unable to parse anchor_target: {self.attributes.get('anchor_target')}"
+                )
+                pass
+        elif self.attributes.get("scope-anchor") is not None:
+            scope_anchor = self.lemma_transcript
+            scope_anchor = SCOPE_ANCHOR_REPLACEMENT_REGEX.sub("", scope_anchor)
+
+            try:
+                scope_anchor = (
+                    scope_anchor.replace("A", "4")
+                    .replace("B", "8")
+                    .replace("S", "5")
+                    .strip()
+                    .split("-")
+                )
+
+                # `scope_anchor` might only have one element, in which case
+                # the length will be the same. This check is for normalizing
+                # abbreviated citations like 160-1 to 160-161
+                if len(scope_anchor[0]) < len(scope_anchor[-1]):
+                    diff = len(scope_anchor[0]) - len(scope_anchor[-1])
+
+                    scope_anchor = [
+                        scope_anchor[0],
+                        scope_anchor[0][0:diff] + scope_anchor[-1],
+                    ]
+
+                self.start_line = scope_anchor[0]
+                self.end_line = scope_anchor[-1]
+            except:
+                logger.warn(f"Unable to parse scope_anchor: {scope_anchor}")
+                pass
 
     def export(self):
         print(self.content)
