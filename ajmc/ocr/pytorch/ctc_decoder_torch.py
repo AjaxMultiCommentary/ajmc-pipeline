@@ -109,23 +109,6 @@ class GreedyDecoder(Decoder):
     def __init__(self, classes, blank_index=0):
         super(GreedyDecoder, self).__init__(classes, blank_index)
 
-
-    #@profile
-    def convert_to_strings(self,
-                           sequences,
-                           sizes=None,
-                           remove_repetitions=False) -> (List[str], List[List[int]]):
-        """Given a list of numeric sequences, returns the corresponding strings"""
-        strings = []
-        offsets = []
-        for x in xrange(len(sequences)):
-            seq_len = sizes[x] if sizes is not None else len(sequences[x])
-            string, string_offsets = self.process_string(sequences[x], seq_len, remove_repetitions)
-            strings.append(string)  # We only return one path
-            offsets.append(string_offsets)
-
-        return strings, offsets
-
     #@profile
     def process_string(self,
                        sequence: torch.tensor,
@@ -148,7 +131,7 @@ class GreedyDecoder(Decoder):
         return string, offsets
 
     #@profile
-    def decode(self, probs, sizes=None, remove_repetitions: bool = True) -> (List[str], List[torch.tensor]):
+    def decode(self, probs, sizes=None, remove_repetitions: bool = True) -> List[str]:
         """
         Returns the argmax decoding given the probability matrix. Removes
         repeated elements in the sequence, as well as blanks.
@@ -156,12 +139,18 @@ class GreedyDecoder(Decoder):
         Arguments:
             probs: Tensor of character probabilities from the network. Expected shape of batch x seq_length x output_dim
             sizes(optional): Size of each sequence in the mini-batch
+            remove_repetitions: Whether to remove repeated characters in the probs
         Returns:
             strings: sequences of the model's best guess for the transcription on inputs
             offsets: time step per character predicted
         """
         max_probs = torch.argmax(probs, 2)
+        sequences = max_probs.view(max_probs.size(0), max_probs.size(1))
 
-        return self.convert_to_strings(sequences=max_probs.view(max_probs.size(0), max_probs.size(1)),
-                                       sizes=sizes,
-                                       remove_repetitions=remove_repetitions)
+        strings = []
+        for x in xrange(len(sequences)):
+            seq_len = sizes[x] if sizes is not None else len(sequences[x])
+            string, string_offsets = self.process_string(sequences[x], seq_len, remove_repetitions)
+            strings.append(string)
+
+        return strings
