@@ -12,8 +12,8 @@ from ajmc.commons.image import draw_box
 from ajmc.commons.miscellaneous import get_ajmc_logger, ROOT_LOGGER
 from ajmc.olr.evaluation import compute_shapes_confusion_matrix, compute_mean_iou
 from ajmc.olr.line_detection import models
-from ajmc.olr.line_detection.data_processing import get_split_page_ids, get_pages_lines
-
+from ajmc.olr.line_detection.data_processing import get_pages_lines
+from ajmc.text_processing.raw_classes import RawCommentary
 
 ROOT_LOGGER.setLevel('INFO')
 logger = get_ajmc_logger(__name__)
@@ -52,7 +52,8 @@ def compute_micro_averaged_metrics(predictions: Dict[str, List[geom.Shape]], gro
 def import_predictions(page_ids: List[str]):
     predictions = {'blla': {}, 'legacy': {}, 'blla_adjusted': {}, 'legacy_adjusted': {}}
 
-    for comm_id in vs.ALL_COMM_IDS:
+    comm_ids = set([page_id.split('_')[0] for page_id in page_ids])
+    for comm_id in comm_ids:
         comm_olr_dir = vs.get_comm_olr_lines_dir(comm_id)
         comm_page_ids = [page_id for page_id in page_ids if page_id.startswith(comm_id)]
 
@@ -62,41 +63,60 @@ def import_predictions(page_ids: List[str]):
                 page_preds = json.loads(page_path.read_text())
                 predictions[model_name][page_id] = [geom.Shape(points) for points in page_preds]
 
+    predictions['easy_ocr'] = {
+        page_id: [geom.Shape(points) for points in json.loads((EXP_DIR / 'outputs/easy_ocr' / (page_id + '.json')).read_text())] for page_id in
+        page_ids}
+    predictions['tesseract'] = {}
+
+    for comm_id in comm_ids:
+        comm = RawCommentary(comm_id, '*_tess_retrained')
+        comm_page_ids = [page_id for page_id in page_ids if page_id.startswith(comm_id)]
+        for page in comm.children.pages:
+            if page.id in comm_page_ids:
+                predictions['tesseract'][page.id] = [l.bbox for l in page.children.lines]
+
     return predictions
 
 
-#%% Set directories and paths
+def write_easy_ocr_preds():
+    easy_ocr_model = models.EasyOCRModel()
+    images_dir = EXP_DIR / 'images'
+    images_dir.mkdir(exist_ok=True)
+
+    output_dir = EXP_DIR / 'outputs/easy_ocr'
+    output_dir.mkdir(exist_ok=True)
+
+    all_preds = {}
+    for page_id in VIA['_via_img_metadata'].keys():
+        comm_id = page_id.split('_')[0]
+        img_path = vs.get_comm_img_dir(comm_id) / (page_id + '.png')
+        img = cv2.imread(str(img_path), cv2.IMREAD_GRAYSCALE)
+        img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+        img_path = images_dir / (page_id + '.png')
+        cv2.imwrite(str(img_path), img)
+        output_path = output_dir / (page_id + '.json')
+        page_preds = easy_ocr_model.predict(img_path)
+        page_preds_json = [[[int(s.xyxy[0]), int(s.xyxy[1])], [int(s.xyxy[2]), int(s.xyxy[3])]] for s in page_preds]
+        output_path.write_text(json.dumps(page_preds_json))
+        all_preds[page_id] = easy_ocr_model.predict(img_path)
+
+
+# Set directories and paths
 
 EXP_DIR = Path('/Users/sven/Desktop/line_detection_experiments')
 EXP_DIR.mkdir(exist_ok=True)
-LINES_VIA_PATH = Path('/Users/sven/drive/lines_annotation.json')
+LINES_VIA_PATH = Path('/Users/sven/packages/ajmc_data/GT-commentaries-lines/GT-commentaries-lines-balanced.json')
+VIA = json.loads(LINES_VIA_PATH.read_text(encoding='utf-8'))
 
 #%% Import the ground truth lines and the predictions
-via_dict = json.loads(LINES_VIA_PATH.read_text(encoding='utf-8'))
-full_groundtruth = get_pages_lines(get_split_page_ids('test') + get_split_page_ids('train'), via_dict)
-
-# Balance commentaries
-import random
-
-random.seed(0)
-
-balanced_groundtruth = {}
-for comm_id in vs.ALL_COMM_IDS:
-    comm_gt_keys = [k for k in full_groundtruth.keys() if k.startswith(comm_id)]
-    sampled_keys = random.sample(comm_gt_keys, k=min(40, len(comm_gt_keys)))
-    if len(sampled_keys) < 5:
-        print(f'Comm {comm_id} has less than 20 pages')
-        continue
-    balanced_groundtruth.update({k: full_groundtruth[k] for k in sampled_keys})
-
-#%%
+balanced_groundtruth = get_pages_lines(VIA)
 predictions = import_predictions(list(balanced_groundtruth.keys()))
 
 #%% Get the results of the baselines
 
 results = {}
 
-for model_name in ['blla', 'legacy', 'blla_adjusted', 'legacy_adjusted']:
+for model_name in ['blla', 'legacy', 'blla_adjusted', 'legacy_adjusted', 'easy_ocr', 'tesseract']:
     # Declare the model's results dict, setting all the parameters to None (as baselines do not have parameters)
     results[model_name] = {k: None for k in ['split_lines', 'double_line_threshold', 'minimal_height_factor', 'line_inclusion_threshold']}
     results[model_name]['iou'] = compute_micro_averaged_iou(predictions[model_name], balanced_groundtruth)
@@ -104,7 +124,84 @@ for model_name in ['blla', 'legacy', 'blla_adjusted', 'legacy_adjusted']:
     for metric, score in scores.items():
         results[model_name][metric] = score
 
-#%%
+#%% Create a dataframe with the results of the preliminary test
+import pandas as pd
+
+pretest_results = pd.DataFrame(results).T
+# Drop the first 4 columns as they are all None
+pretest_results = pretest_results.drop(columns=['split_lines', 'double_line_threshold', 'minimal_height_factor', 'line_inclusion_threshold'])
+
+# Drop the blla_adjusted and legacy_adjusted rows as they are the same as the blla and legacy columns
+pretest_results = pretest_results.drop(index=['blla_adjusted', 'legacy_adjusted'])
+
+#Rename the index
+pretest_results = pretest_results.rename(index={'blla': 'KrakenBlla', 'legacy': 'KrakenLegacy', 'easy_ocr': 'EasyOCR', 'tesseract': 'Tesseract'})
+
+# Rename the column iou to IoU
+pretest_results = pretest_results.rename(columns={'iou': 'IoU'})
+
+styler = pretest_results.style
+
+# Export this dataframe to latex
+styler.format(escape='latex', precision=3)
+
+# Highlight the best results in each column
+styler.highlight_max(axis=0, props='font-weight: bold')
+
+styler.set_caption("""Results of the preliminary tests on the balanced dataset.""")
+
+styler.set_table_styles()
+
+latex = styler.to_latex(hrules=True,
+                        position_float='centering',
+                        convert_css=True,
+                        label=f'tab:4_1 {styler.caption}')
+
+#%% Draw the outputs of the models in the preliminary test
+
+COLORS = {'groundtruth': vs.COLORS['distinct']['green'],
+          'blla': vs.COLORS['distinct']['red'],
+          'legacy': vs.COLORS['distinct']['blue'],
+          'easy_ocr': vs.COLORS['distinct']['purple'],
+          'tesseract': vs.COLORS['distinct']['ecru']}
+
+output_dir = EXP_DIR / 'pretests_outputs'
+shutil.rmtree(output_dir)
+output_dir.mkdir(exist_ok=True)
+
+sample_pages_ids = ['cu31924087948174_0086',
+                    'sophoclesplaysa05campgoog_0014',
+                    'sophoclesplaysa05campgoog_0204']
+
+for page_id in sample_pages_ids:
+
+    img_path = vs.get_comm_img_dir(page_id.split('_')[0]) / (page_id + '.png')
+
+    for model_name in ['blla', 'legacy', 'easy_ocr', 'tesseract']:
+        img = cv2.imread(str(img_path))
+        output_path = output_dir / (page_id + f'_{model_name}.png')
+        lines = predictions[model_name][page_id]
+
+        for line in lines:
+            img = draw_box(line.bbox, img, stroke_color=vs.COLORS['hues']['dodger_blue'], stroke_thickness=max(2, int(img.shape[1] / 1000)))
+
+        cv2.imwrite(str(output_path), img)
+
+#%% Draw the outputs of GT
+
+for page_id in sample_pages_ids:
+
+    img_path = vs.get_comm_img_dir(page_id.split('_')[0]) / (page_id + '.png')
+    output_path = output_dir / f'{page_id}_GT.png'
+    img = cv2.imread(str(img_path))
+    lines = balanced_groundtruth[page_id]
+
+    for line in lines:
+        img = draw_box(line.bbox, img, stroke_color=COLORS['groundtruth'], stroke_thickness=max(2, int(img.shape[1] / 1000)))
+
+    cv2.imwrite(str(output_path), img)
+
+#%% Compute the experiments (run only once)
 
 for split_lines in [True]:
     for double_line_threshold in [1.4, 1.6]:
@@ -182,7 +279,9 @@ for split_lines in [True]:
                 (output_dir / 'results.json').write_text(json.dumps(results[model_name], indent=2))
                 (output_dir.parent / 'all_results.json').write_text(json.dumps(results, indent=2))
 
-#%% Inspect the results
+#%% Inspect the results and export them to latex
+
+
 import pandas as pd
 
 try:
@@ -190,3 +289,60 @@ try:
 except NameError:
     results = json.loads((EXP_DIR / 'outputs/all_results.json').read_text(encoding='utf-8'))
     df = pd.DataFrame.from_dict(results, orient='index')
+
+# Keep only the rows where line_inclusion_threshold is either 0.65 or None
+df = df[(df['line_inclusion_threshold'] == 0.65) | (df['line_inclusion_threshold'].isna())]
+
+# Drop the split_lines and the line_inclusion_threshold column
+df = df.drop(columns=['split_lines', 'line_inclusion_threshold'])
+
+# Rename the columns
+df = df.rename(columns={'double_line_threshold': '\(h_{max}\)',
+                        'minimal_height_factor': '\(h_{min}\)',
+                        'iou': 'IoU', })
+
+# Rename the index
+# df = df.rename(index=lambda x: 'Combined' if 'combined' in x else x)
+df = df.rename(index={'blla': 'Blla', 'legacy': 'Legacy',
+                      'legacy_adjusted': 'LegacyAdjusted',
+                      'blla_adjusted': 'BllaAdjusted'})
+
+# Name the index
+df.index.name = 'Model'
+
+# Sort the rows by max height, then by min height, so that nan values are at the begining
+df = df.sort_values(by=['\(h_{max}\)', '\(h_{min}\)'], na_position='first')
+
+#%%
+styler = df.style
+
+# Export this dataframe to latex
+styler.format(escape='latex', na_rep='-')
+
+# Highlight the best results in each column, only for the IoU, Precision, Recall and F1 columns
+styler.highlight_max(props='font-weight: bold', axis=0, subset=['IoU', 'Precision', 'Recall', 'F1'])
+
+# Set the precision of the floats, using 1 decimal for the max and min height, and 3 decimals for the rest
+styler = styler.format({'\(h_{max}\)': '{:.1f}',
+                        '\(h_{min}\)': '{:.2f}',
+                        'IoU': '{:.3f}',
+                        'Precision': '{:.3f}',
+                        'Recall': '{:.3f}',
+                        'F1': '{:.3f}'})
+
+styler.set_caption(
+    """Results of the line detection experiments. The best results are emboldened column-wise. \(h_{max}\) and \(h_{min}\) respectively represent the maximum and minimum height thresholds used for each combined model.""")
+
+styler.set_table_styles()
+
+latex = styler.to_latex(hrules=True,
+                        position_float='centering',
+                        convert_css=True,
+                        label=f'tab:4_1 {styler.caption.split(".")[0]}')
+
+import re
+
+latex = re.sub(r'combined.*? ', 'Combined ', latex)
+latex = re.sub(r'Model &.*?\\\\\n', '', latex)
+latex = re.sub(r'\n & \\\(h', r'\nModel & \(h', latex)
+latex = latex.replace(' nan ', ' - ')

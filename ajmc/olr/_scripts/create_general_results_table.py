@@ -149,8 +149,7 @@ styler.hide(subset=[(reg, 'P') for reg in df.columns.get_level_values(0) if reg 
                    [(reg, 'N') for reg in df.columns.get_level_values(0) if reg != 'all'], axis=1)
 
 for xp in set([row[0] for row in styler.index]):
-    styler.highlight_max(subset=  # + \
-                         (xp, [('all', 'mAP')] + [(col) for col in df.columns if col[1] == 'AP']),
+    styler.highlight_max(subset=(xp, [('all', 'mAP')] + [(col) for col in df.columns if col[1] == 'AP']),
                          props="font-weight: bold")
 
 styler.set_table_styles()

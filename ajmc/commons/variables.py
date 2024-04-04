@@ -164,7 +164,13 @@ PD_COMM_IDS = ['bsb10234118',
                'sophoclesplaysa05campgoog',
                'sophokle1v3soph',
                'Wecklein1894',
-               'SchneidewinNauckRadermacher1913', 'Hermann1851', 'lestragdiesdeso00tourgoog']
+               'SchneidewinNauckRadermacher1913',
+               'Hermann1851',
+               'lestragdiesdeso00tourgoog',
+               'thukydides02thuc',
+               'pvergiliusmaroa00virggoog',
+               'annalsoftacitusp00taci',
+               ]
 
 COPYRIGHT_COMM_IDS = list(set(ALL_COMM_IDS) - set(EXTERNAL_COMM_IDS) - set(PD_COMM_IDS))
 
@@ -446,13 +452,14 @@ COLORS = {
         'red': (178, 0, 30),
         'pink': (240, 34, 130),
         'blue': (59, 159, 241),
-        'green': (152, 229, 135),
+        'green': (99, 163, 103),
         'yellow': (255, 200, 2),
         'brown': (175, 113, 89),
         'dark_green': (18, 91, 79),
         'purple': (70, 30, 68),
         'dark_blue': (55, 80, 125),
         'ecru': (181, 162, 103),
+        'grey': (136, 136, 136),
     },
     # https://coolors.co/f72585-b5179e-7209b7-560bad-480ca8-3a0ca3-3f37c9-4361ee-4895ef-4cc9f0
     'hues': {
