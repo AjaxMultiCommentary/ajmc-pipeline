@@ -189,7 +189,8 @@ def get_word_boxes_by_projection(line_img: np.ndarray, line_text: str) -> list[g
                                                       fallback_fonts=[fallback_font],
                                                       font_variants=['regular'] * len(line_text),
                                                       target_height=line_img.shape[0],
-                                                      return_chars_offsets=True)
+                                                      return_chars_offsets=True,
+                                                      raise_if_unprintable_char=False)
 
     # We now expand spaces so that the drawn text has the same width as the line image
     number_of_spaces = line_text.count(' ')
@@ -236,11 +237,23 @@ def get_word_boxes_by_projection(line_img: np.ndarray, line_text: str) -> list[g
     return word_boxes
 
 
+def get_word_boxes_brute_force(line_img: np.ndarray, line_text: str) -> list[geom.Shape]:
+    word_boxes = []
+    for i in range(len(line_text.split())):
+        word_boxes.append(geom.Shape.from_xyxy(x1=max(i * line_img.shape[0] // len(line_text.split()) - 1, 0),
+                                               y1=0,
+                                               x2=(i + 1) * line_img.shape[0] // len(line_text.split()),
+                                               y2=line_img.shape[1]))
+
+    return word_boxes
+
+
 def get_word_boxes(line_img: np.ndarray, line_text: str) -> list[geom.Shape]:
     """Finds the bounding boxes of the words in  ``line_img`` given a predicted ``line_text``.
 
     Args:
-        line_img (np.ndarray): The image to find the words in, black on white, 8-bit, single channel.
+        line_img (np.ndarray):
+        The image to find the words in, black on white, 8-bit, single channel.
         line_text (str): The predicted string.
     """
     # We will start by trying to find the word boxes using the projection method

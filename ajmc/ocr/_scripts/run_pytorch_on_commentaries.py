@@ -1,5 +1,4 @@
 import json
-import shutil
 from pathlib import Path
 
 import cv2
@@ -12,7 +11,7 @@ from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr.pytorch import data_processing as dp
 from ajmc.ocr.pytorch.config import get_config
 from ajmc.ocr.pytorch.model import OcrTorchModel
-from ajmc.ocr.pytorch.word_offsets_detection import get_word_boxes_by_projection, get_word_boxes_by_dilation
+from ajmc.ocr.pytorch.word_offsets_detection import get_word_boxes_by_projection, get_word_boxes_by_dilation, get_word_boxes_brute_force
 
 logger = get_ajmc_logger(__name__)
 MODEL_DIR = Path('/scratch/sven/withbackbone_v2')
@@ -38,8 +37,7 @@ def get_page_lines(img_path: Path):
     line_shapes = [geom.Shape(l) for l in json.loads(line_detection_preds_path.read_text())]
     line_tensors = [img_tensor[:, l.ymin:l.ymax + 1, l.xmin:l.xmax + 1].clone() for l in line_shapes]
     return [{'shape': l_shape,
-             'torch_line': dp.TorchInferenceLine(line_id='test',
-                                                 img_tensor=l_tensor,
+             'torch_line': dp.TorchInferenceLine(img_tensor=l_tensor,
                                                  img_height=config['chunk_height'],
                                                  chunk_width=config['chunk_width'],
                                                  chunk_overlap=config['chunk_overlap'])}
@@ -47,10 +45,6 @@ def get_page_lines(img_path: Path):
 
 
 for comm_id in vs.ALL_COMM_IDS:
-    comm_id = 'sophoclesplaysa05campgoog'
-    for dir_path in vs.get_comm_ocr_runs_dir(comm_id).glob('*'):
-        if dir_path.name.endswith('_pytorch'):
-            shutil.rmtree(dir_path)
     output_dir = vs.get_comm_ocr_runs_dir(comm_id) / f'{get_62_based_datecode()}_pytorch' / 'outputs'
     output_dir.mkdir(parents=True, exist_ok=True)
     for img_path in sorted(vs.get_comm_img_dir(comm_id).glob('*' + vs.DEFAULT_IMG_EXTENSION), key=lambda p: p.stem):
@@ -71,11 +65,17 @@ for comm_id in vs.ALL_COMM_IDS:
         cv2_img = cv2.imread(str(img_path), cv2.IMREAD_GRAYSCALE)
         fallback_lines = 0
         for j, line in enumerate(lines):
+            if line['text'] == '':
+                line['word_boxes'] = []
+                continue
             cv2_line = cv2_img[line['shape'].ymin:line['shape'].ymax + 1, line['shape'].xmin:line['shape'].xmax + 1].copy()
             word_boxes = get_word_boxes_by_dilation(cv2_line, line['text'])
             if len(word_boxes) != len(line['text'].split()):
                 fallback_lines += 1
-                word_boxes = get_word_boxes_by_projection(cv2_line, line['text'])
+                try:
+                    word_boxes = get_word_boxes_by_projection(cv2_line, line['text'])
+                except:
+                    word_boxes = get_word_boxes_brute_force(cv2_line, line['text'])
 
             word_boxes = [(w.xmin + line['shape'].xmin,
                            w.ymin + line['shape'].ymin,
@@ -95,4 +95,3 @@ for comm_id in vs.ALL_COMM_IDS:
 
         output_path = output_dir / f'{img_path.stem}.json'
         output_path.write_text(json.dumps(output, indent=2))
-    break

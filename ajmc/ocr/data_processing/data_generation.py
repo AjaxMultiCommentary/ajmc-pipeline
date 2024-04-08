@@ -29,7 +29,8 @@ def draw_textline(textline: str,
                   default_charset: str = 'latin',
                   output_file: Optional[Path] = None,
                   show_image: bool = False,
-                  return_chars_offsets: bool = False) -> Image:
+                  return_chars_offsets: bool = False,
+                  raise_if_unprintable_char: bool = True) -> Image:
     """
     Draws a textline using the given fonts.
 
@@ -106,7 +107,11 @@ def draw_textline(textline: str,
                     x = draw_char(char, fallback_font, x, y)
                     break
             else:
-                raise ValueError(f'Char {char} could be displayed by any font')
+                if raise_if_unprintable_char:
+                    raise ValueError(f'Char {char} could be displayed by any font')
+                else:
+                    chars_offsets.append(x)
+                    x = draw_char('#', fallback_fonts[0], x, y)
 
     # Crop the drawboard to the text, resize it to the desired height, and paste it on a new image, adding padding
     crop = drawboard.crop(drawboard.getbbox())

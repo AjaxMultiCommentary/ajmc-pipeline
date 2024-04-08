@@ -37,6 +37,7 @@ sample_bboxes = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.i
 
 
 sample_comm_id = 'cu31924087948174'
+
 sample_comm_root_dir = vs.get_comm_root_dir(sample_comm_id)
 
 sample_page_id = sample_comm_id + '_0083'

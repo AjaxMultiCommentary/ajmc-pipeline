@@ -113,9 +113,8 @@ class GreedyDecoder(Decoder):
     def process_string(self,
                        sequence: torch.tensor,
                        size: int,
-                       remove_repetitions=False) -> (str, torch.tensor):
+                       remove_repetitions=False) -> str:
         string = ''
-        offsets = []
         for i in range(size):
             char = self.indices_to_classes[sequence[i].item()]
             if char != self.indices_to_classes[self.blank_index]:
@@ -124,11 +123,9 @@ class GreedyDecoder(Decoder):
                     pass
                 elif char == self.classes[self.space_index]:
                     string += ' '
-                    offsets.append(i)
                 else:
                     string += char
-                    offsets.append(i)
-        return string, offsets
+        return string
 
     #@profile
     def decode(self, probs, sizes=None, remove_repetitions: bool = True) -> List[str]:
@@ -150,7 +147,7 @@ class GreedyDecoder(Decoder):
         strings = []
         for x in xrange(len(sequences)):
             seq_len = sizes[x] if sizes is not None else len(sequences[x])
-            string, string_offsets = self.process_string(sequences[x], seq_len, remove_repetitions)
+            string = self.process_string(sequences[x], seq_len, remove_repetitions)
             strings.append(string)
 
         return strings

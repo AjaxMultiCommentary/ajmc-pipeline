@@ -126,7 +126,8 @@ SPREADSHEETS = {
 #                                                 FORMATS, EXTENSIONS AND PATTERNS
 # ======================================================================================================================
 
-OCR_OUTPUT_EXTENSIONS = ['.xml', '.hocr', '.html']
+OCR_OUTPUTS_EXTENSIONS = ['.hocr', '.xml', '.html', '.json']
+
 DEFAULT_IMG_EXTENSION = '.png'
 OLR_PREFIX = '_OLR_'
 OCR_GT_PREFIX = 'OCRGT_'
