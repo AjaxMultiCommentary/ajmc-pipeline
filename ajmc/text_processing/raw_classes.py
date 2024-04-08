@@ -185,7 +185,7 @@ class RawCommentary(Commentary):
     def _get_children(self, children_type):
 
         if children_type == 'pages':
-            pages = [RawPage(ocr_path=p, commentary=self) for p in self.ocr_dir.glob('*') if p.suffix in vs.OCR_OUTPUT_EXTENSIONS]
+            pages = [RawPage(ocr_path=p, commentary=self) for p in self.ocr_dir.glob('*') if p.suffix in vs.OCR_OUTPUTS_EXTENSIONS]
             return sorted(pages, key=lambda x: x.id)
 
         elif children_type == 'sections':
@@ -646,19 +646,17 @@ class RawPage(Page, TextContainer):
     @lazy_property
     def markup(self) -> bs4.BeautifulSoup:
         if self.ocr_path is not None:
-            return bs4.BeautifulSoup(self.ocr_path.read_text('utf-8'), 'xml')
+            if self.ocr_format != 'json':
+                return bs4.BeautifulSoup(self.ocr_path.read_text('utf-8'), 'xml')
+            else:
+                return json.loads(self.ocr_path.read_text('utf-8'))
 
     @lazy_property
     def ocr_format(self) -> str:
-        if self.ocr_path.suffix.endswith('xml'):
-            return 'pagexml'
-        elif self.ocr_path.suffix == '.html':
-            return 'krakenhocr'
-        elif self.ocr_path.suffix == '.hocr':
-            return 'tesshocr'
-        else:
-            raise NotImplementedError("""The format could not be identified. It looks like the format is neither 
-            ``tesshocr``, nor ``krakenhocr`` nor ``pagexml``, which are the only formats this module deals with.""")
+        if self.ocr_path.suffix not in vs.OCR_OUTPUTS_EXTENSIONS:
+            raise NotImplementedError(
+                f'This OCR output format is not supported. Expecting {vs.OCR_OUTPUTS_EXTENSIONS} but found {self.ocr_path.suffix}.')
+        return self.ocr_path.suffix[1:]
 
     @lazy_property
     def bbox(self) -> Shape:
