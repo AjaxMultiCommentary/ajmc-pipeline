@@ -1,10 +1,10 @@
 import re
-import unicodedata
 from abc import abstractmethod
 from pathlib import Path
-from typing import List, Optional, Type, Union
+from typing import List, Optional, Type, Union, Callable
 
 import cv2
+import unicodedata
 from lazy_objects.lazy_objects import lazy_property, LazyObject
 
 from ajmc.commons import variables as vs, image as ajmc_img
@@ -156,10 +156,13 @@ class Commentary(TextContainer):
             for child_type in ['regions', 'lines', 'words']:
                 boxes = []
                 for child in getattr(page.children, child_type):
-                    if child.bbox.bbox not in boxes:
-                        boxes.append(child.bbox.bbox)
-                    else:
-                        print(f'Page {page.id} has duplicated {child_type}: {child.text} at {child.bbox.bbox}')
+                    try:
+                        if child.bbox.bbox not in boxes:
+                            boxes.append(child.bbox.bbox)
+                        else:
+                            print(f'Page {page.id} has duplicated {child_type}: {child.text} at {child.bbox.bbox}')
+                    except ValueError:
+                        print(f'Page {page.id} has a {child_type} with no bbox: {child.text}')
 
                 page_diffs[child_type] = len(getattr(page.children, child_type)) - len(boxes)
 
@@ -192,8 +195,10 @@ class Commentary(TextContainer):
 
 
     def is_safe(self):
-        if any([d for page_diffs in self.get_duplicates().values() for d in page_diffs.values()]):
-            return False
+        comm_diff = self.get_duplicates()
+        for page_id, diffs in comm_diff.items():
+            if any(diffs.values()):
+                return False
         return True
 
 
@@ -201,7 +206,8 @@ class Page:
 
     def draw_textcontainers(self,
                             tc_types: List[str] = vs.CHILD_TYPES,
-                            output_path: Optional[Union[str, Path]] = None) -> 'np.ndarray':
+                            output_path: Optional[Union[str, Path]] = None,
+                            text_getter: Optional[Callable] = None) -> 'np.ndarray':
         """Draws the text containers of the page on the page's image.
 
         Args:
@@ -211,7 +217,7 @@ class Page:
         draw = self.image.matrix.copy()
 
         for type_ in tc_types:
-            draw = ajmc_img.draw_textcontainers(draw, None, *getattr(self.children, type_))
+            draw = ajmc_img.draw_textcontainers(draw, None, text_getter, *getattr(self.children, type_))
 
         if output_path is not None:
             cv2.imwrite(str(output_path), draw)

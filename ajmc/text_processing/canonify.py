@@ -56,9 +56,10 @@ if __name__ == '__main__':
     unsafe_canonicals = []
 
     for comm_id in args.commentary_ids:
+        print()
         print(f'Processing commentary {comm_id}...')
 
-        can_path = vs.get_comm_canonical_path_from_ocr_run_id(comm_id, ocr_run_pattern=args.ocr_run_pattern)
+        can_path = vs.get_comm_canonical_path_from_ocr_run_pattern(comm_id, ocr_run_pattern=args.ocr_run_pattern)
         if can_path.exists():
             existing_can_json = json.loads(can_path.read_text('utf-8'))
 

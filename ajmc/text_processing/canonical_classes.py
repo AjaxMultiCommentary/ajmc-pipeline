@@ -131,7 +131,7 @@ class CanonicalCommentary(Commentary):
         """
 
         if json_path is None:
-            json_path = vs.get_comm_canonical_path_from_ocr_run_id(id, ocr_run_id)
+            json_path = vs.get_comm_canonical_path_from_ocr_run_pattern(id, ocr_run_id)
         else:
             json_path = Path(json_path)
 
@@ -192,7 +192,7 @@ class CanonicalCommentary(Commentary):
                              for child_type in vs.CHILD_TYPES}}
 
         if output_path is None:
-            output_path = vs.get_comm_canonical_path_from_ocr_run_id(self.id, self.ocr_run_id)
+            output_path = vs.get_comm_canonical_path_from_ocr_run_pattern(self.id, self.ocr_run_id)
 
         output_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
 
@@ -366,6 +366,10 @@ class CanonicalAnnotation(CanonicalTextContainer):
         logger.warning(f'``{self.__class__}``s have no bbox.')
         return None
 
+    @lazy_property
+    def bboxes(self) -> List[Shape]:
+        return [word.bbox for word in self.children.words]
+
 
 class CanonicalEntity(CanonicalAnnotation):
 
@@ -428,7 +432,6 @@ class CanonicalHyphenation(CanonicalAnnotation):
     def to_json(self) -> Dict[str, Union[str, Tuple[int, int], bool]]:
         return {'word_range': self.word_range,
                 'shifts': self.shifts}
-
 
 
 class CanonicalLemma(CanonicalAnnotation):

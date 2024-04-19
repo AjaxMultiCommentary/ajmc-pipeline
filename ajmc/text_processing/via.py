@@ -321,8 +321,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+
     ##############################
     # Debugging
+    # args = argparse.Namespace()
+    # args.comm_ids = ['sophokle1v3soph']
     # args.clean = True
     # args.safe_check = True
     # args.save = True
