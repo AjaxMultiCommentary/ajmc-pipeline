@@ -24,7 +24,6 @@ contours: List[Shape] = image_processing.find_contours(image)
 
 [p for p in contours[0].points[:,0]]
 def is_intersecting(s1: Shape, s2:Shape):
-    # todo performance
     intersects = False
     for p1 in s1.points:
         for p2 in s2.points:

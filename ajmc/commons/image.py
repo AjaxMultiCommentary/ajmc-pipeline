@@ -2,7 +2,7 @@
 
 import random
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Callable
 
 import cv2
 import numpy as np
@@ -12,6 +12,8 @@ from ajmc.commons import variables
 from ajmc.commons.docstrings import docstring_formatter, docstrings
 from ajmc.commons.geometry import Shape
 from ajmc.commons.miscellaneous import get_ajmc_logger
+from ajmc.ocr.data_processing import font_utils
+from ajmc.ocr.data_processing.data_generation import draw_textline
 
 logger = get_ajmc_logger(__name__)
 
@@ -147,30 +149,62 @@ def draw_box(box: variables.BoxType,
                                thickness=stroke_thickness)
 
     if text is not None:
+        try:
+            text_img = draw_textline(text,
+                                     fonts=font_utils.get_default_fonts(),
+                                     fallback_fonts=font_utils.get_fallback_fonts(),
+                                     target_height=max((box[1][1] - box[0][1]) // 3, 10),
+                                     raise_if_unprintable_char=False)
+
+            # Convert the pillow image to a numpy array
+            text_img = np.array(text_img)
+            # Colorize the text image (it is black by default)
+            text_img = cv2.cvtColor(text_img, cv2.COLOR_GRAY2BGR)
+
+            # Include the image in the original image
+            img_matrix[box[0][1] - text_img.shape[0]:box[0][1], box[1][0] - text_img.shape[1]: box[1][0]:] = text_img
+        except Exception as e:
+            print(f'Error: {e}')
+            pass
+
         # Start by getting the actual size of the text_box
-        (text_width, text_height), _ = cv2.getTextSize(text, fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                                                       fontScale=text_size,
-                                                       thickness=text_thickness)
-
-        # Draw a rectangle around the text
-        img_matrix = cv2.rectangle(img_matrix,
-                                   pt1=(box[1][0] - text_width - 4, box[0][1] - text_height - 4),
-                                   pt2=(box[1][0], box[0][1]),
-                                   color=rgb_to_bgr(stroke_color),
-                                   thickness=-1)  # -1 means that the rectangle will be filled
-
-        img_matrix = cv2.putText(img_matrix, text,
-                                 org=(box[1][0] - text_width, box[0][1] - 2),
-                                 fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                                 fontScale=text_size,
-                                 color=(255, 255, 255),
-                                 thickness=text_thickness)
+        # (text_width, text_height), _ = cv2.getTextSize(text, fontFace=cv2.FONT_HERSHEY_TRIPLEX,
+        #                                                fontScale=text_size,
+        #                                                thickness=text_thickness)
+        #
+        # # Draw a rectangle around the text
+        # img_matrix = cv2.rectangle(img_matrix,
+        #                            pt1=(box[1][0] - text_width - 4, box[0][1] - text_height - 4),
+        #                            pt2=(box[1][0], box[0][1]),
+        #                            color=rgb_to_bgr(stroke_color),
+        #                            thickness=-1)  # -1 means that the rectangle will be filled
+        #
+        # img_matrix = cv2.putText(img_matrix, text,
+        #                          org=(box[1][0] - text_width, box[0][1] - 2),
+        #                          fontFace=cv2.FONT_HERSHEY_TRIPLEX,
+        #                          fontScale=text_size,
+        #                          color=(255, 255, 255),
+        #                          thickness=text_thickness)
 
     return img_matrix
 
 
-def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str, Path]] = None, *textcontainers):
+def draw_textcontainers(img_matrix: np.ndarray,
+                        output_path: Optional[Union[str, Path]] = None,
+                        text_getter: Optional[Callable] = None,
+                        *textcontainers, ):
     """Draws a list of ``TextContainer``s on ``img_matrix``."""
+
+    def _text_getter(tc):
+        if text_getter is None:
+            if tc.type == 'region':
+                return tc.region_type
+            elif tc.type in ['entity', 'sentence', 'hyphenation', 'lemma']:
+                return tc.label if tc.type == 'entity' else tc.type
+            else:
+                return tc.type
+        else:
+            return text_getter(tc)
 
     # Get the set of textcontainer types
     for tc in textcontainers:
@@ -181,7 +215,7 @@ def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str,
                                   stroke_thickness=2,
                                   fill_color=variables.REGION_TYPES_TO_COLORS[tc.region_type],
                                   fill_opacity=.3,
-                                  text=tc.region_type)
+                                  text=_text_getter(tc))
 
         elif tc.type in ['entity', 'sentence', 'hyphenation', 'lemma']:
             for i, bbox in enumerate(tc.bboxes):
@@ -193,7 +227,7 @@ def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str,
                                           stroke_thickness=2,
                                           fill_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                           fill_opacity=.3,
-                                          text=tc.label if tc.type == 'entity' else tc.type)
+                                          text=_text_getter(tc))
                 else:
                     img_matrix = draw_box(box=bbox.bbox,
                                           img_matrix=img_matrix,
@@ -211,7 +245,7 @@ def draw_textcontainers(img_matrix: np.ndarray, output_path: Optional[Union[str,
                                   stroke_thickness=1,
                                   fill_color=variables.TEXTCONTAINERS_TYPES_TO_COLORS[tc.type],
                                   fill_opacity=.2,
-                                  text=tc.type)
+                                  text=_text_getter(tc))
 
     if output_path is not None:
         cv2.imwrite(str(output_path), img_matrix)

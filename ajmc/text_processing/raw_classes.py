@@ -99,9 +99,9 @@ class RawCommentary(Commentary):
         # We now populate the children and images
         children = {k: [] for k in vs.CHILD_TYPES}
         w_count = 0
-        for section in tqdm(self.children.sections, desc=f'Canonizing {can.id} - Iterating over sections...'):
+        for section in self.children.sections:
             section_start = w_count
-            for page in section.children.pages:
+            for page in tqdm(section.children.pages, desc=f'Canonizing section {section.section_title}...'):
                 page = page.get_ocr_gt_page()
                 page.optimise()
                 p_start = w_count
@@ -136,6 +136,8 @@ class RawCommentary(Commentary):
                                                 transcript=ent.transcript,
                                                 label=ent.label,
                                                 wikidata_id=ent.wikidata_id))
+                    else:
+                        print(f'WARNING: NO WORDS. {page.id} ent {ent.transcript}')  # Todo remove
                 # Adding sentences
                 for s in page.children.sentences:
                     if s.children.words:
@@ -146,6 +148,8 @@ class RawCommentary(Commentary):
                                                   corrupted=s.corrupted,
                                                   incomplete_continuing=s.incomplete_continuing,
                                                   incomplete_truncated=s.incomplete_truncated))
+                    else:
+                        print(f'WARNING: NO WORDS. {page.id} sentence')  # Todo remove
 
                 # Adding hyphenations
                 for h in page.children.hyphenations:
@@ -154,6 +158,8 @@ class RawCommentary(Commentary):
                                 CanonicalHyphenation(word_range=(h.children.words[0].index, h.children.words[-1].index),
                                                      commentary=can,
                                                      shifts=h.shifts))
+                    else:
+                        print(f'WARNING: NO WORDS. {page.id} hyphen')  # Todo remove
 
                 for l in page.children.lemmas:
                     if l.children.words:
@@ -163,6 +169,8 @@ class RawCommentary(Commentary):
                                                                  label=l.value,
                                                                  transcript=l.transcript,
                                                                  anchor_target=l.anchor_target))
+                    else:
+                        print(f'WARNING: NO WORDS. {page.id} lemma {l.transcript}')  # Todo remove
 
                 # We reset the page to free up memory
                 page.reset()
@@ -185,7 +193,7 @@ class RawCommentary(Commentary):
     def _get_children(self, children_type):
 
         if children_type == 'pages':
-            pages = [RawPage(ocr_path=p, commentary=self) for p in self.ocr_dir.glob('*') if p.suffix in vs.OCR_OUTPUT_EXTENSIONS]
+            pages = [RawPage(ocr_path=p, commentary=self) for p in self.ocr_dir.glob('*') if p.suffix in vs.OCR_OUTPUTS_EXTENSIONS]
             return sorted(pages, key=lambda x: x.id)
 
         elif children_type == 'sections':
@@ -411,12 +419,14 @@ class RawPage(Page, TextContainer):
                 annotations = cas_utils.safe_import_page_annotations(self.id, cas, rebuild,
                                                                      vs.ANNOTATION_LAYERS[children_type])
 
-                if children_type == 'entities':
-                    return [RawEntity.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
-                elif children_type == 'sentences':
-                    return [RawSentence.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
-                elif children_type == 'hyphenations':
-                    return [RawHyphenation.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
+                child_class = {'entities': RawEntity, 'sentences': RawSentence, 'hyphenations': RawHyphenation}[children_type]
+                children = []
+                for cas_ann in annotations:
+                    child = child_class.from_cas_annotation(self, cas_ann, rebuild)
+                    if not child.warnings:
+                        children.append(child)
+                return children
+
             else:
                 return []
 
@@ -430,12 +440,16 @@ class RawPage(Page, TextContainer):
             cas = cas_utils.import_page_cas(self.id, children_type)
 
             if cas is not None:
-                annotations = cas_utils.safe_import_page_annotations(page_id=self.id,
-                                                                     cas=cas,
-                                                                     rebuild=rebuild,
+                annotations = cas_utils.safe_import_page_annotations(page_id=self.id, cas=cas, rebuild=rebuild,
                                                                      annotation_layer=vs.ANNOTATION_LAYERS[children_type])
 
-                return [RawLemma.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
+                children = []
+                for cas_ann in annotations:
+                    child = RawLemma.from_cas_annotation(self, cas_ann, rebuild)
+                    if not child.warnings:
+                        children.append(child)
+
+                return children
 
             else:
                 return []
@@ -513,26 +527,26 @@ class RawPage(Page, TextContainer):
 
         # Process words
         self.children.words = [w for w in self.children.words if re.sub(r'\s+', '', w.text) != '']
-        pruned_words = []
-        word_bboxes = []
+        clean_words = []
+        clean_word_bboxes = []
         for w in self.children.words:
             w.text = w.text.strip()  # Remove leading and trailing whitespace (happens sometimes)
             w.adjust_bbox()
-            if w.bbox.bbox not in word_bboxes:
-                pruned_words.append(w)
-                word_bboxes.append(w.bbox.bbox)
-        self.children.words = pruned_words
+            if w.bbox.bbox not in clean_word_bboxes:
+                clean_words.append(w)
+                clean_word_bboxes.append(w.bbox.bbox)
+        self.children.words = clean_words
 
         # Process lines
-        pruned_lines = []
-        line_bboxes = []
+        clean_lines = []
+        clean_line_bboxes = []
         self.children.lines = [l for l in self.children.lines if l.children.words]
         for l in self.children.lines:
             l.adjust_bbox()
-            if l.bbox.bbox not in line_bboxes:
-                pruned_lines.append(l)
-                line_bboxes.append(l.bbox.bbox)
-        self.children.lines = pruned_lines
+            if l.bbox.bbox not in clean_line_bboxes:
+                clean_lines.append(l)
+                clean_line_bboxes.append(l.bbox.bbox)
+        self.children.lines = clean_lines
 
         # Create fake lines for words without lines
         for word in self.children.words:
@@ -541,17 +555,17 @@ class RawPage(Page, TextContainer):
                 self.children.lines.append(RawLine(page=self, word_ids=[word.id], bbox=word.bbox))
 
         # Process regions
-        pruned_regions = []
-        region_bboxes = []
+        clean_regions = []
+        clean_region_bboxes = []
         self.children.regions = [r for r in self.children.regions
                                  if r.region_type not in vs.EXCLUDED_REGION_TYPES
                                  and r.children.words]
         for r in self.children.regions:
             r.adjust_bbox()
-            if r.bbox.bbox not in region_bboxes:
-                pruned_regions.append(r)
-                region_bboxes.append(r.bbox.bbox)
-        self.children.regions = pruned_regions
+            if r.bbox.bbox not in clean_region_bboxes:
+                clean_regions.append(r)
+                clean_region_bboxes.append(r.bbox.bbox)
+        self.children.regions = clean_regions
 
         # Cut lines according to regions
         for r in self.children.regions:
@@ -646,19 +660,17 @@ class RawPage(Page, TextContainer):
     @lazy_property
     def markup(self) -> bs4.BeautifulSoup:
         if self.ocr_path is not None:
-            return bs4.BeautifulSoup(self.ocr_path.read_text('utf-8'), 'xml')
+            if self.ocr_format != 'json':
+                return bs4.BeautifulSoup(self.ocr_path.read_text('utf-8'), 'xml')
+            else:
+                return json.loads(self.ocr_path.read_text('utf-8'))
 
     @lazy_property
     def ocr_format(self) -> str:
-        if self.ocr_path.suffix.endswith('xml'):
-            return 'pagexml'
-        elif self.ocr_path.suffix == '.html':
-            return 'krakenhocr'
-        elif self.ocr_path.suffix == '.hocr':
-            return 'tesshocr'
-        else:
-            raise NotImplementedError("""The format could not be identified. It looks like the format is neither 
-            ``tesshocr``, nor ``krakenhocr`` nor ``pagexml``, which are the only formats this module deals with.""")
+        if self.ocr_path.suffix not in vs.OCR_OUTPUTS_EXTENSIONS:
+            raise NotImplementedError(
+                    f'This OCR output format is not supported. Expecting {vs.OCR_OUTPUTS_EXTENSIONS} but found {self.ocr_path.suffix}.')
+        return self.ocr_path.suffix[1:]
 
     @lazy_property
     def bbox(self) -> Shape:
@@ -819,11 +831,35 @@ class RawAnnotation(TextContainer):
 
     def _get_children(self, children_type):
         """Returns the children of the annotation, coping with the fact that annotation have multiple bboxes."""
-        return [c for c in getattr(self.parents.page.children, children_type)
-                if any([is_bbox_within_bbox_with_threshold(contained=c.bbox.bbox,
-                                                           container=bbox.bbox,
-                                                           threshold=vs.PARAMETERS['entity_inclusion_threshold'])
-                        for bbox in self.bboxes])]
+
+        # We first get the children based on overlap with the bboxes
+        # Notice that there is no bijection between the set of bboxes and the set of children (i.e. there can be 3 bboxes but 4 words and vice-versa)
+        children = [c for c in getattr(self.parents.page.children, children_type)
+                    if any([is_bbox_within_bbox_with_threshold(contained=c.bbox.bbox, container=bbox.bbox,
+                                                               threshold=vs.PARAMETERS['word_annotation_inclusion_threshold'])
+                            for bbox in self.bboxes])]
+
+        if children_type == 'words' and not children:
+            # In this case, the annotation has no words. We start by making the bboxes to enlarge bboxes by 20% horizontally
+            enlarged_bboxes = [((b.xmin - int(0.2 * b.width), b.ymin), (b.xmax + int(0.2 * b.width), b.ymax)) for b in self.bboxes]
+            threshold = vs.PARAMETERS['word_annotation_inclusion_threshold']
+            # We now reduce the threshold by 0.1 until we find a word
+            while not children and threshold > 0.2:
+                children = [c for c in self.parents.page.children.words
+                            if any([is_bbox_within_bbox_with_threshold(contained=c.bbox.bbox, container=bbox, threshold=threshold)
+                                    for bbox in enlarged_bboxes])]
+                threshold -= 0.1
+
+            # If we still have no children, we find the word which stand nearest to the first bbox
+            # We weight the distance in order to avoid taking words that are too far vertically (we want words from the same line)
+            if not children:
+                return [min(self.parents.page.children.words,
+                            key=lambda w: (w.bbox.center[0] - self.bboxes[0].center[0]) ** 2 + 10 * (
+                                    w.bbox.center[1] - self.bboxes[0].center[1]) ** 2)]
+            else:
+                return children
+        else:
+            return children
 
 
 class RawEntity(RawAnnotation):

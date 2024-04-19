@@ -13,7 +13,7 @@ DEFAULT_SEARCH_INDEX_EXPORT_LOCATION = "."
 class CommentaryIndex:
     def __init__(self, commentary_id: str) -> None:
         self.commentary_id = commentary_id
-        self.commentary_path = variables.get_comm_canonical_path_from_ocr_run_id(
+        self.commentary_path = variables.get_comm_canonical_path_from_ocr_run_pattern(
             commentary_id, variables.COMM_BEST_OCR_GLOB
         )
 

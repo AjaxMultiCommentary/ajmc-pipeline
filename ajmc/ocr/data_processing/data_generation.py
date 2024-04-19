@@ -3,14 +3,14 @@ import json
 import random
 import re
 import shutil
-import unicodedata
 from pathlib import Path
 from typing import Tuple, List, Dict, Optional, Generator
 
+import unicodedata
 from PIL import Image, ImageDraw, ImageOps
 from tqdm import tqdm
 
-from ajmc.commons import unicode_utils
+from ajmc.commons import unicode_utils, variables as vs
 from ajmc.commons.file_management import int_to_x_based_code
 from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.unicode_utils import get_char_charset
@@ -24,11 +24,13 @@ def draw_textline(textline: str,
                   fonts: Dict[str, Font],
                   fallback_fonts: List[Font],
                   target_height: int,
-                  font_variants: List[str],
+                  font_variants: Optional[List[str]] = None,
                   kerning: int = 0,
                   default_charset: str = 'latin',
                   output_file: Optional[Path] = None,
-                  show_image: bool = False) -> Image:
+                  show_image: bool = False,
+                  return_chars_offsets: bool = False,
+                  raise_if_unprintable_char: bool = True) -> Image:
     """
     Draws a textline using the given fonts.
 
@@ -38,9 +40,7 @@ def draw_textline(textline: str,
             `{'latin': ajmc.ocr.font_utils.Font,
             'greek': ajmc.ocr.font_utils.Font,
             'numeral': ajmc.ocr.font_utils.Font,
-            'punctuation': ajmc.ocr.font_utils.Font,
-            'fallback': [ajmc.ocr.font_utils.Font]}`.
-            Notice that ``'fallback'`` must be a list of ``Font``.
+            'punctuation': ajmc.ocr.font_utils.Font}`.
         fallback_fonts (list): A list of fallback fonts to use when a can't be printed with the main font.
         target_height (int): The desired height of the output image, in pixels.
         font_variants (list): A list of size len(text) containing the font variant to use for each character,
@@ -51,16 +51,19 @@ def draw_textline(textline: str,
         show_image (bool): Whether to show the image.
     """
 
+
     # Set default values
     upscale_factor = 3
     kerning *= upscale_factor
+    if font_variants is None:
+        font_variants = ['Regular'] * len(textline)
 
     # Get the drawboard height
     drawboard_height: int = target_height * upscale_factor
     font_size = int(0.5 * drawboard_height)
 
     # Adapt the font size to the text
-    for charset, font in fonts.items():
+    for font in fonts.values():
         font.set_size(font_size)
 
     for font in fallback_fonts:
@@ -69,8 +72,10 @@ def draw_textline(textline: str,
     # Chunk the text
     chars = [(char, get_char_charset(char, fallback=default_charset), variant) for char, variant in zip(textline, font_variants)]
 
+    char_widths = [fonts[charset].pil_font.getlength(char) for char, charset, _ in chars]
+
     # Get the text sizetypeface
-    drawboard_width = int(sum([fonts[charset].pil_font.getlength(char) for char, charset, _ in chars]))
+    drawboard_width = int(sum(char_widths))
     drawboard_width += int(2 * drawboard_width + (kerning * len(chars)))  # We take some leeway (we crop afterwards)
 
     # Create a drawboard
@@ -86,21 +91,30 @@ def draw_textline(textline: str,
         x += font.pil_font.getlength(char) + kerning
         return x
 
+    chars_offsets = []
+
     for i, (char, charset, variant) in enumerate(chars):
 
         font = fonts[charset].font_variants.get(variant, fonts[charset])
 
         if font.has_glyph(char):
+            chars_offsets.append(x)
             x = draw_char(char, font, x, y)
+
 
         else:
             for fallback_font in fallback_fonts:
                 if fallback_font.has_glyph(char):
                     logger.debug(f'Char {char} could not be displayed by {fonts[charset].path.stem} font, using {fallback_font.name}')
+                    chars_offsets.append(x)
                     x = draw_char(char, fallback_font, x, y)
                     break
             else:
-                raise ValueError(f'Char {char} could be displayed by any font')
+                if raise_if_unprintable_char:
+                    raise ValueError(f'Char {char} could be displayed by any font')
+                else:
+                    chars_offsets.append(x)
+                    x = draw_char('#', fallback_fonts[0], x, y)
 
     # Crop the drawboard to the text, resize it to the desired height, and paste it on a new image, adding padding
     crop = drawboard.crop(drawboard.getbbox())
@@ -108,6 +122,8 @@ def draw_textline(textline: str,
     target_width = int(resize_factor * crop.width)
     final_image = crop.resize((target_width, target_height))
     final_image = ImageOps.invert(final_image)
+    char_widths = [int(resize_factor * width) for width in char_widths]
+    chars_offsets = [int(resize_factor * offset) for offset in chars_offsets]
 
     if show_image:
         final_image.show()
@@ -115,7 +131,9 @@ def draw_textline(textline: str,
     if output_file:
         final_image.save(output_file)
 
-    # print(f'Drew text in {time.time() - start_time} seconds')
+    if return_chars_offsets:
+        return final_image, char_widths, chars_offsets
+
     return final_image
 
 
@@ -595,8 +613,7 @@ if __name__ == '__main__':
     # BASE_OUTPUT_DIR = Path('/Users/sven/Desktop/coucou')
     BASE_OUTPUT_DIR = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data')
 
-    FONTS_DIR = Path('./data/fonts/fonts')
-    FONTS = [Font(font_path, font_variant='Regular') for font_path in walk_through_font_dir(FONTS_DIR)]
+    FONTS = [Font(font_path, font_variant='Regular') for font_path in walk_through_font_dir(vs.FONTS_DIR)]
 
     GREEK_CAPITAL_FONTS_NAMES = ["GFSIgnacio-Regular.otf",
                                  "GFSGaraldus-Regular.otf",

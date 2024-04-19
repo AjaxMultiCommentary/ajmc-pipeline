@@ -4,7 +4,7 @@
     "ne_corpus_commit": "6e638f1574116fbef6127495b75a4d10668dd923",
     "ocr_run_id": "3464N4_tess_retrained",
     "lemlink_corpus_commit": "057c2a9948f3b04a9a316a992bca22e35297fdcb",
-    "commentaries_data_commit": "c1a048bfe8cea02d8bf1626b7d26f0d9e073a50b"
+    "commentaries_data_commit": "b8ae4f7786321a4909cd6f75a21342585c334fe8"
   },
   "ocr_gt_page_ids": [
     "cu31924087948174_0035",
@@ -3313,6 +3313,16 @@
       },
       {
         "word_range": [
+          1242,
+          1243
+        ],
+        "shifts": [
+          0,
+          0
+        ]
+      },
+      {
+        "word_range": [
           1350,
           1351
         ],
@@ -3707,7 +3717,7 @@
           -1
         ],
         "transcript": "229",
-        "label": "scope",
+        "label": "primary-partial",
         "wikidata_id": null
       },
       {
@@ -3720,7 +3730,7 @@
           -1
         ],
         "transcript": "229",
-        "label": "primary-partial",
+        "label": "scope",
         "wikidata_id": null
       },
       {
@@ -3967,7 +3977,7 @@
           -1
         ],
         "transcript": "l. 60",
-        "label": "primary-partial",
+        "label": "scope",
         "wikidata_id": null
       },
       {
@@ -3980,7 +3990,7 @@
           -1
         ],
         "transcript": "l. 60",
-        "label": "scope",
+        "label": "primary-partial",
         "wikidata_id": null
       },
       {
@@ -4642,8 +4652,8 @@
           0,
           -1
         ],
-        "transcript": "589, 90",
-        "label": "scope",
+        "transcript": "589, go",
+        "label": "primary-partial",
         "wikidata_id": null
       },
       {
@@ -4655,8 +4665,8 @@
           0,
           -1
         ],
-        "transcript": "589, go",
-        "label": "primary-partial",
+        "transcript": "589, 90",
+        "label": "scope",
         "wikidata_id": null
       },
       {

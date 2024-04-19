@@ -1,7 +1,7 @@
 """Model classes for torch based ocr models."""
 
 from collections import OrderedDict
-from typing import Iterable, List, Tuple
+from typing import Iterable, List
 
 import torch
 import torch.nn as nn
@@ -63,7 +63,7 @@ class OcrTorchModel(nn.Module):
     def predict(self, x: torch.Tensor,
                 chunks_to_img_mapping: List[int],
                 img_widths: List[int],
-                remove_repetitions: bool = True) -> Tuple[List[str], List[List[int]]]:
+                remove_repetitions: bool = True) -> List[str]:
         """Predicts the text in a batch of image tensors.
 
         Args:

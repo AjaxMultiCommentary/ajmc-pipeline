@@ -37,6 +37,7 @@ sample_bboxes = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.i
 
 
 sample_comm_id = 'cu31924087948174'
+
 sample_comm_root_dir = vs.get_comm_root_dir(sample_comm_id)
 
 sample_page_id = sample_comm_id + '_0083'
@@ -63,7 +64,7 @@ sample_raw_entities = sample_ocr_page.children.entities
 
 sample_can_commentary = sample_raw_commentary.to_canonical()
 
-sample_canonical_path = vs.get_comm_canonical_path_from_ocr_run_id(sample_comm_id, sample_ocr_run_id)
+sample_canonical_path = vs.get_comm_canonical_path_from_ocr_run_pattern(sample_comm_id, sample_ocr_run_id)
 sample_can_commentary.to_json(sample_canonical_path)
 
 sample_cancommentary_from_json = CanonicalCommentary.from_json(sample_canonical_path)

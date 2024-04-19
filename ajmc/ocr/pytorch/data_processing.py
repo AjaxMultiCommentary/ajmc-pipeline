@@ -1,12 +1,12 @@
-# TODO : revise the docs
+# TODO 👁️: revise the docs
 import os
 import random
-import unicodedata
 from abc import abstractmethod
 from pathlib import Path
 from typing import List, Dict, Tuple, Generator, Optional, Any, Callable, Iterable
 
 import torch
+import unicodedata
 from torch.nn.utils.rnn import pad_sequence
 from torchvision import transforms
 from torchvision.io import read_image, ImageReadMode
@@ -78,7 +78,6 @@ class TorchInferenceLine:
 
     # #@profile
     def __init__(self,
-                 line_id: str,
                  img_tensor: torch.Tensor,
                  img_height: int,
                  chunk_width: int,
@@ -99,7 +98,6 @@ class TorchInferenceLine:
             chunk_overlap (int): The overlap between the chunks to be created from the image
         """
 
-        self.line_id = line_id
         self.img_tensor = prepare_img_tensor(img_tensor, img_height=img_height)
         self.img_width: int = self.img_tensor.shape[2]
         self.chunks = chunk_img_tensor(self.img_tensor, chunk_width, chunk_overlap)
@@ -150,20 +148,17 @@ class TorchInferenceBatch:
 
     # #@profile
     def __init__(self,
-                 line_ids: List[str],
                  img_widths: Tuple[int],
                  chunks: torch.Tensor,
                  chunks_to_img_mapping: List[int],
                  ):
-        self.line_ids = line_ids
         self.img_widths = img_widths
         self.chunks = chunks
         self.chunks_to_img_mapping = chunks_to_img_mapping
 
     @classmethod
     def from_lines(cls, ocr_lines: List[TorchInferenceLine]):
-        return cls(line_ids=[l.line_id for l in ocr_lines],
-                   img_widths=tuple(l.img_width for l in ocr_lines),
+        return cls(img_widths=tuple(l.img_width for l in ocr_lines),
                    chunks=torch.cat([l.chunks for l in ocr_lines], dim=0),
                    chunks_to_img_mapping=[len(l.chunks) for l in ocr_lines])
 
@@ -361,11 +356,9 @@ class TorchInferenceDataset(TorchOcrDataset):
             img_tensor = read_image(str(img_path), mode=ImageReadMode.GRAY).requires_grad_(False)
             line_boxes: List['Shape'] = self.line_detector(img_path)
 
-            page_lines = {f'{img_path.stem}_{"_".join(l.xyxy)}': img_tensor[l.ymin:l.ymax, l.xmin:l.xmax].clone()
-                          for l in line_boxes}
-
-            page_lines = [TorchInferenceLine(line_id=k, img_tensor=v, img_height=self.img_height, chunk_width=self.chunk_width)
-                          for k, v in page_lines.items()]
+            page_lines = [img_tensor[l.ymin:l.ymax, l.xmin:l.xmax].clone() for l in line_boxes]
+            page_lines = [TorchInferenceLine(img_tensor=v, img_height=self.img_height, chunk_width=self.chunk_width, chunk_overlap=self.chunk_overlap)
+                          for v in page_lines]
 
             for ocr_line in page_lines:
 
@@ -387,8 +380,8 @@ class TorchBatchedTrainingDataset(torch.utils.data.Dataset):
                  cache_dir: Optional[Path] = None,
                  num_workers: int = 1,
                  epoch_steps_run_per_worker: int = 0,
-                 chars_to_special_classes: Dict[str, str] = None,  # Todo this can be removed after first run
-                 classes_to_indices: Dict[str, int] = None,  # Todo this can be removed after first run
+                 chars_to_special_classes: Dict[str, str] = None,  # Todo 👁️ this can be removed after first run
+                 classes_to_indices: Dict[str, int] = None,  # Todo 👁️ this can be removed after first run
                  drop_remainding_batches: bool = False):
         """A dataset that loads batches of ocr data from disk.
 
@@ -437,7 +430,8 @@ class TorchBatchedTrainingDataset(torch.utils.data.Dataset):
 
     def fetch_and_cache_batch(self, idx):
         batch = self.fetch_batch(idx)
-        batch.change_texts(chars_to_special_classes=self.chars_to_special_classes, classes_to_indices=self.classes_to_indices)  # Todo: this is a hack
+        batch.change_texts(chars_to_special_classes=self.chars_to_special_classes,
+                           classes_to_indices=self.classes_to_indices)  # Todo👁️: this is a hack
         torch.save(batch.to_dict(), self.cache_dir / self.batch_paths[idx].name)
         return batch
 
@@ -602,7 +596,6 @@ def chunk_img_tensor(img_tensor: torch.Tensor,
     return torch.stack(chunks, dim=0)
 
 
-
 # #@profile
 def prepare_img_tensor(img_tensor: torch.Tensor,
                        img_height: int) -> torch.Tensor:
@@ -639,7 +632,8 @@ def recompose_chunks(chunks: torch.Tensor,
     Returns:
         The reassembled tensor, in shape (width, height).
     """
-
+    if len(chunks) == 1:
+        return chunks[0]
     # take the first chunk, remove the overlap
     reassembled = chunks[0][:-int(chunk_overlap / 2), :].squeeze(0)
     for i in range(1, len(chunks)):
@@ -736,7 +730,7 @@ def pre_batch_filelist(filelist: List[Path],
         last_file_index = 0
 
     # Start the main for loop to create the batches
-    # Todo: this should be done using an ``TorchTrainingDataset``
+    # Todo👁️: this should be done using an ``TorchTrainingDataset``
     batch_size = 0
     ocr_lines = []
 
@@ -793,7 +787,7 @@ def pre_batch_dataset(config: dict,
             last_file_index = 0
 
         # Start the main for loop to create the batches
-        # Todo: this should be done using an ``TorchTrainingDataset``
+        # Todo👁️: this should be done using an ``TorchTrainingDataset``
         batch_size = 0
         ocr_lines = []
 
