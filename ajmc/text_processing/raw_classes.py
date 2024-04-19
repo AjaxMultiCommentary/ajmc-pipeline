@@ -419,12 +419,14 @@ class RawPage(Page, TextContainer):
                 annotations = cas_utils.safe_import_page_annotations(self.id, cas, rebuild,
                                                                      vs.ANNOTATION_LAYERS[children_type])
 
-                if children_type == 'entities':
-                    return [RawEntity.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
-                elif children_type == 'sentences':
-                    return [RawSentence.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
-                elif children_type == 'hyphenations':
-                    return [RawHyphenation.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
+                child_class = {'entities': RawEntity, 'sentences': RawSentence, 'hyphenations': RawHyphenation}[children_type]
+                children = []
+                for cas_ann in annotations:
+                    child = child_class.from_cas_annotation(self, cas_ann, rebuild)
+                    if not child.warnings:
+                        children.append(child)
+                return children
+
             else:
                 return []
 
@@ -438,12 +440,16 @@ class RawPage(Page, TextContainer):
             cas = cas_utils.import_page_cas(self.id, children_type)
 
             if cas is not None:
-                annotations = cas_utils.safe_import_page_annotations(page_id=self.id,
-                                                                     cas=cas,
-                                                                     rebuild=rebuild,
+                annotations = cas_utils.safe_import_page_annotations(page_id=self.id, cas=cas, rebuild=rebuild,
                                                                      annotation_layer=vs.ANNOTATION_LAYERS[children_type])
 
-                return [RawLemma.from_cas_annotation(self, cas_ann, rebuild) for cas_ann in annotations]
+                children = []
+                for cas_ann in annotations:
+                    child = RawLemma.from_cas_annotation(self, cas_ann, rebuild)
+                    if not child.warnings:
+                        children.append(child)
+
+                return children
 
             else:
                 return []
