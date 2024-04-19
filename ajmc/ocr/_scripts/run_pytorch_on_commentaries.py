@@ -11,7 +11,7 @@ from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.ocr.pytorch import data_processing as dp
 from ajmc.ocr.pytorch.config import get_config
 from ajmc.ocr.pytorch.model import OcrTorchModel
-from ajmc.ocr.pytorch.word_offsets_detection import get_word_boxes_by_projection, get_word_boxes_by_dilation, get_word_boxes_brute_force
+from ajmc.ocr.pytorch.word_boxes_detection import get_word_boxes_by_projection, get_word_boxes_by_dilation, get_word_boxes_brute_force
 
 logger = get_ajmc_logger(__name__)
 MODEL_DIR = Path('/scratch/sven/withbackbone_v2')

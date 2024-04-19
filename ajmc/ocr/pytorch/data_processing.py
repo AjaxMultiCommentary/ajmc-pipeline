@@ -1,4 +1,4 @@
-# TODO : revise the docs
+# TODO 👁️: revise the docs
 import os
 import random
 from abc import abstractmethod
@@ -380,8 +380,8 @@ class TorchBatchedTrainingDataset(torch.utils.data.Dataset):
                  cache_dir: Optional[Path] = None,
                  num_workers: int = 1,
                  epoch_steps_run_per_worker: int = 0,
-                 chars_to_special_classes: Dict[str, str] = None,  # Todo this can be removed after first run
-                 classes_to_indices: Dict[str, int] = None,  # Todo this can be removed after first run
+                 chars_to_special_classes: Dict[str, str] = None,  # Todo 👁️ this can be removed after first run
+                 classes_to_indices: Dict[str, int] = None,  # Todo 👁️ this can be removed after first run
                  drop_remainding_batches: bool = False):
         """A dataset that loads batches of ocr data from disk.
 
@@ -430,7 +430,8 @@ class TorchBatchedTrainingDataset(torch.utils.data.Dataset):
 
     def fetch_and_cache_batch(self, idx):
         batch = self.fetch_batch(idx)
-        batch.change_texts(chars_to_special_classes=self.chars_to_special_classes, classes_to_indices=self.classes_to_indices)  # Todo: this is a hack
+        batch.change_texts(chars_to_special_classes=self.chars_to_special_classes,
+                           classes_to_indices=self.classes_to_indices)  # Todo👁️: this is a hack
         torch.save(batch.to_dict(), self.cache_dir / self.batch_paths[idx].name)
         return batch
 
@@ -729,7 +730,7 @@ def pre_batch_filelist(filelist: List[Path],
         last_file_index = 0
 
     # Start the main for loop to create the batches
-    # Todo: this should be done using an ``TorchTrainingDataset``
+    # Todo👁️: this should be done using an ``TorchTrainingDataset``
     batch_size = 0
     ocr_lines = []
 
@@ -786,7 +787,7 @@ def pre_batch_dataset(config: dict,
             last_file_index = 0
 
         # Start the main for loop to create the batches
-        # Todo: this should be done using an ``TorchTrainingDataset``
+        # Todo👁️: this should be done using an ``TorchTrainingDataset``
         batch_size = 0
         ocr_lines = []
 

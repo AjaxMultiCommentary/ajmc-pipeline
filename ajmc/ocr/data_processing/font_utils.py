@@ -1,12 +1,12 @@
 from pathlib import Path
-from typing import Dict, Iterable, Optional
+from typing import Dict, Iterable, Optional, List
 
 import pandas as pd
 from fontTools.ttLib import TTFont, TTCollection
 from lazy_objects.lazy_objects import lazy_property
 from PIL import ImageFont
 
-from ajmc.commons import unicode_utils
+from ajmc.commons import unicode_utils, variables as vs
 
 
 def walk_through_font_dir(font_dir: Path):
@@ -219,3 +219,30 @@ def get_missing_glyphs_table(chars_to_test: str,
         df.to_excel((fonts_dir.parent / 'glyphs/fonts_glyphs.xlsx'), index=False, encoding='utf-8')
 
     return df, all_missing_chars
+
+
+def get_fallback_fonts() -> List[Font]:
+    """Returns a list of fallback fonts."""
+    global FALLBACK_FONTS
+    if FALLBACK_FONTS is None:
+        FALLBACK_FONTS = [Font(vs.FONTS_DIR / 'NotoSans-Regular.ttf'),
+                          Font(vs.FONTS_DIR / 'Cardo-Regular.ttf')]
+    return FALLBACK_FONTS
+
+
+FALLBACK_FONTS = None
+
+
+def get_default_fonts() -> Dict[str, Font]:
+    global DEFAULT_FONTS
+    if DEFAULT_FONTS is None:
+        greek_font = Font(vs.PACKAGE_DIR / 'data/fonts/fonts/Porson-Regular.otf')
+        latin_font = Font(vs.PACKAGE_DIR / 'data/fonts/fonts/TimesNewRoman-Regular.ttf')
+        DEFAULT_FONTS = {'latin': latin_font,
+                         'greek': greek_font,
+                         'numeral': latin_font,
+                         'punctuation': latin_font}
+    return DEFAULT_FONTS
+
+
+DEFAULT_FONTS = None

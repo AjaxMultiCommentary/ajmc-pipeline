@@ -10,7 +10,7 @@ import unicodedata
 from PIL import Image, ImageDraw, ImageOps
 from tqdm import tqdm
 
-from ajmc.commons import unicode_utils
+from ajmc.commons import unicode_utils, variables as vs
 from ajmc.commons.file_management import int_to_x_based_code
 from ajmc.commons.miscellaneous import get_ajmc_logger
 from ajmc.commons.unicode_utils import get_char_charset
@@ -24,7 +24,7 @@ def draw_textline(textline: str,
                   fonts: Dict[str, Font],
                   fallback_fonts: List[Font],
                   target_height: int,
-                  font_variants: List[str],
+                  font_variants: Optional[List[str]] = None,
                   kerning: int = 0,
                   default_charset: str = 'latin',
                   output_file: Optional[Path] = None,
@@ -51,9 +51,12 @@ def draw_textline(textline: str,
         show_image (bool): Whether to show the image.
     """
 
+
     # Set default values
     upscale_factor = 3
     kerning *= upscale_factor
+    if font_variants is None:
+        font_variants = ['Regular'] * len(textline)
 
     # Get the drawboard height
     drawboard_height: int = target_height * upscale_factor
@@ -610,8 +613,7 @@ if __name__ == '__main__':
     # BASE_OUTPUT_DIR = Path('/Users/sven/Desktop/coucou')
     BASE_OUTPUT_DIR = Path('/scratch/sven/ocr_exp/source_datasets/artificial_data')
 
-    FONTS_DIR = Path('./data/fonts/fonts')
-    FONTS = [Font(font_path, font_variant='Regular') for font_path in walk_through_font_dir(FONTS_DIR)]
+    FONTS = [Font(font_path, font_variant='Regular') for font_path in walk_through_font_dir(vs.FONTS_DIR)]
 
     GREEK_CAPITAL_FONTS_NAMES = ["GFSIgnacio-Regular.otf",
                                  "GFSGaraldus-Regular.otf",
