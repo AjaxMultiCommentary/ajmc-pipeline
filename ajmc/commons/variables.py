@@ -34,6 +34,7 @@ COMMS_DATA_DIR = AJMC_DATA_DIR / 'commentaries_data'
 NE_CORPUS_DIR = AJMC_DATA_DIR / 'AjMC-NE-corpus'
 LEMLINK_CORPUS_DIR = AJMC_DATA_DIR / 'lemma-linkage-corpus'
 LEMLINK_XMI_DIR = LEMLINK_CORPUS_DIR / 'data/preparation/corpus/annotated'
+FONTS_DIR = PACKAGE_DIR / 'data/fonts/fonts'
 
 # RELATIVE PATHS
 COMM_IMG_REL_DIR = Path('images/png')
@@ -107,8 +108,13 @@ def get_comm_ocr_outputs_dir(comm_id: str, ocr_run_id: str) -> Path:
     return get_comm_ocr_runs_dir(comm_id) / get_ocr_run_id_from_pattern(comm_id, ocr_run_id) / 'outputs'
 
 
-def get_comm_canonical_path_from_ocr_run_id(comm_id: str, ocr_run_pattern: str) -> Path:
-    return get_comm_canonical_dir(comm_id) / f'{get_ocr_run_id_from_pattern(comm_id, ocr_run_pattern)}.json'
+def get_comm_canonical_path_from_ocr_run_pattern(comm_id: str, ocr_run_pattern: str) -> Path:
+    if not ocr_run_pattern.endswith('.json'):
+        ocr_run_pattern += '.json'
+    try:
+        return next(get_comm_canonical_dir(comm_id).glob(ocr_run_pattern))
+    except StopIteration:
+        raise FileNotFoundError(f'No canonical found for comm_id={comm_id} and ocr_run_pattern={ocr_run_pattern}')
 
 
 def get_comm_sections_path(comm_id: str) -> Path:
@@ -504,5 +510,5 @@ REGION_TYPES_TO_COLORS = {l: c for l, c in zip(ORDERED_OLR_REGION_TYPES,
 PARAMETERS = {
     'ocr_region_inclusion_threshold': 0.7,
     'words_line_inclusion_threshold': 0.7,
-    'entity_inclusion_threshold': 0.8,
+    'word_annotation_inclusion_threshold': 0.80,
 }

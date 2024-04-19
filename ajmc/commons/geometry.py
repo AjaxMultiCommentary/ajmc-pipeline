@@ -264,7 +264,8 @@ def are_bboxes_overlapping_with_threshold(bbox1: variables.BoxType,
 
 @docstring_formatter(**docstrings)
 def adjust_bbox_to_included_contours(bbox: variables.BoxType,
-                                     contours: List[Shape]) -> Shape:
+                                     contours: List[Shape],
+                                     exclude_vertically_expanding_contours: bool = True) -> Shape:
     """Finds the contours included in ``bbox`` and returns a shape objects that minimally contains them.
 
     Note:
@@ -276,10 +277,13 @@ def adjust_bbox_to_included_contours(bbox: variables.BoxType,
         contours: A list of included contours
     """
 
-    included_contours = [c for c in contours
-                         if are_bboxes_overlapping(c.bbox, bbox)
-                         and not (c.bbox[0][1] < bbox[0][1]
-                                  or c.bbox[1][1] > bbox[1][1])]
+    if exclude_vertically_expanding_contours:
+        included_contours = [c for c in contours
+                             if are_bboxes_overlapping(c.bbox, bbox)
+                             and not (c.bbox[0][1] < bbox[0][1]
+                                      or c.bbox[1][1] > bbox[1][1])]
+    else:
+        included_contours = [c for c in contours if are_bboxes_overlapping(c.bbox, bbox)]
 
     if included_contours:  # If we find included contours, readjust the bounding box
         return Shape([xy for c in included_contours for xy in c.bbox])

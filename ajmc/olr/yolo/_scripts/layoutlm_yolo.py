@@ -3,13 +3,7 @@ from collections import Counter
 
 import numpy as np
 import pandas as pd
-from
-
-
-@
-
-
-import MetricBuilder
+from mean_average_precision import MetricBuilder
 from transformers import LayoutLMv3FeatureExtractor, LayoutLMv3ForTokenClassification, LayoutLMv3TokenizerFast, \
     RobertaForTokenClassification, RobertaTokenizerFast
 

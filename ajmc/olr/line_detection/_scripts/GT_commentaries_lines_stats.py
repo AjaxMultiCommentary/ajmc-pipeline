@@ -31,7 +31,7 @@ df = pd.DataFrame.from_dict({'Commentary': [p.split('_')[0] for p in lines.keys(
 #Create a new dataframe with the number of lines and pages per commentary
 df = df.groupby('Commentary').agg({'Lines': 'sum', 'Pages': 'nunique'}).sort_values('Commentary')
 
-df['public_domain'] = ['Public domain' if c in vs.PD_COMM_IDS else 'In copyright' for c in df.index]
+df['public_domain'] = ['Public domain' if c in vs.PD_COMM_IDS else 'Copyright' for c in df.index]
 
 # Set a multiindex with the public domain column
 df.set_index('public_domain', append=True, inplace=True)
@@ -48,11 +48,11 @@ df.sort_index(inplace=True)
 #%%
 # Separate the df in two, one for public domain and one for non public domain
 df_pd = df.loc['Public domain']
-df_npd = df.loc['In copyright']
+df_npd = df.loc['Copyright']
 
 # Give the dataframes a multiindex with the public domain column
 df_pd.index = pd.MultiIndex.from_tuples([('Public domain', c) for c in df_pd.index], names=['', 'Commentary'])
-df_npd.index = pd.MultiIndex.from_tuples([('In copyright', c) for c in df_npd.index], names=['', 'Commentary'])
+df_npd.index = pd.MultiIndex.from_tuples([('Copyright', c) for c in df_npd.index], names=['', 'Commentary'])
 
 # Add a row with the total number of lines and pages for each dataframe
 total_pd = pd.DataFrame({
@@ -70,8 +70,8 @@ total_npd = pd.DataFrame({
     "Lines": [df_npd["Lines"].sum()]
 })
 
-total_npd.index = pd.MultiIndex.from_tuples([('In copyright', 'Total')], names=['', 'Commentary'])
-# total_npd.index = ['In copyright']
+total_npd.index = pd.MultiIndex.from_tuples([('Copyright', 'Total')], names=['', 'Commentary'])
+# total_npd.index = ['Copyright']
 
 df_pd = pd.concat([df_pd, total_pd])
 df_npd = pd.concat([df_npd, total_npd])
