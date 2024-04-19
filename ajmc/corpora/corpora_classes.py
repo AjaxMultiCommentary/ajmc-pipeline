@@ -210,3 +210,27 @@ class LogeionCorpus(Corpus):
             dict_ = json.loads(file.read_text(encoding='utf-8'))
             lexica[file.stem] = dict_
         return lexica
+
+
+class EpibauCorpus(Corpus):
+
+    def __init__(self, corpus_id: str = 'EpibauCorpus'):
+        super().__init__(corpus_id)
+
+    @property
+    def data_dir(self) -> Path:
+        return self.root_dir / 'data/release/v0.3/'
+
+    @property
+    def files(self) -> typing.List[Path]:
+        return [p for p in self.data_dir.rglob('*.tsv') if 'masked' not in p.name]
+
+
+    def get_plain_text(self) -> str:
+        if (self.root_dir / 'plaintext.txt').exists():
+            return (self.root_dir / 'plaintext.txt').read_text(encoding='utf-8')
+        text = ''
+        for file in self.files:
+            text += ' '.join([l.split('\t')[0] for l in file.read_text(encoding='utf-8').splitlines()[1:]])
+        (self.root_dir / 'plaintext.txt').write_text(text, encoding='utf-8')
+        return text
