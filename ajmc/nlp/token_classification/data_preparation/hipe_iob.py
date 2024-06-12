@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List, Optional
 
 import torch
@@ -41,14 +42,14 @@ class HipeDataset(torch.utils.data.Dataset):
 def prepare_datasets(config: 'argparse.Namespace', tokenizer):
     data = {}
     for split in ['train', 'eval']:
-        if config[split + '_path'] or config[split + '_url']:
-            data[split] = tsv_to_dict(path=config[split + '_path'], url=config[split + '_url'])
+        if getattr(config, split + '_path') or getattr(config, split + '_url'):
+            data[split] = tsv_to_dict(path=getattr(config, split + '_path'), url=getattr(config, split + '_url'))
 
-    config['unique_labels'] = sort_ner_labels(
-        get_unique_elements([data[k][config['labels_column']] for k in data.keys()]))
-    config['labels_to_ids'] = {label: i for i, label in enumerate(config['unique_labels'])}
-    config['ids_to_labels'] = {id: tag for tag, id in config['labels_to_ids'].items()}
-    config['num_labels'] = len(config['unique_labels'])
+    config.unique_labels = sort_ner_labels(
+            get_unique_elements([data[k][config.labels_column] for k in data.keys()]))
+    config.labels_to_ids = {label: i for i, label in enumerate(config.unique_labels)}
+    config.ids_to_labels = {id: tag for tag, id in config.labels_to_ids.items()}
+    config.num_labels = len(config.unique_labels)
 
     for split in data.keys():
         data[split]['batchencoding'] = tokenizer(data[split]['TOKEN'],
@@ -57,8 +58,8 @@ def prepare_datasets(config: 'argparse.Namespace', tokenizer):
                                                  is_split_into_words=True,
                                                  return_overflowing_tokens=True)
 
-        data[split]['labels'] = [align_labels_to_tokenized(e.word_ids, data[split][config['labels_column']],
-                                                           config['labels_to_ids'])
+        data[split]['labels'] = [align_labels_to_tokenized(e.word_ids, data[split][config.labels_column],
+                                                           config.labels_to_ids)
                                  for e in data[split]['batchencoding'].encodings]
 
         data[split]['words'] = [align_to_tokenized(e.word_ids, data[split]['TOKEN']) for e in
@@ -77,9 +78,9 @@ def prepare_datasets(config: 'argparse.Namespace', tokenizer):
     return datasets
 
 
-def create_prediction_dataset(tokenizer, path: Optional[str] = None, url: Optional[str] = None):
+def create_prediction_dataset(tokenizer, path: Optional[Path] = None, url: Optional[str] = None):
     """Creates a ``HipeDataset`` for prediction (i.e. without labels) from a ``path`` or an ``url``."""
-    data = tsv_to_dict(path=path, url=url)
+    data = tsv_to_dict(path=str(path), url=url)
     data['batchencoding'] = tokenizer(data['TOKEN'],
                                       padding=True,
                                       truncation=True,
