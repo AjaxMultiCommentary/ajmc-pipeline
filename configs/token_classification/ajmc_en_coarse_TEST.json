@@ -1,0 +1,19 @@
+{
+  "train_url": "https://raw.githubusercontent.com/hipe-eval/HIPE-2022-data/main/data/v2.1/ajmc/en/HIPE-2022-v2.1-ajmc-train-en.tsv",
+  "eval_url": "https://raw.githubusercontent.com/hipe-eval/HIPE-2022-data/main/data/v2.1/ajmc/en/HIPE-2022-v2.1-ajmc-dev-en.tsv",
+  "output_dir": "/scratch/sven/token_classification_testing_DELOK",
+  "hipe_script_path": "/scratch/sven/packages/HIPE-scorer/clef_evaluation.py",
+  "labels_column": "NE-COARSE-LIT",
+  "model_name_or_path": "xlm-roberta-base",
+  "do_train": true,
+  "overwrite_outputs": true,
+  "do_predict": true,
+  "device_name": "cuda:1",
+  "epochs": 2,
+  "predict_urls": [
+    "https://raw.githubusercontent.com/hipe-eval/HIPE-2022-data/main/data/v2.1/ajmc/en/HIPE-2022-v2.1-ajmc-dev-en.tsv",
+    "https://raw.githubusercontent.com/hipe-eval/HIPE-2022-data/main/data/v2.1/ajmc/en/HIPE-2022-v2.1-ajmc-test-allmasked-en.tsv"
+  ],
+  "evaluate_during_training": true,
+  "do_debug": true
+}

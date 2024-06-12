@@ -49,8 +49,9 @@ def draw_textline(textline: str,
         default_charset (str): The default font to use when a character doesn't belong to any charset.
         output_file (Path): The path to save the image to.
         show_image (bool): Whether to show the image.
+        return_chars_offsets (bool): Whether to return the x offsets of each character.
+        raise_if_unprintable_char (bool): Whether to raise an error if a character can't be printed.
     """
-
 
     # Set default values
     upscale_factor = 3

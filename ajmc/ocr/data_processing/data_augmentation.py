@@ -199,7 +199,7 @@ def random_augment_line(img_path: Path,
 
 
 def augment_img_dir(img_dir: Path, output_dir: Path):
-    for image_path in tqdm(img_dir.glob('*.png')):
+    for image_path in tqdm(img_dir.glob('*en.png')):
         random_augment_line(image_path, output_dir)
         random_augment_line(image_path, output_dir)
 

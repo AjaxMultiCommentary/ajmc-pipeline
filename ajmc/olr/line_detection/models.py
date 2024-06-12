@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 import cv2
-import easyocr
 from kraken import blla, pageseg, binarization
 from kraken.lib import vgsl
 from PIL import Image
@@ -52,6 +51,7 @@ class LineDetectionModel:
 class EasyOCRModel(LineDetectionModel):
 
     def __init__(self, languages=['en']):
+        import easyocr
         super().__init__()
         self.reader = easyocr.Reader(languages)
 
