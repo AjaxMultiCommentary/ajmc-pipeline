@@ -363,7 +363,7 @@ def get_metadata_spreadsheet() -> pd.DataFrame:
 _NER_SPREADSHEET = None
 
 
-def get_metadata_spreadsheet() -> pd.DataFrame:
+def get_ner_spreadsheet() -> pd.DataFrame:
     """Returns the metadata spreadsheet as a ``pd.DataFrame``."""
 
     global _NER_SPREADSHEET
@@ -375,7 +375,7 @@ def get_metadata_spreadsheet() -> pd.DataFrame:
 _LEMLINK_SPREADSHEET = None
 
 
-def get_metadata_spreadsheet() -> pd.DataFrame:
+def get_lemlink_spreadsheet() -> pd.DataFrame:
     """Returns the metadata spreadsheet as a ``pd.DataFrame``."""
 
     global _LEMLINK_SPREADSHEET
