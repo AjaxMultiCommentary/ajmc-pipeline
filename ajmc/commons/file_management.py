@@ -360,6 +360,29 @@ def get_metadata_spreadsheet() -> pd.DataFrame:
     return _METADATA_SPREADSHEET
 
 
+_NER_SPREADSHEET = None
+
+
+def get_metadata_spreadsheet() -> pd.DataFrame:
+    """Returns the metadata spreadsheet as a ``pd.DataFrame``."""
+
+    global _NER_SPREADSHEET
+    if _NER_SPREADSHEET is None:
+        _NER_SPREADSHEET = read_google_sheet(vs.SPREADSHEETS['ner_gt'], 'documents')
+    return _NER_SPREADSHEET
+
+
+_LEMLINK_SPREADSHEET = None
+
+
+def get_metadata_spreadsheet() -> pd.DataFrame:
+    """Returns the metadata spreadsheet as a ``pd.DataFrame``."""
+
+    global _LEMLINK_SPREADSHEET
+    if _LEMLINK_SPREADSHEET is None:
+        _LEMLINK_SPREADSHEET = read_google_sheet(vs.SPREADSHEETS['lemlink_gt'], 'lemma_linkage_groundtruth')
+    return _LEMLINK_SPREADSHEET
+
 def get_commit_hash(dir_: Path) -> str:
     """Returns the commit hash of a directory."""
     return subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=dir_).decode().strip()
