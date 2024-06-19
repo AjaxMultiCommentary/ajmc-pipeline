@@ -125,7 +125,8 @@ def get_comm_sections_path(comm_id: str) -> Path:
 SPREADSHEETS = {
     'metadata': '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE',
     'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito',
-    'ocr_gt': '1RsJQTgM4oO-ds0cK3rstx-iBxsvxjwCSVRWS63NvQrQ'
+    'ocr_gt': '1RsJQTgM4oO-ds0cK3rstx-iBxsvxjwCSVRWS63NvQrQ',
+    'lemlink': '1xBnJFYjQ4DwVHYzQVLVRrHflMtN54Sxo3N4qjET5x7Y'
 }
 
 # ======================================================================================================================
