@@ -43,3 +43,29 @@ print(ids_in_spreadsheet - ids_in_dir)
 # See the ids present in the directory but not in the spreadsheet
 print('ids in Git but not in spreadsheet')
 print(ids_in_dir - ids_in_spreadsheet)
+
+#%% We now split the lemlink spreadsheet in train and test sets
+
+# first inspect the dataset
+len(lemlink_spreadsheet[lemlink_spreadsheet['annotated'] == True])
+#%%
+from simple_splitter.split import split
+
+# Split the lemlink spreadsheet in train and test sets
+
+splits = split(splits=[('train', 0.70), ('test', 0.14), ('dev', 0.16)],
+               stratification_columns=[lemlink_spreadsheet['commentary_id'].to_list(),
+                                       lemlink_spreadsheet['license'].to_list(),
+                                       lemlink_spreadsheet['in_miniref'],
+                                       lemlink_spreadsheet['annotated']], )
+
+lemlink_spreadsheet['split'] = splits
+
+len(lemlink_spreadsheet[(lemlink_spreadsheet['split'] == 'train') & (lemlink_spreadsheet['annotated'] == True) & (
+        lemlink_spreadsheet['commentary_id'] == 'sophoclesplaysa05campgoog')])
+
+#%%
+
+for sp in splits:
+    print(sp)
+#%%

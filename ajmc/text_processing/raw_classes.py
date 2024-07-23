@@ -130,24 +130,24 @@ class RawCommentary(Commentary):
                 for ent in page.children.entities:
                     if ent.children.words:
                         children['entities'].append(
-                                CanonicalEntity(word_range=(ent.children.words[0].index, ent.children.words[-1].index),
-                                                commentary=can,
-                                                shifts=ent.shifts,
-                                                transcript=ent.transcript,
-                                                label=ent.label,
-                                                wikidata_id=ent.wikidata_id))
+                            CanonicalEntity(word_range=(ent.children.words[0].index, ent.children.words[-1].index),
+                                            commentary=can,
+                                            shifts=ent.shifts,
+                                            transcript=ent.transcript,
+                                            label=ent.label,
+                                            wikidata_id=ent.wikidata_id))
                     else:
                         print(f'WARNING: NO WORDS. {page.id} ent {ent.transcript}')  # Todo remove
                 # Adding sentences
                 for s in page.children.sentences:
                     if s.children.words:
                         children['sentences'].append(
-                                CanonicalSentence(word_range=(s.children.words[0].index, s.children.words[-1].index),
-                                                  commentary=can,
-                                                  shifts=s.shifts,
-                                                  corrupted=s.corrupted,
-                                                  incomplete_continuing=s.incomplete_continuing,
-                                                  incomplete_truncated=s.incomplete_truncated))
+                            CanonicalSentence(word_range=(s.children.words[0].index, s.children.words[-1].index),
+                                              commentary=can,
+                                              shifts=s.shifts,
+                                              corrupted=s.corrupted,
+                                              incomplete_continuing=s.incomplete_continuing,
+                                              incomplete_truncated=s.incomplete_truncated))
                     else:
                         print(f'WARNING: NO WORDS. {page.id} sentence')  # Todo remove
 
@@ -155,9 +155,9 @@ class RawCommentary(Commentary):
                 for h in page.children.hyphenations:
                     if h.children.words:
                         children['hyphenations'].append(
-                                CanonicalHyphenation(word_range=(h.children.words[0].index, h.children.words[-1].index),
-                                                     commentary=can,
-                                                     shifts=h.shifts))
+                            CanonicalHyphenation(word_range=(h.children.words[0].index, h.children.words[-1].index),
+                                                 commentary=can,
+                                                 shifts=h.shifts))
                     else:
                         print(f'WARNING: NO WORDS. {page.id} hyphen')  # Todo remove
 
@@ -177,10 +177,10 @@ class RawCommentary(Commentary):
 
             # Adding sections
             children['sections'].append(
-                    CanonicalSection(word_range=(section_start, w_count - 1),
-                                     commentary=can,
-                                     section_types=section.section_types,
-                                     section_title=section.section_title))
+                CanonicalSection(word_range=(section_start, w_count - 1),
+                                 commentary=can,
+                                 section_types=section.section_types,
+                                 section_title=section.section_title))
 
         # We now populate the children of the commentary
         can.children = LazyObject((lambda x: x), constrained_attrs=vs.CHILD_TYPES, **children)
@@ -238,7 +238,7 @@ class RawCommentary(Commentary):
         ocr_gt_partial_page_ids = []
         for p in self.via_project['_via_img_metadata'].values():
             if (any([vs.OCR_GT_PREFIX in r['region_attributes']['label'] for r in p['regions']])
-                    and Path(p['filename']).stem not in self.ocr_gt_page_ids):
+                and Path(p['filename']).stem not in self.ocr_gt_page_ids):
                 ocr_gt_partial_page_ids.append(Path(p['filename']).stem)
 
         return sorted(ocr_gt_partial_page_ids)
@@ -372,7 +372,7 @@ class RawPage(Page, TextContainer):
             regions = []
             for r in self.via_dict['regions']:
                 if (r['region_attributes']['label'].startswith(vs.OLR_PREFIX)
-                        and not any([t in r['region_attributes']['label'] for t in vs.EXCLUDED_REGION_TYPES])):
+                    and not any([t in r['region_attributes']['label'] for t in vs.EXCLUDED_REGION_TYPES])):
                     regions.append(RawRegion.from_via(via_dict=r, page=self))
             return regions
 
@@ -493,7 +493,7 @@ class RawPage(Page, TextContainer):
         schema = json.loads(schema_path.read_text('utf-8'))
         jsonschema.validate(instance=inception_dict, schema=schema)
         ((output_dir / self.id).with_suffix('.json')).write_text(
-                json.dumps(inception_dict, indent=4, ensure_ascii=False), encoding='utf-8')
+            json.dumps(inception_dict, indent=4, ensure_ascii=False), encoding='utf-8')
 
 
     def reset(self):
@@ -669,7 +669,7 @@ class RawPage(Page, TextContainer):
     def ocr_format(self) -> str:
         if self.ocr_path.suffix not in vs.OCR_OUTPUTS_EXTENSIONS:
             raise NotImplementedError(
-                    f'This OCR output format is not supported. Expecting {vs.OCR_OUTPUTS_EXTENSIONS} but found {self.ocr_path.suffix}.')
+                f'This OCR output format is not supported. Expecting {vs.OCR_OUTPUTS_EXTENSIONS} but found {self.ocr_path.suffix}.')
         return self.ocr_path.suffix[1:]
 
     @lazy_property
@@ -855,7 +855,7 @@ class RawAnnotation(TextContainer):
             if not children:
                 return [min(self.parents.page.children.words,
                             key=lambda w: (w.bbox.center[0] - self.bboxes[0].center[0]) ** 2 + 10 * (
-                                    w.bbox.center[1] - self.bboxes[0].center[1]) ** 2)]
+                                w.bbox.center[1] - self.bboxes[0].center[1]) ** 2)]
             else:
                 return children
         else:

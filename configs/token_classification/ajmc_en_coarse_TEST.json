@@ -1,19 +1,21 @@
 {
-  "train_url": "https://raw.githubusercontent.com/hipe-eval/HIPE-2022-data/main/data/v2.1/ajmc/en/HIPE-2022-v2.1-ajmc-train-en.tsv",
-  "eval_url": "https://raw.githubusercontent.com/hipe-eval/HIPE-2022-data/main/data/v2.1/ajmc/en/HIPE-2022-v2.1-ajmc-dev-en.tsv",
+  "train_path": "/scratch/sven/ajmc_data/AjMC-NE-corpus/data/release/v0.4/ajmc-v0.4-train-en.tsv",
+  "eval_path": "/scratch/sven/ajmc_data/AjMC-NE-corpus/data/release/v0.4/ajmc-v0.4-test-en.tsv",
   "output_dir": "/scratch/sven/token_classification_testing_DELOK",
-  "hipe_script_path": "/scratch/sven/packages/HIPE-scorer/clef_evaluation.py",
   "labels_column": "NE-COARSE-LIT",
-  "model_name_or_path": "xlm-roberta-base",
+  "model_name_or_path": "dbmdz/bert-base-historic-multilingual-cased",
+  "data_format": "ner",
   "do_train": true,
+  "do_seqeval": true,
   "overwrite_outputs": true,
-  "do_predict": true,
+  "do_predict": false,
   "device_name": "cuda:1",
-  "epochs": 2,
+  "epochs": 1,
+  "batch_size": 32,
   "predict_urls": [
     "https://raw.githubusercontent.com/hipe-eval/HIPE-2022-data/main/data/v2.1/ajmc/en/HIPE-2022-v2.1-ajmc-dev-en.tsv",
     "https://raw.githubusercontent.com/hipe-eval/HIPE-2022-data/main/data/v2.1/ajmc/en/HIPE-2022-v2.1-ajmc-test-allmasked-en.tsv"
   ],
   "evaluate_during_training": true,
-  "do_debug": true
+  "do_debug": false
 }

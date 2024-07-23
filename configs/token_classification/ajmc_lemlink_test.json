@@ -1,0 +1,15 @@
+{
+  "train_path": "/scratch/sven/ajmc_data/lemma-linkage-corpus/data/release/v1.0.alpha/lemlink-v1.0.alpha-train.tsv",
+  "eval_path": "/scratch/sven/ajmc_data/lemma-linkage-corpus/data/release/v1.0.alpha/lemlink-v1.0.alpha-test.tsv",
+  "output_dir": "/scratch/sven/token_classification_testing_DELOK",
+  "labels_column": "LABEL",
+  "model_name_or_path": "dbmdz/bert-base-historic-multilingual-cased",
+  "data_format": "lemlink",
+  "do_train": true,
+  "do_seqeval": true,
+  "overwrite_outputs": true,
+  "device_name": "cuda:1",
+  "epochs": 10,
+  "batch_size": 32,
+  "evaluate_during_training": true
+}

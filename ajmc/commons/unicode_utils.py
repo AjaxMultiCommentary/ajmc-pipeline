@@ -256,6 +256,11 @@ def get_char_charset(char: str, fallback: str = 'fallback') -> str:
         return fallback
 
 
+def get_string_charset(string: str, fallback: str = 'latin') -> str:
+    """Returns the charset of a string, if any, ``fallback`` otherwise."""
+    charsets = [get_char_charset(char, fallback=fallback) for char in string]
+    return max(set(charsets), key=charsets.count)
+
 def count_chars_by_charset(string: str, charset: str) -> int:
     """Counts the number of chars by unicode characters set.
 

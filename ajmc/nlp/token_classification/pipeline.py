@@ -5,14 +5,16 @@ It runs on a single GPU."""
 import random
 import time
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import pandas as pd
 import torch
 import transformers
 from torch.utils.data import DataLoader, RandomSampler
+from tqdm import tqdm
 
-from ajmc.commons.miscellaneous import get_ajmc_logger
+from ajmc.commons.miscellaneous import get_ajmc_logger, ROOT_LOGGER
 from ajmc.nlp.token_classification.config import AjmcNlpConfig
 from ajmc.nlp.token_classification.data_preparation.hipe_iob import prepare_datasets
 from ajmc.nlp.token_classification.evaluation import evaluate_dataset, seqeval_to_df, evaluate_hipe
@@ -87,10 +89,10 @@ def train(config: AjmcNlpConfig,
 
         loss_batches_list = []
         epoch_time = time.time()
+        model.train()
 
-        for step, batch in enumerate(train_dataloader):
+        for step, batch in tqdm(enumerate(train_dataloader), total=len(train_dataloader), desc=f"Training ep. {epoch_num}"):
 
-            model.train()
             inputs = {key: batch[key].to(config.device) for key in batch.keys()}
             outputs = model(**inputs)
             loss = outputs[0]  # model outputs are tuples in pytorch and transformers
@@ -113,6 +115,7 @@ def train(config: AjmcNlpConfig,
 
         # ============================ Evaluate and append during training ============================
         if config.evaluate_during_training:
+            model.eval()
             epoch_results = evaluate_dataset(dataset=eval_dataset,
                                              model=model,
                                              batch_size=config.batch_size,
@@ -136,7 +139,7 @@ def train(config: AjmcNlpConfig,
                 if config.do_save:
                     model.save_pretrained(config.model_save_dir)
                     tokenizer.save_pretrained(config.model_save_dir)
-                    torch.save(config.model_save_dir / "training_args.bin")
+                    torch.save(model.state_dict(), config.model_save_dir / "training_args.bin")
 
             else:
                 count_no_improvement += 1
@@ -157,14 +160,14 @@ def train(config: AjmcNlpConfig,
 
 def create_dirs(config: AjmcNlpConfig):
     # Create directories
-    config.output_dir.mkdir(exist_ok=config.overwrite_outputs)
-    config.model_save_dir.mkdir(exist_ok=config.overwrite_outputs)
-    config.predictions_dir.mkdir(exist_ok=config.overwrite_outputs)
-    config.seqeval_output_dir.mkdir(exist_ok=config.overwrite_outputs)
-    config.hipe_output_dir.mkdir(exist_ok=config.overwrite_outputs)
+    config.output_dir.mkdir(exist_ok=config.overwrite_outputs, parents=True)
+    config.model_save_dir.mkdir(exist_ok=config.overwrite_outputs, parents=True)
+    config.predictions_dir.mkdir(exist_ok=config.overwrite_outputs, parents=True)
+    config.seqeval_output_dir.mkdir(exist_ok=config.overwrite_outputs, parents=True)
+    config.hipe_output_dir.mkdir(exist_ok=config.overwrite_outputs, parents=True)
 
 
-def main(config_path: Path):
+def main(config_path: Optional[Path] = None, config_dict: Optional[dict] = None):
     """Main entrypoint.
 
     Args:
@@ -172,10 +175,14 @@ def main(config_path: Path):
     """
 
     # Create the config
-    config = AjmcNlpConfig.from_json(config_path)
+    if config_path is not None:
+        config = AjmcNlpConfig.from_json(config_path)
+    elif config_dict is not None:
+        config = AjmcNlpConfig.from_dict(config_dict)
+    else:
+        raise ValueError("Either config_path or config_dict must be provided.")
 
-    # Get the logger 
-    logger = get_ajmc_logger(__name__)
+    ROOT_LOGGER.setLevel("DEBUG" if config.do_debug else "INFO")
     logger.info(f"""Runing pipeline on {config.output_dir.name}""")
 
     create_dirs(config)
@@ -184,15 +191,15 @@ def main(config_path: Path):
     config.to_json(config.output_dir / 'config.json')
 
     # 👁️ change model_name_or_path to model_config ; make a double path on data
-    # tokenizer = transformers.AutoTokenizer.from_pretrained(config.model_name_or_path, add_prefix_space=True)  # for roberta exclusively
     tokenizer = transformers.AutoTokenizer.from_pretrained(config.model_name_or_path)
+    # Todo: move to config
+    if 'roberta' in config.model_name_or_path or config.model_name_or_path == 'bowphs/PhilBerta':
+        tokenizer = transformers.AutoTokenizer.from_pretrained(config.model_name_or_path, add_prefix_space=True)  # for roberta exclusively
 
     datasets = prepare_datasets(config, tokenizer)
 
     model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name_or_path,
-                                                                         num_labels=config.num_labels,
-                                                                         # This is defined in hipe_iob. not the best way
-                                                                         )
+                                                                         num_labels=config.num_labels)
 
     if config.do_train:
         train(config=config,
@@ -201,7 +208,7 @@ def main(config_path: Path):
               eval_dataset=datasets['eval'] if config.evaluate_during_training else None,
               tokenizer=tokenizer)
 
-    if config.do_eval:
+    if config.do_hipe_eval:
         evaluate_hipe(dataset=datasets['eval'],
                       model=model,
                       device=config.device,
@@ -212,6 +219,14 @@ def main(config_path: Path):
                       groundtruth_tsv_path=config.eval_path,
                       groundtruth_tsv_url=config.eval_url,
                       )
+
+    if config.do_seqeval:
+        seq_results = evaluate_dataset(dataset=datasets['eval'],
+                                       model=model,
+                                       batch_size=config.batch_size,
+                                       ids_to_labels=config.ids_to_labels)
+        seq_results = seqeval_to_df(seq_results)
+        seq_results.to_csv(config.seqeval_output_dir / 'final_results.tsv', sep='\t', index=False)
 
     if config.do_predict:
         for url in config.predict_urls:
@@ -228,4 +243,5 @@ def main(config_path: Path):
 if __name__ == '__main__':
     from ajmc.commons import variables as vs
 
-    main(config_path=vs.PACKAGE_DIR / 'configs/token_classification/ajmc_en_coarse_TEST.json')
+    # Todo ‼️ : change the path to the config file
+    main(config_path=vs.PACKAGE_DIR / 'configs/token_classification/ajmc_lemlink_test.json')

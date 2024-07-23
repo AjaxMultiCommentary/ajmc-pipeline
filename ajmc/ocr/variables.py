@@ -43,6 +43,7 @@ TESSTRAIN_DIR = Path('/Users/sven/packages/tesseract') if LOCAL else XP_DIR / 'l
 TESSDATA_DIR = Path('/Users/sven/packages/tesseract_/tessdata') if LOCAL else XP_DIR / 'lib/tessdata_best'
 LANGDATA_DIR = None if LOCAL else XP_DIR / 'lib/langdata_lstm'
 DICTIONARIES_DIR = XP_DIR / 'utils/dictionaries'
+POST_CORRECTION_DICTIONARIES_DIR = DICTIONARIES_DIR / 'post_correction_dicts'
 MODELS_DIR = XP_DIR / 'models'
 SOURCE_DATASETS_DIR = XP_DIR / 'source_datasets'
 DATASETS_DIR = XP_DIR / 'datasets'

@@ -6,7 +6,7 @@ import pandas as pd
 
 from ajmc.commons.file_management import get_62_based_datecode
 from ajmc.ocr import variables as ocr_vs
-from ajmc.ocr.config import CONFIGS
+from ajmc.ocr.tesseract.config import CONFIGS
 
 
 def reformulate_output_dir(output_dir: Path) -> pathlib.Path:

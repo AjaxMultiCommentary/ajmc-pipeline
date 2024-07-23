@@ -162,8 +162,8 @@ class CombinedModel(LineDetectionModel):
         self.split_lines = split_lines
 
     def predict(self, img_path: Optional[Path],
-                legacy_predictions: Optional[List[geom.Shape]],
-                blla_predictions: Optional[List[geom.Shape]]) -> List[geom.Shape]:
+                legacy_predictions: Optional[List[geom.Shape]] = None,
+                blla_predictions: Optional[List[geom.Shape]] = None) -> List[geom.Shape]:
         """Predicts the lines for the image at img_path using the legacy and BL/LLA models and returns the combined predictions.
 
         Args:

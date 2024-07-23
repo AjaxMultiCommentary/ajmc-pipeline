@@ -23,7 +23,7 @@ class AjmcNlpConfig:
     eval_path: Optional[Path] = None  # Absolute path to the tsv data file to evaluate on # Required: False
     eval_url: Optional[str] = None  # url to the tsv data file to evaluate on # Required: False
     output_dir: Optional[Path] = None  # Absolute path to the directory in which outputs are to be stored # Required: False
-    hipe_script_path: Optional[Path] = None  # The path the CLEF-HIPE-evaluation script. This parameter is required if ``do_eval``
+    hipe_script_path: Optional[Path] = None  # The path the CLEF-HIPE-evaluation script. This parameter is required if ``do_hipe_eval``
     config_path: Path = None  # The path to a config json file from which to extract config. Overwrites other specified config # Required: False
     predict_paths: List[Path] = field(default_factory=list)  # A list of tsv files to predict # Required: False
     predict_urls: List[str] = field(default_factory=list)  # A list of tsv files-urls to predict # Required: False
@@ -31,13 +31,16 @@ class AjmcNlpConfig:
     # ================ DATA RELATED ====================================================================================
     labels_column: Optional[str] = None  # Name of the tsv col to extract labels from # Required: False
     unknownify_tokens: bool = False  # Sets all tokens to '[UNK]'. Useful for ablation experiments. # Required: False
+    data_format: str = 'ner'  # The format of the data. 'ner' or 'lemlink' # Required: False
 
     # ================ MODEL INFO ======================================================================================
     model_name_or_path: Optional[Path] = None  # Absolute path to model directory  or HF model name (e.g. 'bert-base-cased') # Required: False
+    model_max_length: Optional[int] = None  # Maximum length of the input sequence # Required: False # Leave to None to default to model's
 
     # =================== ACTIONS ======================================================================================
     do_train: bool = False  # whether to train. Leave to false if you just want to evaluate
-    do_eval: bool = False  # Performs CLEF-HIPE evaluation, alone or at the end of training if ``do_train``.
+    do_hipe_eval: bool = False  # Performs CLEF-HIPE evaluation, alone or at the end of training if ``do_train``.
+    do_seqeval: bool = False  # Performs seqeval evaluation, alone or at the end of training if ``do_train``.
     do_predict: bool = False  # Predicts on ``predict_urls`` or/and ``predict_paths``
     do_save: bool = True  # Saves the model after training
     evaluate_during_training: bool = False  # Whether to evaluate during training.
@@ -73,9 +76,8 @@ class AjmcNlpConfig:
 
 
     @classmethod
-    def from_json(cls, path: Path) -> 'AjmcNlpConfig':
-        """Loads a config from a json file"""
-        config = json.loads(path.read_text(encoding='utf-8'))
+    def from_dict(cls, config: dict) -> 'AjmcNlpConfig':
+        """Creates a config from a dictionary"""
 
         # Convert paths to Path objects
         for k, v in config.items():
@@ -86,6 +88,12 @@ class AjmcNlpConfig:
             config['predict_paths'] = [Path(p) for p in config['predict_paths']]
 
         return cls(**config)
+
+    @classmethod
+    def from_json(cls, path: Path) -> 'AjmcNlpConfig':
+        """Loads a config from a json file"""
+        config = json.loads(path.read_text(encoding='utf-8'))
+        return cls.from_dict(**config)
 
     def to_json(self, path: Path):
         """Saves the config to a json file"""

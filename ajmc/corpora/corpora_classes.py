@@ -119,7 +119,7 @@ class PlainTextCorpus(Corpus):
 
     @property
     def files(self) -> typing.List[Path]:
-        return [self.data_dir / 'corpus_cleaned.txt']
+        return [self.root_dir / 'cleantext.txt']
 
     def get_plain_text(self) -> str:
         return self.files[0].read_text(encoding='utf-8')
@@ -175,7 +175,7 @@ class PdfCorpus(PlainTextCorpus):
                 total_text += text + '\n\n\n'
 
         print(f'{deleted} documents deleted')
-        (self.data_dir / 'corpus_cleaned.txt').write_text(total_text, encoding='utf-8')
+        (self.root_dir / 'cleantext.txt').write_text(total_text, encoding='utf-8')
 
 
 class BrillCorpus(PdfCorpus):
@@ -227,8 +227,8 @@ class TeiCorpus(Corpus):
         return list(self.data_dir.glob('*.xml'))
 
     def get_plain_text(self) -> str:
-        if (self.root_dir / 'plaintext.txt').exists():
-            return (self.root_dir / 'plaintext.txt').read_text(encoding='utf-8')
+        if (self.root_dir / 'cleantext.txt').exists():
+            return (self.root_dir / 'cleantext.txt').read_text(encoding='utf-8')
 
         full_text = ''
         for file in self.files:
@@ -236,7 +236,7 @@ class TeiCorpus(Corpus):
             for text in soup.find_all(re.compile(r'(?:tei:)?text')):
                 full_text += text.text + '\n\n\n'
 
-        (self.root_dir / 'plaintext.txt').write_text(full_text, encoding='utf-8')
+        (self.root_dir / 'cleantext.txt').write_text(full_text, encoding='utf-8')
         return full_text
 
 
@@ -270,12 +270,12 @@ class PerseusLegacyCorpus(Corpus):
 
 
     def get_plain_text(self) -> str:
-        if (self.root_dir / 'plaintext.txt').exists():
-            return (self.root_dir / 'plaintext.txt').read_text(encoding='utf-8')
+        if (self.root_dir / 'cleantext.txt').exists():
+            return (self.root_dir / 'cleantext.txt').read_text(encoding='utf-8')
 
         text = '\n\n\n'.join([self.read_document(file) for file in self.files])
         text = harmonise_linebreaks(text)
-        (self.root_dir / 'plaintext.txt').write_text(text, encoding='utf-8')
+        (self.root_dir / 'cleantext.txt').write_text(text, encoding='utf-8')
         return text
 
 
@@ -313,14 +313,14 @@ class LogeionCorpus(Corpus):
 
 
     def get_plain_text(self) -> str:
-        if (self.root_dir / 'plaintext.txt').exists():
-            return (self.root_dir / 'plaintext.txt').read_text(encoding='utf-8')
+        if (self.root_dir / 'cleantext.txt').exists():
+            return (self.root_dir / 'cleantext.txt').read_text(encoding='utf-8')
         text = ''
         for file in self.files:
             dict_ = json.loads(file.read_text(encoding='utf-8'))
             text += '\n'.join([v if v.endswith('.') else v + '.' for v in dict_.values()]) + '\n\n\n'
 
-        (self.root_dir / 'plaintext.txt').write_text(text, encoding='utf-8')
+        (self.root_dir / 'cleantext.txt').write_text(text, encoding='utf-8')
         return text
 
     def get_lexica(self) -> typing.Dict[str, typing.Dict[str, str]]:
@@ -346,10 +346,10 @@ class EpibauCorpus(Corpus):
 
 
     def get_plain_text(self) -> str:
-        if (self.root_dir / 'plaintext.txt').exists():
-            return (self.root_dir / 'plaintext.txt').read_text(encoding='utf-8')
+        if (self.root_dir / 'cleantext.txt').exists():
+            return (self.root_dir / 'cleantext.txt').read_text(encoding='utf-8')
         text = ''
         for file in self.files:
             text += ' '.join([l.split('\t')[0] for l in file.read_text(encoding='utf-8').splitlines()[1:]])
-        (self.root_dir / 'plaintext.txt').write_text(text, encoding='utf-8')
+        (self.root_dir / 'cleantext.txt').write_text(text, encoding='utf-8')
         return text
