@@ -190,16 +190,21 @@ def main(config_path: Optional[Path] = None, config_dict: Optional[dict] = None)
     # Save config
     config.to_json(config.output_dir / 'config.json')
 
-    # 👁️ change model_name_or_path to model_config ; make a double path on data
-    tokenizer = transformers.AutoTokenizer.from_pretrained(config.model_name_or_path)
+    tokenizer = transformers.AutoTokenizer.from_pretrained(config.model_name)
     # Todo: move to config
-    if 'roberta' in config.model_name_or_path or config.model_name_or_path == 'bowphs/PhilBerta':
-        tokenizer = transformers.AutoTokenizer.from_pretrained(config.model_name_or_path, add_prefix_space=True)  # for roberta exclusively
+    if 'roberta' in config.model_name or config.model_name == 'bowphs/PhilBerta':
+        tokenizer = transformers.AutoTokenizer.from_pretrained(config.model_name, add_prefix_space=True)  # for roberta exclusively
 
     datasets = prepare_datasets(config, tokenizer)
 
-    model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name_or_path,
-                                                                         num_labels=config.num_labels)
+    if not config.model_path:
+        model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name,
+                                                                             num_labels=config.num_labels)
+    else:
+        model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_path,
+                                                                             local_files_only=True,
+                                                                             config=transformers.AutoConfig.from_pretrained(config.model_name,
+                                                                                                                            num_labels=config.num_labels, ))
 
     if config.do_train:
         train(config=config,

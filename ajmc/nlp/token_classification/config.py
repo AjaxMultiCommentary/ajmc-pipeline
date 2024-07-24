@@ -34,7 +34,8 @@ class AjmcNlpConfig:
     data_format: str = 'ner'  # The format of the data. 'ner' or 'lemlink' # Required: False
 
     # ================ MODEL INFO ======================================================================================
-    model_name_or_path: Optional[Path] = None  # Absolute path to model directory  or HF model name (e.g. 'bert-base-cased') # Required: False
+    model_name: Optional[Path] = None  # Absolute path to model directory  or HF model name (e.g. 'bert-base-cased') # Required: False
+    model_path: Optional[Path] = None  # Absolute path to model directory # Required: False
     model_max_length: Optional[int] = None  # Maximum length of the input sequence # Required: False # Leave to None to default to model's
 
     # =================== ACTIONS ======================================================================================
@@ -81,7 +82,7 @@ class AjmcNlpConfig:
 
         # Convert paths to Path objects
         for k, v in config.items():
-            if (k.endswith('_path') or k.endswith('_dir')) and v is not None and k != 'model_name_or_path':  # Todo 👁️ fix this
+            if (k.endswith('_path') or k.endswith('_dir')) and v is not None and k != 'model_path':
                 config[k] = Path(v)
 
         if config.get('predict_paths', False):
