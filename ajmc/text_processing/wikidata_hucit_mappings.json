@@ -1,0 +1,1537 @@
+{
+    "http://www.wikidata.org/entity/Q123397": {
+        "wd_labels": [
+            "The Republic",
+            "La Repubblica",
+            "Republic",
+            "Plato's Republic",
+            "Plat. Rep.",
+            "Repubblica Platonica",
+            "Repubblica"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3611",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg030"
+    },
+    "http://www.wikidata.org/entity/Q1236228": {
+        "wd_labels": [
+            "Anabasis of Alexander",
+            "Anabasi di Alessandro",
+            "The Anabasis of Alexander",
+            "The Life of Alexander the Great",
+            "Arr. An.",
+            "Anabasis Alexandri"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2385",
+        "cts_urn": "urn:cts:greekLit:tlg0074.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q1230918": {
+        "wd_labels": [
+            "Miles gloriosus",
+            "Miles gloriosus",
+            "Pl. Mil.",
+            "Miles Gloriusus",
+            "Il soldato fanfarone",
+            "Il soldato spaccone"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1196",
+        "cts_urn": "urn:cts:latinLit:phi0119.phi012"
+    },
+    "http://www.wikidata.org/entity/Q35160": {
+        "wd_labels": [
+            "Odyssey",
+            "Odissea",
+            "the Odyssey",
+            "Homer's Odyssey",
+            "Hom. Od.",
+            "L'Odissea"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2816",
+        "cts_urn": "urn:cts:greekLit:tlg0012.tlg002"
+    },
+    "http://www.wikidata.org/entity/Q1233164": {
+        "wd_labels": [
+            "Eumenides",
+            "Le Eumenidi",
+            "The Eumenides",
+            "The Furies",
+            "The Kindly Ones",
+            "The Reconciliation",
+            "Aesch. Eum.",
+            "Eumenidi"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1462",
+        "cts_urn": "urn:cts:greekLit:tlg0085.tlg007"
+    },
+    "http://www.wikidata.org/entity/Q1415903": {
+        "wd_labels": [
+            "Philoctetes",
+            "Filottete",
+            "Soph. Phil."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3901",
+        "cts_urn": "urn:cts:greekLit:tlg0011.tlg006"
+    },
+    "http://www.wikidata.org/entity/Q241077": {
+        "wd_labels": [
+            "Antigone",
+            "Antigone",
+            "Soph. Ant."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3897",
+        "cts_urn": "urn:cts:greekLit:tlg0011.tlg002"
+    },
+    "http://www.wikidata.org/entity/Q1233835": {
+        "wd_labels": [
+            "Herakles",
+            "Eracle",
+            "Heracles Mad",
+            "Heracles",
+            "Hercules",
+            "Hercules Furens",
+            "The Madness of Herakles",
+            "Eur. Her.",
+            "Eracle furente",
+            "Ercole furioso"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2296",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg009"
+    },
+    "http://www.wikidata.org/entity/Q945342": {
+        "wd_labels": [
+            "Trachiniae",
+            "Le Trachinie",
+            "The Trachinian Maidens",
+            "Women of Trachis",
+            "Maidens of Trachis",
+            "The Maidens of Trachis",
+            "Trachinian Women",
+            "Soph. Trach.",
+            "Trachinie"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3902",
+        "cts_urn": "urn:cts:greekLit:tlg0011.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q3320792": {
+        "wd_labels": [
+            "Agamemnon",
+            "Agamennone",
+            "Aesch. Ag."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1459",
+        "cts_urn": "urn:cts:greekLit:tlg0085.tlg005"
+    },
+    "http://www.wikidata.org/entity/Q273668": {
+        "wd_labels": [
+            "Apology",
+            "Apologia di Socrate",
+            "The Apology of Socrates",
+            "Apology of Socrates",
+            "Plat. Apol.",
+            "Meleto",
+            "Apologia"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3583",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg002"
+    },
+    "http://www.wikidata.org/entity/Q846870": {
+        "wd_labels": [
+            "Prometheus Bound",
+            "Prometeo incatenato",
+            "Prometheus in Chains",
+            "Prometheus Chained",
+            "Prometheus Chain'd",
+            "Aesch. PB",
+            "Prometeo legato"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1464",
+        "cts_urn": "urn:cts:greekLit:tlg0085.tlg003"
+    },
+    "http://www.wikidata.org/entity/Q523227": {
+        "wd_labels": [
+            "Iphigenia in Tauris",
+            "Ifigenia in Tauride",
+            "Iphigenia among the Tauri",
+            "Iphigeneia in Taurica",
+            "Eur. IT"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2300",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg013"
+    },
+    "http://www.wikidata.org/entity/Q286381": {
+        "wd_labels": [
+            "Medea",
+            "Medea",
+            "Eur. Med."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2301",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg003"
+    },
+    "http://www.wikidata.org/entity/Q1115611": {
+        "wd_labels": [
+            "Hecuba",
+            "Ecuba",
+            "Eur. Hec."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2293",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg007"
+    },
+    "http://www.wikidata.org/entity/Q3411444": {
+        "wd_labels": [
+            "Pythian Odes",
+            "Pitiche",
+            "Pind. P."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3576",
+        "cts_urn": "urn:cts:greekLit:tlg0033.tlg002"
+    },
+    "http://www.wikidata.org/entity/Q733444": {
+        "wd_labels": [
+            "Electra",
+            "Elettra",
+            "Soph. El."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3898",
+        "cts_urn": "urn:cts:greekLit:tlg0011.tlg005"
+    },
+    "http://www.wikidata.org/entity/Q148643": {
+        "wd_labels": [
+            "Oedipus Rex",
+            "Edipo re",
+            "Oedipus the King",
+            "Soph. OT",
+            "Oedipus Tyrannus",
+            "Oidipous Tyrannus",
+            "Edipo tiranno"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3900",
+        "cts_urn": "urn:cts:greekLit:tlg0011.tlg004"
+    },
+    "http://www.wikidata.org/entity/Q934597": {
+        "wd_labels": [
+            "The Bacchae",
+            "Le Baccanti",
+            "The Bacchantes",
+            "The Bacch\u00e6",
+            "The Bacchanals",
+            "Bacchae",
+            "Bacchanals",
+            "Eur. Ba.",
+            "Bakkhai",
+            "Baccanti"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2288",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg017"
+    },
+    "http://www.wikidata.org/entity/Q1246408": {
+        "wd_labels": [
+            "Alcestis",
+            "Alcesti",
+            "Eur. Alc."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2286",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg002"
+    },
+    "http://www.wikidata.org/entity/Q1215817": {
+        "wd_labels": [
+            "The Knights",
+            "I cavalieri",
+            "Knights",
+            "The Demagogues",
+            "Aristoph. Kn.",
+            "Cavalieri"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1611",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg002"
+    },
+    "http://www.wikidata.org/entity/Q868447": {
+        "wd_labels": [
+            "The Clouds",
+            "Le nuvole",
+            "Clouds",
+            "Aristoph. Cl.",
+            "Nuvole"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1613",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg003"
+    },
+    "http://www.wikidata.org/entity/Q506546": {
+        "wd_labels": [
+            "Seven against Thebes",
+            "I sette contro Tebe",
+            "The Seven against Thebes",
+            "The Seven Chiefs against Thebes",
+            "The Seven Against Thebes",
+            "The Seven Who Fought Against Thebes",
+            "Aesch. Seven",
+            "I sette a Tebe",
+            "Sette a Tebe",
+            "Sette contro Tebe",
+            "Sette re di Tebe"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1465",
+        "cts_urn": "urn:cts:greekLit:tlg0085.tlg004"
+    },
+    "http://www.wikidata.org/entity/Q614607": {
+        "wd_labels": [
+            "Ion",
+            "Ione",
+            "Eur. Ion"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2298",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg010"
+    },
+    "http://www.wikidata.org/entity/Q943884": {
+        "wd_labels": [
+            "Odes",
+            "Odi",
+            "Horace. Carmina",
+            "Carmina (Odae)",
+            "Hor. Od.",
+            "Horace. Odes"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1052",
+        "cts_urn": "urn:cts:latinLit:phi0893.phi001"
+    },
+    "http://www.wikidata.org/entity/Q667285": {
+        "wd_labels": [
+            "Works and Days",
+            "Le opere e i giorni",
+            "Hes. WD"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2705",
+        "cts_urn": "urn:cts:greekLit:tlg0020.tlg002"
+    },
+    "http://www.wikidata.org/entity/Q156498": {
+        "wd_labels": [
+            "Theogony",
+            "Teogonia",
+            "Hes. Th.",
+            "La Teogonia"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2707",
+        "cts_urn": "urn:cts:greekLit:tlg0020.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q287323": {
+        "wd_labels": [
+            "Tristia",
+            "Tristia",
+            "Sorrows",
+            "Lamentations"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1163",
+        "cts_urn": "urn:cts:latinLit:phi0959.phi008"
+    },
+    "http://www.wikidata.org/entity/Q1145374": {
+        "wd_labels": [
+            "Cyropaedia",
+            "Ciropedia",
+            "Xen. Cyrop."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/4020",
+        "cts_urn": "urn:cts:greekLit:tlg0032.tlg007"
+    },
+    "http://www.wikidata.org/entity/Q27214182": {
+        "wd_labels": [
+            "Nemean Odes",
+            "Nemee",
+            "Pind. N."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3574",
+        "cts_urn": "urn:cts:greekLit:tlg0033.tlg003"
+    },
+    "http://www.wikidata.org/entity/Q375786": {
+        "wd_labels": [
+            "Hippolytus",
+            "Ippolito",
+            "Hippolytos",
+            "Eur. Hipp."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2297",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg005"
+    },
+    "http://www.wikidata.org/entity/Q11688406": {
+        "wd_labels": [
+            "The Libation Bearers",
+            "Le Coefore",
+            "The Choephori",
+            "Choephori",
+            "Libation-Bearers",
+            "The Libation-Pourers",
+            "The Mourners",
+            "Cho\u00ebphori",
+            "Choephoroe",
+            "The Choephor\u0153",
+            "The Choephor\u00e6",
+            "Aesch. Lib.",
+            "Le coefore",
+            "Coefore"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1460",
+        "cts_urn": "urn:cts:greekLit:tlg0085.tlg006"
+    },
+    "http://www.wikidata.org/entity/Q109562961": {
+        "wd_labels": [
+            "Protagoras"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3610",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg022"
+    },
+    "http://www.wikidata.org/entity/Q663886": {
+        "wd_labels": [
+            "Orestes",
+            "Oreste",
+            "Eur. Orest."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2302",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg016"
+    },
+    "http://www.wikidata.org/entity/Q540161": {
+        "wd_labels": [
+            "Electra",
+            "Elettra",
+            "Eur. El."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2290",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg012"
+    },
+    "http://www.wikidata.org/entity/Q1233660": {
+        "wd_labels": [
+            "The Phoenician Women",
+            "Le fenicie",
+            "Phoenissae",
+            "The Ph\u0153nician Maidens",
+            "The Ph\u0153nician Virgins",
+            "The Phoenician Maidens",
+            "Eur. Phoen.",
+            "Fenicie"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2303",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg015"
+    },
+    "http://www.wikidata.org/entity/Q1248812": {
+        "wd_labels": [
+            "Helen",
+            "Elena",
+            "Eur. Hel."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2294",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg014"
+    },
+    "http://www.wikidata.org/entity/Q667750": {
+        "wd_labels": [
+            "Rhesus",
+            "Reso",
+            "Rhesos",
+            "Eur. Rh."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2304",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg019"
+    },
+    "http://www.wikidata.org/entity/Q42191504": {
+        "wd_labels": [
+            "Institutiones grammaticae",
+            "Institutiones grammaticae",
+            "Institutio de arte grammatica"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/9048",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q311287": {
+        "wd_labels": [
+            "Lucius Accius",
+            "Lucio Accio",
+            "Accius",
+            "Accio"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q8275": {
+        "wd_labels": [
+            "Iliad",
+            "Iliade",
+            "the Iliad",
+            "Hom. Il."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2815",
+        "cts_urn": "urn:cts:greekLit:tlg0012.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q788458": {
+        "wd_labels": [
+            "The Persians",
+            "I Persiani",
+            "Persae",
+            "Persians",
+            "Aesch. Pers.",
+            "Persiani"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1463",
+        "cts_urn": "urn:cts:greekLit:tlg0085.tlg002"
+    },
+    "http://www.wikidata.org/entity/Q677997": {
+        "wd_labels": [
+            "Ars Poetica",
+            "Epistola ai Pisoni",
+            "The Art of Poetry",
+            "Epistula ad Pisones",
+            "On the Nature of Poetry",
+            "Hor. Ars",
+            "Ars Poetica",
+            "Epistula ad Pisones"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1057",
+        "cts_urn": "urn:cts:latinLit:phi0893.phi006"
+    },
+    "http://www.wikidata.org/entity/Q60220": {
+        "wd_labels": [
+            "Aeneid",
+            "Eneide",
+            "Aen\u0113is",
+            "Aeneis",
+            "Eneid",
+            "\u00c6neid",
+            "Verg. A.",
+            "Aeneis"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1413",
+        "cts_urn": "urn:cts:latinLit:phi0690.phi003"
+    },
+    "http://www.wikidata.org/entity/Q1896045": {
+        "wd_labels": [
+            "Rhetoric",
+            "Retorica",
+            "Aristot. Rh."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1664",
+        "cts_urn": "urn:cts:greekLit:tlg0086.tlg038"
+    },
+    "http://www.wikidata.org/entity/Q675210": {
+        "wd_labels": [
+            "Laelius de Amicitia",
+            "Laelius de amicitia",
+            "De Amicitia",
+            "On Friendship",
+            "Cic. Amic."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/916",
+        "cts_urn": "urn:cts:latinLit:phi0474.phi052"
+    },
+    "http://www.wikidata.org/entity/Q61678318": {
+        "wd_labels": [
+            "Hecuba",
+            "Hecuba"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q1035171": {
+        "wd_labels": [
+            "Captivi",
+            "Captivi",
+            "Pl. Capt.",
+            "I prigionieri"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1189",
+        "cts_urn": "rn:cts:latinLit:phi0119.phi005"
+    },
+    "http://www.wikidata.org/entity/Q294001": {
+        "wd_labels": [
+            "Oedipus at Colonus",
+            "Edipo a Colono",
+            "Oidipous at Colonos",
+            "Oedipus at Colonna",
+            "Oedipus on Kolonos",
+            "Oedipus at colonus",
+            "OEdipe a Colone",
+            "\u0152dipus Coloneus",
+            "Soph. OC",
+            "Edipo Coloneo"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3899",
+        "cts_urn": "urn:cts:greekLit:tlg0011.tlg007"
+    },
+    "http://www.wikidata.org/entity/Q512802": {
+        "wd_labels": [
+            "Andromache",
+            "Andromaca",
+            "Eur. Andr."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2287",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg006"
+    },
+    "http://www.wikidata.org/entity/Q3623430": {
+        "wd_labels": [
+            "Armorum iudicium",
+            "Il giudizio delle armi (Accio)"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q1233770": {
+        "wd_labels": [
+            "Iphigenia in Aulis",
+            "Ifigenia in Aulide",
+            "Iphigeneia at Aulis",
+            "Iphigenia at Aulis",
+            "Iphigeneia in Aulis",
+            "Eur. IA"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2299",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg018"
+    },
+    "http://www.wikidata.org/entity/Q1233645": {
+        "wd_labels": [
+            "Andria",
+            "Andria",
+            "Ter. An.",
+            "The Woman from Andros",
+            "Girl from Andros"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1342",
+        "cts_urn": "http://purl.org/hucit/kb/works/1342"
+    },
+    "http://www.wikidata.org/entity/Q412341": {
+        "wd_labels": [
+            "Ajax",
+            "Aiace",
+            "Aias",
+            "The Death of Ajax",
+            "Soph. Aj."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3896",
+        "cts_urn": "urn:cts:greekLit:tlg0011.tlg003"
+    },
+    "http://www.wikidata.org/entity/Q19175126": {
+        "wd_labels": [
+            "Isthmian Odes",
+            "Istmiche",
+            "Pind. I."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3573",
+        "cts_urn": "urn:cts:greekLit:tlg0033.tlg004"
+    },
+    "http://www.wikidata.org/entity/Q104871": {
+        "wd_labels": [
+            "A Midsummer Night's Dream",
+            "Sogno di una notte di mezza estate",
+            "A Mid\u017fommer nights Dreame"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q471715": {
+        "wd_labels": [
+            "Sophist",
+            "Sofista",
+            "Plat. Soph."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3612",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg007"
+    },
+    "http://www.wikidata.org/entity/Q752285": {
+        "wd_labels": [
+            "Laws",
+            "Leggi",
+            "Plat. Laws",
+            "Le leggi"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3600",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg034"
+    },
+    "http://www.wikidata.org/entity/Q87743321": {
+        "wd_labels": [
+            "Cynegetica",
+            "Cynegetica",
+            "Opp. C."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3438",
+        "cts_urn": "urn:cts:greekLit:tlg0024.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q18146776": {
+        "wd_labels": [
+            "Olympic Odes",
+            "Olimpiche",
+            "Olympian Odes",
+            "Pind. O."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3575",
+        "cts_urn": "urn:cts:greekLit:tlg0033.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q87208371": {
+        "wd_labels": [
+            "Life of Pericles",
+            "Vita di Pericle",
+            "Plut. Per."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3737",
+        "cts_urn": "urn:cts:greekLit:tlg0007.tlg012"
+    },
+    "http://www.wikidata.org/entity/Q606830": {
+        "wd_labels": [
+            "Antony and Cleopatra",
+            "Antonio e Cleopatra",
+            "Anthony and Cleopatra",
+            "The Tragedy of Anthony and Cleopatra",
+            "Tragedy of Anthony and Cleopatra",
+            "Anthonie and Cleopatra"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q555862": {
+        "wd_labels": [
+            "Phaedrus",
+            "Fedro",
+            "Plat. Phaedrus"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3607",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg012"
+    },
+    "http://www.wikidata.org/entity/Q661222": {
+        "wd_labels": [
+            "King John",
+            "Re Giovanni",
+            "The Life and Death of King John",
+            "Life and Death of King John"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q181598": {
+        "wd_labels": [
+            "King Lear",
+            "Re Lear",
+            "The Tragedie of King Lear",
+            "The Tragedy of King Lear",
+            "Tragedy of King Lear",
+            "The Life and Death of King Lear",
+            "Life and death of king lear"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q463126": {
+        "wd_labels": [
+            "Coriolanus",
+            "Coriolano",
+            "The Tragedy of Coriolanus",
+            "Tragedy of Coriolanus",
+            "Caius Marcius Coriolanus"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q244161": {
+        "wd_labels": [
+            "Phaedo",
+            "Fedone",
+            "Plat. Phaedo"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3606",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg004"
+    },
+    "http://www.wikidata.org/entity/Q672319": {
+        "wd_labels": [
+            "The Suppliants",
+            "Le supplici",
+            "The Suppliant Women",
+            "Supplices",
+            "Suppliants",
+            "Eur. Supp."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2305",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg008"
+    },
+    "http://www.wikidata.org/entity/Q215750": {
+        "wd_labels": [
+            "Julius Caesar",
+            "Giulio Cesare",
+            "The Tragedy of Julius Caesar",
+            "Tragedy of Julius Caesar"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q24965445": {
+        "wd_labels": [
+            "Against Stephanos",
+            "Contro Stefano"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q26833": {
+        "wd_labels": [
+            "Othello",
+            "Otello",
+            "The Tragedie of Othello, the Moore of Venice",
+            "Othello, the Moor of Venice",
+            "The Tragedy of Othello",
+            "Tragedy of Othello"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q7163": {
+        "wd_labels": [
+            "politics",
+            "politica"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q130283": {
+        "wd_labels": [
+            "Macbeth",
+            "Macbeth",
+            "The Scottish Play",
+            "The Bard's Play",
+            "The Tragedy of Macbeth",
+            "Tragedy of Macbeth",
+            "Dramma scozzese"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q27616189": {
+        "wd_labels": [
+            "Odyssey"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q41567": {
+        "wd_labels": [
+            "Hamlet",
+            "Amleto",
+            "The Tragedy of Hamlet, Prince of Denmark",
+            "Hamlet, Prince of Denmark",
+            "Tragedy of Hamlet",
+            "La tragedia di Amleto, principe di Danimarca",
+            "Amleto, principe di Danimarca"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q184742": {
+        "wd_labels": [
+            "Metamorphoses",
+            "Le metamorfosi",
+            "Ov. Met.",
+            "Metamorfosi",
+            "Metamorfosi (Ovidio)",
+            "Metamorfosi di Ovidio",
+            "Le metamorfosi (Ovidio)"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1161",
+        "cts_urn": "urn:cts:latinLit:phi0959.phi006"
+    },
+    "http://www.wikidata.org/entity/Q4691037": {
+        "wd_labels": [
+            "Against Leptines",
+            "Contro Leptine",
+            "Dem. 20"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1997",
+        "cts_urn": "urn:cts:greekLit:tlg0014.tlg020"
+    },
+    "http://www.wikidata.org/entity/Q4691027": {
+        "wd_labels": [
+            "Against Androtion",
+            "Contro Androzione",
+            "Dem. 22"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1996",
+        "cts_urn": "urn:cts:greekLit:tlg0014.tlg022"
+    },
+    "http://www.wikidata.org/entity/Q87737021": {
+        "wd_labels": [
+            "On the Mysteries",
+            "Sui misteri",
+            "Andoc. 1"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1520",
+        "cts_urn": "urn:cts:greekLit:tlg0027.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q2995964": {
+        "wd_labels": [
+            "Against Timarchus",
+            "Contro Timarco",
+            "Aeschin. 1"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1457",
+        "cts_urn": "urn:cts:greekLit:tlg0026.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q3798932": {
+        "wd_labels": [
+            "Hymn to Apollo I",
+            "Inno ad Apollo I",
+            "HH 3",
+            "Inno ad Apollo"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/4588",
+        "cts_urn": "urn:cts:greekLit:tlg0013.tlg021"
+    },
+    "http://www.wikidata.org/entity/Q105984077": {
+        "wd_labels": [
+            "Apology of Socrates"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q1196456": {
+        "wd_labels": [
+            "Plutus",
+            "Pluto",
+            "Wealth",
+            "The Plutus",
+            "Aristoph. Pl."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1616",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg011"
+    },
+    "http://www.wikidata.org/entity/Q87208306": {
+        "wd_labels": [
+            "Life of Solon",
+            "Vita di Solone",
+            "Plut. Sol."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3753",
+        "cts_urn": "urn:cts:greekLit:tlg0007.tlg007"
+    },
+    "http://www.wikidata.org/entity/Q1233203": {
+        "wd_labels": [
+            "Herakles' Children",
+            "Gli Eraclidi",
+            "Heracleidae",
+            "Children of Heracles",
+            "Heraclidae",
+            "Eur. Heraclid.",
+            "Children of Herakles"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2295",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg004"
+    },
+    "http://www.wikidata.org/entity/Q3618696": {
+        "wd_labels": [
+            "Antigone",
+            "Antigone"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q73112": {
+        "wd_labels": [
+            "   ",
+            "Anabasi",
+            "Xenophon's March Up-Country",
+            "Anabasis of Cyrus",
+            "Xen. Anab."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/4016",
+        "cts_urn": "urn:cts:greekLit:tlg0032.tlg006"
+    },
+    "http://www.wikidata.org/entity/Q1474843": {
+        "wd_labels": [
+            "Menexenus",
+            "Menesseno",
+            "Plat. Menex."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3602",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg028"
+    },
+    "http://www.wikidata.org/entity/Q815376": {
+        "wd_labels": [
+            "The Frogs",
+            "Le rane",
+            "Frogs",
+            "Aristoph. Frogs",
+            "Rane"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1617",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg009"
+    },
+    "http://www.wikidata.org/entity/Q192638": {
+        "wd_labels": [
+            "Apollonius of Rhodes",
+            "Apollonio Rodio",
+            "Apollonius Rhodius",
+            "Apollonio di Rodi"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q1164079": {
+        "wd_labels": [
+            "The Birds",
+            "Gli uccelli",
+            "Birds",
+            "Aristoph. Birds",
+            "Uccelli"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1606",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg006"
+    },
+    "http://www.wikidata.org/entity/Q1217552": {
+        "wd_labels": [
+            "The Wasps",
+            "Le vespe",
+            "Wasps",
+            "Aristoph. Wasps",
+            "Vespe"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1619",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg004"
+    },
+    "http://www.wikidata.org/entity/Q2741164": {
+        "wd_labels": [
+            "Meteorology",
+            "Meteorologica",
+            "Meteorologica"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1654",
+        "cts_urn": "urn:cts:greekLit:tlg0086.tlg026"
+    },
+    "http://www.wikidata.org/entity/Q1167925": {
+        "wd_labels": [
+            "Septem sapientium convivium",
+            "Il banchetto dei sette savi",
+            "Plut. Septem.",
+            "Septem sapientium convivium"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3751",
+        "cts_urn": "urn:cts:greekLit:tlg0007.tlg079"
+    },
+    "http://www.wikidata.org/entity/Q26257566": {
+        "wd_labels": [
+            "De Natura Animalium",
+            "Sulla natura degli animali",
+            "On the Nature of Animals",
+            "Ael. NA",
+            "De Natura Animalium"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1912",
+        "cts_urn": "urn:cts:greekLit:tlg0545.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q43706": {
+        "wd_labels": [
+            "John Chrysostom",
+            "Giovanni Crisostomo",
+            "Saint John Chrysostom",
+            "St. John Chrysostom",
+            "Giovanni Crisostomo",
+            "Ioannes Crisostomus",
+            "Johannes Chrysostomus",
+            "John I Chrysostom",
+            "San Crisostomo",
+            "San Giovanni Crisostomo",
+            "Giovanni Boccadoro"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q1226154": {
+        "wd_labels": [
+            "Satires",
+            "Satire",
+            "Sermones",
+            "Hor. S.",
+            "Sermones",
+            "Le satire",
+            "Saturae"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1055",
+        "cts_urn": "rn:cts:latinLit:phi0893.phi004"
+    },
+    "http://www.wikidata.org/entity/Q674638": {
+        "wd_labels": [
+            "Hellenica",
+            "Elleniche",
+            "Xen. Hell."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/4025",
+        "cts_urn": "urn:cts:greekLit:tlg0032.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q1216943": {
+        "wd_labels": [
+            "The Trojan Women",
+            "Le troiane",
+            "Troades",
+            "Trojan Women",
+            "The Daughters of Troy",
+            "Daughters of Troy",
+            "Eur. Tro.",
+            "Le troadi",
+            "Le Troiane",
+            "Troiane",
+            "Troadi"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2306",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg011"
+    },
+    "http://www.wikidata.org/entity/Q2555163": {
+        "wd_labels": [
+            "Oeconomicus",
+            "Economico",
+            "Xen. Ec.",
+            "Leggi per il governo della casa"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/4029",
+        "cts_urn": "urn:cts:greekLit:tlg0032.tlg003"
+    },
+    "http://www.wikidata.org/entity/Q3606509": {
+        "wd_labels": [
+            "Agesilaus",
+            "Agesilao",
+            "Xen. Ages."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/4015",
+        "cts_urn": "urn:cts:greekLit:tlg0032.tlg009"
+    },
+    "http://www.wikidata.org/entity/Q87210068": {
+        "wd_labels": [
+            "Life of Cleomenes",
+            "Vita di Cleomene",
+            "Plut. Cleom."
+        ],
+        "hucit_uri": "",
+        "cts_urn": "urn:cts:greekLit:tlg0007.tlg051b"
+    },
+    "http://www.wikidata.org/entity/Q26257556": {
+        "wd_labels": [
+            "Varia Historia",
+            "Storia varia",
+            "Ael. VH",
+            "Varia Historia"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1914",
+        "cts_urn": "urn:cts:greekLit:tlg0545.tlg002"
+    },
+    "http://www.wikidata.org/entity/Q1788674": {
+        "wd_labels": [
+            "Second Alcibiades",
+            "Alcibiade secondo",
+            "Plat. Alc. 2"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3581",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg014"
+    },
+    "http://www.wikidata.org/entity/Q651941": {
+        "wd_labels": [
+            "Moralia",
+            "Moralia"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q1049466": {
+        "wd_labels": [
+            "Trachinoidei",
+            "Trachinoidei"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q12902611": {
+        "wd_labels": [
+            "Life of Sulla",
+            "Vita di Silla",
+            "Plut. Sull."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3755",
+        "cts_urn": "urn:cts:greekLit:tlg0007.tlg033"
+    },
+    "http://www.wikidata.org/entity/Q12902610": {
+        "wd_labels": [
+            "Life of Lucullus",
+            "Vita di Lucullo",
+            "Plut. Luc."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3722",
+        "cts_urn": "urn:cts:greekLit:tlg0007.tlg036"
+    },
+    "http://www.wikidata.org/entity/Q761731": {
+        "wd_labels": [
+            "Thesmophoriazusae",
+            "Le donne alle Tesmoforie",
+            "Festival Women",
+            "The Thesmophoriazus\u00e6",
+            "The Women's Festival",
+            "Ladies' Day",
+            "Aristoph. Thes.",
+            "Tesmoforiazuse"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1618",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg008"
+    },
+    "http://www.wikidata.org/entity/Q18421778": {
+        "wd_labels": [
+            "Marcus Tullius Cicero/Letters/M. Tullius Tiro"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q87746403": {
+        "wd_labels": [
+            "Panathenaicus",
+            "Panatenaico"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2887",
+        "cts_urn": "urn:cts:greekLit:tlg0010.tlg021"
+    },
+    "http://www.wikidata.org/entity/Q3745528": {
+        "wd_labels": [
+            "Philoctetes",
+            "Filottete"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q817383": {
+        "wd_labels": [
+            "Bibliotheca",
+            "Biblioteca",
+            "Apollodorus' library",
+            "Apollod.",
+            "Biblioteca di Apollodoro"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/9087",
+        "cts_urn": "urn:cts:greekLit:tlg0548.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q264241": {
+        "wd_labels": [
+            "Gorgias",
+            "Gorgia",
+            "Plat. Gorg."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3594",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg023"
+    },
+    "http://www.wikidata.org/entity/Q3237044": {
+        "wd_labels": [
+            "Epistulae ad Atticum",
+            "Epistulae ad Atticum",
+            "Letters to Atticus",
+            "Ad Atticum",
+            "Cic. Att."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/921",
+        "cts_urn": "urn:cts:latinLit:phi0474.phi057"
+    },
+    "http://www.wikidata.org/entity/Q183304": {
+        "wd_labels": [
+            "Troilus and Cressida",
+            "Troilo e Cressida",
+            "The Tragedy of Troilus and Cressida",
+            "Tragedy of Troilus and Cressida",
+            "The Famous Historie of Troylus and Cresseid"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q107029507": {
+        "wd_labels": [
+            "Anthology of Stobaeus",
+            "Antologia di Stobeo",
+            "Florilegium of Stobaeus",
+            "Stobaeus' Anthologia",
+            "Anthologium"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3191",
+        "cts_urn": "urn:cts:greekLit:tlg2037.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q3481081": {
+        "wd_labels": [
+            "Sense and Sensibilia",
+            "Sui sensi",
+            "On Sense and the Sensible",
+            "On Sense and What is Sensed",
+            "On Sense Perception",
+            "De sensu et sensibilibus",
+            "De sensu et sensili",
+            "De sensu et sensato"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1640",
+        "cts_urn": "urn:cts:greekLit:tlg0086.tlg041"
+    },
+    "http://www.wikidata.org/wiki/Q1193602": {
+        "wd_labels": [
+            "Peace",
+            "La pace",
+            "Pax",
+            "The Peace",
+            "Aristoph. Peace",
+            "Pace"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1615",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg005"
+    },
+    "http://www.wikidata.org/entity/Q42188444": {
+        "wd_labels": [
+            "On the Arrangement of Words",
+            "D.H. Comp."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/4438",
+        "cts_urn": "urn:cts:greekLit:tlg0081.tlg012"
+    },
+    "http://www.wikidata.org/entity/Q634846": {
+        "wd_labels": [
+            "Hippias Major",
+            "Ippia maggiore",
+            "Plat. Hipp. Maj."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3596",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg025"
+    },
+    "http://www.wikidata.org/entity/Q1347394": {
+        "wd_labels": [
+            "Cratylus",
+            "Cratilo",
+            "Plat. Crat."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3586",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg005"
+    },
+    "http://www.wikidata.org/entity/Q1216139": {
+        "wd_labels": [
+            "The Suppliants",
+            "Le supplici",
+            "Supplices",
+            "Suppliant Women",
+            "The Suppliant Maidens",
+            "The Supplicants",
+            "Aesch. Supp.",
+            "Le Supplici",
+            "Supplici"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2305",
+        "cts_urn": "urn:cts:greekLit:tlg0006.tlg008"
+    },
+    "http://www.wikidata.org/entity/Q3008827": {
+        "wd_labels": [
+            "Cynegeticus",
+            "Caccia con i cani",
+            "On Hunting",
+            "Xen. Hunt.",
+            "Cinegetico"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/4019",
+        "cts_urn": "urn:cts:greekLit:tlg0032.tlg014"
+    },
+    "http://www.wikidata.org/entity/Q87768678": {
+        "wd_labels": [
+            "Civil Wars",
+            "Guerre civili",
+            "App. BC"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1562",
+        "cts_urn": "urn:cts:greekLit:tlg0551.tlg017"
+    },
+    "http://www.wikidata.org/entity/Q1059987": {
+        "wd_labels": [
+            "The Acharnians",
+            "Gli acarnesi",
+            "Acharnians",
+            "Aristoph. Ach.",
+            "Acarnesi"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1603",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q371884": {
+        "wd_labels": [
+            "Timaeus",
+            "Timeo",
+            "Plat. Tim."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3617",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg031"
+    },
+    "http://www.wikidata.org/entity/Q76347075": {
+        "wd_labels": [
+            "Oedipus at Colonus"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q608261": {
+        "wd_labels": [
+            "Assemblywomen",
+            "Le donne al parlamento",
+            "Ecclesiazusae",
+            "Women in Council",
+            "The Ecclesiazus\u00e6",
+            "The Female Haranguers",
+            "Aristoph. Eccl.",
+            "Ecclesiazuse",
+            "Le donne all'assemblea",
+            "\u1f18\u03ba\u03ba\u03bb\u03b7\u03c3\u03b9\u03ac\u03b6\u03bf\u03c5\u03c3\u03b1\u03b9",
+            "Ekklesiazousai"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1610",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg010"
+    },
+    "http://www.wikidata.org/entity/Q220972": {
+        "wd_labels": [
+            "Philebus",
+            "Filebo",
+            "Plat. Phileb."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3608",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg010"
+    },
+    "http://www.wikidata.org/entity/Q355342": {
+        "wd_labels": [
+            "Adelphoe",
+            "Adelphoe",
+            "The Brothers",
+            "Ter. Ad.",
+            "Adelphi",
+            "Adelphoi",
+            "I fratelli",
+            "I due fratelli"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1347",
+        "cts_urn": "urn:cts:latinLit:phi0134.phi006"
+    },
+    "http://www.wikidata.org/entity/Q1225196": {
+        "wd_labels": [
+            "Life of Apollonius of Tyana",
+            "Vita di Apollonio di Tiana",
+            "Philostr. VA"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2408",
+        "cts_urn": "urn:cts:greekLit:tlg0638.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q1581567": {
+        "wd_labels": [
+            "In Verrem",
+            "Verrine",
+            "in C. Verrem",
+            "Cic. Ver.",
+            "In Verrem",
+            "in C. Verrem actio prima",
+            "Cicerone contro Verre"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/869",
+        "cts_urn": "urn:cts:latinLit:phi0474.phi005"
+    },
+    "http://www.wikidata.org/entity/Q442": {
+        "wd_labels": [
+            "Natural History",
+            "Naturalis historia",
+            "Pliny's Natural History",
+            "Naturalis Historia",
+            "Plin. Nat."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1210",
+        "cts_urn": "urn:cts:latinLit:phi0978.phi001"
+    },
+    "http://www.wikidata.org/entity/Q18618577": {
+        "wd_labels": [
+            "Oedipus at Colonus"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q669911": {
+        "wd_labels": [
+            "Statesman",
+            "Politico",
+            "Plat. Stat."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3609",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg008"
+    },
+    "http://www.wikidata.org/entity/Q3618627": {
+        "wd_labels": [
+            "Roman Antiquities",
+            "Antichit\u00e0 romane",
+            "D.H."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/2087",
+        "cts_urn": "urn:cts:greekLit:tlg0081.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q13040256": {
+        "wd_labels": [
+            "Speeches",
+            "Orazioni"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "https://www.wikidata.org/wiki/Q798026": {
+        "wd_labels": [
+            "Bacchides",
+            "Bacchidi",
+            "Pl. Bac.",
+            "Bacchides"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1188",
+        "cts_urn": "urn:cts:latinLit:phi0119.phi004"
+    },
+    "http://www.wikidata.org/entity/Q649562": {
+        "wd_labels": [
+            "Richard II",
+            "Riccardo II",
+            "King Richard II",
+            "The Tragedy of King Richard the Second",
+            "Tragedy of King Richard the Second",
+            "The Life and Death of Richard the Second",
+            "Life and Death of Richard the Second"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q1193602": {
+        "wd_labels": [
+            "Peace",
+            "La pace",
+            "Pax",
+            "The Peace",
+            "Aristoph. Peace",
+            "Pace"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1615",
+        "cts_urn": "urn:cts:greekLit:tlg0019.tlg005"
+    },
+    "http://www.wikidata.org/entity/Q1246446": {
+        "wd_labels": [
+            "Carmen saeculare",
+            "Carmen saeculare",
+            "Secular Hymn",
+            "Hor. Carm.",
+            "Carme Secolare"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/1053",
+        "cts_urn": "urn:cts:latinLit:phi0893.phi002"
+    },
+    "http://www.wikidata.org/entity/Q648889": {
+        "wd_labels": [
+            "Euthyphro",
+            "Eutifrone",
+            "Plat. Euthyph."
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/3593",
+        "cts_urn": "urn:cts:greekLit:tlg0059.tlg001"
+    },
+    "http://www.wikidata.org/entity/Q336115": {
+        "wd_labels": [
+            "Theognis of Megara",
+            "Teognide",
+            "Theognis",
+            "Teognide di Megara"
+        ],
+        "hucit_uri": "",
+        "cts_urn": ""
+    },
+    "http://www.wikidata.org/entity/Q20552131": {
+        "wd_labels": [
+            "Hymn to Hermes I",
+            "Inno a Hermes I",
+            "HH 4"
+        ],
+        "hucit_uri": "http://purl.org/hucit/kb/works/4429",
+        "cts_urn": "urn:cts:greekLit:tlg0013.tlg004"
+    }
+}

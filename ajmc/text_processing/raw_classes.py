@@ -411,7 +411,7 @@ class RawPage(Page, TextContainer):
         elif children_type in ['entities', 'sentences', 'hyphenations']:
             try:
                 rebuild = cas_utils.import_page_rebuild(self.id, annotation_type=children_type)
-            except:
+            except FileNotFoundError:
                 logger.debug(f'Looking for {children_type}: No rebuild file found for page {self.id}')
                 return []
             cas = cas_utils.import_page_cas(self.id, children_type)
@@ -433,7 +433,7 @@ class RawPage(Page, TextContainer):
         elif children_type == 'lemmas':
             try:
                 rebuild = cas_utils.import_page_rebuild(self.id, annotation_type=children_type)
-            except:
+            except FileNotFoundError:
                 logger.debug(f'Looking for {children_type}: No rebuild file found for page {self.id}')
                 return []
 
