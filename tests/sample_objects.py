@@ -8,7 +8,6 @@ from ajmc.text_processing.raw_classes import RawCommentary
 
 ROOT_LOGGER.setLevel('DEBUG')
 logger = get_ajmc_logger(__name__)
-vs.COMMS_DATA_DIR = vs.PACKAGE_DIR / 'tests/data'
 
 
 # Arithmetic
@@ -36,7 +35,7 @@ sample_bboxes = {k: geometry.get_bbox_from_points(v) for k, v in sample_points.i
 # Commentaries, OCR, path and via
 
 
-sample_comm_id = 'cu31924087948174'
+sample_comm_id = 'sample_test_cu31924087948174'
 
 sample_comm_root_dir = vs.get_comm_root_dir(sample_comm_id)
 
