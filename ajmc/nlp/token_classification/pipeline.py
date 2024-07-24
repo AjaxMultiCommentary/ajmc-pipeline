@@ -1,7 +1,6 @@
 """This module is highly inspired by HuggingFace's
 `run_ner.py <https://github.com/huggingface/transformers/blob/main/examples/pytorch/token-classification/run_ner.py>`_.
 It runs on a single GPU."""
-
 import random
 import time
 from pathlib import Path
@@ -9,6 +8,7 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
+import safetensors
 import torch
 import transformers
 from torch.utils.data import DataLoader, RandomSampler
@@ -28,6 +28,16 @@ def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
+
+
+def get_canine_state_dict_from_shiba_safetensors(safetensors_path: str) -> dict:
+    with safetensors.safe_open(safetensors_path, framework='pt') as model_file:
+        state_dict = {}
+        for k in model_file.keys():
+            if k.startswith('shiba_model.'):
+                state_dict[k[12:]] = model_file.get_tensor(k)
+
+    return state_dict
 
 
 def train(config: AjmcNlpConfig,
@@ -70,13 +80,13 @@ def train(config: AjmcNlpConfig,
     ]
     optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=config.learning_rate, eps=config.adam_epsilon)
     scheduler = transformers.get_linear_schedule_with_warmup(
-            optimizer, num_warmup_steps=config.warmup_steps, num_training_steps=t_total
+        optimizer, num_warmup_steps=config.warmup_steps, num_training_steps=t_total
     )
     # =================== Pretraining declarations ====================
     logger.info(f"""Running training on {len(train_dataset)} examples, for {config.epochs} epochs.""")
 
     global_step = 0
-    best_f1 = 0.3
+    best_f1 = -1
     count_no_improvement = 0
     train_results = pd.DataFrame()
 
@@ -201,10 +211,9 @@ def main(config_path: Optional[Path] = None, config_dict: Optional[dict] = None)
         model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name,
                                                                              num_labels=config.num_labels)
     else:
-        model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_path,
-                                                                             local_files_only=True,
-                                                                             config=transformers.AutoConfig.from_pretrained(config.model_name,
-                                                                                                                            num_labels=config.num_labels, ))
+        model = transformers.AutoModelForTokenClassification.from_pretrained(
+            config.model_name, num_labels=config.num_labels,
+            state_dict=get_canine_state_dict_from_shiba_safetensors(str(config.model_path)))
 
     if config.do_train:
         train(config=config,
