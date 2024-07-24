@@ -21,7 +21,7 @@ sample_interval_lists = {'base': [(1, 10), (15, 15), (16, 20)],
                          'overlapping': [(2, 12)],
                          'non_overlapping': [(0, 0), (30, 40)]}
 
-# Geometry
+# Geometry tests
 sample_points = {'base': [(0, 0), (2, 0), (1, 1), (2, 2), (0, 2)],
                  'included': [(0, 0), (1, 0), (1, 1), (0, 1)],
                  'overlapping': [[1, 1], [3, 1], [2, 2], [3, 3], [1, 3]],
