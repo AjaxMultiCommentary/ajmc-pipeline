@@ -46,7 +46,7 @@ if __name__ == '__main__':
         raise SystemExit
 
     ################### DEBUG ###################
-    # args.commentary_ids = ['sophoclesplaysa05campgoog']
+    # args.commentary_ids = ['lestragdiesdeso00tourgoog']
     # args.force = True
     # args.stream_handler_level = 'DEBUG'
     ################### DEBUG ###################

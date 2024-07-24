@@ -1,0 +1,19 @@
+{
+  "model_name_or_path": "xlm-roberta-base",
+  "output_dir": "/home/najem/dhlab-data/data/najem-data/xlm-roberta-base/outputs",
+  "train_file": "/home/najem/dhlab-data/data/najem-data/xlm-roberta-base/pre_training_data/dataset.txt",
+  "validation_split_percentage": 1,
+  "line_by_line": true,
+  "pad_to_max_length": true,
+  "max_seq_length": 512,
+  "do_train": true,
+  "per_device_train_batch_size": 6,
+  "gradient_accumulation_steps": 6,
+  "per_device_eval_batch_size": 6,
+  "do_eval": true,
+  "save_steps": 2500,
+  "evaluation_strategy": "steps",
+  "eval_steps": 2500,
+  "num_train_epochs": 3,
+  "overwrite_output_dir": true
+}

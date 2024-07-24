@@ -1,7 +1,8 @@
 import os
-from typing import List, Union, Dict
+from pathlib import Path
+from typing import List, Union, Dict, Optional
 
-import datasets
+import evaluate
 import numpy as np
 import pandas as pd
 import torch
@@ -21,7 +22,7 @@ def seqeval_evaluation(predictions: List[List[str]],
                        groundtruth: List[List[str]],
                        nerify_labels: bool = False):
     """Simple wrapper around seqeval."""
-    metric = datasets.load_metric('seqeval')
+    metric = evaluate.load('seqeval')
     if not nerify_labels:
         return metric.compute(predictions=predictions, references=groundtruth, zero_division=0)
     else:
@@ -68,6 +69,7 @@ def evaluate_dataset(dataset: torch.utils.data.Dataset,
             break
 
     # Remove ignored index (special tokens)
+
     predictions = [
         [ids_to_labels[p] for (p, l) in zip(example_pred, example_gt) if l != -100]
         for example_pred, example_gt in zip(predictions, groundtruth)
@@ -80,46 +82,45 @@ def evaluate_dataset(dataset: torch.utils.data.Dataset,
     return seqeval_evaluation(predictions, groundtruth)
 
 
-def evaluate_iob_files(output_dir: str, groundtruth_path: str, preds_path: str, method: str,
-                       hipe_script_path: str = None, output_suffix: str = None, task: str = 'nerc_coarse'):
+def evaluate_iob_files(output_dir: Path,
+                       groundtruth_path: Path,
+                       preds_path: Path,
+                       method: str,
+                       hipe_script_path: Optional[Path] = None,
+                       output_suffix: str = None,
+                       task: str = 'nerc_coarse'):
     """Evaluates CLEF-HIPE compliant files.
      If ``method`` is set to ``'hipe'``, runs run CLEF-HIPE-evaluation within ``os.system``. Else if ``method`` is set to
      ``'seqeval``, imports the files as dfs."""
 
     if method == 'hipe':
         os.system(
-            f"""
-            python {hipe_script_path} \
+                f"""
+            python {str(hipe_script_path)} \
             --skip-check \
-            --ref {groundtruth_path} \
-            --pred {preds_path} \
+            --ref {str(groundtruth_path)} \
+            --pred {str(preds_path)} \
             --task {task} \
-            --outdir {output_dir}
+            --outdir {str(output_dir)}
             """
         )
 
     elif method == 'seqeval':
 
-        with open(preds_path, 'r') as f:
-            preds = pd.read_csv(f, delimiter='\t', skiprows=1, comment='#', usecols=[0, 1],
-                                names=['TOKEN', 'NE-COARSE-LIT'])
-
-        with open(groundtruth_path, 'r') as f:
-            gt = pd.read_csv(f, delimiter="\t", skiprows=1, comment="#", usecols=[0, 1],
-                             names=["TOKEN", "NE-COARSE-LIT"])
+        preds = pd.read_csv(preds_path.open('r'), delimiter='\t', skiprows=1, comment='#', usecols=[0, 1], names=['TOKEN', 'NE-COARSE-LIT'])
+        gt = pd.read_csv(groundtruth_path.open('r'), delimiter="\t", skiprows=1, comment="#", usecols=[0, 1], names=["TOKEN", "NE-COARSE-LIT"])
 
         # Evaluate with seqeval
-        metric = datasets.load_metric("seqeval")
+        metric = evaluate.load("seqeval")
         results = metric.compute(predictions=[preds["NE-COARSE-LIT"].tolist()],
                                  references=[gt["NE-COARSE-LIT"].tolist()])
 
         results = seqeval_to_df(results)
 
         if output_suffix:
-            results.to_csv(os.path.join(output_dir, "{}_results_{}.tsv".format(method, output_suffix)), sep="\t",
-                           index=False)
+            results.to_csv(output_dir / f'{method}_results_{output_suffix}.tsv', sep='\t', index=False)
         else:
-            results.to_csv(os.path.join(output_dir, "{}_results.tsv".format(method)), sep="\t", index=False)
+            results.to_csv(output_dir / f'{method}_results.tsv', sep='\t', index=False)
 
 
 def seqeval_to_df(seqeval_output: Dict[str, Union[Dict[str, float], float]],
@@ -150,7 +151,8 @@ def seqeval_to_df(seqeval_output: Dict[str, Union[Dict[str, float], float]],
             for subkey in seqeval_output[key].keys():
                 to_df[(key, abbreviations[subkey])] = [seqeval_output[key][subkey]]
 
-    ordered_keys = [("ALL", key) for key in ["F1", "A", "P", "R"]] + [(k[0], metric) for k in to_df.keys() if k[0] != 'ALL' for metric in ["F1", "P", "R", 'N']]
+    ordered_keys = [("ALL", key) for key in ["F1", "A", "P", "R"]] + [(k[0], metric) for k in to_df.keys() if k[0] != 'ALL' for metric in
+                                                                      ["F1", "P", "R", 'N']]
 
     if do_debug:
         to_df_debug = {}
@@ -169,11 +171,11 @@ def evaluate_hipe(dataset: 'token_classification.data_preparation.HipeDataset',
                   model: transformers.PreTrainedModel,
                   device: torch.device,
                   ids_to_labels: Dict[int, str],
-                  output_dir: str,
+                  output_dir: Path,
                   labels_column: str,
-                  hipe_script_path: str,
-                  groundtruth_tsv_path: str = None,
-                  groundtruth_tsv_url: str = None,
+                  hipe_script_path: Path,
+                  groundtruth_tsv_path: Optional[Path] = None,
+                  groundtruth_tsv_url: Optional[str] = None,
                   batch_size: int = 8,
                   do_debug: bool = False):
     """Performs the entire pipeline to hipe-evaluate a model, i.e. :
@@ -187,10 +189,9 @@ def evaluate_hipe(dataset: 'token_classification.data_preparation.HipeDataset',
     # Write tsv locally
     if groundtruth_tsv_url:
         logger.info(f'Downloading a local copy from {groundtruth_tsv_url}')
-        groundtruth_tsv_path = os.path.join(output_dir, 'groundtruth.tsv')
+        groundtruth_tsv_path = output_dir / 'groundtruth.tsv'
         groundtruth_tsv_data = get_tsv_data(url=groundtruth_tsv_url)
-        with open(groundtruth_tsv_path, 'w', encoding='utf-8') as f:
-            f.write(groundtruth_tsv_data)
+        groundtruth_tsv_path.write_text(groundtruth_tsv_data, encoding='utf-8')
 
     predictions = predict_dataset(dataset=dataset, model=model, do_debug=do_debug).tolist()
 
@@ -200,14 +201,13 @@ def evaluate_hipe(dataset: 'token_classification.data_preparation.HipeDataset',
         for prediction, line_numbers in zip(predictions, dataset.tsv_line_numbers)
     ]
 
-    preds_path = os.path.join(output_dir, 'results/hipe_eval/predictions.tsv')
+    preds_path = output_dir / 'results/hipe_eval/predictions.tsv'
     write_predictions_to_tsv(dataset.words, predictions, dataset.tsv_line_numbers,
                              preds_path,
                              labels_column, groundtruth_tsv_path, groundtruth_tsv_url)
 
-    evaluate_iob_files(output_dir=os.path.join(output_dir, 'results/hipe_eval'),
+    evaluate_iob_files(output_dir=output_dir / 'results/hipe_eval',
                        groundtruth_path=groundtruth_tsv_path,
                        preds_path=preds_path,
                        method='hipe',
-                       hipe_script_path=hipe_script_path,
-                       )
+                       hipe_script_path=hipe_script_path)

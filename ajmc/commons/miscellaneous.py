@@ -54,6 +54,7 @@ def recursive_iterator(iterable: Iterable, iterable_types: Iterable[Type[Iterabl
 
 def get_unique_elements(iterable: Iterable, iterable_types: Iterable[Type[Iterable]] = (list, tuple)) -> List[str]:
     """Get the list of elements from any potentially recursive iterable."""
+
     return list(set([l for l in recursive_iterator(iterable, iterable_types)]))
 
 

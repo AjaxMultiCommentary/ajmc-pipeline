@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List, Dict, Union, Any, Iterable
 
 import torch
@@ -157,7 +158,7 @@ def align_from_tokenized(tokens_to_words_offsets: List[Union[None, int]],
 def write_predictions_to_tsv(words: List[List[Union[str, None]]],
                              labels: List[List[Union[str, None]]],
                              tsv_line_numbers: List[List[Union[int, None]]],
-                             output_file: str,
+                             output_file: Path,
                              labels_column: str,
                              tsv_path: str = None,
                              tsv_url: str = None, ):
@@ -166,9 +167,9 @@ def write_predictions_to_tsv(words: List[List[Union[str, None]]],
     ``words``, ``labels`` and ``tsv_line_numbers`` should be three alined list, so as in HipeDataset.
     """
 
-    logger.info(f'Writing predictions to {output_file}')
+    logger.info(f'Writing predictions to {str(output_file)}')
 
-    tsv_lines = [l.split('\t') for l in get_tsv_data(tsv_path, tsv_url).split('\n')]
+    tsv_lines = [l.split('\t') for l in get_tsv_data(str(tsv_path), tsv_url).split('\n')]
     label_col_number = tsv_lines[0].index(labels_column)
     for i in range(len(words)):
         for j in range(len(words[i])):
@@ -176,8 +177,7 @@ def write_predictions_to_tsv(words: List[List[Union[str, None]]],
                 assert tsv_lines[tsv_line_numbers[i][j]][0] == words[i][j]
                 tsv_lines[tsv_line_numbers[i][j]][label_col_number] = labels[i][j]
 
-    with open(output_file, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(['\t'.join(l) for l in tsv_lines]))
+    output_file.write_text('\n'.join(['\t'.join(l) for l in tsv_lines]), encoding='utf-8')
 
 
 # LEGACY.

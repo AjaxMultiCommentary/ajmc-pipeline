@@ -30,6 +30,7 @@ else:
     in your .bashrc.
     """))
 
+# test
 COMMS_DATA_DIR = AJMC_DATA_DIR / 'commentaries_data'
 NE_CORPUS_DIR = AJMC_DATA_DIR / 'AjMC-NE-corpus'
 LEMLINK_CORPUS_DIR = AJMC_DATA_DIR / 'lemma-linkage-corpus'
@@ -127,7 +128,8 @@ SPREADSHEETS = {
     'metadata': '1jaSSOF8BWij0seAAgNeGe3Gtofvg9nIp_vPaSj5FtjE',
     'olr_gt': '1_hDP_bGDNuqTPreinGS9-ShnXuXCjDaEbz-qEMUSito',
     'ocr_gt': '1RsJQTgM4oO-ds0cK3rstx-iBxsvxjwCSVRWS63NvQrQ',
-    'lemlink': '1xBnJFYjQ4DwVHYzQVLVRrHflMtN54Sxo3N4qjET5x7Y'
+    'ner_gt': '1rlZfz61xws14We_wjPnkkDXGxAWCKOaF5JuJsGwKI2c',
+    'lemlink_gt': '1xBnJFYjQ4DwVHYzQVLVRrHflMtN54Sxo3N4qjET5x7Y'
 }
 
 # ======================================================================================================================

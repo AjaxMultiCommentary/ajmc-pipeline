@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from typing import Dict, Union, List, Optional
 
 import numpy as np
@@ -29,7 +29,7 @@ def predict(model_inputs: Dict[str, torch.tensor],
     model.eval()
 
     with torch.no_grad():
-        outputs = model(**{k: v.to(model.device) for k,v in model_inputs.items()})
+        outputs = model(**{k: v.to(model.device) for k, v in model_inputs.items()})
 
         return np.argmax(outputs['logits'].detach().cpu().numpy(), axis=2)
 
@@ -76,12 +76,16 @@ def predict_dataset(dataset: torch.utils.data.Dataset,
     return predict_batches(dataloader, model, do_debug=do_debug)
 
 
-
-def predict_and_write_tsv(model, output_dir, tokenizer, ids_to_labels, labels_column: str,
-                          path: Optional[str] = None, url: Optional[str] = None):
+def predict_and_write_tsv(model,
+                          output_dir,
+                          tokenizer,
+                          ids_to_labels,
+                          labels_column: str,
+                          path: Optional[Path] = None,
+                          url: Optional[str] = None):
     """Creates a dataset from a tsv, predicts and writes predictions to tsv."""
 
-    logger.info(f"""Starting prediction on {path.split('/')[-1] if path else url.split('/')[-1]}""")
+    logger.info(f"""Starting prediction on {path.name if path else url.split('/')[-1]}""")
     dataset_to_pred = create_prediction_dataset(tokenizer=tokenizer, path=path, url=url)
     predictions = predict_dataset(dataset_to_pred, model)
 
@@ -90,7 +94,7 @@ def predict_and_write_tsv(model, output_dir, tokenizer, ids_to_labels, labels_co
         for prediction, line_numbers in zip(predictions, dataset_to_pred.tsv_line_numbers)
     ]
 
-    preds_path = os.path.join(output_dir, url.split('/')[-1])
+    preds_path = output_dir / url.split('/')[-1]
 
     write_predictions_to_tsv(words=dataset_to_pred.words,
                              labels=predictions,
@@ -99,5 +103,3 @@ def predict_and_write_tsv(model, output_dir, tokenizer, ids_to_labels, labels_co
                              labels_column=labels_column,
                              tsv_path=path,
                              tsv_url=url)
-
-
