@@ -31,6 +31,7 @@ def set_seed(seed):
 
 
 def get_canine_state_dict_from_shiba_safetensors(safetensors_path: str) -> dict:
+    safetensors_path = str(Path(safetensors_path) / 'model.safetensors')
     with safetensors.safe_open(safetensors_path, framework='pt') as model_file:
         state_dict = {}
         for k in model_file.keys():

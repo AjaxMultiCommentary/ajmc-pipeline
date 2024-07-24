@@ -5,7 +5,7 @@ from ajmc.nlp.token_classification.pipeline import main
 base_config = {
     "do_train": True,
     "do_seqeval": True,
-    "overwrite_outputs": False,
+    "overwrite_outputs": True,
     "device_name": "cuda:1",
     "epochs": 40,
     "batch_size": 4,
@@ -13,13 +13,15 @@ base_config = {
     "model_max_length": 2048,
 }
 model_names_and_paths = [
-    ('dbmdz/bert-base-historic-multilingual-cased', None),
-    ('bowphs/PhilBerta', None),
-    ('FacebookAI/xlm-roberta-base', None),
-    ('google/canine-c', None),
+    # ('dbmdz/bert-base-historic-multilingual-cased', None),
+    # ('bowphs/PhilBerta', None),
+    # ('FacebookAI/xlm-roberta-base', None),
+    # ('google/canine-c', None),
     ('google/canine-c', '/scratch/sven/canine/output/checkpoint-25000'),
     ('google/canine-c', '/scratch/sven/canine/output/checkpoint-50000'),
     ('google/canine-c', '/scratch/sven/canine/output/checkpoint-75000'),
+    ('google/canine-c', '/scratch/sven/canine/output/checkpoint-100000'),
+    ('google/canine-c', '/scratch/sven/canine/output/checkpoint-125000'),
 
 ]
 
@@ -82,11 +84,7 @@ for model_name, model_path in model_names_and_paths:
     full_model_name = get_full_model_name(model_name, model_path)
     for data_format in ['lemlink', 'ner']:
         output_dir = get_model_output_dir(model_name, model_path, data_format)
-        try:
-            best_results = pd.read_csv(output_dir / 'results/seqeval/best_results.tsv', sep='\t', header=[0, 1])
-        except FileNotFoundError:
-            print(f'No results found for {full_model_name} - {data_format}')
-            continue
+        best_results = pd.read_csv(output_dir / 'results/seqeval/best_results.tsv', sep='\t', header=[0, 1])
         best_results[('exp', 'model')] = full_model_name
         best_results[('exp', 'data_format')] = data_format
         results.append(best_results)
