@@ -311,7 +311,7 @@ def import_page_rebuild(page_id: str, annotation_type: str):
             metadata = json.loads((run_dir / 'xmis' / 'metadata.json').read_text('utf-8'))
             region_types = metadata['region_types']
         except FileNotFoundError:
-            xml_path = vs.LEMLINK_XMI_DIR / 'TypeSystem.xml'
+            xml_path = vs.LEMLINK_TYPESYSTEM_PATH
             xmi_path = run_dir / 'xmis' / (page_id + '.xmi')
             cas = get_cas(xmi_path, xml_path)
             if cas:

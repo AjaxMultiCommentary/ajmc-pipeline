@@ -35,6 +35,7 @@ COMMS_DATA_DIR = AJMC_DATA_DIR / 'commentaries_data'
 NE_CORPUS_DIR = AJMC_DATA_DIR / 'AjMC-NE-corpus'
 LEMLINK_CORPUS_DIR = AJMC_DATA_DIR / 'lemma-linkage-corpus'
 LEMLINK_XMI_DIR = LEMLINK_CORPUS_DIR / 'data/preparation/corpus/annotated'
+LEMLINK_TYPESYSTEM_PATH = LEMLINK_XMI_DIR/ 'TypeSystem.xml'
 FONTS_DIR = PACKAGE_DIR / 'data/fonts/fonts'
 
 # RELATIVE PATHS
