@@ -13,9 +13,10 @@ SELECTOR_REGEX = re.compile(r"n=(?P<n>\d+)\[(?P<offset>\d+)\]")
 
 
 class Chunk:
-    def __init__(self, text: str, start_offset: int, elem):
+    def __init__(self, text: str, start_offset: int, n: str, elem):
         self.text = text
         self.start_offset = start_offset
+        self.n = n
         self.elem = elem
 
 
@@ -27,10 +28,7 @@ class TEI2TextMapper:
         self.tree = etree.XML(req.text, parser)
         self.chunk_by = chunk_by
 
-        all_text = ''.join(self.tree.xpath(f"//{self.chunk_by}/text()", namespaces=NAMESPACES)).strip()
-
-        self.text = unicodedata.normalize("NFC", all_text)
-        self._chunks = []
+        self.chunks = []
 
         str_offset = 0
 
@@ -38,14 +36,26 @@ class TEI2TextMapper:
             chunk_text = chunk.text
 
             if chunk_text is not None:
-                self._chunks.append(
+                t = unicodedata.normalize("NFC", chunk_text)
+
+                self.chunks.append(
                     Chunk(
                         text=chunk_text,
                         start_offset=str_offset,
+                        n=chunk.get("n"),
                         elem=chunk,
                     )
                 )
-                str_offset += len(chunk_text)
+                str_offset += len(t)
+
+        self.text = "".join(c.text for c in self.chunks)
+
+    def lines_for_offsets(self, offsets: list[int]):
+        return [
+            chunk
+            for chunk in self.chunks
+            if chunk.start_offset >= offsets[0] and offsets[1] >= chunk.start_offset + len(chunk.text)
+        ]
 
     def selector_to_offsets(self, selector: str):
         [f, e] = selector.split(":")
@@ -55,38 +65,36 @@ class TEI2TextMapper:
 
         if f_matches is not None and e_matches is not None:
             f_n = f_matches.group("n")
-            e_n = e_matches.group("n")
+            l_n = e_matches.group("n")
             f_offset = f_matches.group("offset")
-            e_offset = e_matches.group("offset")
+            l_offset = e_matches.group("offset")
 
-            f_chunk = [chunk for chunk in self._chunks if chunk.elem.get("n") == f_n][0]
-            e_chunk = [chunk for chunk in self._chunks if chunk.elem.get("n") == e_n][0]
+            f_chunk = [chunk for chunk in self.chunks if chunk.elem.get("n") == f_n][0]
+            l_chunk = [chunk for chunk in self.chunks if chunk.elem.get("n") == l_n][0]
 
             return [
                 f_chunk.start_offset + int(f_offset),
-                e_chunk.start_offset + int(e_offset),
+                l_chunk.start_offset + int(l_offset),
             ]
 
     def offsets_to_selector(self, offsets: list[int]):
         first_chunk = [
             chunk
-            for chunk in self._chunks
+            for chunk in self.chunks
             if offsets[0] >= chunk.start_offset
                and offsets[0] < chunk.start_offset + len(chunk.text)
         ][0]
         last_chunk = [
             chunk
-            for chunk in self._chunks
+            for chunk in self.chunks
             if offsets[1] > chunk.start_offset
                and chunk.start_offset + len(chunk.text) >= offsets[1]
         ][0]
 
-        return f"""{self.chunk_by.replace(':', '-')}@n={
-        first_chunk.elem.get('n')}[{
-        offsets[0] - first_chunk.start_offset}]:{
-        self.chunk_by.replace(':', '-')}@n={
-        last_chunk.elem.get('n')}[{
-        offsets[1] - last_chunk.start_offset}]"""
+        return f"""{self.chunk_by.replace(':', '-')}@n={first_chunk.n}[{
+            offsets[0] - first_chunk.start_offset}]:{
+            self.chunk_by.replace(':', '-')}@n={last_chunk.n}[{
+            offsets[1] - last_chunk.start_offset}]"""
 
 
 #%%
@@ -115,3 +123,4 @@ for i in range(len(data['ANCHOR_TARGET'])):
 offsets = mapper.selector_to_offsets(sample_selector)
 sample_text
 mapper.text
+

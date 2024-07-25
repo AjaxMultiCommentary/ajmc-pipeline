@@ -14,6 +14,13 @@ class TestTEI2TextMapper():
         assert isinstance(mapper.text, str)
         assert unicodedata.is_normalized('NFC', mapper.text)
 
+    def test_lines_for_offsets(self, mapper):
+        offsets = mapper.selector_to_offsets('tei-l@n=9[0]:tei-l@n=24[34]')
+        lines = mapper.lines_for_offsets(offsets)
+        
+        for idx, line in enumerate(lines, start=9):
+            assert line.n == str(idx)
+
     def test_offsets_to_selector(self, mapper):
         assert mapper.offsets_to_selector([38, 100]) == 'tei-l@n=2[4]:tei-l@n=3[29]'
 
