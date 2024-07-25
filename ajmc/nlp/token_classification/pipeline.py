@@ -209,12 +209,15 @@ def main(config_path: Optional[Path] = None, config_dict: Optional[dict] = None)
     datasets = prepare_datasets(config, tokenizer)
 
     if not config.model_path:
-        model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name,
-                                                                             num_labels=config.num_labels)
+        model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_name, num_labels=config.num_labels)
+
     else:
-        model = transformers.AutoModelForTokenClassification.from_pretrained(
-            config.model_name, num_labels=config.num_labels,
-            state_dict=get_canine_state_dict_from_shiba_safetensors(str(config.model_path)))
+        if 'canine' in config.model_name:
+            model = transformers.AutoModelForTokenClassification.from_pretrained(
+                config.model_name, num_labels=config.num_labels,
+                state_dict=get_canine_state_dict_from_shiba_safetensors(str(config.model_path)))
+        else:
+            model = transformers.AutoModelForTokenClassification.from_pretrained(config.model_path, num_labels=config.num_labels)
 
     if config.do_train:
         train(config=config,

@@ -48,6 +48,29 @@ class HipeDataset(torch.utils.data.Dataset):
         return len(self.tsv_line_numbers)
 
 
+def read_lemlink_tsv(tsv_path: Path) -> pd.DataFrame:
+    """Read a TSV file with the format of the lemlink dataset.
+
+    Note:
+        THIS IS INTENDED TO READ UNCOMMENTED TSV FILES.
+    """
+
+    df = pd.read_csv(tsv_path,
+                     # comment='#',
+                     sep='\t',
+                     header=None,
+                     quoting=csv.QUOTE_NONE,
+                     dtype=str,
+                     keep_default_na=False,
+                     names=['TOKEN', 'LABEL', 'ANCHOR_TEXT', 'ANCHOR_TARGET', 'RENDER', 'SEG', 'DOCUMENT_ID'])
+    # Add a column with the line number
+    df['n'] = df.index
+    # Replace the Labels B-Note and I-Note with O
+    df['LABEL'] = df['LABEL'].apply(lambda x: 'O' if x in ['B-note', 'I-note'] else x)
+    return df
+
+
+
 def prepare_datasets(config: 'argparse.Namespace', tokenizer):
     data = {}
     for split in ['train', 'eval']:
@@ -55,18 +78,8 @@ def prepare_datasets(config: 'argparse.Namespace', tokenizer):
             if config.data_format == 'ner':
                 data[split] = tsv_to_dict(path=getattr(config, split + '_path'), url=getattr(config, split + '_url'))
             elif config.data_format == 'lemlink':
-                df = pd.read_csv(getattr(config, split + '_path'),
-                                 # comment='#',
-                                 sep='\t',
-                                 header=None,
-                                 quoting=csv.QUOTE_NONE,
-                                 dtype=str,
-                                 keep_default_na=False,
-                                 names=['TOKEN', 'LABEL', 'ANCHOR_TEXT', 'ANCHOR_TARGET', 'RENDER', 'SEG', 'DOCUMENT_ID'])
-                # Replace the Labels B-Note and I-Note with O
-                df['LABEL'] = df['LABEL'].apply(lambda x: 'O' if x in ['B-note', 'I-note'] else x)
+                df = read_lemlink_tsv(getattr(config, split + '_path'))
                 data[split] = df.to_dict(orient='list')
-                data[split]['n'] = [i for i in range(len(data[split]['TOKEN']))]
 
     config.unique_labels = sort_ner_labels(
             get_unique_elements([data[k][config.labels_column] for k in data.keys()]))

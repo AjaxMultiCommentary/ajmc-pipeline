@@ -1,7 +1,7 @@
 import re
-import requests
 import unicodedata
 
+import requests
 from lxml import etree
 
 NAMESPACES = {
@@ -27,9 +27,7 @@ class TEI2TextMapper:
         self.tree = etree.XML(req.text, parser)
         self.chunk_by = chunk_by
 
-        all_text = self.tree.xpath(f"//{self.chunk_by}/text()", namespaces=NAMESPACES)[
-            0
-        ].strip()
+        all_text = ''.join(self.tree.xpath(f"//{self.chunk_by}/text()", namespaces=NAMESPACES)).strip()
 
         self.text = unicodedata.normalize("NFC", all_text)
         self._chunks = []
@@ -74,18 +72,46 @@ class TEI2TextMapper:
             chunk
             for chunk in self._chunks
             if offsets[0] >= chunk.start_offset
-            and offsets[0] < chunk.start_offset + len(chunk.text)
+               and offsets[0] < chunk.start_offset + len(chunk.text)
         ][0]
         last_chunk = [
             chunk
             for chunk in self._chunks
             if offsets[1] > chunk.start_offset
-            and chunk.start_offset + len(chunk.text) >= offsets[1]
+               and chunk.start_offset + len(chunk.text) >= offsets[1]
         ][0]
 
         return f"""{self.chunk_by.replace(':', '-')}@n={
-            first_chunk.elem.get('n')}[{
-            offsets[0] - first_chunk.start_offset}]:{
-            self.chunk_by.replace(':', '-')}@n={
-            last_chunk.elem.get('n')}[{
-            offsets[1] - last_chunk.start_offset}]"""
+        first_chunk.elem.get('n')}[{
+        offsets[0] - first_chunk.start_offset}]:{
+        self.chunk_by.replace(':', '-')}@n={
+        last_chunk.elem.get('n')}[{
+        offsets[1] - last_chunk.start_offset}]"""
+
+
+#%%
+from pathlib import Path
+from ajmc.nlp.token_classification.data_preparation.hipe_iob import read_lemlink_tsv
+
+sample_tsv_path = Path('/scratch/sven/ajmc_data/lemma-linkage-corpus/data/release/v1.0.beta/lemlink-v1.0.beta-test_NOCOMMENT.tsv')
+
+data = read_lemlink_tsv(sample_tsv_path)
+data = data.to_dict(orient='list')
+
+mapper = TEI2TextMapper('http://raw.githubusercontent.com/gregorycrane/Wolf1807/master/ajax-2019/ajax-lj.xml')
+
+for i in range(len(data['ANCHOR_TARGET'])):
+    if data['ANCHOR_TARGET'][i] != '_':
+        sample_selector = data['ANCHOR_TARGET'][i]
+        sample_text = data['ANCHOR_TEXT'][i]
+        break
+        # text = mapper.text[mapper.selector_to_offsets(data['ANCHOR_TARGET'][i])[0]:mapper.selector_to_offsets(data['ANCHOR_TARGET'][i])[1]]
+        # if text != data['ANCHOR_TEXT'][i]:
+        #     print(i, text, ' |||| ', data['ANCHOR_TEXT'][i])
+        # else:
+        #     print(i, 'OK')
+        # break
+
+offsets = mapper.selector_to_offsets(sample_selector)
+sample_text
+mapper.text

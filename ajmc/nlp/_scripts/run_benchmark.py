@@ -10,18 +10,22 @@ base_config = {
     "epochs": 40,
     "batch_size": 4,
     "evaluate_during_training": True,
-    "model_max_length": 2048,
+    # "model_max_length": 512,
 }
 model_names_and_paths = [
-    # ('dbmdz/bert-base-historic-multilingual-cased', None),
-    # ('bowphs/PhilBerta', None),
-    # ('FacebookAI/xlm-roberta-base', None),
-    # ('google/canine-c', None),
+    ('dbmdz/bert-base-historic-multilingual-cased', None),
+    ('bowphs/PhilBerta', None),
+    ('FacebookAI/xlm-roberta-base', None),
+    ('google/canine-c', None),
     ('google/canine-c', '/scratch/sven/canine/output/checkpoint-25000'),
     ('google/canine-c', '/scratch/sven/canine/output/checkpoint-50000'),
     ('google/canine-c', '/scratch/sven/canine/output/checkpoint-75000'),
     ('google/canine-c', '/scratch/sven/canine/output/checkpoint-100000'),
     ('google/canine-c', '/scratch/sven/canine/output/checkpoint-125000'),
+    ('xlm-roberta-base', '/scratch/sven/xlm-roberta-base/outputs/checkpoint-5000'),
+    ('xlm-roberta-base', '/scratch/sven/xlm-roberta-base/outputs/checkpoint-10000'),
+    ('xlm-roberta-base', '/scratch/sven/xlm-roberta-base/outputs/checkpoint-15000'),
+    ('xlm-roberta-base', '/scratch/sven/xlm-roberta-base/outputs/checkpoint-20000'),
 
 ]
 
@@ -70,8 +74,11 @@ for model_name, model_path in model_names_and_paths:
         config['eval_path'] = eval_paths[data_format]
         config['labels_column'] = labels_columns[data_format]
 
-        if config['model_name'] == 'bowphs/PhilBerta':
+        if 'canine' in config['model_name']:
+            config['model_max_length'] = 2048
+        else:
             config['model_max_length'] = 512
+
         main(config_dict=config)
 
 #%% We now generate a general results table for the experiments we just ran.
@@ -101,7 +108,7 @@ import matplotlib.pyplot as plt
 
 
 # Create a big single figure with all the plots of training loss and F1 score for each model and data format
-fig, axs = plt.subplots(int(len(model_names_and_paths)), 2, figsize=(20, 15))
+fig, axs = plt.subplots(int(len(model_names_and_paths)), 2, figsize=(12, 36))
 
 for i, (model_name, model_path) in enumerate(model_names_and_paths):
     for j, data_format in enumerate(['lemlink', 'ner']):

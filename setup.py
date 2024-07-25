@@ -137,6 +137,7 @@ setup(
         'PyYAML',
         'regex',
         'seqeval',
+        'sentence_transformers',
         'transformers',
         'tqdm',
         'evaluate',

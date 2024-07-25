@@ -1,7 +1,9 @@
-import pytest
 import unicodedata
 
+import pytest
+
 from ajmc.nlp.lemlink.data_preparation import TEI2TextMapper
+
 
 @pytest.fixture(scope="module")
 def mapper():
@@ -16,4 +18,7 @@ class TestTEI2TextMapper():
         assert mapper.offsets_to_selector([38, 100]) == 'tei-l@n=2[4]:tei-l@n=3[29]'
 
     def test_selector_to_offsets(self, mapper):
-        assert mapper.selector_to_offsets('tei-l@n=2[4]:tei-l@n=3[29]') == [38, 100]
+        offsets = mapper.selector_to_offsets('tei-l@n=9[0]:tei-l@n=9[34]')
+
+        assert offsets == [289, 323]
+        assert mapper.text[offsets[0]:offsets[1]] == 'ἔνδον γὰρ ἁνὴρ ἄρτι τυγχάνει, κάρα';
