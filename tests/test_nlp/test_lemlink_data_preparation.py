@@ -10,6 +10,7 @@ def mapper():
 class TestTEI2TextMapper():
     def test_init(self, mapper):
         assert isinstance(mapper.text, str)
+        assert len(mapper.text) > 1000
         assert unicodedata.is_normalized('NFC', mapper.text)
 
     def test_offsets_to_selector(self, mapper):
