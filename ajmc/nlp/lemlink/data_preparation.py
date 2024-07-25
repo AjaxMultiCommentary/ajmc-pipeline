@@ -27,7 +27,7 @@ class TEI2TextMapper:
         self.tree = etree.XML(req.text, parser)
         self.chunk_by = chunk_by
 
-        all_text = ' '.join(self.tree.xpath(f"//{self.chunk_by}/text()", namespaces=NAMESPACES)).strip()
+        all_text = ''.join(self.tree.xpath(f"//{self.chunk_by}/text()", namespaces=NAMESPACES)).strip()
 
         self.text = unicodedata.normalize("NFC", all_text)
         self._chunks = []
