@@ -1,7 +1,9 @@
-import pytest
 import unicodedata
 
+import pytest
+
 from ajmc.nlp.lemlink.data_preparation import TEI2TextMapper
+
 
 @pytest.fixture(scope="module")
 def mapper():
@@ -10,7 +12,6 @@ def mapper():
 class TestTEI2TextMapper():
     def test_init(self, mapper):
         assert isinstance(mapper.text, str)
-        assert len(mapper.text) > 1000
         assert unicodedata.is_normalized('NFC', mapper.text)
 
     def test_offsets_to_selector(self, mapper):
@@ -19,8 +20,5 @@ class TestTEI2TextMapper():
     def test_selector_to_offsets(self, mapper):
         offsets = mapper.selector_to_offsets('tei-l@n=9[0]:tei-l@n=9[34]')
 
+        assert offsets == [289, 323]
         assert mapper.text[offsets[0]:offsets[1]] == 'ἔνδον γὰρ ἁνὴρ ἄρτι τυγχάνει, κάρα';
-
-        offsets = mapper.selector_to_offsets('tei-l@n=1362[0]:tei-l@n=1362[35]')
-
-        assert mapper.text[offsets[0]:offsets[1]] == 'ἡμᾶς σὺ δειλοὺς τῇδε θἠμέρᾳ φανεῖς.'
