@@ -27,9 +27,6 @@ class TEI2TextMapper:
         self.tree = etree.XML(req.text, parser)
         self.chunk_by = chunk_by
 
-        all_text = ''.join(self.tree.xpath(f"//{self.chunk_by}/text()", namespaces=NAMESPACES)).strip()
-
-        self.text = unicodedata.normalize("NFC", all_text)
         self._chunks = []
 
         str_offset = 0
@@ -38,33 +35,37 @@ class TEI2TextMapper:
             chunk_text = chunk.text
 
             if chunk_text is not None:
+                t = unicodedata.normalize('NFC', chunk_text)
+
                 self._chunks.append(
                     Chunk(
-                        text=chunk_text,
+                        text=t,
                         start_offset=str_offset,
                         elem=chunk,
                     )
                 )
-                str_offset += len(chunk_text)
+                str_offset += len(t)
+
+        self.text = ''.join(c.text for c in self._chunks)
 
     def selector_to_offsets(self, selector: str):
-        [f, e] = selector.split(":")
+        [f, l] = selector.split(":")
 
         f_matches = SELECTOR_REGEX.search(f)
-        e_matches = SELECTOR_REGEX.search(e)
+        l_matches = SELECTOR_REGEX.search(l)
 
-        if f_matches is not None and e_matches is not None:
+        if f_matches is not None and l_matches is not None:
             f_n = f_matches.group("n")
-            e_n = e_matches.group("n")
+            l_n = l_matches.group("n")
             f_offset = f_matches.group("offset")
-            e_offset = e_matches.group("offset")
+            l_offset = l_matches.group("offset")
 
             f_chunk = [chunk for chunk in self._chunks if chunk.elem.get("n") == f_n][0]
-            e_chunk = [chunk for chunk in self._chunks if chunk.elem.get("n") == e_n][0]
+            l_chunk = [chunk for chunk in self._chunks if chunk.elem.get("n") == l_n][0]
 
             return [
                 f_chunk.start_offset + int(f_offset),
-                e_chunk.start_offset + int(e_offset),
+                l_chunk.start_offset + int(l_offset),
             ]
 
     def offsets_to_selector(self, offsets: list[int]):
