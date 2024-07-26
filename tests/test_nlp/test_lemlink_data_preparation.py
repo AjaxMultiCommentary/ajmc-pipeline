@@ -14,6 +14,12 @@ class TestTEI2TextMapper():
         assert isinstance(mapper.text, str)
         assert unicodedata.is_normalized('NFC', mapper.text)
 
+    def test_line_799(self, mapper):
+        l_799 = [chunk for chunk in mapper.chunks if chunk.n == '799'][0]
+
+        assert l_799.text is not None
+        assert l_799.text == 'τὴν ὀλεθρίαν Αἴαντος ἐλπίζει φέρειν.'
+
     def test_lines_for_offsets(self, mapper):
         offsets = mapper.selector_to_offsets('tei-l@n=9[0]:tei-l@n=24[34]')
         lines = mapper.lines_for_offsets(offsets)
@@ -25,7 +31,7 @@ class TestTEI2TextMapper():
         lines = mapper.lines_for_offsets(offsets)
 
         assert len(lines) == 2
-        
+
         for idx, line in enumerate(lines, start=208):
             assert line.n == str(idx)
 

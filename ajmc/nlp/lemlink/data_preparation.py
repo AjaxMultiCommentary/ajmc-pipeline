@@ -33,7 +33,7 @@ class TEI2TextMapper:
         str_offset = 0
 
         for chunk in self.tree.iterfind(f".//{self.chunk_by}", namespaces=NAMESPACES):
-            chunk_text = chunk.text
+            chunk_text = etree.tostring(chunk, encoding='unicode', method='text') # type: ignore
 
             if chunk_text is not None:
                 t = unicodedata.normalize("NFC", chunk_text)
@@ -47,6 +47,8 @@ class TEI2TextMapper:
                     )
                 )
                 str_offset += len(t)
+            else:
+                print(chunk.get('n'))
 
         self.text = "".join(c.text for c in self.chunks)
 
@@ -101,35 +103,35 @@ class TEI2TextMapper:
 
 
 # %%
-from pathlib import Path
-from ajmc.nlp.token_classification.data_preparation.hipe_iob import read_lemlink_tsv
-from ajmc.nlp.lemlink.data_preparation import TEI2TextMapper
+# from pathlib import Path
+# from ajmc.nlp.token_classification.data_preparation.hipe_iob import read_lemlink_tsv
+# from ajmc.nlp.lemlink.data_preparation import TEI2TextMapper
 
-sample_tsv_path = Path("~/Downloads/lemlink-v1.0.beta-test_NOCOMMENT.tsv")
+# sample_tsv_path = Path("~/Downloads/lemlink-v1.0.beta-test_NOCOMMENT.tsv")
 
-data = read_lemlink_tsv(sample_tsv_path)
-data = data.to_dict(orient="list")
+# data = read_lemlink_tsv(sample_tsv_path)
+# data = data.to_dict(orient="list")
 
-mapper = TEI2TextMapper(
-    "http://raw.githubusercontent.com/gregorycrane/Wolf1807/master/ajax-2019/ajax-lj.xml"
-)
+# mapper = TEI2TextMapper(
+#     "http://raw.githubusercontent.com/gregorycrane/Wolf1807/master/ajax-2019/ajax-lj.xml"
+# )
 
-for i in range(len(data["ANCHOR_TARGET"])):
-    if data["ANCHOR_TARGET"][i] != "_":
-        sample_selector = data["ANCHOR_TARGET"][i]
-        sample_text = data["ANCHOR_TEXT"][i]
-        # break
+# for i in range(len(data["ANCHOR_TARGET"])):
+#     if data["ANCHOR_TARGET"][i] != "_":
+#         sample_selector = data["ANCHOR_TARGET"][i]
+#         sample_text = data["ANCHOR_TEXT"][i]
+#         # break
 
-        if sample_selector is not None:
-            offsets = mapper.selector_to_offsets(data["ANCHOR_TARGET"][i])
+#         if sample_selector is not None:
+#             offsets = mapper.selector_to_offsets(data["ANCHOR_TARGET"][i])
 
-            if offsets is not None:
-                lines = mapper.lines_for_offsets(offsets)
-                text = " ".join(l.text for l in lines)
-                if text != data["ANCHOR_TEXT"][i]:
-                    print(i, text, " |||| ", data["ANCHOR_TEXT"][i])
-                else:
-                    print(i, "OK")
+#             if offsets is not None:
+#                 lines = mapper.lines_for_offsets(offsets)
+#                 text = " ".join(l.text for l in lines)
+#                 if text != data["ANCHOR_TEXT"][i]:
+#                     print(i, text, " |||| ", data["ANCHOR_TEXT"][i])
+#                 else:
+#                     print(i, "OK")
 #         # break
 
 # offsets = mapper.selector_to_offsets(sample_selector)
