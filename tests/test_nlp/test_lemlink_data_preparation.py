@@ -21,6 +21,14 @@ class TestTEI2TextMapper():
         for idx, line in enumerate(lines, start=9):
             assert line.n == str(idx)
 
+        offsets = mapper.selector_to_offsets('tei-l@n=208[0]:tei-l@n=209[15]')
+        lines = mapper.lines_for_offsets(offsets)
+
+        assert len(lines) == 2
+        
+        for idx, line in enumerate(lines, start=208):
+            assert line.n == str(idx)
+
     def test_offsets_to_selector(self, mapper):
         assert mapper.offsets_to_selector([38, 100]) == 'tei-l@n=2[4]:tei-l@n=3[29]'
 

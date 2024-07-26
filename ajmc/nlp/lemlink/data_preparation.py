@@ -54,10 +54,13 @@ class TEI2TextMapper:
         return [
             chunk
             for chunk in self.chunks
-            if chunk.start_offset >= offsets[0] and offsets[1] >= chunk.start_offset + len(chunk.text)
+            if chunk.start_offset >= offsets[0]
+            and offsets[1] >= chunk.start_offset + len(chunk.text)
         ]
 
     def selector_to_offsets(self, selector: str):
+        print(selector)
+
         [f, e] = selector.split(":")
 
         f_matches = SELECTOR_REGEX.search(f)
@@ -69,8 +72,10 @@ class TEI2TextMapper:
             f_offset = f_matches.group("offset")
             l_offset = e_matches.group("offset")
 
-            f_chunk = [chunk for chunk in self.chunks if chunk.elem.get("n") == f_n][0]
-            l_chunk = [chunk for chunk in self.chunks if chunk.elem.get("n") == l_n][0]
+            print("lskdjflksjflksdjlkj")
+            print(l_n)
+            f_chunk = [chunk for chunk in self.chunks if chunk.n == f_n][0]
+            l_chunk = [chunk for chunk in self.chunks if chunk.n == l_n][0]
 
             return [
                 f_chunk.start_offset + int(f_offset),
@@ -82,13 +87,13 @@ class TEI2TextMapper:
             chunk
             for chunk in self.chunks
             if offsets[0] >= chunk.start_offset
-               and offsets[0] < chunk.start_offset + len(chunk.text)
+            and offsets[0] < chunk.start_offset + len(chunk.text)
         ][0]
         last_chunk = [
             chunk
             for chunk in self.chunks
             if offsets[1] > chunk.start_offset
-               and chunk.start_offset + len(chunk.text) >= offsets[1]
+            and chunk.start_offset + len(chunk.text) >= offsets[1]
         ][0]
 
         return f"""{self.chunk_by.replace(':', '-')}@n={first_chunk.n}[{
@@ -97,30 +102,41 @@ class TEI2TextMapper:
             offsets[1] - last_chunk.start_offset}]"""
 
 
-#%%
+# %%
 from pathlib import Path
 from ajmc.nlp.token_classification.data_preparation.hipe_iob import read_lemlink_tsv
+from ajmc.nlp.lemlink.data_preparation import TEI2TextMapper
 
-sample_tsv_path = Path('/scratch/sven/ajmc_data/lemma-linkage-corpus/data/release/v1.0.beta/lemlink-v1.0.beta-test_NOCOMMENT.tsv')
+sample_tsv_path = Path("~/Downloads/lemlink-v1.0.beta-test_NOCOMMENT.tsv")
 
 data = read_lemlink_tsv(sample_tsv_path)
-data = data.to_dict(orient='list')
+data = data.to_dict(orient="list")
 
-mapper = TEI2TextMapper('http://raw.githubusercontent.com/gregorycrane/Wolf1807/master/ajax-2019/ajax-lj.xml')
+mapper = TEI2TextMapper(
+    "http://raw.githubusercontent.com/gregorycrane/Wolf1807/master/ajax-2019/ajax-lj.xml"
+)
 
-for i in range(len(data['ANCHOR_TARGET'])):
-    if data['ANCHOR_TARGET'][i] != '_':
-        sample_selector = data['ANCHOR_TARGET'][i]
-        sample_text = data['ANCHOR_TEXT'][i]
-        break
-        # text = mapper.text[mapper.selector_to_offsets(data['ANCHOR_TARGET'][i])[0]:mapper.selector_to_offsets(data['ANCHOR_TARGET'][i])[1]]
-        # if text != data['ANCHOR_TEXT'][i]:
-        #     print(i, text, ' |||| ', data['ANCHOR_TEXT'][i])
-        # else:
-        #     print(i, 'OK')
+for i in range(len(data["ANCHOR_TARGET"])):
+    if data["ANCHOR_TARGET"][i] != "_":
+        sample_selector = data["ANCHOR_TARGET"][i]
+        sample_text = data["ANCHOR_TEXT"][i]
         # break
 
-offsets = mapper.selector_to_offsets(sample_selector)
-sample_text
-mapper.text
+        if sample_selector is not None:
+            offsets = mapper.selector_to_offsets(data["ANCHOR_TARGET"][i])
 
+            if offsets is not None:
+                lines = mapper.lines_for_offsets(offsets)
+                text = " ".join(l.text for l in lines)
+                if text != data["ANCHOR_TEXT"][i]:
+                    print(i, text, " |||| ", data["ANCHOR_TEXT"][i])
+                else:
+                    print(i, "OK")
+#         # break
+
+# offsets = mapper.selector_to_offsets(sample_selector)
+# # sample_text
+# mapper.text
+
+
+# %%
