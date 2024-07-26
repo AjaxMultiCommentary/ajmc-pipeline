@@ -72,8 +72,6 @@ class TEI2TextMapper:
             f_offset = f_matches.group("offset")
             l_offset = e_matches.group("offset")
 
-            print("lskdjflksjflksdjlkj")
-            print(l_n)
             f_chunk = [chunk for chunk in self.chunks if chunk.n == f_n][0]
             l_chunk = [chunk for chunk in self.chunks if chunk.n == l_n][0]
 
