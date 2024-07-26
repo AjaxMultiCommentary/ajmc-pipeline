@@ -1,0 +1,187 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "source": [
+    "# Understanding the ajmc directory structure.\n",
+    "\n",
+    "`ajmc` has a systematic directory structure, which allows to deal efficiently with path-related problems.\n",
+    "\n",
+    "## The `root_dir`\n",
+    "The `root_dir` is be the root directory in which every commentary has its data stored in a directory named after its id. All the data for Campbell should therefore be in `root_dir/cu31924087948174`, as Campbell's id is `cu31924087948174`.\n",
+    "\n",
+    "The default `root_dir` is usually called from `variables.COMMS_DATA_DIR`, but this can be easilly customized.\n",
+    "\n",
+    "## Commentary directories structure\n",
+    "\n",
+    "Each commentary directory observes the following structure:\n",
+    "\n",
+    "- `images/png` contains the png images. It is the default place to look for images.\n",
+    "- `ocr` contains all the outputs and evaluation from ocrs\n",
+    "- `ocr/evaluation` contains only the corrected pages selected for evaluation of the model and their corresponding:\n",
+    "- `olr` contains the via_project.json, which stores information about olr.\n",
+    "\n",
+    "All these can be accessed in `variables`"
+   ],
+   "metadata": {
+    "collapsed": false
+   }
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "collapsed": true,
+    "ExecuteTime": {
+     "end_time": "2023-09-03T12:56:22.084250Z",
+     "start_time": "2023-09-03T12:56:22.081323Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "The path to ocr runs from commentary root should be `ocr/runs`\n",
+      "The path to the via_project from commentary root should be `olr/via_project.json`\n"
+     ]
+    }
+   ],
+   "source": [
+    "from ajmc.commons import variables as vs\n",
+    "\n",
+    "print(f\"\"\"The path to ocr runs from commentary root should be `{vs.COMM_OCR_RUNS_REL_DIR}`\"\"\")\n",
+    "print(f\"\"\"The path to the via_project from commentary root should be `{vs.COMM_VIA_REL_PATH}`\"\"\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Note that you can also get most of the paths for a specific commentary id using the various helpers in `ajmc.commons.variables`:"
+   ],
+   "metadata": {
+    "collapsed": false
+   }
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "The absolute path to the images-dir of sophoclesplaysa05campgoog is /Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/sophoclesplaysa05campgoog/images/png\n",
+      "The absolute path to the sections of sophoclesplaysa05campgoog is /Users/sven/drive/_AJAX/AjaxMultiCommentary/data/commentaries/commentaries_data/sophoclesplaysa05campgoog/sections.json\n"
+     ]
+    }
+   ],
+   "source": [
+    "commentary_id = 'sophoclesplaysa05campgoog'\n",
+    "\n",
+    "print(f\"\"\"The absolute path to the images-dir of {commentary_id} is {vs.get_comm_img_dir(commentary_id)}\"\"\")\n",
+    "print(f\"\"\"The absolute path to the sections of {commentary_id} is {vs.get_comm_sections_path(commentary_id)}\"\"\")\n"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2023-09-03T12:57:09.978435Z",
+     "start_time": "2023-09-03T12:57:09.973913Z"
+    }
+   }
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "In the end, the global structure looks like :\n",
+    "\n",
+    "```\n",
+    "cu31924087948174\n",
+    "     ├── canonical  # Canonical jsons\n",
+    "     │    ├── 1bm0b3_tess_final  # V1 canonical (for annotation/INCEpTION only)\n",
+    "     │    └── v2  # V2 canonical (for `CanonicalCommentary` importation)\n",
+    "     ├── images\n",
+    "     │    ├── pdf\n",
+    "     │    └── png\n",
+    "     ├── ner  # Named entity recognition data\n",
+    "     │    └── annotation\n",
+    "     │        └── xmi\n",
+    "     │            └── 1bm0b3_tess_final\n",
+    "     ├── ocr  # OCR data\n",
+    "     │    ├── annotation  # For Lace annotation\n",
+    "     │    │         └── lace_corrected\n",
+    "     │    ├── general_evaluation  # Evaluation of all `ocr/runs`\n",
+    "     │    ├── groundtruth  # OCR Groundtruth data\n",
+    "     │    │         ├── evaluation\n",
+    "     │    │         ├── images\n",
+    "     │    │         └── retraining\n",
+    "     │    └── runs  # OCR runs\n",
+    "     │        ├── 13p082_lace_base\n",
+    "     │        │         ├── evaluation\n",
+    "     │        │         ├── evaluation_fuzzy\n",
+    "     │        │         └── outputs\n",
+    "     │        ├── 13s0gR_ocrd_vanilla\n",
+    "     │        │         ├── evaluation\n",
+    "     │        │         ├── evaluation_fuzzy\n",
+    "     │        │         └── outputs\n",
+    "     │        ├── 1560he_ocrd_min\n",
+    "     │        │         ├── evaluation\n",
+    "     │        │         ├── evaluation_fuzzy\n",
+    "     │        │         └── outputs\n",
+    "     │        ├── 15o0a0_lace_base_cu31924087948174-...\n",
+    "     │        │         ├── evaluation\n",
+    "     │        │         └── outputs\n",
+    "     │        ├── 1bm0b3_tess_final\n",
+    "     │        │         └── outputs\n",
+    "     │        ├── 2480ei_greek-english_porson_sophoclesplaysa05campgoog\n",
+    "     │        │         ├── evaluation\n",
+    "     │        │         └── outputs\n",
+    "     │        ├── 28qmab_tess_base\n",
+    "     │        │         └── outputs\n",
+    "     │        ├── tess_eng_finetune-grc-pogretra\n",
+    "     │        │         ├── evaluation\n",
+    "     │        │         └── outputs\n",
+    "     │        └── tess_eng_grc\n",
+    "     │                 ├── evaluation\n",
+    "     │                 └── outputs\n",
+    "     └── olr\n",
+    "```"
+   ],
+   "metadata": {
+    "collapsed": false
+   }
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## OCR run ids\n",
+    "\n",
+    "As you may have notice, the id of a single OCR run (i.e. a single OCRing of a commentary with a given system and parameters) is used throughout the entire repository to identify the source of a commentary. If `ner/annotation/xmi` contains a directory named `1bm0b3_tess_final` it means that this specific annotation is perfomed using `ocr/runs/1bm0b3_tess_final/outputs` as its base."
+   ],
+   "metadata": {
+    "collapsed": false
+   }
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 0
+}

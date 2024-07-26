@@ -1,0 +1,686 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="ajmc.corpora package" href="ajmc.corpora.html" /><link rel="prev" title="ajmc package" href="ajmc.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2023.08.19 -->
+        <title>ajmc.commons package - ajmc v0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">ajmc v0.0.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">ajmc v0.0.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">ajmc</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of ajmc</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="ajmc.html">ajmc package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of ajmc package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">ajmc.commons package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ajmc.corpora.html">ajmc.corpora package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ajmc.nlp.html">ajmc.nlp package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of ajmc.nlp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="ajmc.nlp.token_classification.html">ajmc.nlp.token_classification package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of ajmc.nlp.token_classification package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="ajmc.nlp.token_classification.data_preparation.html">ajmc.nlp.token_classification.data_preparation package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ajmc.ocr.html">ajmc.ocr package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of ajmc.ocr package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="ajmc.ocr.preprocessing.html">ajmc.ocr.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ajmc.ocr.pytorch.html">ajmc.ocr.pytorch package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ajmc.ocr.tesseract.html">ajmc.ocr.tesseract package</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ajmc.olr.html">ajmc.olr package</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of ajmc.olr package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="ajmc.olr.layoutlm.html">ajmc.olr.layoutlm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ajmc.olr.yolo.html">ajmc.olr.yolo package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ajmc.text_processing.html">ajmc.text_processing package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="other_pages/base_functionalities.html">Basic functionalities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_pages/commentary_importation_pipeline.html">Commentary importation pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_pages/data_organisation.html">Understanding the ajmc directory structure.</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="other_pages/introduction_to_code.html">Understanding the goal of the library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_pages/introduction_to_code.html#The-commons-directory">The commons directory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_pages/introduction_to_code.html#The-text_processing-directory">The <code class="docutils literal notranslate"><span class="pre">text_processing</span></code> directory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_pages/contributing_guidelines.html">Contributing guidelines</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-ajmc.commons">
+<span id="ajmc-commons-package"></span><h1>ajmc.commons package<a class="headerlink" href="#module-ajmc.commons" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">ajmc.commons</span></code> contains all the utilities (helpers, functions, objects, hard-coded variables) which are common (i.e. which must be accessible) to
+task-specific repositories. These include notably:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">file_management</span></code> utilities, which allow to handle files systematically in the ajmc’s data organisation (see <code class="docutils literal notranslate"><span class="pre">notebooks/data_organisation.ipnb</span></code> for more) and to retrieve information from the various project spreadsheets.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">arithmetic.py</span></code> contains helper maths function, mainly to deal with intervals, which are a common object in our Canonical format (of which more below).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docstrings.py</span></code> centralizes common function and class docstrings in a single place and provides a decorator to retrieve them easily.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geometry.py</span></code> provides helper functions and an object, <code class="docutils literal notranslate"><span class="pre">Shape</span></code>, to deal with geometrical objects such as contours and bounding boxes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">image.py</span></code> provides helper functions and an object, <code class="docutils literal notranslate"><span class="pre">AjmcImage</span></code>, to deal with images.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">miscellaneous.py</span></code> receives everything which doesn’t fit anywhere else. It notably contains generic functions and decorator, lazy objects for efficiency etc…</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">variables</span></code> contains all the hard-coded variables such as PATHS, COLORS, SPREADSHEET_IDS, CHARSETS and many more.</p></li>
+</ul>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-ajmc.commons.arithmetic">
+<span id="ajmc-commons-arithmetic-module"></span><h2>ajmc.commons.arithmetic module<a class="headerlink" href="#module-ajmc.commons.arithmetic" title="Link to this heading">¶</a></h2>
+<p>This module contains basic arithmetic functions.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.arithmetic.are_intervals_within_intervals">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.arithmetic.</span></span><span class="sig-name descname"><span class="pre">are_intervals_within_intervals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contained</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/ajmc/commons/arithmetic.html#are_intervals_within_intervals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.arithmetic.are_intervals_within_intervals" title="Link to this definition">¶</a></dt>
+<dd><p>Applies <code class="docutils literal notranslate"><span class="pre">is_interval_within_interval</span></code> on a list of intervals, making sure that all the contained intervals
+are contained in one of the container intervals.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.arithmetic.compute_interval_overlap">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.arithmetic.</span></span><span class="sig-name descname"><span class="pre">compute_interval_overlap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ajmc/commons/arithmetic.html#compute_interval_overlap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.arithmetic.compute_interval_overlap" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the overlap between two intervals defined by their start and their stop included.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i1</strong> – A <code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code> defining the included boundaries of an interval, with start &lt;= stop.</p></li>
+<li><p><strong>i2</strong> – A <code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code> defining the included boundaries of an interval, with start &lt;= stop.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The length of the overlap.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.arithmetic.is_interval_within_interval">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.arithmetic.</span></span><span class="sig-name descname"><span class="pre">is_interval_within_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contained</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/ajmc/commons/arithmetic.html#is_interval_within_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.arithmetic.is_interval_within_interval" title="Link to this definition">¶</a></dt>
+<dd><p>Checks if the <code class="docutils literal notranslate"><span class="pre">contained</span></code>, interval is included in the <code class="docutils literal notranslate"><span class="pre">container</span></code> interval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container</strong> – A <code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code> defining the included boundaries of an interval, with start &lt;= stop.</p></li>
+<li><p><strong>contained</strong> – A <code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code> defining the included boundaries of an interval, with start &lt;= stop.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.arithmetic.safe_divide">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.arithmetic.</span></span><span class="sig-name descname"><span class="pre">safe_divide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dividend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">divisor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ajmc/commons/arithmetic.html#safe_divide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.arithmetic.safe_divide" title="Link to this definition">¶</a></dt>
+<dd><p>Simple division which return <code class="docutils literal notranslate"><span class="pre">np.nan</span></code> if <code class="docutils literal notranslate"><span class="pre">divisor</span></code> equals zero.</p>
+</dd></dl>
+
+</section>
+<section id="module-ajmc.commons.docstrings">
+<span id="ajmc-commons-docstrings-module"></span><h2>ajmc.commons.docstrings module<a class="headerlink" href="#module-ajmc.commons.docstrings" title="Link to this heading">¶</a></h2>
+<p>This file contains generic docstring chunks to be formatted using``docstring_formatter``.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.docstrings.docstring_formatter">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.docstrings.</span></span><span class="sig-name descname"><span class="pre">docstring_formatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ajmc/commons/docstrings.html#docstring_formatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.docstrings.docstring_formatter" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator with arguments used to format the docstring of a functions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">docstring_formatter</span></code> is a decorator with arguments, which means that it takes any set of <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> as argument and
+returns a decorator. It should therefore always be called with parentheses (unlike traditional decorators - see
+below). It follows the grammar of <code class="docutils literal notranslate"><span class="pre">str.format()</span></code>, i.e. <code class="docutils literal notranslate"><span class="pre">{my_format_value}</span></code>.
+grammar.</p>
+<p class="rubric">Example</p>
+<p>This code snippet:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nd">@docstring_formatter</span><span class="p">(</span><span class="n">greeting</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_func</span><span class="p">():</span>
+    <span class="s2">&quot;A simple greeter that says </span><span class="si">{greeting}</span><span class="s2">&quot;</span>
+    <span class="c1"># Do your stuff</span>
+</pre></div>
+</div>
+<p>Is actually equivalent with :</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_func</span><span class="p">():</span>
+    <span class="s2">&quot;A simple greeter that says </span><span class="si">{greeting}</span><span class="s2">&quot;</span>
+    <span class="c1"># Do your stuff</span>
+
+<span class="n">my_func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">my_func</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">greeting</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Best practice is to name your arguments in compliance with <code class="docutils literal notranslate"><span class="pre">docstrings.docstrings</span></code> in order to simply call
+<code class="docutils literal notranslate"><span class="pre">&#64;doctring_formatter(**docstrings.docstrings)</span></code>.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="ajmc-commons-file-management-module">
+<h2>ajmc.commons.file_management module<a class="headerlink" href="#ajmc-commons-file-management-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="ajmc-commons-geometry-module">
+<h2>ajmc.commons.geometry module<a class="headerlink" href="#ajmc-commons-geometry-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="ajmc-commons-image-module">
+<h2>ajmc.commons.image module<a class="headerlink" href="#ajmc-commons-image-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="ajmc-commons-miscellaneous-module">
+<h2>ajmc.commons.miscellaneous module<a class="headerlink" href="#ajmc-commons-miscellaneous-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-ajmc.commons.unicode_utils">
+<span id="ajmc-commons-unicode-utils-module"></span><h2>ajmc.commons.unicode_utils module<a class="headerlink" href="#module-ajmc.commons.unicode_utils" title="Link to this heading">¶</a></h2>
+<p>This file contains unicode variables and functions which serve processing unicode characters.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.chunk_string_by_charsets">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">chunk_string_by_charsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fallback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'latin'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#chunk_string_by_charsets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.chunk_string_by_charsets" title="Link to this definition">¶</a></dt>
+<dd><p>Chunk a string by character set, returning a list of tuples of the form (chunk, charset).</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chunk_string_by_charsets</span><span class="p">(</span><span class="s1">&#39;Hello Γειά σου Κόσμε World&#39;</span><span class="p">)</span>
+<span class="go">[(&#39;Hello &#39;, &#39;latin&#39;), (&#39;Γειά σου Κόσμε &#39;, &#39;greek&#39;), (&#39;World&#39;, &#39;latin&#39;)]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>string</strong> (<em>str</em>) – The string to chunk.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples of the form (chunk, charset).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.count_chars_by_charset">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">count_chars_by_charset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#count_chars_by_charset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.count_chars_by_charset" title="Link to this definition">¶</a></dt>
+<dd><p>Counts the number of chars by unicode characters set.</p>
+<p class="rubric">Example</p>
+<p><code class="docutils literal notranslate"><span class="pre">count_chars_by_charset('γεια</span> <span class="pre">σας,</span> <span class="pre">world',</span> <span class="pre">'greek')</span></code> returns <code class="docutils literal notranslate"><span class="pre">7</span></code> as there are 7 greek
+chars in <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> – a NFC-normalized string (default). For NFD-normalized strings, use <code class="docutils literal notranslate"><span class="pre">count_chars_by_charset_nfd</span></code>.</p></li>
+<li><p><strong>charset</strong> – should be <code class="docutils literal notranslate"><span class="pre">'greek'</span></code>, <code class="docutils literal notranslate"><span class="pre">'latin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'numeral'</span></code>, <code class="docutils literal notranslate"><span class="pre">'punctuation'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the number of charset-matching characters in <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.count_chars_by_charset_nfd">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">count_chars_by_charset_nfd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#count_chars_by_charset_nfd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.count_chars_by_charset_nfd" title="Link to this definition">¶</a></dt>
+<dd><p>Counts the number of chars by unicode characters set.</p>
+<p class="rubric">Example</p>
+<p><code class="docutils literal notranslate"><span class="pre">count_chars_by_charset('γεια</span> <span class="pre">σας,</span> <span class="pre">world',</span> <span class="pre">'greek')</span></code> returns <code class="docutils literal notranslate"><span class="pre">7</span></code> as there are 7 greek
+chars in <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> – a NFD-normalized string. For NFC-normalized strings, use <code class="docutils literal notranslate"><span class="pre">count_chars_by_charset</span></code>.</p></li>
+<li><p><strong>charset</strong> – should be <code class="docutils literal notranslate"><span class="pre">'greek'</span></code>, <code class="docutils literal notranslate"><span class="pre">'latin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'numeral'</span></code>, <code class="docutils literal notranslate"><span class="pre">'punctuation'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the number of charset-matching characters in <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.get_all_chars_from_range">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">get_all_chars_from_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#get_all_chars_from_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.get_all_chars_from_range" title="Link to this definition">¶</a></dt>
+<dd><p>Get all characters from a range of unicode characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<em>str</em>) – The first character in the range.</p></li>
+<li><p><strong>end</strong> (<em>str</em>) – The last character in the    range.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string containing all characters in the range.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.get_all_chars_from_ranges">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">get_all_chars_from_ranges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#get_all_chars_from_ranges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.get_all_chars_from_ranges" title="Link to this definition">¶</a></dt>
+<dd><p>Get all characters from a list of ranges of unicode characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ranges</strong> (<em>list</em>) – A list of tuples of unicode characters ranges.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string containing all characters in the ranges.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.get_char_charset">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">get_char_charset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fallback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'fallback'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#get_char_charset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.get_char_charset" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the charset of a character, if any, <code class="docutils literal notranslate"><span class="pre">fallback</span></code> otherwise.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.get_char_unicode_name">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">get_char_unicode_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#get_char_unicode_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.get_char_unicode_name" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the unicode name of a character.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.get_string_charset">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">get_string_charset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fallback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'latin'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#get_string_charset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.get_string_charset" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the charset of a string, if any, <code class="docutils literal notranslate"><span class="pre">fallback</span></code> otherwise.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.harmonise_ligatures">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">harmonise_ligatures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#harmonise_ligatures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.harmonise_ligatures" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.harmonise_miscellaneous_symbols">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">harmonise_miscellaneous_symbols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#harmonise_miscellaneous_symbols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.harmonise_miscellaneous_symbols" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.harmonise_non_printable">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">harmonise_non_printable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#harmonise_non_printable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.harmonise_non_printable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.harmonise_punctuation">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">harmonise_punctuation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#harmonise_punctuation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.harmonise_punctuation" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.harmonise_spaces">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">harmonise_spaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#harmonise_spaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.harmonise_spaces" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.harmonise_unicode">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">harmonise_unicode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">text:</span> <span class="pre">str,</span> <span class="pre">harmonise_functions:</span> <span class="pre">~typing.Tuple[~typing.Callable[[str],</span> <span class="pre">str]]</span> <span class="pre">=</span> <span class="pre">(&lt;function</span> <span class="pre">harmonise_punctuation&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">harmonise_miscellaneous_symbols&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">harmonise_ligatures&gt;)</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#harmonise_unicode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.harmonise_unicode" title="Link to this definition">¶</a></dt>
+<dd><p>Harmonise unicode characters.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function takes an <code class="docutils literal notranslate"><span class="pre">NFC</span></code> string and returns an <code class="docutils literal notranslate"><span class="pre">NFC</span></code> string.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to harmonise.</p></li>
+<li><p><strong>harmonise_functions</strong> (<em>tuple</em>) – A tuple of functions to apply to the text. Each function should take an NFC string as input and return an NFC string as output.</p></li>
+<li><p><strong>harmonise_space_chars</strong> (<em>bool</em>) – Whether to harmonise space characters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The harmonised text (an <code class="docutils literal notranslate"><span class="pre">NFC</span></code> string).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.is_charset_string">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">is_charset_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#is_charset_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.is_charset_string" title="Link to this definition">¶</a></dt>
+<dd><p>Returns True if more than <code class="docutils literal notranslate"><span class="pre">threshold</span></code> of chars in string are in <code class="docutils literal notranslate"><span class="pre">charset</span></code>, False otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> – self explanatory</p></li>
+<li><p><strong>charset</strong> – should be <code class="docutils literal notranslate"><span class="pre">'greek'</span></code>, <code class="docutils literal notranslate"><span class="pre">'latin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'numeral'</span></code>, <code class="docutils literal notranslate"><span class="pre">'punctuation'</span></code> or a valid <code class="docutils literal notranslate"><span class="pre">re</span></code>-pattern,
+for instance <code class="docutils literal notranslate"><span class="pre">r'([ô-ÿ])'</span></code></p></li>
+<li><p><strong>threshold</strong> – the threshold above which the function returns True</p></li>
+<li><p><strong>strict</strong> – if True, only chars in <code class="docutils literal notranslate"><span class="pre">charset</span></code> are considered, if False, chars in <code class="docutils literal notranslate"><span class="pre">charset</span></code>, <code class="docutils literal notranslate"><span class="pre">'numeral'</span></code> and
+<code class="docutils literal notranslate"><span class="pre">'punctuation'</span></code> are considered.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.is_charset_string_nfd">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">is_charset_string_nfd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#is_charset_string_nfd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.is_charset_string_nfd" title="Link to this definition">¶</a></dt>
+<dd><p>Returns True if more than <code class="docutils literal notranslate"><span class="pre">threshold</span></code> of chars in string are in <code class="docutils literal notranslate"><span class="pre">charset</span></code>, False otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> – a NFD-normalized string. For NFC-normalized strings, use <code class="docutils literal notranslate"><span class="pre">is_charset_string</span></code>.</p></li>
+<li><p><strong>charset</strong> – should be <code class="docutils literal notranslate"><span class="pre">'greek'</span></code>, <code class="docutils literal notranslate"><span class="pre">'latin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'numeral'</span></code>, <code class="docutils literal notranslate"><span class="pre">'punctuation'</span></code>.</p></li>
+<li><p><strong>threshold</strong> – the threshold above which the function returns True</p></li>
+<li><p><strong>strict</strong> – if True, only chars in <code class="docutils literal notranslate"><span class="pre">charset</span></code> are considered, if False, chars in <code class="docutils literal notranslate"><span class="pre">charset</span></code>, <code class="docutils literal notranslate"><span class="pre">'numeral'</span></code> and
+<code class="docutils literal notranslate"><span class="pre">'punctuation'</span></code> are considered.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ajmc.commons.unicode_utils.remove_diacritics">
+<span class="sig-prename descclassname"><span class="pre">ajmc.commons.unicode_utils.</span></span><span class="sig-name descname"><span class="pre">remove_diacritics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ajmc/commons/unicode_utils.html#remove_diacritics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ajmc.commons.unicode_utils.remove_diacritics" title="Link to this definition">¶</a></dt>
+<dd><p>Removes diacritical marks via NFKD normalization and recombination.
+Useful for building search indexes (and searching against them).</p>
+<p>Example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">remove_diacritics</span><span class="p">(</span><span class="s2">&quot;μῆνιν ἄειδε, θεά&quot;</span><span class="p">)</span>
+<span class="go">&#39;μηνιν αειδε θεα&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="ajmc-commons-variables-module">
+<h2>ajmc.commons.variables module<a class="headerlink" href="#ajmc-commons-variables-module" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ajmc.corpora.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ajmc.corpora package</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ajmc.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ajmc package</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Sven Najem-Meyer
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ajmc.commons package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-ajmc.commons.arithmetic">ajmc.commons.arithmetic module</a><ul>
+<li><a class="reference internal" href="#ajmc.commons.arithmetic.are_intervals_within_intervals"><code class="docutils literal notranslate"><span class="pre">are_intervals_within_intervals()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.arithmetic.compute_interval_overlap"><code class="docutils literal notranslate"><span class="pre">compute_interval_overlap()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.arithmetic.is_interval_within_interval"><code class="docutils literal notranslate"><span class="pre">is_interval_within_interval()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.arithmetic.safe_divide"><code class="docutils literal notranslate"><span class="pre">safe_divide()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-ajmc.commons.docstrings">ajmc.commons.docstrings module</a><ul>
+<li><a class="reference internal" href="#ajmc.commons.docstrings.docstring_formatter"><code class="docutils literal notranslate"><span class="pre">docstring_formatter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ajmc-commons-file-management-module">ajmc.commons.file_management module</a></li>
+<li><a class="reference internal" href="#ajmc-commons-geometry-module">ajmc.commons.geometry module</a></li>
+<li><a class="reference internal" href="#ajmc-commons-image-module">ajmc.commons.image module</a></li>
+<li><a class="reference internal" href="#ajmc-commons-miscellaneous-module">ajmc.commons.miscellaneous module</a></li>
+<li><a class="reference internal" href="#module-ajmc.commons.unicode_utils">ajmc.commons.unicode_utils module</a><ul>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.chunk_string_by_charsets"><code class="docutils literal notranslate"><span class="pre">chunk_string_by_charsets()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.count_chars_by_charset"><code class="docutils literal notranslate"><span class="pre">count_chars_by_charset()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.count_chars_by_charset_nfd"><code class="docutils literal notranslate"><span class="pre">count_chars_by_charset_nfd()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.get_all_chars_from_range"><code class="docutils literal notranslate"><span class="pre">get_all_chars_from_range()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.get_all_chars_from_ranges"><code class="docutils literal notranslate"><span class="pre">get_all_chars_from_ranges()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.get_char_charset"><code class="docutils literal notranslate"><span class="pre">get_char_charset()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.get_char_unicode_name"><code class="docutils literal notranslate"><span class="pre">get_char_unicode_name()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.get_string_charset"><code class="docutils literal notranslate"><span class="pre">get_string_charset()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.harmonise_ligatures"><code class="docutils literal notranslate"><span class="pre">harmonise_ligatures()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.harmonise_miscellaneous_symbols"><code class="docutils literal notranslate"><span class="pre">harmonise_miscellaneous_symbols()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.harmonise_non_printable"><code class="docutils literal notranslate"><span class="pre">harmonise_non_printable()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.harmonise_punctuation"><code class="docutils literal notranslate"><span class="pre">harmonise_punctuation()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.harmonise_spaces"><code class="docutils literal notranslate"><span class="pre">harmonise_spaces()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.harmonise_unicode"><code class="docutils literal notranslate"><span class="pre">harmonise_unicode()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.is_charset_string"><code class="docutils literal notranslate"><span class="pre">is_charset_string()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.is_charset_string_nfd"><code class="docutils literal notranslate"><span class="pre">is_charset_string_nfd()</span></code></a></li>
+<li><a class="reference internal" href="#ajmc.commons.unicode_utils.remove_diacritics"><code class="docutils literal notranslate"><span class="pre">remove_diacritics()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ajmc-commons-variables-module">ajmc.commons.variables module</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=2fea6348"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>
